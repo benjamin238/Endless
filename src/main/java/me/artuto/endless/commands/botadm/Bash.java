@@ -19,6 +19,8 @@ package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import net.dv8tion.jda.core.Permission;
 
 /**
@@ -41,20 +43,45 @@ public class Bash extends Command
     
     @Override
     protected void execute(CommandEvent event) 
-    {        
+    {       
         if(!(event.isOwner()) || event.isCoOwner())
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
             return;
         }
+        if(event.getArgs().isEmpty())
+        {
+            event.replyError("Cannot execute a empty command");
+            return;
+        }
         
-        try
-        {
-            event.replySuccess("Done! Output: \n```\n"+Runtime.getRuntime().exec(new String(event.getArgs()))+" ```");
-        }
-        catch(Exception e)
-        {
-           event.replyError("Error! Output:\n```\n"+e+" ```");         
-        }
+        Bash obj = new Bash();
+
+	String output = obj.executeCommand(event.getArgs());
+                
+        event.reply("Output: \n```\n"+output+" ```");      
     }
+    
+    	private String executeCommand(String command) {
+
+		StringBuilder output = new StringBuilder();
+
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(command);
+			p.waitFor();
+			BufferedReader reader =
+                            new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+                        String line = "";
+			while ((line = reader.readLine())!= null) {
+				output.append(line + "\n");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return output.toString();
+	}
 }

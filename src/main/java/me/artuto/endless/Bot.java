@@ -84,7 +84,7 @@ public class Bot implements EventListener
                 
                 //Bot Administration
                 
-                //new Bash(), //Do not enable this! Still on development
+                new Bash(),
                 new Eval(),
                 new Shutdown(),
                 

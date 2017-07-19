@@ -19,11 +19,13 @@ package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import java.awt.Color;
 import me.artuto.endless.Const;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 
 /**
  *
@@ -46,9 +48,10 @@ public class About extends Command
     @Override
     protected void execute(CommandEvent event)
     {
+       Color color = event.getSelfMember().getColor();
        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
        EmbedBuilder builder = new EmbedBuilder();
-              builder.setColor(event.getSelfMember().getColor());
+              builder.setColor(color);
               builder.setDescription("Hi, I'm Endless! A multipurpose bot designed to be smart.\n"
               		+ "If you found a bug please contact my dad\n"
               		+ "(`@Artuto#0424 | 264499432538505217`)!\n");
