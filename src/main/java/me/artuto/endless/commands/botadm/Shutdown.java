@@ -48,7 +48,9 @@ public class Shutdown extends Command
             return;
         }
         
-        event.getTextChannel().sendMessage("Done! Good bye!").queue();
+        event.getTextChannel().sendMessage("Done! Good bye!").complete();
         event.getJDA().shutdown();
     }
+    
+    
 }
