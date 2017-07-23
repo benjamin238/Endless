@@ -26,3 +26,4 @@ config.yml
 
 # Other things
 logs/*
+log*
