@@ -19,7 +19,11 @@ package me.artuto.endless;
 
 import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
+import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
@@ -42,10 +46,25 @@ import me.artuto.endless.commands.tools.*;
  * @author Artu
  */
 
-public class Bot implements EventListener
-{
+public class Bot implements EventListener 
+{   
+    private final SimpleLog LOG = SimpleLog.getLog("Startup Checker");
+    
     public static void main(String[] args) throws IOException, LoginException, IllegalArgumentException, RateLimitedException
     {
+        File file = new File("logs");
+        if (!file.exists())
+            {
+                if (file.mkdir())
+                {
+                    System.out.println("'logs' directory created!");
+                } 
+                else 
+                {
+                    throw new IOException("I was not able to create the 'logs' folder, please check you have the correct permissions.");
+                }
+            }
+        
         Config config;
         try{
             config = new Config();
@@ -120,12 +139,13 @@ public class Bot implements EventListener
     public void onEvent(Event event)
     {
         if (event instanceof ReadyEvent)
+        {
             System.out.println("[ENDLESS]: My robotic body is ready!\n"
                     + "[ENDLESS]: Logged in as: "+event.getJDA().getSelfUser().getName()+"#"+event.getJDA().getSelfUser().getDiscriminator()
                     + "("+event.getJDA().getSelfUser().getId()+")\n"
                     + "[ENDLESS]: Using prefix: "+Config.getPrefix()+"\n"
                     + "[ENDLESS]: Owner: "+Config.getOwnerTag()+"("+Config.getOwnerId()+")\n"
                     + "[ENDLESS]: Co-Owner: "+Config.getCoOwnerTag()+" ("+Config.getCoOwnerId()+")\n");
+        }
     }
-    
 }
