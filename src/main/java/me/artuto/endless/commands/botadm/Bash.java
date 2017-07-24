@@ -20,6 +20,7 @@ package me.artuto.endless.commands.botadm;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import net.dv8tion.jda.core.Permission;
 
@@ -54,34 +55,36 @@ public class Bash extends Command
             event.replyError("Cannot execute a empty command");
             return;
         }
-        
-        Bash obj = new Bash();
 
-	String output = obj.executeCommand(event.getArgs());
+        StringBuilder output = new StringBuilder();
+        String finalOutput;
+        try {
+            Process p = Runtime.getRuntime().exec(event.getArgs());
+            p.waitFor();
+            BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String runningLineOutput;
+            while ((runningLineOutput = reader.readLine())!= null) {
+                output.append(runningLineOutput).append("\n");
+            }
+
+            if (output.toString().isEmpty()) {
+                event.replySuccess("Done, with no output!");
+                return;
+            }
+
+            // Remove linebreak
+            finalOutput = output.substring(0, output.length() - 1);
+        } catch (IOException e) {
+            event.replyError("I wasn't able to find the command `" + args + "`!");
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            event.replyError("An unknown error occurred! Ask a bot owner to check the bot console.");
+            return;
+        }
                 
-        event.reply("Output: \n```\n"+output+" ```");      
+        event.reply("Output: \n```\n"+finalOutput+" ```");
     }
-    
-    	private String executeCommand(String command) {
-
-		StringBuilder output = new StringBuilder();
-
-		Process p;
-		try {
-			p = Runtime.getRuntime().exec(command);
-			p.waitFor();
-			BufferedReader reader =
-                            new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-                        String line = "";
-			while ((line = reader.readLine())!= null) {
-				output.append(line + "\n");
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return output.toString();
-	}
 }
