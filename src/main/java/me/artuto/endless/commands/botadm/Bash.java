@@ -68,6 +68,7 @@ public class Bash extends Command
             while ((runningLineOutput = reader.readLine())!= null) {
                 output.append(runningLineOutput).append("\n");
             }
+            System.out.println(output.toString());
 
             if (output.toString().isEmpty()) {
                 event.replySuccess("Done, with no output!");
@@ -79,9 +80,11 @@ public class Bash extends Command
         } catch (IOException e) {
             event.replyError("I wasn't able to find the command `" + args + "`!");
             return;
+        } catch (IllegalArgumentException e) {
+            event.replyError("Command output too long!");
         } catch (Exception e) {
             e.printStackTrace();
-            event.replyError("An unknown error occurred! Ask a bot owner to check the bot console.");
+            event.replyError("An unknown error occurred! Check the bot console.");
             return;
         }
                 
