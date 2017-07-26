@@ -27,3 +27,7 @@ config.yml
 # Other things
 logs/*
 log*
+target*
+target/*
+nb-configuration.xml
+dependency-reduced-pom.xml

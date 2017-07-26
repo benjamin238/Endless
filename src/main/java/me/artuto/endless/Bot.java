@@ -104,11 +104,13 @@ public class Bot implements EventListener
                 //Bot Administration
                 
                 new Bash(),
+                new BotCPanel(),
                 new Eval(),
                 new Shutdown(),
                 
                 //Moderation
                 
+                new Ban(),
                 new Kick(),
                 
                 //Tools

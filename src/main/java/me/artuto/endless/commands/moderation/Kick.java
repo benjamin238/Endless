@@ -19,8 +19,15 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import java.awt.Color;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
 /**
  *
@@ -44,24 +51,66 @@ public class Kick extends Command
     @Override
     protected void execute(CommandEvent event)
     {
+        EmbedBuilder builder = new EmbedBuilder();
+        String reason = event.getArgs().replaceAll("<@!?\\d+>", "");
         Member member;
-    	if(event.getMessage().getMentionedUsers().isEmpty())
-    	{
-    		try
-    		{
-    			member = event.getGuild().getMemberById(event.getArgs());
-    		} catch(Exception e) 
-    		    		    		
-    		{
-    			member = null;
-    		}
+        if(event.getMessage().getMentionedUsers().isEmpty())
+        {
+            try
+    	    {
+    		member = event.getGuild().getMemberById(event.getArgs());
+    	    } 
+            catch(Exception e)    		
+    	   {
+    		member = null;
+    	    }
     	}
+       
     	else
-    		member = event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
+        {
+            member = event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
+        }
+    	
     	if(member==null)
     	{
     		event.reply(event.getClient().getError()+" I wasn't able to find the user "+event.getArgs());
     		return;
-    	}
+    	}        
+    
+        if(!event.getSelfMember().canInteract(member))
+        {
+            event.replyError("I can't kick the specified user!");
+            return;
+        }
+        
+        if(!event.getMember().canInteract(member))
+        {
+            event.replyError("You can't kick the specified user!");
+            return;
+        }
+        
+        try
+        {
+           
+           event.getGuild().getController().kick(member).reason(reason).queue();
+           event.replySuccess("Kicked user **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with reason **"+reason+"**");
+           
+           builder.setColor(Color.YELLOW);
+           builder.setThumbnail(event.getGuild().getIconUrl());
+           builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+           builder.setTitle("Kick");
+           builder.setDescription("You were kicked on the guild **"+event.getGuild().getName()+"** by **"
+                   +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
+                   + "They gave the following reason: **"+reason+"**\n");
+           builder.setFooter("Time", null);
+           builder.setTimestamp(Instant.now());
+           
+           member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, (e) -> 
+                   event.replyWarning("I was not able to DM the user due they has DM on Mutual Guilds off!")));               
+        }
+        catch(Exception e)
+        {
+            
+        }
     }
 }

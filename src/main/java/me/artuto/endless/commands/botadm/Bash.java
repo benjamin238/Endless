@@ -57,7 +57,7 @@ public class Bash extends Command
         }
 
         StringBuilder output = new StringBuilder();
-        String finalOutput;
+        String finalOutput = null;
         try {
             Process p = Runtime.getRuntime().exec(event.getArgs());
             p.waitFor();
@@ -78,7 +78,7 @@ public class Bash extends Command
             // Remove linebreak
             finalOutput = output.substring(0, output.length() - 1);
         } catch (IOException e) {
-            event.replyError("I wasn't able to find the command `" + args + "`!");
+            event.replyError("I wasn't able to find the command `" + event.getArgs() + "`!");
             return;
         } catch (IllegalArgumentException e) {
             event.replyError("Command output too long!");
