@@ -22,7 +22,7 @@
 hs_err_pid*
 
 # Configuration files
-config.yml
+*.yml
 
 # Other things
 logs/*
