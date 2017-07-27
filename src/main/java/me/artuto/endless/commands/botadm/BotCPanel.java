@@ -105,7 +105,7 @@ public class BotCPanel extends Command
        }
     }
     
-  /*private class Game extends Command
+    /*private class Game extends Command
     {
         public Game()
         {
@@ -135,7 +135,7 @@ public class BotCPanel extends Command
             try
             {
                String status = event.getArgs();
-               event.getJDA().getPresence().setGame(Game.of());
+               event.getJDA().getPresence().setGame(Game.of(event.getArgs()));
                event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame()+" without error!");
             }
             catch(Exception e)

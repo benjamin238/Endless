@@ -19,8 +19,11 @@ package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import java.awt.Color;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 
 /**
  *
@@ -43,11 +46,24 @@ public class Stats extends Command
     @Override
     protected void execute(CommandEvent event)
     {
+        Color color;
+        
+        if(event.isFromType(ChannelType.PRIVATE))
+        {
+            color = Color.decode("#33ff00");
+        }
+        else
+        {
+            color = event.getGuild().getSelfMember().getColor();
+        }
+        
         EmbedBuilder builder = new EmbedBuilder();
         builder.addField(":map: Guilds: ", "**"+event.getJDA().getGuilds().size()+"**" , true);
         builder.addField(":speech_balloon: Text Channels: ", "**"+event.getJDA().getTextChannels().size()+"**", true);
         builder.addField(":speaker: Voice Channels: ", "**"+event.getJDA().getVoiceChannels().size()+"**", true);
         builder.addField(":bust_in_silhouette: Users: ", "**"+event.getJDA().getUsers().size()+"**", true);
+        builder.setColor(color);
         builder.setFooter(event.getSelfUser().getName(), event.getSelfUser().getAvatarUrl());
+        event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue();
     }
 }

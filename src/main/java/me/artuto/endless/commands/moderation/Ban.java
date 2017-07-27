@@ -104,11 +104,10 @@ public class Ban extends Command
            
             member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, (e) -> 
                    event.replyWarning("I was not able to DM the user due they has DM on Mutual Guilds off!")));
-                
-            }
-            catch(Exception e)
-            {
-                   
-            }  
         }
+        catch(Exception e)
+        {
+                   
+        }
+    }
 }

@@ -23,6 +23,7 @@ import java.awt.Color;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 
 /**
  *
@@ -46,8 +47,19 @@ public class Donate extends Command
     @Override
     protected void execute(CommandEvent event)
     {        
+      Color color;
+        
+        if(event.isFromType(ChannelType.PRIVATE))
+        {
+            color = Color.decode("#33ff00");
+        }
+        else
+        {
+            color = event.getGuild().getSelfMember().getColor();
+        }  
+        
       EmbedBuilder builder = new EmbedBuilder();
-           builder.setColor(Color.decode("#33ff00"));
+           builder.setColor(color);
            builder.addField(":moneybag: Donations:", "Actually, I host Endless on a very basic VPS, which can cause some lag sometimes.\n"
                    + "I'll appreciate your donation. All the recauded money will be for get a new and better VPS.\n", false);
            builder.addField(":money_mouth: How to donate:", "If you want donate please go to **https://paypal.me/artuto**\n"

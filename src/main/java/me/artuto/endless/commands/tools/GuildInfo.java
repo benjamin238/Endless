@@ -19,10 +19,12 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import java.awt.Color;
 import java.time.format.DateTimeFormatter;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 
@@ -46,31 +48,35 @@ public class GuildInfo extends Command
     
     @Override
     protected void execute(CommandEvent event)
-    {
-    	Guild guild;
+    {     
+        Guild guild;
     	guild = event.getGuild();
        
         Member owner;        
         owner = guild.getOwner();
-        
-        String roles="";
-        roles = guild.getRoles().stream().map((rol) -> rol.getName()).filter((r) -> (!r.equalsIgnoreCase("@everyone"))).map((r) -> "`, `"+r).reduce(roles, String::concat);
-    	
+            	        
     	String title =":information_source: Information about the guild **"+guild.getName()+"**";
         
-    	if(roles.isEmpty())
-    		roles="@everyone";
-    	else
-    		roles=roles.substring(3)+"`";
+        StringBuilder emotesbldr = new StringBuilder();
+        guild.getEmotes().forEach(e -> emotesbldr.append(" ").append(e.getAsMention()));
+        
+    	StringBuilder rolesbldr = new StringBuilder();
+        guild.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
+        
+        StringBuilder textchbldr = new StringBuilder();
+        guild.getTextChannels().forEach(tc -> textchbldr.append(" ").append(tc.getAsMention()));
+        
+        StringBuilder voicechbldr = new StringBuilder();
+        guild.getVoiceChannels().forEach(vc -> voicechbldr.append(" ").append(vc.getName()));
         
     	EmbedBuilder builder = new EmbedBuilder();
-        builder.addField(":1234: ID: ", "**"+guild.getId()+"**", false);
-        builder.addField(":bust_in_silhouette: Owner: ", "**"+owner.getUser().getName()+"**#**"+owner.getUser().getDiscriminator()+"**", false);
-        builder.addField(":map: Region: ", "**"+guild.getRegion()+"**", false);
-        builder.addField(":one: User count: ", "**"+guild.getMembers().size()+"**", false);
-        builder.addField(":hammer: Roles: ", roles, false);
-        builder.addField(":speech_left: Text Channels: ", "**"+guild.getTextChannels().size()+"**", true);
-        builder.addField(":speaker: Voice Channels: ", "**"+guild.getVoiceChannels().size()+"**", true);
+        builder.addField(":1234: ID: ", "**"+guild.getId()+"**", true);
+        builder.addField(":bust_in_silhouette: Owner: ", "**"+owner.getUser().getName()+"**#**"+owner.getUser().getDiscriminator()+"**", true);
+        builder.addField(":map: Region: ", "**"+guild.getRegion()+"**", true);
+        builder.addField(":one: User count: ", "**"+guild.getMembers().size()+"**", true);
+        builder.addField(":hammer: Roles: ", rolesbldr.toString(), false);
+        builder.addField(":speech_left: Text Channels: ", textchbldr.toString(), false);
+        builder.addField(":speaker: Voice Channels: ", voicechbldr.toString(), false);
         builder.addField(":speech_balloon: Default Channel: ", "**"+guild.getPublicChannel().getName()+"**", true);
         builder.addField(":date: Creation Date: ", "**"+guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
         builder.addField(":vertical_traffic_light: Verification level: ", "**"+guild.getVerificationLevel()+"**", true);
@@ -79,5 +85,11 @@ public class GuildInfo extends Command
     	builder.setThumbnail(guild.getIconUrl());
         builder.setColor(guild.getSelfMember().getColor());
     	event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+        
+        EmbedBuilder builder2 = new EmbedBuilder();
+        builder2.setTitle("Emotes of this guild");
+        builder2.setDescription(emotesbldr.toString());
+        builder2.setColor(guild.getSelfMember().getColor());
+        event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder2.build()).build()).queue();
     }
 }

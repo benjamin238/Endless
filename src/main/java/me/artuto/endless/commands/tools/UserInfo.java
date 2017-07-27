@@ -19,10 +19,12 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import java.awt.Color;
 import java.time.format.DateTimeFormatter;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Member;
 
@@ -50,44 +52,62 @@ public class UserInfo extends Command
     {
     	EmbedBuilder builder = new EmbedBuilder();
     	Member member;
-    	if(event.getMessage().getMentionedUsers().isEmpty())
-    	{
+        
+        if(event.getArgs().isEmpty())
+        {
+            member = event.getMessage().getMember();
+        }
+        else
+        {
+            if(event.getMessage().getMentionedUsers().isEmpty())
+    	    {
     		try
     		{
-    			member = event.getGuild().getMemberById(event.getArgs());
-    		} catch(Exception e) 
-    		    		    		
+    		    member = event.getGuild().getMemberById(event.getArgs());
+    		} 
+                catch(Exception e)    		  		    		
     		{
-    			member = null;
+    		    member = null;
     		}
-    	}
-    	else
-    		member = event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
-    	if(member==null)
-    	{
-    		event.reply(event.getClient().getError()+" I wasn't able to find the user "+event.getArgs());
-    		return;
-    	}
-    	
-        String roles="";
-        roles = member.getRoles().stream().map((rol) -> rol.getName()).filter((r) -> (!r.equalsIgnoreCase("@everyone"))).map((r) -> "`, `"+r).reduce(roles, String::concat);
-    	
+    	    }
+    	    else
+            {
+                member = event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
+            }
+    		
+    	    if(member==null)
+    	    {
+                event.reply(event.getClient().getError()+" I wasn't able to find the user "+event.getArgs());
+                return;
+    	    } 
+        }
+        
+        Color color;
+        
+        if(event.isFromType(ChannelType.PRIVATE))
+        {
+            color = Color.decode("#33ff00");
+        }
+        else
+        {
+            color = event.getGuild().getSelfMember().getColor();
+        }
+    	    	
         String title=(member.getUser().isBot()?":information_source: Information about the bot **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"**":":information_source: Information about the user **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"**");
+        
+        StringBuilder rolesbldr = new StringBuilder();
+        member.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
         		
-    	if(roles.isEmpty())
-    		roles="None";
-    	else
-    		roles=roles.substring(3)+"`";
-               builder.addField(":1234: ID: ", "**"+member.getUser().getId()+"**", false);
-    	       builder.addField(":busts_in_silhouette: Nickname: ", (member.getNickname()==null ? "None" : "**"+member.getNickname()+"**"), false);
-    	       builder.addField(":hammer: Roles: ", roles, false);
-    	       builder.addField("<:online:313956277808005120> Status: ", "**"+member.getOnlineStatus().name()+"**"+(member.getGame()==null?"":" ("
-      				+ (member.getGame().getType()==Game.GameType.TWITCH?"On Live at [*"+member.getGame().getName()+"*]"
-					   : "Playing **"+member.getGame().getName()+"**")+")"+""), false);
-    	       builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", false);
-    	       builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", false);    
-	       builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
-    	       builder.setColor(member.getColor());
-               event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();    		   
+        builder.addField(":1234: ID: ", "**"+member.getUser().getId()+"**", true);
+    	builder.addField(":busts_in_silhouette: Nickname: ", (member.getNickname()==null ? "None" : "**"+member.getNickname()+"**"), true);
+    	builder.addField(":hammer: Roles: ", rolesbldr.toString(), false);
+    	builder.addField("<:online:334859814410911745> Status: ", "**"+member.getOnlineStatus().name()+"**"+(member.getGame()==null?"":" ("
+      		        + (member.getGame().getType()==Game.GameType.TWITCH?"On Live at [*"+member.getGame().getName()+"*]"
+	                    : "Playing **"+member.getGame().getName()+"**")+")"+""), false);
+    	builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
+    	builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);    
+	builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
+    	builder.setColor(color);
+        event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();    		   
     }
 }

@@ -48,7 +48,17 @@ public class About extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-       Color color = event.getSelfMember().getColor();
+       Color color;
+        
+        if(event.isFromType(ChannelType.PRIVATE))
+        {
+            color = Color.decode("#33ff00");
+        }
+        else
+        {
+            color = event.getGuild().getSelfMember().getColor();
+        }
+        
        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
        EmbedBuilder builder = new EmbedBuilder();
               builder.setColor(color);
@@ -65,7 +75,7 @@ public class About extends Command
               builder.addField("Endless Version:", Const.VERSION, false);
               builder.setFooter("Uptime", null);
               builder.setTimestamp(event.getClient().getStartTime());
-              builder.setThumbnail(event.getSelfMember().getUser().getAvatarUrl());
+              builder.setThumbnail(event.getSelfUser().getAvatarUrl());
               event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
     }
 }

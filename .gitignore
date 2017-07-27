@@ -31,3 +31,6 @@ target*
 target/*
 nb-configuration.xml
 dependency-reduced-pom.xml
+.idea/*
+.idea*
+*.iml
