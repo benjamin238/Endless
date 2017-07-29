@@ -1,10 +1,12 @@
 # Endless
 
-Endless is a Discord bot written in Java using Java Discord API (JDA).
+Endless is a Discord bot written in Java using Java Discord API (JDA) and JDA-Utilities with love ❤.
 
 ## Open Source
 
-Endless is license under GNU GPL 3.0 License, that means you can go here and look how something works, but, if you are using it on your own bot please remember to give credits to me and any changes made to any piece of code published here may be stated.
+Endless is license under GNU GPL 3.0 License, that means you can go here and look how something works, but, if you are using it on your own bot please remember to give credits to me.
+
+Also, any changes made to any piece of code published here may be stated.
 
 ## Editing the source code
 
