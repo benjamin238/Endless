@@ -21,7 +21,9 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 
 /**
  *
@@ -30,6 +32,8 @@ import net.dv8tion.jda.core.Permission;
 
 public class Eval extends Command
 {
+    private ScriptEngine engine;
+    
     public Eval()
     {
         this.name = "eval";
@@ -39,17 +43,32 @@ public class Eval extends Command
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
         this.guildOnly = false;
+        
+        engine = new ScriptEngineManager().getEngineByName("Nashorn");
+        try
+        {
+            engine.eval("var imports = new JavaImporter("
+                    + "java.io,"
+                    + "java.lang,"
+                    + "java.util,"
+                    + "Packages.net.dv8tion.jda.core,"
+                    + "Packages.net.dv8tion.jda.core.entities,"
+                    + "Packages.net.dv8tion.jda.core.entities.impl,"
+                    + "Packages.net.dv8tion.jda.core.managers,"
+                    + "Packages.net.dv8tion.jda.core.managers.impl,"
+                    + "Packages.net.dv8tion.jda.core.utils);");
+        }
+        catch(ScriptException e)
+        {
+            e.printStackTrace();
+        }
     }
 	
     @Override
     protected void execute(CommandEvent event) 
     {
-        ScriptEngine se = new ScriptEngineManager().getEngineByName("Nashorn");
-        se.put("event", event);
-        se.put("jda", event.getJDA());
-        se.put("guild", event.getGuild());
-        se.put("channel", event.getChannel());
-        se.put("member", event.getMember());
+        
+        
         
         if(!(event.isOwner()) || event.isCoOwner())
         {
@@ -59,11 +78,28 @@ public class Eval extends Command
         
         try
         {
-            event.reply(event.getClient().getSuccess()+" Done! Output:\n```\n"+se.eval(event.getArgs())+" ```");
+            engine.put("event", event);
+            engine.put("jda", event.getJDA());
+            engine.put("channel", event.getChannel());
+            engine.put("message", event.getMessage());
+            if(event.isFromType(ChannelType.TEXT))
+            {
+                engine.put("member", event.getMember());
+                engine.put("guild", event.getGuild());
+            }
+            
+            Object out = engine.eval(
+                    "(function() {"
+                        + "with (imports) {"
+                            + event.getArgs()
+                        + "}"
+                        + "})();");
+                       
+            event.replySuccess(out == null ? "Done with no output!" : "Done! Output:\n```\n"+out.toString()+" ```");
         } 
-        catch(Exception e)
+        catch(ScriptException e2)
         {
-            event.reply(event.getClient().getError()+" Error! Output:\n```\n"+e+" ```");
+            event.replyError("Error! Output:\n```\n"+e2+" ```");
         }
     }
 }

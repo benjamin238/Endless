@@ -64,7 +64,7 @@ public class About extends Command
               builder.setColor(color);
               builder.setDescription("Hi, I'm Endless! A multipurpose bot designed to be smart.\n"
               		+ "If you found a bug please contact my dad\n"
-              		+ "(`@Artuto#0424 | 264499432538505217`)!\n");
+              		+ "("+Const.DEV+")!\n");
               builder.addField(":bust_in_silhouette: Owner:", "**"+Config.getOwnerTag()+"** (**"+Config.getOwnerId()+"**)", false);
               builder.addField(":busts_in_silhouette: Co-Owner(s):", "**"+Config.getCoOwnerTag()+"** (**"+Config.getCoOwnerId()+"**)", false);
               builder.addField(":books:  Library:", "Java Discord API (JDA) and JDA Utilities <:jda:325395909347115008>", false);
@@ -72,8 +72,7 @@ public class About extends Command
               		+ "Please open an Issue or create a PR on GitHub\n"
               		+ "**https://github.com/ArtutoGamer/Endless**\n", false);
               builder.addField(":link: Support Guild:", "**https://discord.gg/CXKfYW3**\n", false);
-              builder.addField("Endless Version:", Const.VERSION, false);
-              builder.setFooter("Uptime", null);
+              builder.setFooter("Version: "+Const.VERSION+" | Uptime", null);
               builder.setTimestamp(event.getClient().getStartTime());
               builder.setThumbnail(event.getSelfUser().getAvatarUrl());
               event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
