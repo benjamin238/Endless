@@ -67,9 +67,6 @@ public class Eval extends Command
     @Override
     protected void execute(CommandEvent event) 
     {
-        
-        
-        
         if(!(event.isOwner()) || event.isCoOwner())
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
