@@ -17,137 +17,48 @@
 
 package me.artuto.endless;
 
-import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
-import com.jagrosh.jdautilities.waiter.EventWaiter;
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import javax.security.auth.login.LoginException;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.Game;
+import me.artuto.endless.loader.Config;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
+import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.utils.SimpleLog;
-import me.artuto.endless.loader.*;
-import me.artuto.endless.commands.bot.*;
-import me.artuto.endless.commands.botadm.*;
-import me.artuto.endless.commands.moderation.*;
-import me.artuto.endless.commands.others.*;
-import me.artuto.endless.commands.tools.*;
 
 /**
  *
  * @author Artu
  */
 
-public class Bot implements EventListener 
-{   
-    private final SimpleLog LOG = SimpleLog.getLog("Startup Checker");
+public class Bot extends ListenerAdapter
+{
+    private final SimpleLog LOG = SimpleLog.getLog("DISCORD-BANS");
     
-    public static void main(String[] args) throws IOException, LoginException, IllegalArgumentException, RateLimitedException
-    {
-        File file = new File("logs");
-        if (!file.exists())
-            {
-                if (file.mkdir())
-                {
-                    System.out.println("'logs' directory created!");
-                } 
-                else 
-                {
-                    throw new IOException("I was not able to create the 'logs' folder, please check you have the correct permissions.");
-                }
-            }
-        
-        Config config;
-        try{
-            config = new Config();
-        } catch(Exception e) {
-            SimpleLog.getLog("Config").fatal(e);
-            return;
-        }
-        
-        //Register Commands and some other things
-        
-        EventWaiter waiter = new EventWaiter();
-
-        CommandClientBuilder client = new CommandClientBuilder();
-
-        client.useDefaultGame();
-
-        client.setOwnerId(Config.getOwnerId());
-             
-        client.setCoOwnerIds(Config.getCoOwnerId());
-                
-        client.setServerInvite(Const.INVITE);
-        
-        client.setEmojis(Const.DONE_E, Const.WARN_E, Const.FAIL_E);
-
-        client.setPrefix(Config.getPrefix());
-        
-        client.addCommands(
-        		
-        	//Bot
-
-                new About(),
-                new Donate(),
-                new Invite(),
-                new Ping(),
-                new Stats(),
-                
-                //Bot Administration
-                
-                new Bash(),
-                new BotCPanel(),
-                new Eval(),
-                new Shutdown(),
-                
-                //Moderation
-                
-                new Ban(),
-                new Kick(),
-                
-                //Tools
-               
-                new GuildInfo(),
-                new UserInfo(),
-        
-                //Others
-        
-                new Say());
-        
-                //JDA Connection
-        
-        new JDABuilder(AccountType.BOT)
-                .setToken(config.getToken())
-                .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setGame(Game.of(Const.GAME_0))
-                .addEventListener(waiter)
-                .addEventListener(client.build())
-                .addEventListener(new Bot())
-                .addEventListener(new Logging())
-                .buildAsync();
-    }
     
-    //When ready print the bot info
     
     @Override
-    public void onEvent(Event event)
+    public void onGuildJoin(GuildJoinEvent event)
     {
-        if (event instanceof ReadyEvent)
+        Guild guild;
+        guild = event.getGuild();
+        
+        User owner;
+        owner = event.getJDA().getUserById(Config.getOwnerId());
+        
+        String leavemsg;
+        leavemsg = "Hi! Sorry, but you can't have a copy of Endless on Discord Bots, this is for my own security.\n"
+                    + "If you think this is an error, please contact the Developer.";
+        
+        String warnmsg;
+        warnmsg = "<@264499432538505217>, **"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless here!";
+        
+        if(event.getGuild().getId().equals("110373943822540800"))
         {
-            System.out.println("[ENDLESS]: My robotic body is ready!\n"
-                    + "[ENDLESS]: Logged in as: "+event.getJDA().getSelfUser().getName()+"#"+event.getJDA().getSelfUser().getDiscriminator()
-                    + "("+event.getJDA().getSelfUser().getId()+")\n"
-                    + "[ENDLESS]: Using prefix: "+Config.getPrefix()+"\n"
-                    + "[ENDLESS]: Owner: "+Config.getOwnerTag()+"("+Config.getOwnerId()+")\n"
-                    + "[ENDLESS]: Co-Owner: "+Config.getCoOwnerTag()+" ("+Config.getCoOwnerId()+")\n");
+            guild.getPublicChannel().sendMessage(warnmsg);
+            owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> LOG.fatal(leavemsg)));
+            guild.leave().complete();
         }
     }
 }

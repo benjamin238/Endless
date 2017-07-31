@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Game;
 
 /**
  *
@@ -34,7 +35,7 @@ public class BotCPanel extends Command
         this.name = "bot";
         this.help = "Controls ";
         this.category = new Command.Category("Bot Administration");
-        this.children = new Command[]{new Status()};
+        this.children = new Command[]{new Status(), new Playing()};
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
@@ -105,9 +106,9 @@ public class BotCPanel extends Command
        }
     }
     
-    /*private class Game extends Command
+    private class Playing extends Command
     {
-        public Game()
+        public Playing()
         {
             this.name = "game";
             this.help = "Sets the Game (Game.of) of the bot.";
@@ -134,9 +135,8 @@ public class BotCPanel extends Command
             
             try
             {
-               String status = event.getArgs();
-               event.getJDA().getPresence().setGame(Game.of(event.getArgs()));
-               event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame()+" without error!");
+                event.getJDA().getPresence().setGame(Game.of(event.getArgs()));
+                event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame()+" without error!");
             }
             catch(Exception e)
             {
@@ -144,6 +144,6 @@ public class BotCPanel extends Command
                 e.printStackTrace();
             }
        }
-    }*/
+    }
 }
 
