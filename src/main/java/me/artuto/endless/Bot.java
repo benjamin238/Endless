@@ -49,7 +49,8 @@ public class Bot extends ListenerAdapter
         
         String leavemsg;
         leavemsg = "Hi! Sorry, but you can't have a copy of Endless on Discord Bots, this is for my own security.\n"
-                    + "If you think this is an error, please contact the Developer.";
+                    + "Please remove this Account from the Discord Bots list or I'll take further actions.\n"
+                    + "If you think this is an error, please contact the Developer. ~Artuto";
         
         String warnmsg;
         warnmsg = "<@264499432538505217>, **"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless here!";
