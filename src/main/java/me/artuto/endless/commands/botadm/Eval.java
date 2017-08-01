@@ -38,10 +38,10 @@ public class Eval extends Command
     {
         this.name = "eval";
         this.help = "Executes Nashorn code";
-        this.category = new Command.Category("Bot Administration");
+        this.category = new Category("Owner Command");
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
+        this.ownerCommand = true;
         this.guildOnly = false;
         
         engine = new ScriptEngineManager().getEngineByName("Nashorn");
@@ -67,7 +67,7 @@ public class Eval extends Command
     @Override
     protected void execute(CommandEvent event) 
     {
-        if(!(event.isOwner()) || event.isCoOwner())
+        if(!(event.isOwner()) && !(event.isCoOwner()))
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
             return;

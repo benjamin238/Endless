@@ -19,14 +19,19 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.awt.Color;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Member;
+import me.artuto.endless.utils.FormatUtil;
+import net.dv8tion.jda.core.OnlineStatus;
+import net.dv8tion.jda.core.entities.Emote;
 
 /**
  *
@@ -50,8 +55,10 @@ public class UserInfo extends Command
     @Override
     protected void execute(CommandEvent event)
     {
+        String emote = null;
+        String status = null;
     	EmbedBuilder builder = new EmbedBuilder();
-    	Member member;
+    	Member member = null;
         
         if(event.getArgs().isEmpty())
         {
@@ -59,55 +66,74 @@ public class UserInfo extends Command
         }
         else
         {
-            if(event.getMessage().getMentionedUsers().isEmpty())
-    	    {
-    		try
-    		{
-    		    member = event.getGuild().getMemberById(event.getArgs());
-    		} 
-                catch(Exception e)    		  		    		
-    		{
-    		    member = null;
-    		}
-    	    }
+            List<Member> list = FinderUtil.findMembers(event.getArgs(), event.getGuild());
+            
+            if(list.isEmpty())
+            {
+                event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
+            }
+            else if(list.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
+            }
     	    else
             {
-                member = event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
+                member = list.get(0);
             }
-    		
-    	    if(member==null)
-    	    {
-                event.reply(event.getClient().getError()+" I wasn't able to find the user "+event.getArgs());
-                return;
-    	    } 
         }
-        
-        Color color;
-        
-        if(event.isFromType(ChannelType.PRIVATE))
+              
+        if(member.getOnlineStatus().toString().equals("ONLINE"))
         {
-            color = Color.decode("#33ff00");
+            emote = "<:online:334859814410911745>";
+            status = "Online ";
         }
-        else
+        else if(member.getOnlineStatus().toString().equals("IDLE"))
         {
-            color = event.getGuild().getSelfMember().getColor();
+            emote = "<:away:334859813869584384>";
+            status = "Idle ";
         }
-    	    	
-        String title=(member.getUser().isBot()?":information_source: Information about the bot **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"**":":information_source: Information about the user **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"**");
+        else if(member.getOnlineStatus().toString().equals("DO_NOT_DISTURB"))
+        {
+            emote = "<:dnd:334859814029099008>";
+            status = "Do Not Disturb ";
+        }
+        else if(member.getOnlineStatus().toString().equals("INVISIBLE"))
+        {
+            emote = "<:invisible:334859814410649601>";
+            status = "Invisible ";
+        }
+        else if(member.getOnlineStatus().toString().equals("OFFLINE"))
+        {
+            emote = "<:offline:334859814423232514>";
+            status = "Offline ";
+        }
+        else if(member.getOnlineStatus().toString().equals("UNKNOWN"))
+        {
+            emote = ":interrobang:";
+            status = "Unknown ";
+        }
         
-        StringBuilder rolesbldr = new StringBuilder();
-        member.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
+        try
+        {
+            String title=(member.getUser().isBot()?":information_source: Information about the bot **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"**":":information_source: Information about the user **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"**");
+        
+            StringBuilder rolesbldr = new StringBuilder();
+            member.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
         		
-        builder.addField(":1234: ID: ", "**"+member.getUser().getId()+"**", true);
-    	builder.addField(":busts_in_silhouette: Nickname: ", (member.getNickname()==null ? "None" : "**"+member.getNickname()+"**"), true);
-    	builder.addField(":hammer: Roles: ", rolesbldr.toString(), false);
-    	builder.addField("<:online:334859814410911745> Status: ", "**"+member.getOnlineStatus().name()+"**"+(member.getGame()==null?"":" ("
-      		        + (member.getGame().getType()==Game.GameType.TWITCH?"On Live at [*"+member.getGame().getName()+"*]"
-	                    : "Playing **"+member.getGame().getName()+"**")+")"+""), false);
-    	builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
-    	builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);    
-	builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
-    	builder.setColor(color);
-        event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();    		   
+            builder.addField(":1234: ID: ", "**"+member.getUser().getId()+"**", true);
+    	    builder.addField(":busts_in_silhouette: Nickname: ", (member.getNickname()==null ? "None" : "**"+member.getNickname()+"**"), true);
+    	    builder.addField(":hammer: Roles: ", rolesbldr.toString(), false);
+    	    builder.addField(emote+" Status: ", "**"+status+"**"+(member.getGame()==null?"":" ("
+      	       	            + (member.getGame().getType()==Game.GameType.TWITCH?"On Live at [*"+member.getGame().getName()+"*]"
+	                        : "Playing **"+member.getGame().getName()+"**")+")"+""), false);
+    	    builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
+    	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);    
+	    builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
+    	    builder.setColor(member.getColor());
+            event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
+        }
+    	catch(Exception e)
+        {
+        }   		   
     }
 }

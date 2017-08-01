@@ -19,12 +19,10 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
-import java.awt.Color;
 import java.time.format.DateTimeFormatter;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 
@@ -77,7 +75,7 @@ public class GuildInfo extends Command
         builder.addField(":hammer: Roles: ", rolesbldr.toString(), false);
         builder.addField(":speech_left: Text Channels: ", textchbldr.toString(), false);
         builder.addField(":speaker: Voice Channels: ", voicechbldr.toString(), false);
-        builder.addField(":speech_balloon: Default Channel: ", "**"+guild.getPublicChannel().getName()+"**", true);
+        builder.addField(":speech_balloon: Default Channel: ", guild.getPublicChannel().getAsMention(), true);
         builder.addField(":date: Creation Date: ", "**"+guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
         builder.addField(":vertical_traffic_light: Verification level: ", "**"+guild.getVerificationLevel()+"**", true);
         builder.addField(":envelope: Default Notification level: ", "**"+guild.getDefaultNotificationLevel()+"**", true);
