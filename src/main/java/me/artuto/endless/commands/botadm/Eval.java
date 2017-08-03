@@ -91,8 +91,15 @@ public class Eval extends Command
                             + event.getArgs()
                         + "}"
                         + "})();");
-                       
-            event.replySuccess(out == null ? "Done with no output!" : "Done! Output:\n```\n"+out.toString()+" ```");
+            
+            if(out==null)
+            {
+                event.reactSuccess();
+            }
+            else
+            {
+                event.replySuccess("Done! Output:\n```\n"+out.toString()+" ```");
+            }
         } 
         catch(ScriptException e2)
         {

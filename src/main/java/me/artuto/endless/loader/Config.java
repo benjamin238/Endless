@@ -36,6 +36,7 @@ public class Config
     private static String ownertag;
     private static String coownerid;
     private static String coownertag;
+    private static String dbanstoken;
     
     public Config() throws Exception
     {
@@ -71,6 +72,9 @@ public class Config
                 case "coownertag":
                     coownertag = value;
                     break;
+                case "dbanstoken":
+                    dbanstoken = value;
+                    break;    
             }
         }
         if(userToken==null)
@@ -85,6 +89,8 @@ public class Config
             LOG.warn("No Co-Owner provided in the config file! Disabling feature...");
         if(coownertag==null)
             LOG.warn("No Co-Owner provided in the config file! Disabling feature...");
+        if(dbanstoken==null)
+            LOG.warn("No Discord Bans token provided in the config file! Disabling feature...");
     }
     
     public String getToken()
@@ -115,5 +121,10 @@ public class Config
     public static String getCoOwnerTag()
     {
         return coownertag;
+    }
+    
+    public static String getDBansToken()
+    {
+        return dbanstoken;
     }
 }
