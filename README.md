@@ -30,6 +30,6 @@ Thanks for this awesome people in helping me on creating the bot!
 
 [DV8FromTheWorld](https://github.com/DV8FromTheWorld) for creating [JDA](https://github.com/DV8FromTheWorld/JDA)
 
-[jagrosh](https://github.com/jagrosh) for his [Example Bot](https://github.com/jagrosh/ExampleBot) and [JDA Utilities](https://github.com/JDA-Applications/JDA-Utilities)
+[jagrosh](https://github.com/jagrosh) for his [Example Bot](https://github.com/jagrosh/ExampleBot) and [JDA Utilities](https://github.com/JDA-Applications/JDA-Utilities) and his cool bots
 
 Anyone online on the JDA and Discord API server.
