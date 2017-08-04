@@ -25,6 +25,7 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
 
 /**
  *
@@ -36,6 +37,7 @@ public class GuildInfo extends Command
     public GuildInfo()
     {
         this.name = "guild";
+        this.aliases = new String[]{"server", "serverinfo", "guildinfo", "ginfo", "sinfo"};
         this.help = "Shows info about the current guild";
         this.category = new Command.Category("Tools");
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
@@ -55,6 +57,8 @@ public class GuildInfo extends Command
             	        
     	String title =":information_source: Information about the guild **"+guild.getName()+"**";
         
+        long botCount = guild.getMembers().stream().filter((u) -> u.getUser().isBot()).count();
+               
         StringBuilder emotesbldr = new StringBuilder();
         guild.getEmotes().forEach(e -> emotesbldr.append(" ").append(e.getAsMention()));
         
@@ -71,7 +75,7 @@ public class GuildInfo extends Command
         builder.addField(":1234: ID: ", "**"+guild.getId()+"**", true);
         builder.addField(":bust_in_silhouette: Owner: ", "**"+owner.getUser().getName()+"**#**"+owner.getUser().getDiscriminator()+"**", true);
         builder.addField(":map: Region: ", "**"+guild.getRegion()+"**", true);
-        builder.addField(":one: User count: ", "**"+guild.getMembers().size()+"**", true);
+        builder.addField(":one: User count: ", "**"+guild.getMembers().size()+"** (**"+botCount+"** bots)", true);
         builder.addField(":hammer: Roles: ", rolesbldr.toString(), false);
         builder.addField(":speech_left: Text Channels: ", textchbldr.toString(), false);
         builder.addField(":speaker: Voice Channels: ", voicechbldr.toString(), false);

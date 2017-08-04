@@ -43,6 +43,7 @@ public class UserInfo extends Command
     public UserInfo()
     {
         this.name = "user";
+        this.aliases = new String[]{"member", "userinfo", "i", "info", "memberinfo", "whois"};
         this.help = "Shows info about the specified user";
         this.arguments= "@user or ID";
         this.category = new Command.Category("Tools");
