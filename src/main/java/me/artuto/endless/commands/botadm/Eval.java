@@ -38,7 +38,7 @@ public class Eval extends Command
     {
         this.name = "eval";
         this.help = "Executes Nashorn code";
-        this.category = new Category("Owner Command");
+        this.category = new Category("Bot Administration");
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
