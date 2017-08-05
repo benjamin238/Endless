@@ -10,7 +10,7 @@ Also, any changes made to any piece of code published here may be stated.
 
 ## Editing the source code
 
-I won't give support when editing the source code to create a custom build of Endless, (unless is a PR and is here).
+I won't provide support when editing the source code to create a custom build of Endless, (unless is a PR and is here).
 
 ## Support
 
