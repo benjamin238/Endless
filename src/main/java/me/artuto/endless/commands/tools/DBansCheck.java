@@ -55,6 +55,9 @@ public class DBansCheck extends Command
     @Override
     protected void execute(CommandEvent event)
     {        
+        User user;
+        user = event.getJDA().getUserById(event.getArgs());
+         
         if(Config.getDBansToken().isEmpty())
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
@@ -85,11 +88,11 @@ public class DBansCheck extends Command
             
             if(response.body().string().equalsIgnoreCase("True"))
             {
-                event.reply("The user with ID `"+event.getArgs()+"` is listed on Discord Bans! <:banhammer:270222913234272257>");
+                event.reply("The user "+user.getName()+"#"+user.getDiscriminator()+" (`"+event.getArgs()+"`) is listed on Discord Bans! <:banhammer:270222913234272257>");
             }    
             else
             {
-                event.reply("The user with ID `"+event.getArgs()+"` isn't listed on Discord Bans! <:blobthumbsup:317004148564426758>");
+                event.reply("The user "+user.getName()+"#"+user.getDiscriminator()+" (`"+event.getArgs()+"`) isn't listed on Discord Bans! <:blobthumbsup:317004148564426758>");
             }
        }
        catch(IOException e)
