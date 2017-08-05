@@ -23,6 +23,7 @@ import java.io.IOException;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.utils.SimpleLog;
+import net.dv8tion.jda.core.entities.User;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
