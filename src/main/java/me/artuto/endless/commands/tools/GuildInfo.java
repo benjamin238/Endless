@@ -48,7 +48,10 @@ public class GuildInfo extends Command
     
     @Override
     protected void execute(CommandEvent event)
-    {     
+    {   
+        String roles;
+        roles = null;
+        
         Guild guild;
     	guild = event.getGuild();
        
@@ -57,7 +60,7 @@ public class GuildInfo extends Command
             	        
     	String title =":information_source: Information about the guild **"+guild.getName()+"**";
         
-        long botCount = guild.getMembers().stream().filter((u) -> u.getUser().isBot()).count();
+        long botCount = guild.getMembers().stream().filter(u -> u.getUser().isBot()).count();
                
         StringBuilder emotesbldr = new StringBuilder();
         guild.getEmotes().forEach(e -> emotesbldr.append(" ").append(e.getAsMention()));
@@ -70,6 +73,11 @@ public class GuildInfo extends Command
         
         StringBuilder voicechbldr = new StringBuilder();
         guild.getVoiceChannels().forEach(vc -> voicechbldr.append(" ").append(vc.getName()));
+        
+        if(emotesbldr.toString().isEmpty())
+        {
+            
+        }
         
     	EmbedBuilder builder = new EmbedBuilder();
         builder.addField(":1234: ID: ", "**"+guild.getId()+"**", true);
