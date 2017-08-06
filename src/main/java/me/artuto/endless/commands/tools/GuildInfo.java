@@ -49,15 +49,13 @@ public class GuildInfo extends Command
     @Override
     protected void execute(CommandEvent event)
     {   
-        String roles;
-        roles = null;
-        
+        String roles = null;
+        String emotes = null;
+        String voicech = null;
         Guild guild;
     	guild = event.getGuild();
-       
         Member owner;        
         owner = guild.getOwner();
-            	        
     	String title =":information_source: Information about the guild **"+guild.getName()+"**";
         
         long botCount = guild.getMembers().stream().filter(u -> u.getUser().isBot()).count();
@@ -76,7 +74,29 @@ public class GuildInfo extends Command
         
         if(emotesbldr.toString().isEmpty())
         {
-            
+            emotes = "**None**";
+        }
+        else
+        {
+            emotes = emotesbldr.toString();
+        }
+        
+        if(rolesbldr.toString().isEmpty())
+        {
+            roles = "**None**";
+        }
+        else
+        {
+            roles = rolesbldr.toString();
+        }
+        
+        if(voicechbldr.toString().isEmpty())
+        {
+            voicech = "**None**";
+        }
+        else
+        {
+            voicech = voicechbldr.toString();
         }
         
     	EmbedBuilder builder = new EmbedBuilder();
@@ -84,9 +104,9 @@ public class GuildInfo extends Command
         builder.addField(":bust_in_silhouette: Owner: ", "**"+owner.getUser().getName()+"**#**"+owner.getUser().getDiscriminator()+"**", true);
         builder.addField(":map: Region: ", "**"+guild.getRegion()+"**", true);
         builder.addField(":one: User count: ", "**"+guild.getMembers().size()+"** (**"+botCount+"** bots)", true);
-        builder.addField(":hammer: Roles: ", rolesbldr.toString(), false);
+        builder.addField(":hammer: Roles: ", roles, false);
         builder.addField(":speech_left: Text Channels: ", textchbldr.toString(), false);
-        builder.addField(":speaker: Voice Channels: ", voicechbldr.toString(), false);
+        builder.addField(":speaker: Voice Channels: ", voicech, false);
         builder.addField(":speech_balloon: Default Channel: ", guild.getPublicChannel().getAsMention(), true);
         builder.addField(":date: Creation Date: ", "**"+guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
         builder.addField(":vertical_traffic_light: Verification level: ", "**"+guild.getVerificationLevel()+"**", true);
@@ -98,7 +118,7 @@ public class GuildInfo extends Command
         
         EmbedBuilder builder2 = new EmbedBuilder();
         builder2.setTitle("Emotes of this guild");
-        builder2.setDescription(emotesbldr.toString());
+        builder2.setDescription(emotes);
         builder2.setColor(guild.getSelfMember().getColor());
         event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder2.build()).build()).queue();
     }
