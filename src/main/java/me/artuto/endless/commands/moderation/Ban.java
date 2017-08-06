@@ -91,9 +91,7 @@ public class Ban extends Command
         {
             event.getGuild().getController().ban(member, 0).reason(reason).queue();
             event.replySuccess("Banned user **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with reason **"+reason+"**");
-            
-            builder.setColor(Color.RED);
-            builder.setThumbnail(event.getGuild().getIconUrl());
+
             builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
             builder.setTitle("Ban");
             builder.setDescription("You were banned on the guild **"+event.getGuild().getName()+"** by **"
@@ -101,6 +99,8 @@ public class Ban extends Command
                 + "They gave the following reason: **"+reason+"**\n");
             builder.setFooter("Time", null);
             builder.setTimestamp(Instant.now());
+            builder.setColor(Color.RED);
+            builder.setThumbnail(event.getGuild().getIconUrl());
            
             member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, (e) -> 
                    event.replyWarning("I was not able to DM the user due they has DM on Mutual Guilds off!")));
