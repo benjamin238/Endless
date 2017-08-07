@@ -1,0 +1,29 @@
+//////////////////////////////////////////////////////////
+//            Configuration of Endless                  //
+//////////////////////////////////////////////////////////
+// Thanks for downloading your own instance of Endless! //
+// Here are some configuration parameters needed for    //
+// running the bot correctly.                           //
+//////////////////////////////////////////////////////////
+
+// Put here your token, you can get one at https://discordapp.com/developers/
+
+token=
+
+// Here goes the prefix
+
+prefix=e!
+
+// Now setup the owner info.
+
+owner=
+ownertag=
+
+// Now, if needed, setup CoOwner's info
+
+coownerid=
+coownertag=
+
+// Others
+
+dbanstoken=
