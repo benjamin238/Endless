@@ -60,7 +60,7 @@ public class Kick extends Command
         User author;
         author = event.getAuthor();
         
-        if(event.getArgs().isEmpty()
+        if(event.getArgs().isEmpty())
         {
             event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
             return;
