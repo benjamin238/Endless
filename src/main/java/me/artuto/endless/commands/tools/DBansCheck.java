@@ -85,7 +85,7 @@ public class DBansCheck extends Command
            
             RequestBody formBody = new FormBody.Builder()
                 .add("token", Config.getDBansToken())
-                .add("userid", event.getArgs())
+                .add("userid", user.getId())
                 .build();
             
             Request request = new Request.Builder()
@@ -97,11 +97,11 @@ public class DBansCheck extends Command
             
             if(response.body().string().equalsIgnoreCase("True"))
             {
-                event.reply("The user "+user.getName()+"#"+user.getDiscriminator()+" (`"+event.getArgs()+"`) is listed on Discord Bans! <:banhammer:270222913234272257>");
+                event.reply("The user "+user.getName()+"#"+user.getDiscriminator()+" (`"+user.getId()+"`) is listed on Discord Bans! <:banhammer:270222913234272257>");
             }    
             else
             {
-                event.reply("The user "+user.getName()+"#"+user.getDiscriminator()+" (`"+event.getArgs()+"`) isn't listed on Discord Bans! <:blobthumbsup:317004148564426758>");
+                event.reply("The user "+user.getName()+"#"+user.getDiscriminator()+" (`"+user.getId()+"`) isn't listed on Discord Bans! <:blobthumbsup:317004148564426758>");
             }
        }
        catch(IOException e)
