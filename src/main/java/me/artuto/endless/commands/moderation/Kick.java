@@ -63,6 +63,12 @@ public class Kick extends Command
         Member member;
         User author;
         author = event.getAuthor();
+        
+        if(event.getArgs().isEmpty()
+        {
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
+            return;
+        }
 
         if(reason==null)
         {
