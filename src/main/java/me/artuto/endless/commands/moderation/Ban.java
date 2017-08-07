@@ -56,10 +56,6 @@ public class Ban extends Command
     protected void execute(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
-        String args = event.getArgs();
-        String[] targetpre = args.split(" for ");
-        String target = targetpre[0];
-        String reason = targetpre[1];
         Member member;
         User author;
         author = event.getAuthor();
@@ -69,6 +65,12 @@ public class Ban extends Command
             event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
             return;
         }
+        
+        String args = event.getArgs();
+        String[] targetpre = args.split(" for ");
+        String target = targetpre[0];
+        String reason = targetpre[1];
+        
         
         if(reason==null)
         {
