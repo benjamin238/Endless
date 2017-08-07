@@ -44,23 +44,10 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Endless extends ListenerAdapter
 {   
-    private final SimpleLog LOG = SimpleLog.getLog("Startup Checker");
+    private static final SimpleLog LOG = SimpleLog.getLog("Startup Checker");
 
     public static void main(String[] args) throws IOException, LoginException, IllegalArgumentException, RateLimitedException, InterruptedException
-    {
-        File file = new File("logs");
-        if (!file.exists())
-            {
-                if (file.mkdir())
-                {
-                    System.out.println("'logs' directory created!");
-                } 
-                else 
-                {
-                    throw new IOException("I was not able to create the 'logs' folder, please check you have the correct permissions.");
-                }
-            }
-        
+    {        
         Config config;
         
         try

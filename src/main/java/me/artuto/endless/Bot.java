@@ -17,15 +17,21 @@
 
 package me.artuto.endless;
 
+import com.jagrosh.jdautilities.waiter.EventWaiter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.utils.SimpleLog;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -34,10 +40,6 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Bot extends ListenerAdapter
 {
-    private final SimpleLog LOG = SimpleLog.getLog("DISCORD-BANS");
-    
-    
-    
     @Override
     public void onGuildJoin(GuildJoinEvent event)
     {
@@ -57,9 +59,20 @@ public class Bot extends ListenerAdapter
         
         if(event.getGuild().getId().equals("110373943822540800"))
         {
-            guild.getPublicChannel().sendMessage(warnmsg);
-            owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> LOG.fatal(leavemsg)));
+            event.getJDA().getTextChannelById("119222314964353025").sendMessage(warnmsg).complete();
+            owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> SimpleLog.getLog("DISCORD BANS").fatal(leavemsg)));
             guild.leave().complete();
+        }
+    }
+    
+    @Override
+    public void onReady(ReadyEvent event)
+    {
+        File file = new File("logs");
+        if(!file.exists())
+        {
+            file.mkdir();
+            SimpleLog.getLog("Startup").info("'logs' directory created!");
         }
     }
 }
