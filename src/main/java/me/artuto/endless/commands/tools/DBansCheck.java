@@ -55,9 +55,17 @@ public class DBansCheck extends Command
     
     @Override
     protected void execute(CommandEvent event)
-    {        
+    {   
         User user;
-        user = event.getJDA().getUserById(event.getArgs());
+        try
+        {
+           user = event.getJDA().retrieveUserById(event.getArgs()).complete(); 
+        }
+        catch(Exception e)
+        {
+            event.replyError("That user was not found!");
+            return;
+        }
          
         if(Config.getDBansToken().isEmpty())
         {

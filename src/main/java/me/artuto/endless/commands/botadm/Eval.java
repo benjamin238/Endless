@@ -41,7 +41,7 @@ public class Eval extends Command
         this.category = new Category("Bot Administration");
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = true;
+        this.ownerCommand = false;
         this.guildOnly = false;
         
         engine = new ScriptEngineManager().getEngineByName("Nashorn");
@@ -56,7 +56,15 @@ public class Eval extends Command
                     + "Packages.net.dv8tion.jda.core.entities.impl,"
                     + "Packages.net.dv8tion.jda.core.managers,"
                     + "Packages.net.dv8tion.jda.core.managers.impl,"
-                    + "Packages.net.dv8tion.jda.core.utils);");
+                    + "Packages.net.dv8tion.jda.core.utils,"
+                    + "Packages.me.artuto.endless,"
+                    + "Packages.me.artuto.endless.commands.bot,"
+                    + "Packages.me.artuto.endless.botadm,"
+                    + "Packages.me.artuto.endless.moderation,"
+                    + "Packages.me.artuto.endless.others,"
+                    + "Packages.me.artuto.endless.tools,"
+                    + "Packages.me.artuto.endless.loader,"
+                    + "Packages.me.artuto.endless.utils);");
         }
         catch(ScriptException e)
         {
@@ -98,12 +106,12 @@ public class Eval extends Command
             }
             else
             {
-                event.replySuccess("Done! Output:\n```\n"+out.toString()+" ```");
+                event.replySuccess("Done! Output:\n```java\n"+out.toString()+" ```");
             }
         } 
-        catch(ScriptException e2)
+        catch(Exception e2)
         {
-            event.replyError("Error! Output:\n```\n"+e2+" ```");
+            event.replyError("Error! Output:\n```java\n"+e2+" ```");
         }
     }
 }

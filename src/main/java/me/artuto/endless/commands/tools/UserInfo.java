@@ -43,7 +43,7 @@ public class UserInfo extends Command
         this.name = "user";
         this.aliases = new String[]{"member", "userinfo", "i", "info", "memberinfo", "whois"};
         this.help = "Shows info about the specified user";
-        this.arguments= "@user or ID";
+        this.arguments= "@user | ID | nickname | username";
         this.category = new Command.Category("Tools");
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};

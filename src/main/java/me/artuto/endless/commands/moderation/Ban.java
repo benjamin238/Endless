@@ -19,12 +19,17 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.awt.Color;
 import java.time.Instant;
+import java.util.List;
+import me.artuto.endless.Messages;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
 /**
@@ -37,8 +42,9 @@ public class Ban extends Command
     public Ban()
     {
         this.name = "ban";
+        this.aliases = new String[]{"hackban"};
         this.help = "Bans the specified user";
-        this.arguments = "@user or ID";
+        this.arguments = "@user | ID | nickname | username";
         this.category = new Command.Category("Moderation");
         this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
         this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
@@ -47,33 +53,38 @@ public class Ban extends Command
     }
     
     @Override
-    protected void execute(CommandEvent event) throws ErrorResponseException
+    protected void execute(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
-        String reason = event.getArgs().replaceAll("<@!?\\d+>", "");
+        String args = event.getArgs();
+        String[] targetpre = args.split(" for ");
+        String target = targetpre[0];
+        String reason = targetpre[1];
         Member member;
-        if(event.getMessage().getMentionedUsers().isEmpty())
+        User author;
+        author = event.getAuthor();
+        
+        if(reason==null)
         {
-            try
-    	    {
-    		member = event.getGuild().getMemberById(event.getArgs());
-    	    } 
-            catch(Exception e)    		
-    	   {
-    		member = null;
-    	    }
-    	}
-       
+            reason = "no reason specified";
+        }
+        
+        List<Member> list = FinderUtil.findMembers(target, event.getGuild());
+            
+        if(list.isEmpty())
+        {
+            event.replyWarning("I was not able to found a user with the provided arguments: '"+target+"'");
+            return;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfMembers(list, target));
+            return;
+        }
     	else
         {
-            member = event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
+            member = list.get(0);
         }
-    	
-    	if(member==null)
-    	{
-    		event.reply(event.getClient().getError()+" I wasn't able to find the user "+event.getArgs());
-    		return;
-    	}        
     
         if(!event.getSelfMember().canInteract(member))
         {
@@ -87,10 +98,11 @@ public class Ban extends Command
             return;
         }
         
+        String success = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with reason **"+reason+"**";
+              
         try
         {
-            event.getGuild().getController().ban(member, 0).reason(reason).queue();
-            event.replySuccess("Banned user **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with reason **"+reason+"**");
+            event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
             builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
             builder.setTitle("Ban");
@@ -102,12 +114,13 @@ public class Ban extends Command
             builder.setColor(Color.RED);
             builder.setThumbnail(event.getGuild().getIconUrl());
            
-            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, (e) -> 
-                   event.replyWarning("I was not able to DM the user due they has DM on Mutual Guilds off!")));
+            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
+                    (d) -> event.replySuccess(Messages.BAN_SUCCESS+success), 
+                    (e) -> event.replyWarning(Messages.BAN_NODM+success)));
         }
         catch(Exception e)
         {
-                   
+            event.replyError(Messages.BAN_ERROR+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
         }
     }
 }
