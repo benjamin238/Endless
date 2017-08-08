@@ -109,7 +109,8 @@ public class Endless extends ListenerAdapter
                 new UserInfo(),
         
                 //Others
-        
+                
+                new Choose(),
                 new Say());
         
         //JDA Connection
