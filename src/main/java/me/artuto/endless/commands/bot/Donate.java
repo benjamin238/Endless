@@ -35,6 +35,7 @@ public class Donate extends Command
     public Donate()
     {
         this.name = "donate";
+        this.children = new Command[]{new Add()};
         this.help = "Info about donations";
         this.arguments = "";
         this.category = new Command.Category("Bot");
@@ -67,5 +68,31 @@ public class Donate extends Command
            builder.addField(":heart: Donators:", "Thanks to all donators!\n"
                    + "-**mogana from persona 5** - Host\n", false);
            event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue();
+    }
+    
+    private class Add extends Command
+    {
+        public Add()
+        {
+            this.name = "add";
+            this.help = "Adds a donator to the list";
+            this.category = new Command.Category("Bot Administration");
+            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.ownerCommand = false;
+            this.guildOnly = false;
+        }
+        
+        @Override
+        protected void execute(CommandEvent event)
+        {
+            if(!(event.isOwner()) && !(event.isCoOwner()))
+            {
+                event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
+                return;   
+            }
+            
+            event.reply("reeee");
+        }
     }
 }

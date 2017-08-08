@@ -68,11 +68,18 @@ public class Bot extends ListenerAdapter
     @Override
     public void onReady(ReadyEvent event)
     {
-        File file = new File("logs");
-        if(!file.exists())
+        File logs = new File("logs");
+        if(!logs.exists())
         {
-            file.mkdir();
+            logs.mkdir();
             SimpleLog.getLog("Startup").info("'logs' directory created!");
+        }
+        
+        File data = new File("data");
+        if(!data.exists())
+        {
+            data.mkdir();
+            SimpleLog.getLog("Startup").info("'data' directory created!");
         }
     }
 }

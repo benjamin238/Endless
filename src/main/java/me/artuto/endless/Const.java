@@ -31,4 +31,5 @@ public class Const
     public static String INVITE = ("https://discord.gg/CXKfYW3");
     public static String GAME_0 = ("[ENDLESS] loading...");
     public static String DEV = ("`@Artuto#0424 | 264499432538505217`");
+    public static String DONATORS = "data/donators.json";
  }
