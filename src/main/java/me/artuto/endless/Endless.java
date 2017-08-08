@@ -99,6 +99,7 @@ public class Endless extends ListenerAdapter
                 
                 new Ban(),
                 new Kick(),
+                new Unban(),
                 
                 //Tools
                

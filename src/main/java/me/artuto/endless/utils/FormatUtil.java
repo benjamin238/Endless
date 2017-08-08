@@ -21,23 +21,34 @@ import java.util.List;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 
 /**
  *
  * @author Artu
  * 
- * The following code is property of jagrosh () with some changes made by me.
+ * The following code is property of jagrosh (https://github.com/jagrosh/Spectra) with some changes made by me.
  * Contact me if any issue.
  */
 
 public class FormatUtil 
 {
-        public static String listOfMembers(List<Member> list, String query)
+    public static String listOfMembers(List<Member> list, String query)
     {
         String out = " Multiple members found matching \""+query+"\":";
         for(int i=0; i<6 && i<list.size(); i++)
             out+="\n - "+list.get(i).getUser().getName()+"#"+list.get(i).getUser().getDiscriminator()+" (ID:"+list.get(i).getUser().getId()+")";
+        if(list.size()>6)
+            out+="\n**And "+(list.size()-6)+" more...**";
+        return out;
+    }
+    
+    public static String listOfUsers(List<User> list, String query)
+    {
+        String out = " Multiple users found matching \""+query+"\":";
+        for(int i=0; i<6 && i<list.size(); i++)
+            out+="\n - "+list.get(i).getName()+"#"+list.get(i).getDiscriminator()+" (ID:"+list.get(i).getId()+")";
         if(list.size()>6)
             out+="\n**And "+(list.size()-6)+" more...**";
         return out;

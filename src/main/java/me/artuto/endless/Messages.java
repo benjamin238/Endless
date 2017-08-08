@@ -33,10 +33,12 @@ public class Messages
     // Moderation Messages
     public static String BAN_SUCCESS = "Successfully banned user ";
     public static String BAN_NODM = "An error happened when sending the DM. Banned user ";
-    public static String BAN_ERROR = "An unknown error happened when banning ";
+    public static String BAN_ERROR = "An error happened when banning ";
     public static String KICK_SUCCESS = "Successfully kicked user ";
     public static String KICK_NODM = "An error happened when sending the DM. Kicked user ";
-    public static String KICK_ERROR = "An unknown error happened when banning ";
+    public static String KICK_ERROR = "An error happened when kicking ";
+    public static String UNBAN_SUCCESS = "Successfully unbanned user ";
+    public static String UNBAN_ERROR = "An error happened when unbanning ";
     
     //
 }
