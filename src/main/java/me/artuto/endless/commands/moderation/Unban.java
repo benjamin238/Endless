@@ -48,6 +48,12 @@ public class Unban extends Command
     @Override
     protected void execute(CommandEvent event)
     {
+        if(event.getArgs().isEmpty())
+        {
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban @user | ID | nickname | username for *reason*");
+            return;
+        }
+    
         String args = event.getArgs();
         String[] targetpre = args.split(" for ");
         String target = targetpre[0];
