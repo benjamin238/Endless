@@ -56,6 +56,12 @@ public class Unban extends Command
         User author;
         author = event.getAuthor();
         
+        if(event.getArgs().isEmpty())
+        {
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban @user | ID | nickname | username for *reason*");
+            return;
+        }
+        
                 
         List<User> list = FinderUtil2.findBannedUsers(target, event.getGuild());
             
