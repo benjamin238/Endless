@@ -31,5 +31,7 @@ target*
 target/*
 dependency-reduced-pom.xml
 .idea/*
-.idea*
+.idea
 *.iml
+data
+data/*
