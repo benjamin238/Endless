@@ -103,6 +103,7 @@ public class Endless extends ListenerAdapter
                 
                 //Tools
                
+                new Avatar(),
                 new DBansCheck(),
                 new GuildInfo(),
                 new Lookup(),
