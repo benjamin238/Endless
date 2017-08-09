@@ -99,10 +99,12 @@ public class Endless extends ListenerAdapter
                 
                 new Ban(),
                 new Kick(),
+                new SoftBan(),
                 new Unban(),
                 
                 //Tools
                
+                new Avatar(),
                 new DBansCheck(),
                 new GuildInfo(),
                 new Lookup(),

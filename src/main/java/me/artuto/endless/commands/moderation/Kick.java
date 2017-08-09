@@ -107,28 +107,35 @@ public class Kick extends Command
             return;
         }
         
-        String success = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with reason **"+reason+"**";
+        String success = member.getAsMention();
         
         try
         {
-           event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+            builder.setColor(Color.YELLOW);
+            builder.setThumbnail(event.getGuild().getIconUrl());
+            builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+            builder.setTitle("Kick");
+            builder.setDescription("You were kicked on the guild **"+event.getGuild().getName()+"** by **"
+                    +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
+                    + "They gave the following reason: **"+reason+"**\n");
+            builder.setFooter("Time", null);
+            builder.setTimestamp(Instant.now());
            
-           builder.setColor(Color.YELLOW);
-           builder.setThumbnail(event.getGuild().getIconUrl());
-           builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-           builder.setTitle("Kick");
-           builder.setDescription("You were kicked on the guild **"+event.getGuild().getName()+"** by **"
-                   +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
-                   + "They gave the following reason: **"+reason+"**\n");
-           builder.setFooter("Time", null);
-           builder.setTimestamp(Instant.now());
-           
+<<<<<<< HEAD
            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
                     d -> event.replySuccess("dm"), e -> event.replyWarning("nodm")));             
+=======
+            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
+                    (d) -> event.replySuccess(Messages.KICK_SUCCESS+success), 
+                    (e) -> event.replyWarning(Messages.KICK_NODM+success)));
+            
+           event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+        
+>>>>>>> d689555c8e121c3f11361712d1d6d2f1db1d3b15
         }
         catch(Exception e)
         {
-            event.replyError(Messages.KICK_ERROR+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
+            event.replyError(Messages.KICK_ERROR+member.getAsMention());
         }
     }
 }

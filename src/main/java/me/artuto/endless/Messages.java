@@ -39,6 +39,9 @@ public class Messages
     public static String KICK_ERROR = "An error happened when kicking ";
     public static String UNBAN_SUCCESS = "Successfully unbanned user ";
     public static String UNBAN_ERROR = "An error happened when unbanning ";
+    public static String SOFTBAN_SUCCESS = "Successfully softbanned user ";
+    public static String SOFTBAN_NODM = "An error happened when sending the DM. Softbanned user ";
+    public static String SOFTBAN_ERROR = "An error happened when softbanning ";
     
     //
 }

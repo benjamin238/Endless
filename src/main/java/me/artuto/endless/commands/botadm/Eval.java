@@ -70,6 +70,10 @@ public class Eval extends Command
                     + "Packages.com.jagrosh.jdautilities.commandclient.examples,"
                     + "Packages.com.jagrosh.jdautilities.commandclient.impl,"
                     + "Packages.com.jagrosh.jdautilities.entities,"
+<<<<<<< HEAD
+=======
+                    + "Packages.com.jagrosh.jdautilities.menu,"
+>>>>>>> d689555c8e121c3f11361712d1d6d2f1db1d3b15
                     + "Packages.com.jagrosh.jdautilities.utils,"
                     + "Packages.com.jagrosh.jdautilities.waiter);");
         }
