@@ -129,7 +129,7 @@ public class Kick extends Command
         }
         catch(Exception e)
         {
-            event.replyError(Messages.KICK_ERROR+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
+            event.replyError(Messages.KICK_ERROR+member.getAsMention());
         }
     }
 }
