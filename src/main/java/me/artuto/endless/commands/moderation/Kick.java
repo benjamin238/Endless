@@ -107,7 +107,7 @@ public class Kick extends Command
             return;
         }
         
-        String success = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with reason **"+reason+"**";
+        String success = member.getAsMention();
         
         try
         {
