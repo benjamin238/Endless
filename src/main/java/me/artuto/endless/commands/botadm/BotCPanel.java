@@ -45,15 +45,15 @@ public class BotCPanel extends Command
     @Override
     protected void execute(CommandEvent event) 
     {
-        if(!(event.isOwner()) || event.isCoOwner())
+        if(!(event.isOwner()) && !(event.isCoOwner()))
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-            return;
+            return;   
         }
+        
         if(event.getArgs().isEmpty())
         {
             event.replyError("Please execute a valid subcommand!");
-            return;
         }
     }
     
@@ -73,17 +73,18 @@ public class BotCPanel extends Command
        @Override
        protected void execute(CommandEvent event)
        {
-            if(!(event.isOwner()) || event.isCoOwner())
+            if(!(event.isOwner()) && !(event.isCoOwner()))
             {
                 event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-                return;
-                
+                return;   
             }
+            
             if(event.getArgs().isEmpty())
             {
                 event.replyError("Please provide me a valid OnlineStatus!");
                 return;
             }
+            
             if(event.getArgs().equals("help"))
             {
                 event.replyInDM("Help for subcommand `bot status`\n"

@@ -64,11 +64,18 @@ public class Eval extends Command
                     + "Packages.me.artuto.endless.others,"
                     + "Packages.me.artuto.endless.tools,"
                     + "Packages.me.artuto.endless.loader,"
-                    + "Packages.me.artuto.endless.utils);");
+                    + "Packages.me.artuto.endless.utils,"
+                    + "Packages.com.jagrosh.jdautilities,"
+                    + "Packages.com.jagrosh.jdautilities.commandclient,"
+                    + "Packages.com.jagrosh.jdautilities.commandclient.examples,"
+                    + "Packages.com.jagrosh.jdautilities.commandclient.impl,"
+                    + "Packages.com.jagrosh.jdautilities.entities,"
+                    + "Packages.com.jagrosh.jdautilities.menu.*,"
+                    + "Packages.com.jagrosh.jdautilities.utils,"
+                    + "Packages.com.jagrosh.jdautilities.waiter);");
         }
         catch(ScriptException e)
         {
-            e.printStackTrace();
         }
     }
 	
@@ -78,7 +85,7 @@ public class Eval extends Command
         if(!(event.isOwner()) && !(event.isCoOwner()))
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-            return;
+            return;   
         }
         
         try

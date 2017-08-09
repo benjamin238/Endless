@@ -45,11 +45,12 @@ public class Bash extends Command
     @Override
     protected void execute(CommandEvent event) 
     {       
-        if(!(event.isOwner()) || event.isCoOwner())
+        if(!(event.isOwner()) && !(event.isCoOwner()))
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-            return;
+            return;   
         }
+        
         if(event.getArgs().isEmpty())
         {
             event.replyError("Cannot execute a empty command");
@@ -58,7 +59,8 @@ public class Bash extends Command
 
         StringBuilder output = new StringBuilder();
         String finalOutput = null;
-        try {
+        try 
+        {
             Process p = Runtime.getRuntime().exec(event.getArgs());
             p.waitFor();
             BufferedReader reader =
@@ -77,12 +79,18 @@ public class Bash extends Command
 
             // Remove linebreak
             finalOutput = output.substring(0, output.length() - 1);
-        } catch (IOException e) {
+        } 
+        catch(IOException e) 
+        {
             event.replyError("I wasn't able to find the command `" + event.getArgs() + "`!");
             return;
-        } catch (IllegalArgumentException e) {
+        } 
+        catch(IllegalArgumentException e) 
+        {
             event.replyError("Command output too long!");
-        } catch (Exception e) {
+        }
+        catch(Exception e) 
+        {
             e.printStackTrace();
             event.replyError("An unknown error occurred! Check the bot console.");
             return;

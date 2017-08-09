@@ -42,13 +42,13 @@ public class Shutdown extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        if(!(event.isOwner()) || event.isCoOwner())
+        if(!(event.isOwner()) && !(event.isCoOwner()))
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-            return;
+            return;   
         }
         
-        event.getTextChannel().sendMessage("Done! Good bye!").complete();
+        event.reactSuccess();
         event.getJDA().shutdown();
     }
     

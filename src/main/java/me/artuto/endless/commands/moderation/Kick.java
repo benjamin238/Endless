@@ -22,9 +22,7 @@ import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.awt.Color;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import me.artuto.endless.Messages;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -59,23 +57,27 @@ public class Kick extends Command
         Member member;
         User author;
         author = event.getAuthor();
+        String target = null;
+        String reason = null;
         
         if(event.getArgs().isEmpty())
         {
             event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
             return;
         }
-        
-        String args = event.getArgs();
-        String[] targetpre = args.split(" for ");
-        String target = targetpre[0];
-        String reason = targetpre[1];
 
-        if(reason==null)
+        try
         {
-            reason = "no reason specified";
+            String[] args = event.getArgs().split(" for ");
+            target = args[0];
+            reason = args[1];
         }
-        
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
+            return;
+        }
+
         List<Member> list = FinderUtil.findMembers(target, event.getGuild());
             
         if(list.isEmpty())

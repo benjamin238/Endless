@@ -93,37 +93,37 @@ public class UserInfo extends Command
         if(member.getOnlineStatus().toString().equals("ONLINE"))
         {
             emote = "<:online:334859814410911745>";
-            status = "**Online** ";
+            status = "Online ";
         }
         else if(member.getOnlineStatus().toString().equals("IDLE"))
         {
             emote = "<:away:334859813869584384>";
-            status = "**Away** ";
+            status = "Away ";
         }
         else if(member.getOnlineStatus().toString().equals("DO_NOT_DISTURB"))
         {
             emote = "<:dnd:334859814029099008>";
-            status = "**Do Not Disturb** ";
+            status = "Do Not Disturb ";
         }
         else if(member.getOnlineStatus().toString().equals("INVISIBLE"))
         {
             emote = "<:invisible:334859814410649601>";
-            status = "**Invisible** ";
+            status = "Invisible ";
         }
         else if(member.getOnlineStatus().toString().equals("OFFLINE"))
         {
             emote = "<:offline:334859814423232514>";
-            status = "**Offline** ";
+            status = "Offline ";
         }
         else if(member.getOnlineStatus().toString().equals("UNKNOWN"))
         {
             emote = ":interrobang:";
-            status = "**Unknown** ";
+            status = "Unknown ";
         }
         
         if(rolesbldr.toString().isEmpty())
         {
-            roles = "**None**";
+            roles = "None";
         }
         else
         {
@@ -136,7 +136,7 @@ public class UserInfo extends Command
         }
         else
         {
-            ranks = "**None**";
+            ranks = "**None";
         }
         
         try
