@@ -124,8 +124,7 @@ public class Kick extends Command
            builder.setTimestamp(Instant.now());
            
            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.KICK_SUCCESS+success), 
-                    (e) -> event.replyWarning(Messages.KICK_NODM+success)));             
+                    d -> event.replySuccess("dm"), e -> event.replyWarning("nodm")));             
         }
         catch(Exception e)
         {
