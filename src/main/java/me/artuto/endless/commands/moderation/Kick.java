@@ -123,6 +123,7 @@ public class Kick extends Command
            
 <<<<<<< HEAD
            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
+<<<<<<< HEAD
                     d -> event.replySuccess("dm"), e -> event.replyWarning("nodm")));             
 =======
             member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
@@ -132,6 +133,10 @@ public class Kick extends Command
            event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
         
 >>>>>>> d689555c8e121c3f11361712d1d6d2f1db1d3b15
+=======
+                    (d) -> event.replySuccess(Messages.KICK_SUCCESS+success), 
+                    (e) -> event.replyWarning(Messages.KICK_NODM+success)));             
+>>>>>>> parent of 73c9010... reeee
         }
         catch(Exception e)
         {
