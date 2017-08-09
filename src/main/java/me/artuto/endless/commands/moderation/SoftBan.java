@@ -60,7 +60,7 @@ public class SoftBan extends Command
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"softban @user | ID | nickname | username for *reason*");
             return;
         }
         
