@@ -86,7 +86,7 @@ public class Unban extends Command
             user = list.get(0);
         }
         
-        String success = "**"+user.getName()+"#"+user.getDiscriminator()+"** with reason **"+reason+"**";
+        String success = user.getAsMention();
         
         try
         {
@@ -95,7 +95,7 @@ public class Unban extends Command
         }
         catch(Exception e)
         {
-            event.replyError(Messages.UNBAN_ERROR+user.getName()+"#"+user.getDiscriminator()+"**");
+            event.replyError(Messages.UNBAN_ERROR+user.getAsMention());
         }
     }
     

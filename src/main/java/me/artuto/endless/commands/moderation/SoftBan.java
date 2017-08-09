@@ -30,20 +30,18 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
 /**
  *
  * @author Artu
  */
 
-public class Ban extends Command
+public class SoftBan extends Command
 {
-    public Ban()
+    public SoftBan()
     {
-        this.name = "ban";
-        this.aliases = new String[]{"hackban"};
-        this.help = "Bans the specified user";
+        this.name = "softban";
+        this.help = "Softbans the specified user";
         this.arguments = "@user | ID | nickname | username";
         this.category = new Command.Category("Moderation");
         this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
@@ -71,7 +69,6 @@ public class Ban extends Command
         String target = targetpre[0];
         String reason = targetpre[1];
         
-        
         if(reason==null)
         {
             reason = "no reason specified";
@@ -96,39 +93,42 @@ public class Ban extends Command
     
         if(!event.getSelfMember().canInteract(member))
         {
-            event.replyError("I can't ban the specified user!");
+            event.replyError("I can't softban the specified user!");
             return;
         }
         
         if(!event.getMember().canInteract(member))
         {
-            event.replyError("You can't ban the specified user!");
+            event.replyError("You can't softban the specified user!");
             return;
         }
         
         String success = member.getAsMention();
-              
+        
         try
         {
             builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-            builder.setTitle("Ban");
-            builder.setDescription("You were banned on the guild **"+event.getGuild().getName()+"** by **"
+            builder.setTitle("Softban");
+            builder.setDescription("You were softbanned on the guild **"+event.getGuild().getName()+"** by **"
                 +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
-                + "They gave the following reason: **"+reason+"**\n");
+                + "They gave the following reason: **"+reason+"**\n"
+                + "You can join again.\n");
             builder.setFooter("Time", null);
             builder.setTimestamp(Instant.now());
-            builder.setColor(Color.RED);
+            builder.setColor(Color.ORANGE);
             builder.setThumbnail(event.getGuild().getIconUrl());
            
             member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.BAN_SUCCESS+success), 
-                    (e) -> event.replyWarning(Messages.BAN_NODM+success)));
+                    (d) -> event.replySuccess(Messages.SOFTBAN_SUCCESS+success), 
+                    (e) -> event.replyWarning(Messages.SOFTBAN_NODM+success)));
             
-            event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+            event.getGuild().getController().ban(member, 1).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+            
+            event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
         }
         catch(Exception e)
         {
-            event.replyError(Messages.BAN_ERROR+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
+            event.replyError(Messages.SOFTBAN_ERROR+member.getAsMention());
         }
     }
 }
