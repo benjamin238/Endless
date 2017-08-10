@@ -33,6 +33,7 @@ import me.artuto.endless.commands.bot.*;
 import me.artuto.endless.commands.botadm.*;
 import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.others.*;
+import me.artuto.endless.commands.settings.ModLog;
 import me.artuto.endless.commands.tools.*;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -63,6 +64,7 @@ public class Endless extends ListenerAdapter
         //Register Commands and some other things
         
         EventWaiter waiter = new EventWaiter();
+        Bot bot = new Bot(waiter);
 
         CommandClientBuilder client = new CommandClientBuilder();
 
@@ -102,6 +104,10 @@ public class Endless extends ListenerAdapter
                 new SoftBan(),
                 new Unban(),
                 
+                //Settings
+                
+                new ModLog(bot),
+                
                 //Tools
                
                 new Avatar(),
@@ -123,7 +129,7 @@ public class Endless extends ListenerAdapter
             .setGame(Game.of(Const.GAME_0))
             .addEventListener(waiter)
             .addEventListener(client.build())
-            .addEventListener(new Bot())
+            .addEventListener(bot)
             .addEventListener(new Endless())
             .addEventListener(new Logging())
             .buildBlocking();                
