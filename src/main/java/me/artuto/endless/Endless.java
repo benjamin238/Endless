@@ -80,7 +80,7 @@ public class Endless extends ListenerAdapter
         
         client.addCommands(
         		
-        	//Bot
+        	    //Bot
 
                 new About(),
                 new Donate(),
@@ -134,11 +134,13 @@ public class Endless extends ListenerAdapter
     @Override
     public void onReady(ReadyEvent event)
     {
-        System.out.println("[ENDLESS]: My robotic body is ready!\n"
-            + "[ENDLESS]: Logged in as: "+event.getJDA().getSelfUser().getName()+"#"+event.getJDA().getSelfUser().getDiscriminator()
-            + "("+event.getJDA().getSelfUser().getId()+")\n"
-            + "[ENDLESS]: Using prefix: "+Config.getPrefix()+"\n"
-            + "[ENDLESS]: Owner: "+Config.getOwnerTag()+"("+Config.getOwnerId()+")\n"
-            + "[ENDLESS]: Co-Owner: "+Config.getCoOwnerTag()+" ("+Config.getCoOwnerId()+")\n");
+        SimpleLog LOG = SimpleLog.getLog("Endless");
+
+        LOG.info("My robotic body is ready!");
+        LOG.info("Logged in as: "+event.getJDA().getSelfUser().getName()+"#"+event.getJDA().getSelfUser().getDiscriminator()
+                + " ("+event.getJDA().getSelfUser().getId()+")");
+        LOG.info("Using prefix: "+Config.getPrefix());
+        LOG.info("Owner: "+event.getJDA().getUserById(Config.getOwnerId()).getName()+"#"+event.getJDA().getUserById(Config.getOwnerId()).getDiscriminator()
+                + " ("+event.getJDA().getUserById(Config.getOwnerId()).getId()+")");
     }
 }

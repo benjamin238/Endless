@@ -20,6 +20,8 @@ package me.artuto.endless.commands.bot;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.awt.Color;
+import java.lang.management.OperatingSystemMXBean;
+
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -56,12 +58,16 @@ public class Stats extends Command
         {
             color = event.getGuild().getSelfMember().getColor();
         }
+
+        double ramUse = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024;
         
         EmbedBuilder builder = new EmbedBuilder();
-        builder.addField(":map: Guilds: ", "**"+event.getJDA().getGuilds().size()+"**" , true);
-        builder.addField(":speech_balloon: Text Channels: ", "**"+event.getJDA().getTextChannels().size()+"**", true);
-        builder.addField(":speaker: Voice Channels: ", "**"+event.getJDA().getVoiceChannels().size()+"**", true);
-        builder.addField(":bust_in_silhouette: Users: ", "**"+event.getJDA().getUsers().size()+"**", true);
+        builder.addField(":map: Guilds: ", ""+event.getJDA().getGuilds().size() , true);
+        builder.addField(":speech_balloon: Text Channels: ", ""+event.getJDA().getTextChannels().size(), true);
+        builder.addBlankField(true);
+        builder.addField(":speaker: Voice Channels: ", ""+event.getJDA().getVoiceChannels().size(), true);
+        builder.addField(":bust_in_silhouette: Users: ", ""+event.getJDA().getUsers().size(), true);
+        builder.addField(":computer: RAM usage: ", ramUse+" MB", true);
         builder.setColor(color);
         builder.setFooter(event.getSelfUser().getName(), event.getSelfUser().getAvatarUrl());
         event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue();

@@ -51,12 +51,20 @@ public class DBansCheck extends Command
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
         this.guildOnly = false;
+        this.cooldown = 10;
     }
     
     @Override
     protected void execute(CommandEvent event)
     {   
         User user;
+
+        if(event.getArgs().isEmpty())
+        {
+            event.replyWarning("Please specify a user ID!");
+            return;
+        }
+
         try
         {
            user = event.getJDA().retrieveUserById(event.getArgs()).complete(); 
@@ -71,11 +79,6 @@ public class DBansCheck extends Command
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
             LOG.warn("Someone triggered the Discord Bans Check command, but there's not a token in the config file. In order to stop this message add a token to the config file.");
-            return;
-        }
-        if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("Please specify a user ID!");
             return;
         }
         

@@ -21,6 +21,8 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.util.List;
+import java.util.function.BiConsumer;
+
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -49,7 +51,8 @@ public class Avatar extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        Member target = null;
+        Member target;
+        EmbedBuilder builder = new EmbedBuilder();
         
         if(event.getArgs().isEmpty())
         {
@@ -79,15 +82,13 @@ public class Avatar extends Command
             
         try
         {
-            EmbedBuilder builder = new EmbedBuilder();
-                
                 builder.setImage(target.getUser().getAvatarUrl());
                 builder.setColor(target.getColor());
                 event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
         }
         catch(Exception e)
         {
-             event.replyError("An error happened when getting the avatar!");
+                event.replyError("An error happened when getting the avatar!");
         }
     }
 }

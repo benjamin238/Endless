@@ -61,7 +61,7 @@ public class About extends Command
         
        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
        EmbedBuilder builder = new EmbedBuilder();
-              builder.setColor(color);
+
               builder.setDescription("Hi, I'm Endless! A multipurpose bot designed to be smart.\n"
               		+ "If you found a bug please contact my dad\n"
               		+ "("+Const.DEV+")!\n");
@@ -71,8 +71,9 @@ public class About extends Command
               builder.addField("<:github:326118305062584321> GitHub:", "Did you found a bug? Want improve something?\n"
               		+ "Please open an Issue or create a PR on GitHub\n"
               		+ "**https://github.com/ArtutoGamer/Endless**\n", false);
-              builder.addField(":link: Support Guild:", "**https://discord.gg/CXKfYW3**\n", false);
-              builder.setFooter("Version: "+Const.VERSION+" | Uptime", null);
+              builder.addField(":link: Support Guild:", "**[Support]("+Const.INVITE+")**\n", false);
+              builder.setFooter("Version: "+Const.VERSION+" | Latest Start", null);
+              builder.setColor(color);
               builder.setTimestamp(event.getClient().getStartTime());
               builder.setThumbnail(event.getSelfUser().getAvatarUrl());
               event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
