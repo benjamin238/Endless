@@ -36,7 +36,7 @@ public class Settings
         }
         catch(NumberFormatException e)
         {
-        this.modlogId = 0;
+            this.modlogId = 0;
         }
         try
         {
