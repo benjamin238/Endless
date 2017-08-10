@@ -58,7 +58,7 @@ public class ModLog extends Command
         else if(event.getArgs().equalsIgnoreCase("none"))
         {
             bot.clearModLogChannel(event.getGuild());
-            event.reply(event.getClient().getSuccess()+" Music commands can now be used in any channel");
+            event.reply(event.getClient().getSuccess()+" Modlogging disabled");
         }
         else
         {
