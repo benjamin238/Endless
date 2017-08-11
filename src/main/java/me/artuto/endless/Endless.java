@@ -68,8 +68,9 @@ public class Endless extends ListenerAdapter
         
         EventWaiter waiter = new EventWaiter();
         Bot bot = new Bot(waiter, config);
-        Settings settings;
         ModLogging modlog = new ModLogging(bot);
+        
+        
 
         CommandClientBuilder client = new CommandClientBuilder();
 

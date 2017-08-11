@@ -39,25 +39,24 @@ public class ModLogging
     private static Bot bot;
     private Settings settings;
 
-    public ModLogging(Bot bot)
+    public ModLogging(Bot b)
     {
-        this.bot = bot;
-        this.settings = settings;
+        this.bot = b;
     }
 
-    public static void logBan(User author, Member target, String reason, Guild guild, Message message, CommandEvent event)
+    public static void logBan(User author, Member target, String reason, Guild guild, Message message)
     {
         Settings settings = bot.getSettings(guild);
-        TextChannel tc = event.getJDA().getTextChannelById(bot.getSettings(guild).getModLogId());
-
-            tc.sendMessage(new EmbedBuilder()
-                    .setAuthor(author.getName(), null, author.getAvatarUrl())
-                    .setTitle("A Memeber was banned!")
-                    .setDescription(author.getName()+"#"+author.getDiscriminator()+" banned "+target.getUser().getName()+"#"+target.getUser().getDiscriminator()+"\n with the reason: " +
-                            reason)
-                    .setTimestamp(message.getCreationTime())
-                    .setColor(Color.RED)
-                    .build()).queue();
-            SimpleLog.getLog("DEBUG MODLOG").info("Modlog sent");
+        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        
+        if(settings.getModLogId()==0 || !tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
+        {
+            return;
+        }
+        else
+        {
+            tc.sendMessage("`Ban` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
+                    + "`Reason:` *"+reason+"*").queue();
+        }
     }
 }
