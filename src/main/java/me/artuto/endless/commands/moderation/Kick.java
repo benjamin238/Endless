@@ -30,6 +30,7 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
  *
@@ -130,6 +131,8 @@ public class Kick extends Command
         catch(Exception e)
         {
             event.replyError(Messages.KICK_ERROR+member.getAsMention());
+            SimpleLog.getLog("Kick").fatal(e);
+            e.printStackTrace();
         }
     }
 }

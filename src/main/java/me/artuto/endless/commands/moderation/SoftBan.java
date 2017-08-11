@@ -30,6 +30,7 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
  *
@@ -56,22 +57,27 @@ public class SoftBan extends Command
         EmbedBuilder builder = new EmbedBuilder();
         Member member;
         User author;
+        User user;
         author = event.getAuthor();
+        String target;
+        String reason;
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"softban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban @user | ID | nickname | username for *reason*");
             return;
         }
-        
-        String args = event.getArgs();
-        String[] targetpre = args.split(" for ");
-        String target = targetpre[0];
-        String reason = targetpre[1];
-        
-        if(reason==null)
+
+        try
         {
-            reason = "no reason specified";
+            String[] args = event.getArgs().split(" for ");
+            target = args[0];
+            reason = args[1];
+        }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"softban @user | ID | nickname | username for *reason*");
+            return;
         }
         
         List<Member> list = FinderUtil.findMembers(target, event.getGuild());
@@ -129,6 +135,8 @@ public class SoftBan extends Command
         catch(Exception e)
         {
             event.replyError(Messages.SOFTBAN_ERROR+member.getAsMention());
+            SimpleLog.getLog("SoftBan").fatal(e);
+            e.printStackTrace();
         }
     }
 }

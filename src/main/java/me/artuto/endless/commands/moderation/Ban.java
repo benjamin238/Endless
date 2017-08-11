@@ -67,23 +67,27 @@ public class Ban extends Command
         EmbedBuilder builder = new EmbedBuilder();
         Member member;
         User author;
+        User user;
         author = event.getAuthor();
+        String target;
+        String reason;
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban @user | ID | nickname | username for *reason*");
             return;
         }
-        
-        String args = event.getArgs();
-        String[] targetpre = args.split(" for ");
-        String target = targetpre[0];
-        String reason = targetpre[1];
-        
-        
-        if(reason==null)
+
+        try
         {
-            reason = "no reason specified";
+            String[] args = event.getArgs().split(" for ");
+            target = args[0];
+            reason = args[1];
+        }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
+            return;
         }
         
         List<Member> list = FinderUtil.findMembers(target, event.getGuild());
