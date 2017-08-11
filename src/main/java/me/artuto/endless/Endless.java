@@ -22,6 +22,9 @@ import com.jagrosh.jdautilities.waiter.EventWaiter;
 import java.io.File;
 import java.io.IOException;
 import javax.security.auth.login.LoginException;
+
+import me.artuto.endless.data.Settings;
+import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.OnlineStatus;
@@ -64,7 +67,9 @@ public class Endless extends ListenerAdapter
         //Register Commands and some other things
         
         EventWaiter waiter = new EventWaiter();
-        Bot bot = new Bot(waiter);
+        Bot bot = new Bot(waiter, config);
+        Settings settings;
+        ModLogging modlog = new ModLogging(bot);
 
         CommandClientBuilder client = new CommandClientBuilder();
 

@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import me.artuto.endless.data.Settings;
 import me.artuto.endless.loader.Config;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -43,22 +44,35 @@ import org.json.JSONObject;
 public class Bot extends ListenerAdapter
 {
     private final HashMap<String,Settings> settings;
+    private final Config config;
+    private final EventWaiter waiter;
+    private JDA jda;
     
-    public Bot(EventWaiter waiter)
+    public Bot(EventWaiter waiter, Config config)
     {
+        this.config = config;
+        this.waiter = waiter;
         this.settings = new HashMap<>();
-        try {
+
+        try
+        {
             JSONObject loadedSettings = new JSONObject(new String(Files.readAllBytes(Paths.get("data/serversettings.json"))));
             loadedSettings.keySet().forEach((id) -> {
                 JSONObject o = loadedSettings.getJSONObject(id);
                 
                 settings.put(id, new Settings(
                         o.has("modlog_channel_id") ? o.getString("modlog_channel_id") : null,
-                        o.has("serverlog_channel_id")? o.getString("serverlog_channel_id"): null));
-            });
-        } catch(IOException | JSONException e) {
+                        o.has("serverlog_channel_id")? o.getString("serverlog_channel_id"): null));});
+        }
+        catch(IOException | JSONException e)
+        {
             SimpleLog.getLog("Settings").warn("Failed to load server settings: "+e);
         }
+    }
+
+    public EventWaiter getWaiter()
+    {
+        return waiter;
     }
     
     public Settings getSettings(Guild guild)
@@ -69,6 +83,7 @@ public class Bot extends ListenerAdapter
     public void setModLogChannel(TextChannel channel)
     {
         Settings s = settings.get(channel.getGuild().getId());
+
         if(s==null)
         {
             settings.put(channel.getGuild().getId(), new Settings(channel.getId(),null));
@@ -77,43 +92,27 @@ public class Bot extends ListenerAdapter
         {
             s.setModLogId(channel.getIdLong());
         }
+
         writeSettings();
     }
     
     public void setServerLogChannel(TextChannel channel)
     {
         Settings s = settings.get(channel.getGuild().getId());
+
         if(s==null)
         {
-            settings.put(channel.getGuild().getId(), new Settings(null,channel.getId()));
+            settings.put(channel.getGuild().getId(), new Settings(null, channel.getId()));
         }
         else
         {
             s.setServerLogId(channel.getIdLong());
         }
+
         writeSettings();
     }
-    
-    private void writeSettings()
-    {
-        JSONObject obj = new JSONObject();
-        settings.keySet().stream().forEach(key -> {
-            JSONObject o = new JSONObject();
-            Settings s = settings.get(key);
-            if(s.getModLogId()!=0)
-                o.put("modlog_channel_id", Long.toString(s.getModLogId()));
-            if(s.getServerLogId()!=0)
-                o.put("serverlog_channel_id", Long.toString(s.getServerLogId()));
-            obj.put(key, o);
-        });
-        try {
-            Files.write(Paths.get("data/serversettings.json"), obj.toString(4).getBytes());
-        } catch(IOException ex){
-            SimpleLog.getLog("Settings").warn("Failed to write to file: "+ex);
-        }
-    }
-    
-        public void clearModLogChannel(Guild guild)
+
+    public void clearModLogChannel(Guild guild)
     {
         Settings s = getSettings(guild);
         if(s!=Settings.DEFAULT_SETTINGS)
@@ -125,7 +124,7 @@ public class Bot extends ListenerAdapter
             writeSettings();
         }
     }
-    
+
     public void clearServerLogChannel(Guild guild)
     {
         Settings s = getSettings(guild);
@@ -139,7 +138,30 @@ public class Bot extends ListenerAdapter
         }
     }
     
-    /*@Override
+    private void writeSettings()
+    {
+        JSONObject obj = new JSONObject();
+        settings.keySet().stream().forEach(key -> {
+            JSONObject o = new JSONObject();
+            Settings s = settings.get(key);
+            if(s.getModLogId()!=0)
+                o.put("modlog_channel_id", Long.toString(s.getModLogId()));
+            if(s.getServerLogId()!=0)
+                o.put("serverlog_channel_id", Long.toString(s.getServerLogId()));
+            obj.put(key, o);});
+
+        try
+        {
+            Files.write(Paths.get("data/serversettings.json"), obj.toString(4).getBytes());
+        }
+        catch(IOException ex)
+        {
+            SimpleLog.getLog("Settings").warn("Failed to write to file: "+ex);
+        }
+    }
+
+    
+    @Override
     public void onGuildJoin(GuildJoinEvent event)
     {
         Guild guild;
@@ -180,5 +202,5 @@ public class Bot extends ListenerAdapter
             data.mkdir();
             SimpleLog.getLog("Startup").info("'data' directory created!");
         }
-    }*/
+    }
 }

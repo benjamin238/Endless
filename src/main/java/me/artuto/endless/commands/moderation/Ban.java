@@ -22,14 +22,24 @@ import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.awt.Color;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.Formatter;
 import java.util.List;
+
+import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
+import me.artuto.endless.data.Settings;
 import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.ModLogging;
+import net.dv8tion.jda.client.entities.Group;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.requests.RestAction;
+import net.dv8tion.jda.core.requests.restaction.AuditableRestAction;
+import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
  *
@@ -124,10 +134,14 @@ public class Ban extends Command
                     (e) -> event.replyWarning(Messages.BAN_NODM+success)));
             
             event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+
+            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getMessage(), null);
         }
         catch(Exception e)
         {
             event.replyError(Messages.BAN_ERROR+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
+            SimpleLog.getLog("Ban").fatal(e);
+            e.printStackTrace();
         }
     }
 }

@@ -18,9 +18,16 @@
 package me.artuto.endless.utils;
 
 
+import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import me.artuto.endless.Bot;
 import me.artuto.endless.data.Settings;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.events.Event;
+import net.dv8tion.jda.core.utils.SimpleLog;
+
+import java.awt.*;
 
 /**
  *
@@ -29,23 +36,28 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 public class ModLogging 
 {
-    private final Settings settings;
-    
-    public ModLogging(Settings settings)
+    private static Bot bot;
+    private Settings settings;
+
+    public ModLogging(Bot bot)
     {
+        this.bot = bot;
         this.settings = settings;
     }
-        
-    public void logBan(Message msg)
+
+    public static void logBan(User author, Member target, String reason, Guild guild, Message message, CommandEvent event)
     {
-        TextChannel tc = settings.getModLogId();
-        if(tc==null || !tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_EMBED_LINKS))
-            return;
-        tc.sendMessage(new EmbedBuilder()
-                .setColor(tc.getGuild().getSelfMember().getColor())
-                .setTimestamp(msg.getCreationTime())
-                .setFooter(msg.getAuthor().getName()+"#"+msg.getAuthor().getDiscriminator()+" | #"+msg.getTextChannel().getName(), msg.getAuthor().getEffectiveAvatarUrl())
-                .setDescription(msg.getRawContent())
-                .build()).queue();
+        Settings settings = bot.getSettings(guild);
+        TextChannel tc = event.getJDA().getTextChannelById(bot.getSettings(guild).getModLogId());
+
+            tc.sendMessage(new EmbedBuilder()
+                    .setAuthor(author.getName(), null, author.getAvatarUrl())
+                    .setTitle("A Memeber was banned!")
+                    .setDescription(author.getName()+"#"+author.getDiscriminator()+" banned "+target.getUser().getName()+"#"+target.getUser().getDiscriminator()+"\n with the reason: " +
+                            reason)
+                    .setTimestamp(message.getCreationTime())
+                    .setColor(Color.RED)
+                    .build()).queue();
+            SimpleLog.getLog("DEBUG MODLOG").info("Modlog sent");
     }
 }
