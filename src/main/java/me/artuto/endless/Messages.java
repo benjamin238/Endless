@@ -42,6 +42,10 @@ public class Messages
     public static String SOFTBAN_SUCCESS = "Successfully softbanned user ";
     public static String SOFTBAN_NODM = "An error happened when sending the DM. Softbanned user ";
     public static String SOFTBAN_ERROR = "An error happened when softbanning ";
+    public static String HACKBAN_SUCCESS = "Successfully hackbanned user ";
+    public static String HACKBAN_ERROR = "An error happened when hackbanning ";
     
-    //
+    // Warning
+
+    public static String MODLOG_NOPERMISSIONS = "A Channel as Modlog is set but I don't have the required permissions, make sure I have: `Message Read` `Message Write`, `Send Images` and `Read History`!";
 }

@@ -51,7 +51,6 @@ public class Ban extends Command
     public Ban()
     {
         this.name = "ban";
-        this.aliases = new String[]{"hackban"};
         this.help = "Bans the specified user";
         this.arguments = "@user | ID | nickname | username";
         this.category = new Command.Category("Moderation");
@@ -74,7 +73,7 @@ public class Ban extends Command
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
             return;
         }
 
@@ -86,7 +85,7 @@ public class Ban extends Command
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
             return;
         }
         
@@ -139,7 +138,7 @@ public class Ban extends Command
             
             event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getMessage());
+            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
         }
         catch(Exception e)
         {

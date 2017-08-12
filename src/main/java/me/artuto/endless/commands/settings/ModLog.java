@@ -39,11 +39,12 @@ public class ModLog extends Command
     {
         this.bot = bot;
         this.name = "modlog";
+        this.aliases = new String[]{"banlog", "kicklog", "banslog", "kickslog"};
         this.help = "Sets the modlog channel";
         this.arguments = "#channel | Channel ID | Channel name";
         this.category = new Command.Category("Settings");
-        this.botPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.ownerCommand = false;
         this.guildOnly = true;
     }

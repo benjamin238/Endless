@@ -23,6 +23,7 @@ import java.util.List;
 import me.artuto.endless.Messages;
 import me.artuto.endless.utils.FinderUtil2;
 import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
@@ -73,7 +74,7 @@ public class Unban extends Command
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban @user | ID | nickname | username for *reason*");
             return;
         }
               
@@ -100,6 +101,8 @@ public class Unban extends Command
         {
             event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
             event.replySuccess(Messages.UNBAN_SUCCESS+success);
+
+            ModLogging.logUnban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
         }
         catch(Exception e)
         {

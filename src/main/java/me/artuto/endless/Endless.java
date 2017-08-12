@@ -107,6 +107,7 @@ public class Endless extends ListenerAdapter
                 
                 new Ban(),
                 new Kick(),
+                new Hackban(),
                 new SoftBan(),
                 new Unban(),
                 

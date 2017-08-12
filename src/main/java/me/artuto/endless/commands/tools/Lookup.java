@@ -127,7 +127,7 @@ public class Lookup extends Command
             {
                 builder.addField(":poop: Shithead: ", "**A LOT**", true);
             }
-	    builder.setThumbnail(user.getEffectiveAvatarUrl());
+	        builder.setThumbnail(user.getEffectiveAvatarUrl());
     	    builder.setColor(color);
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
         }

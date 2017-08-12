@@ -17,17 +17,12 @@
 
 package me.artuto.endless.utils;
 
-
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Messages;
 import me.artuto.endless.data.Settings;
-import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.utils.SimpleLog;
-
-import java.awt.*;
+import java.time.OffsetDateTime;
 
 /**
  *
@@ -37,25 +32,133 @@ import java.awt.*;
 public class ModLogging 
 {
     private static Bot bot;
-    private Settings settings;
 
     public ModLogging(Bot b)
     {
         this.bot = b;
     }
 
-    public static void logBan(User author, Member target, String reason, Guild guild, Message message)
+    public static void logBan(User author, Member target, String reason, Guild guild, TextChannel channel, Message message)
     {
         Settings settings = bot.getSettings(guild);
         TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        OffsetDateTime time = message.getCreationTime();
+        int hour = time.getHour();
+        int min = time.getMinute();
+        int sec = time.getSecond();
         
-        if(settings.getModLogId()==0 || !tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
+        if(settings.getModLogId()==0)
         {
             return;
         }
+        else if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
+        {
+            guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
+                    null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+        }
         else
         {
-            tc.sendMessage("`Ban` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
+            tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Ban:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
+                    + "`Reason:` *"+reason+"*").queue();
+        }
+    }
+
+    public static void logHackban(User author, User target, String reason, Guild guild, TextChannel channel, Message message)
+    {
+        Settings settings = bot.getSettings(guild);
+        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        OffsetDateTime time = message.getCreationTime();
+        int hour = time.getHour();
+        int min = time.getMinute();
+        int sec = time.getSecond();
+
+        if(settings.getModLogId()==0)
+        {
+            return;
+        }
+        else if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
+        {
+            guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
+                    null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+        }
+        else
+        {
+            tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Hackban:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") hackbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
+                    + "`Reason:` *"+reason+"*").queue();
+        }
+    }
+
+    public static void logKick(User author, Member target, String reason, Guild guild, TextChannel channel, Message message)
+    {
+        Settings settings = bot.getSettings(guild);
+        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        OffsetDateTime time = message.getCreationTime();
+        int hour = time.getHour();
+        int min = time.getMinute();
+        int sec = time.getSecond();
+
+        if(settings.getModLogId()==0)
+        {
+            return;
+        }
+        else if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
+        {
+            guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
+                    null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+        }
+        else
+        {
+            tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Kick:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
+                    + "`Reason:` *"+reason+"*").queue();
+        }
+    }
+
+    public static void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel, Message message)
+    {
+        Settings settings = bot.getSettings(guild);
+        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        OffsetDateTime time = message.getCreationTime();
+        int hour = time.getHour();
+        int min = time.getMinute();
+        int sec = time.getSecond();
+
+        if(settings.getModLogId()==0)
+        {
+            return;
+        }
+        else if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
+        {
+            guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
+                    null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+        }
+        else
+        {
+            tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Softban:` :banana: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") softbanned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
+                    + "`Reason:` *"+reason+"*").queue();
+        }
+    }
+
+    public static void logUnban(User author, User target, String reason, Guild guild, TextChannel channel, Message message)
+    {
+        Settings settings = bot.getSettings(guild);
+        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        OffsetDateTime time = message.getCreationTime();
+        int hour = time.getHour();
+        int min = time.getMinute();
+        int sec = time.getSecond();
+
+        if(settings.getModLogId()==0)
+        {
+            return;
+        }
+        else if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
+        {
+            guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
+                    null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+        }
+        else
+        {
+            tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Unban:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
                     + "`Reason:` *"+reason+"*").queue();
         }
     }
