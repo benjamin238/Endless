@@ -23,8 +23,10 @@ import java.io.File;
 import java.io.IOException;
 import javax.security.auth.login.LoginException;
 
+import me.artuto.endless.commands.settings.ServerSettings;
 import me.artuto.endless.data.Settings;
 import me.artuto.endless.utils.ModLogging;
+import me.artuto.endless.utils.ServerLogging;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.OnlineStatus;
@@ -69,7 +71,7 @@ public class Endless extends ListenerAdapter
         EventWaiter waiter = new EventWaiter();
         Bot bot = new Bot(waiter, config);
         ModLogging modlog = new ModLogging(bot);
-        
+        ServerLogging serverlog = new ServerLogging(bot);
         
 
         CommandClientBuilder client = new CommandClientBuilder();
@@ -112,7 +114,8 @@ public class Endless extends ListenerAdapter
                 new Unban(),
                 
                 //Settings
-                
+
+                new ServerSettings(bot),
                 new ModLog(bot),
                 
                 //Tools
@@ -137,6 +140,7 @@ public class Endless extends ListenerAdapter
             .addEventListener(waiter)
             .addEventListener(client.build())
             .addEventListener(bot)
+            .addEventListener(serverlog)
             .addEventListener(new Endless())
             .addEventListener(new Logging())
             .buildBlocking();                

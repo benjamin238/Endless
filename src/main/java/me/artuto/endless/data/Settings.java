@@ -17,7 +17,7 @@
 
 package me.artuto.endless.data;
 
-/**
+import me.artuto.endless.Bot; /**
  *
  * @author Artu
  */
@@ -53,7 +53,7 @@ public class Settings
         this.modlogId = modlogId;
         this.srvlogId = srvlogId;
     }
-    
+
     public long getModLogId()
     {
         return modlogId;

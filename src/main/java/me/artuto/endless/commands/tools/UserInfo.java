@@ -150,7 +150,7 @@ public class UserInfo extends Command
             builder.addField(":medal: Special Ranks: ", ranks, true);
     	    builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
     	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);    
-	    builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
+	        builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
     	    builder.setColor(member.getColor());
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
         }

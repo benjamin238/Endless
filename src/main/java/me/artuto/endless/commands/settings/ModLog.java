@@ -52,28 +52,7 @@ public class ModLog extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        if(event.getArgs().isEmpty())
-        {
-            event.reply(event.getClient().getError()+" Please include a text channel or NONE");
-        }
-        else if(event.getArgs().equalsIgnoreCase("none"))
-        {
-            bot.clearModLogChannel(event.getGuild());
-            event.reply(event.getClient().getSuccess()+" Modlogging disabled");
-        }
-        else
-        {
-            List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-            if(list.isEmpty())
-                event.reply(event.getClient().getWarning()+" No Text Channels found matching \""+event.getArgs()+"\"");
-            else if (list.size()>1)
-                event.reply(event.getClient().getWarning()+FormatUtil.listOfTcChannels(list, event.getArgs()));
-            else
-            {
-                bot.setModLogChannel(list.get(0));
-                event.reply(event.getClient().getSuccess()+" Modlogging actions will be logged in "+list.get(0).getAsMention());
-            }
-        }
+
         
     }
 }
