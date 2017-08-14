@@ -30,13 +30,16 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 public class Config 
 {
     private final SimpleLog LOG = SimpleLog.getLog("Config");
-    private String userToken;
+    private String token;
     private static String prefix;
     private static String owner;
     private static String ownertag;
     private static String coownerid;
     private static String coownertag;
     private static String dbanstoken;
+    private static String mysqlip;
+    private static String mysqluser;
+    private static String mysqlpass;
     
     public Config() throws Exception
     {
@@ -49,7 +52,7 @@ public class Config
             switch(key) 
             {
                 case "token":
-                    userToken = value;
+                    token = value;
                     break;
                 case "prefix":
                     if(value==null)
@@ -74,10 +77,19 @@ public class Config
                     break;
                 case "dbanstoken":
                     dbanstoken = value;
-                    break;    
+                    break;
+                case "mysqlip":
+                    mysqlip = value;
+                    break;
+                case "mysqluser":
+                    mysqluser = value;
+                    break;
+                case "mysqlpass":
+                    mysqlpass = value;
+                    break;
             }
         }
-        if(userToken==null)
+        if(token==null)
             throw new Exception("No token provided in the config file!");
         if(prefix==null)
             throw new Exception("No prefix provided in the config file!");
@@ -91,11 +103,17 @@ public class Config
             LOG.warn("No Co-Owner provided in the config file! Disabling feature...");
         if(dbanstoken==null)
             LOG.warn("No Discord Bans token provided in the config file! Disabling feature...");
+        if(mysqlip==null)
+            throw new Exception("No Owner Tag provided in the config file!");
+        if(mysqluser==null)
+            throw new Exception("No Owner Tag provided in the config file!");
+        if(mysqlpass==null)
+            throw new Exception("No Owner Tag provided in the config file!");
     }
     
     public String getToken()
     {
-        return userToken;
+        return token;
     }
     
     public static String getPrefix()
@@ -122,9 +140,24 @@ public class Config
     {
         return coownertag;
     }
-    
+
     public static String getDBansToken()
     {
         return dbanstoken;
+    }
+    
+    public static String getMySQLIp()
+    {
+        return mysqlip;
+    }
+
+    public static String getMySQLUser()
+    {
+        return mysqluser;
+    }
+
+    public static String getMySQLPass()
+    {
+        return mysqlpass;
     }
 }

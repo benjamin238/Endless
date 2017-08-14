@@ -17,11 +17,12 @@
 
 package me.artuto.endless.utils;
 
-import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.Settings;
+import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.utils.SimpleLog;
+
 import java.time.OffsetDateTime;
 
 /**
@@ -31,23 +32,23 @@ import java.time.OffsetDateTime;
 
 public class ModLogging 
 {
-    private static Bot bot;
+    private final SimpleLog LOG = SimpleLog.getLog("ModLog");
+    private static Database database;
 
-    public ModLogging(Bot b)
+    public ModLogging(Database database)
     {
-        this.bot = b;
+        this.database = database;
     }
 
     public static void logBan(User author, Member target, String reason, Guild guild, TextChannel channel, Message message)
     {
-        Settings settings = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        TextChannel tc = database.getModlogChannel(guild);
         OffsetDateTime time = message.getCreationTime();
         int hour = time.getHour();
         int min = time.getMinute();
         int sec = time.getSecond();
         
-        if(settings.getModLogId()==0)
+        if(tc==null)
         {
             return;
         }
@@ -65,14 +66,13 @@ public class ModLogging
 
     public static void logHackban(User author, User target, String reason, Guild guild, TextChannel channel, Message message)
     {
-        Settings settings = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        TextChannel tc = database.getModlogChannel(guild);
         OffsetDateTime time = message.getCreationTime();
         int hour = time.getHour();
         int min = time.getMinute();
         int sec = time.getSecond();
 
-        if(settings.getModLogId()==0)
+        if(tc==null)
         {
             return;
         }
@@ -90,14 +90,13 @@ public class ModLogging
 
     public static void logKick(User author, Member target, String reason, Guild guild, TextChannel channel, Message message)
     {
-        Settings settings = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        TextChannel tc = database.getModlogChannel(guild);
         OffsetDateTime time = message.getCreationTime();
         int hour = time.getHour();
         int min = time.getMinute();
         int sec = time.getSecond();
 
-        if(settings.getModLogId()==0)
+        if(tc==null)
         {
             return;
         }
@@ -115,14 +114,13 @@ public class ModLogging
 
     public static void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel, Message message)
     {
-        Settings settings = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        TextChannel tc = database.getModlogChannel(guild);
         OffsetDateTime time = message.getCreationTime();
         int hour = time.getHour();
         int min = time.getMinute();
         int sec = time.getSecond();
 
-        if(settings.getModLogId()==0)
+        if(tc==null)
         {
             return;
         }
@@ -140,14 +138,13 @@ public class ModLogging
 
     public static void logUnban(User author, User target, String reason, Guild guild, TextChannel channel, Message message)
     {
-        Settings settings = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(settings.getModLogId());
+        TextChannel tc = database.getModlogChannel(guild);
         OffsetDateTime time = message.getCreationTime();
         int hour = time.getHour();
         int min = time.getMinute();
         int sec = time.getSecond();
 
-        if(settings.getModLogId()==0)
+        if(tc==null)
         {
             return;
         }

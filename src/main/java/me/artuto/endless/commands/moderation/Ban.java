@@ -22,23 +22,15 @@ import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.awt.Color;
 import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.util.Formatter;
 import java.util.List;
 
-import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.Settings;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.ModLogging;
-import net.dv8tion.jda.client.entities.Group;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.requests.RestAction;
-import net.dv8tion.jda.core.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
