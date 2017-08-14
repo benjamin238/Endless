@@ -26,12 +26,7 @@ hs_err_pid*
 
 # Other things
 logs/*
-log*
-target*
 target/*
 dependency-reduced-pom.xml
 .idea/*
-.idea
 *.iml
-data
-data/*
