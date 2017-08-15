@@ -23,9 +23,7 @@ import com.jagrosh.jdautilities.waiter.EventWaiter;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.security.auth.login.LoginException;
-
 import me.artuto.endless.commands.settings.ServerSettings;
-import me.artuto.endless.data.Database;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
@@ -68,12 +66,9 @@ public class Endless extends ListenerAdapter
         //Register Commands and some other things
         
         EventWaiter waiter = new EventWaiter();
-        Database database = new Database(Config.getMySQLIp(), Config.getMySQLUser(), Config.getMySQLPass());
-        database.startupCheck();
-        ModLogging modlog = new ModLogging(database);
-        //ServerLogging serverlog = new ServerLogging(bot);
+        Bot bot = new Bot(waiter, config);
+        ModLogging modlog = new ModLogging(bot);
         
-
         CommandClientBuilder client = new CommandClientBuilder();
 
         client.useDefaultGame();
@@ -108,8 +103,8 @@ public class Endless extends ListenerAdapter
                 new Unban(),
                 
                 //Settings
-
-                new ServerSettings(database, modlog),
+                
+                new ServerSettings(bot),               
                 
                 //Tools
                
@@ -132,8 +127,9 @@ public class Endless extends ListenerAdapter
             .setGame(Game.of(Const.GAME_0))
             .addEventListener(waiter)
             .addEventListener(client.build())
-            .addEventListener(new Bot())
-            //.addEventListener(serverlog)
+            .addEventListener(bot)
+            //.addEventListener(new ServerLogging())
+            .addEventListener(bot)
             .addEventListener(new Endless())
             .addEventListener(new Logging())
             .buildBlocking();                
