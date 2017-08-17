@@ -20,13 +20,10 @@ package me.artuto.endless;
 import com.jagrosh.jdautilities.commandclient.CommandClient;
 import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.security.auth.login.LoginException;
-
 import me.artuto.endless.commands.*;
-import me.artuto.endless.commands.ServerSettings;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
