@@ -37,10 +37,8 @@ public class Config
     private static String coownerid;
     private static String coownertag;
     private static String dbanstoken;
-    private static String mysqlip;
-    private static String mysqluser;
-    private static String mysqlpass;
-    
+    private static String dbotstoken;
+
     public Config() throws Exception
     {
         List<String> lines = Files.readAllLines(Paths.get("config.yml"));
@@ -78,15 +76,10 @@ public class Config
                 case "dbanstoken":
                     dbanstoken = value;
                     break;
-                case "mysqlip":
-                    mysqlip = value;
+                case "dbotstoken":
+                    dbotstoken = value;
                     break;
-                case "mysqluser":
-                    mysqluser = value;
-                    break;
-                case "mysqlpass":
-                    mysqlpass = value;
-                    break;
+
             }
         }
         if(token==null)
@@ -103,12 +96,6 @@ public class Config
             LOG.warn("No Co-Owner provided in the config file! Disabling feature...");
         if(dbanstoken==null)
             LOG.warn("No Discord Bans token provided in the config file! Disabling feature...");
-        if(mysqlip==null)
-            throw new Exception("No Owner Tag provided in the config file!");
-        if(mysqluser==null)
-            throw new Exception("No Owner Tag provided in the config file!");
-        if(mysqlpass==null)
-            throw new Exception("No Owner Tag provided in the config file!");
     }
     
     public String getToken()
@@ -145,19 +132,11 @@ public class Config
     {
         return dbanstoken;
     }
+
+    public static String getDBotsToken()
+    {
+        return dbotstoken;
+    }
     
-    public static String getMySQLIp()
-    {
-        return mysqlip;
-    }
 
-    public static String getMySQLUser()
-    {
-        return mysqluser;
-    }
-
-    public static String getMySQLPass()
-    {
-        return mysqlpass;
-    }
 }

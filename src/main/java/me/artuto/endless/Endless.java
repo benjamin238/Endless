@@ -17,6 +17,7 @@
 
 package me.artuto.endless;
 
+import com.jagrosh.jdautilities.commandclient.CommandClient;
 import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
 
@@ -26,6 +27,7 @@ import javax.security.auth.login.LoginException;
 import me.artuto.endless.commands.settings.ServerSettings;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
@@ -68,15 +70,22 @@ public class Endless extends ListenerAdapter
         EventWaiter waiter = new EventWaiter();
         Bot bot = new Bot(waiter, config);
         ModLogging modlog = new ModLogging(bot);
-        
+        JDA jda;
+        CommandClient cmdclient = null;
         CommandClientBuilder client = new CommandClientBuilder();
 
-        client.useDefaultGame();
         client.setOwnerId(Config.getOwnerId());
-        client.setCoOwnerIds(Config.getCoOwnerId());
         client.setServerInvite(Const.INVITE);
         client.setEmojis(Const.DONE_E, Const.WARN_E, Const.FAIL_E);
         client.setPrefix(Config.getPrefix());
+        if(!Config.getCoOwnerId().isEmpty())
+        {
+            client.setCoOwnerIds(Config.getCoOwnerId());
+        }
+        if(!Config.getDBotsToken().isEmpty())
+        {
+            client.setDiscordBotsKey(Config.getDBotsToken());
+        }
         client.addCommands(
         		
         	    //Bot
@@ -112,6 +121,7 @@ public class Endless extends ListenerAdapter
                 new DBansCheck(),
                 new GuildInfo(),
                 new Lookup(),
+                new RoleInfo(),
                 new UserInfo(),
         
                 //Others
@@ -127,7 +137,6 @@ public class Endless extends ListenerAdapter
             .setGame(Game.of(Const.GAME_0))
             .addEventListener(waiter)
             .addEventListener(client.build())
-            .addEventListener(bot)
             //.addEventListener(new ServerLogging())
             .addEventListener(bot)
             .addEventListener(new Endless())
@@ -148,5 +157,7 @@ public class Endless extends ListenerAdapter
         LOG.info("Using prefix: "+Config.getPrefix());
         LOG.info("Owner: "+event.getJDA().getUserById(Config.getOwnerId()).getName()+"#"+event.getJDA().getUserById(Config.getOwnerId()).getDiscriminator()
                 + " ("+event.getJDA().getUserById(Config.getOwnerId()).getId()+")");
+
+        event.getJDA().getPresence().setGame(Game.of("Type "+Config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
     }
 }

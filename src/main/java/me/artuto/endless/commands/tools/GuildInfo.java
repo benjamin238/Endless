@@ -49,22 +49,84 @@ public class GuildInfo extends Command
     @Override
     protected void execute(CommandEvent event)
     {
+        EmbedBuilder builder = new EmbedBuilder();
+        EmbedBuilder builder2 = new EmbedBuilder();
+        String roles ;
+        String voicech;
         Guild guild;
-    	guild = event.getGuild();
-        Member owner;        
+        guild = event.getJDA().getGuildById(event.getArgs());
+        Member owner;
         owner = guild.getOwner();
-    	String title =":information_source: Information about the guild **"+guild.getName()+"**";
-        
-        long botCount = guild.getMembers().stream().filter(u -> u.getUser().isBot()).count();
-        
-    	EmbedBuilder builder = new EmbedBuilder();
-        builder.addField(":1234: ID: ", "**"+guild.getId()+"**", true);
-        builder.addField(":bust_in_silhouette: Owner: ", "**"+owner.getUser().getName()+"**#**"+owner.getUser().getDiscriminator()+"**", true);
-        builder.addField(":map: Region: ", "**"+guild.getRegion()+"**", true);
-        builder.addField(":one: User count: ", "**"+guild.getMembers().size()+"** (**"+botCount+"** bots)", true);
+        String title =":information_source: Information about the guild **"+guild.getName()+"**";
 
-    	builder.setThumbnail(guild.getIconUrl());
-        builder.setColor(guild.getSelfMember().getColor());
-    	event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+        long botCount = guild.getMembers().stream().filter(u -> u.getUser().isBot()).count();
+
+        StringBuilder emotesbldr = new StringBuilder();
+        guild.getEmotes().forEach(e -> emotesbldr.append(" ").append(e.getAsMention()));
+
+        StringBuilder rolesbldr = new StringBuilder();
+        guild.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
+
+        StringBuilder textchbldr = new StringBuilder();
+        guild.getTextChannels().forEach(tc -> textchbldr.append(" ").append(tc.getAsMention()));
+
+        StringBuilder voicechbldr = new StringBuilder();
+        guild.getVoiceChannels().forEach(vc -> voicechbldr.append(" ").append(vc.getName()));
+
+        if(rolesbldr.toString().isEmpty())
+        {
+            roles = "**None**";
+        }
+        else
+        {
+            roles = rolesbldr.toString();
+        }
+
+        if(voicechbldr.toString().isEmpty())
+        {
+            voicech = "**None**";
+        }
+        else
+        {
+            voicech = voicechbldr.toString();
+        }
+
+        try
+        {
+            builder.addField(":1234: ID: ", "**" + guild.getId() + "**", true);
+            builder.addField(":bust_in_silhouette: Owner: ", "**" + owner.getUser().getName() + "**#**" + owner.getUser().getDiscriminator() + "**", true);
+            builder.addField(":map: Region: ", "**" + guild.getRegion() + "**", true);
+            builder.addField(":one: User count: ", "**" + guild.getMembers().size() + "** (**" + botCount + "** bots)", true);
+            builder.addField(":hammer: Roles: ", roles, false);
+            builder.addField(":speech_left: Text Channels: ", textchbldr.toString(), false);
+            builder.addField(":speaker: Voice Channels: ", voicech, false);
+            builder.addField(":speech_balloon: Default Channel: ", guild.getPublicChannel().getAsMention(), true);
+            builder.addField(":date: Creation Date: ", "**" + guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME) + "**", true);
+            builder.addField(":vertical_traffic_light: Verification level: ", "**" + guild.getVerificationLevel() + "**", true);
+            builder.addField(":envelope: Default Notification level: ", "**" + guild.getDefaultNotificationLevel() + "**", true);
+            builder.addField(":wrench: Explicit Content Filter level: ", "**" + guild.getExplicitContentLevel() + "**", true);
+            builder.setThumbnail(guild.getIconUrl());
+            builder.setColor(guild.getSelfMember().getColor());
+            event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+        }
+        catch(Exception e)
+        {
+            event.replyError("Something went wrong when getting the guild info: \n```"+e+"```");
+        }
+
+        if(!emotesbldr.toString().isEmpty())
+        {
+            try
+            {
+                builder2.setTitle("Emotes of this guild");
+                builder2.setDescription(emotesbldr.toString());
+                builder2.setColor(guild.getSelfMember().getColor());
+                event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder2.build()).build()).queue();
+            }
+            catch(Exception e)
+            {
+                event.replyError("Something went wrong when getting the emotes of this guild: \n```"+e+"```");
+            }
+        }
     }
 }

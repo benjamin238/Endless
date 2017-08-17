@@ -87,8 +87,6 @@ public class UserInfo extends Command
         
         StringBuilder rolesbldr = new StringBuilder();
         member.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
-        
-        String title=(member.getUser().isBot()?":information_source: Information about the bot **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** <:bot:334859813915983872>":":information_source: Information about the user **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"**");
               
         if(member.getOnlineStatus().toString().equals("ONLINE"))
         {
@@ -129,33 +127,38 @@ public class UserInfo extends Command
         {
             roles = rolesbldr.toString();
         }
-        
-        if(member.getUser().getAvatarId().startsWith("a_"))
+
+        if(!(member.getUser().getAvatarId()==null))
         {
-            ranks = "<:nitro:334859814566101004> **Nitro**";
+            if(member.getUser().getAvatarId().startsWith("a_"))
+            {
+                ranks = "<:nitro:334859814566101004>";
+            }
+            else
+            {
+                ranks = "";
+            }
         }
-        else
-        {
-            ranks = "**None";
-        }
+
+        String title=(member.getUser().isBot()?":information_source: Information about the bot **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** <:bot:334859813915983872>":":information_source: Information about the user **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** "+ranks);
         
         try
         {	
             builder.addField(":1234: ID: ", "**"+member.getUser().getId()+"**", true);
-    	    builder.addField(":busts_in_silhouette: Nickname: ", (member.getNickname()==null ? "None" : "**"+member.getNickname()+"**"), true);
+    	    builder.addField(":bust_in_silhouette: Nickname: ", (member.getNickname()==null ? "None" : "**"+member.getNickname()+"**"), true);
     	    builder.addField(":hammer: Roles: ", roles, false);
     	    builder.addField(emote+" Status: ", status+(member.getGame()==null?"":" ("
       	       	            + (member.getGame().getType()==Game.GameType.TWITCH?"On Live at [*"+member.getGame().getName()+"*]"
 	                        : "Playing **"+member.getGame().getName()+"**")+")"+""), true);
-            builder.addField(":medal: Special Ranks: ", ranks, true);
     	    builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
     	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);    
-	    builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
+	        builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
     	    builder.setColor(member.getColor());
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
         }
     	catch(Exception e)
         {
+            event.replyError("Something went wrong when getting the role info: \n```"+e+"```");
         }   		   
     }
 }

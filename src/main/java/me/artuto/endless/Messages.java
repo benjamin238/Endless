@@ -20,9 +20,7 @@ package me.artuto.endless;
 /**
  *
  * @author Artu
- */
-
-/**
+ *
  *
  * Since sometimes we need to use the same messages a lot of times, 
  * is better having everything equals.
