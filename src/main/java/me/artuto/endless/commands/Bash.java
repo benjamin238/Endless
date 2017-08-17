@@ -61,8 +61,9 @@ public class Bash extends Command
         String finalOutput = null;
         try 
         {
-            Process p = Runtime.getRuntime().exec(event.getArgs());
-            p.waitFor();
+            ProcessBuilder builder = new ProcessBuilder(event.getArgs().split(" "));
+	    Process p = builder.start();
+
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
 
@@ -79,6 +80,7 @@ public class Bash extends Command
 
             // Remove linebreak
             finalOutput = output.substring(0, output.length() - 1);
+	    reader.close();
         } 
         catch(IOException e) 
         {
