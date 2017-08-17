@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.moderation;
+package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
@@ -23,14 +23,14 @@ import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
-
 import me.artuto.endless.Messages;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
@@ -38,16 +38,16 @@ import net.dv8tion.jda.core.utils.SimpleLog;
  * @author Artu
  */
 
-public class Ban extends Command
+public class Kick extends Command
 {
-    public Ban()
+    public Kick()
     {
-        this.name = "ban";
-        this.help = "Bans the specified user";
+        this.name = "kick";
+        this.help = "Kicks the specified user";
         this.arguments = "@user | ID | nickname | username";
         this.category = new Command.Category("Moderation");
-        this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
-        this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
+        this.botPermissions = new Permission[]{Permission.KICK_MEMBERS};
+        this.userPermissions = new Permission[]{Permission.KICK_MEMBERS};
         this.ownerCommand = false;
         this.guildOnly = true;
     }
@@ -58,14 +58,13 @@ public class Ban extends Command
         EmbedBuilder builder = new EmbedBuilder();
         Member member;
         User author;
-        User user;
         author = event.getAuthor();
         String target;
         String reason;
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
             return;
         }
 
@@ -77,10 +76,10 @@ public class Ban extends Command
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
             return;
         }
-        
+
         List<Member> list = FinderUtil.findMembers(target, event.getGuild());
             
         if(list.isEmpty())
@@ -96,46 +95,46 @@ public class Ban extends Command
     	else
         {
             member = list.get(0);
-        }
+        }       
     
         if(!event.getSelfMember().canInteract(member))
         {
-            event.replyError("I can't ban the specified user!");
+            event.replyError("I can't kick the specified user!");
             return;
         }
         
         if(!event.getMember().canInteract(member))
         {
-            event.replyError("You can't ban the specified user!");
+            event.replyError("You can't kick the specified user!");
             return;
         }
         
         String success = member.getAsMention();
-              
+        
         try
         {
+            builder.setColor(Color.YELLOW);
+            builder.setThumbnail(event.getGuild().getIconUrl());
             builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-            builder.setTitle("Ban");
-            builder.setDescription("You were banned on the guild **"+event.getGuild().getName()+"** by **"
-                +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
-                + "They gave the following reason: **"+reason+"**\n");
+            builder.setTitle("Kick");
+            builder.setDescription("You were kicked on the guild **"+event.getGuild().getName()+"** by **"
+                    +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
+                    + "They gave the following reason: **"+reason+"**\n");
             builder.setFooter("Time", null);
             builder.setTimestamp(Instant.now());
-            builder.setColor(Color.RED);
-            builder.setThumbnail(event.getGuild().getIconUrl());
-           
-            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.BAN_SUCCESS+success), 
-                    (e) -> event.replyWarning(Messages.BAN_NODM+success)));
-            
-            event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
+            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
+                    (d) -> event.replySuccess(Messages.KICK_SUCCESS+success),
+                    (e) -> event.replyWarning(Messages.KICK_NODM+success)));
+            
+           event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+
+           ModLogging.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
         }
         catch(Exception e)
         {
-            event.replyError(Messages.BAN_ERROR+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
-            SimpleLog.getLog("Ban").fatal(e);
+            event.replyError(Messages.KICK_ERROR+member.getAsMention());
+            SimpleLog.getLog("Kick").fatal(e);
             e.printStackTrace();
         }
     }

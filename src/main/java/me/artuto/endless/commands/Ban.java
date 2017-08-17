@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.moderation;
+package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
@@ -23,14 +23,14 @@ import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
+
 import me.artuto.endless.Messages;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
@@ -38,12 +38,12 @@ import net.dv8tion.jda.core.utils.SimpleLog;
  * @author Artu
  */
 
-public class SoftBan extends Command
+public class Ban extends Command
 {
-    public SoftBan()
+    public Ban()
     {
-        this.name = "softban";
-        this.help = "Softbans the specified user";
+        this.name = "ban";
+        this.help = "Bans the specified user";
         this.arguments = "@user | ID | nickname | username";
         this.category = new Command.Category("Moderation");
         this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
@@ -65,7 +65,7 @@ public class SoftBan extends Command
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"softban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
             return;
         }
 
@@ -77,7 +77,7 @@ public class SoftBan extends Command
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"softban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
             return;
         }
         
@@ -100,45 +100,42 @@ public class SoftBan extends Command
     
         if(!event.getSelfMember().canInteract(member))
         {
-            event.replyError("I can't softban the specified user!");
+            event.replyError("I can't ban the specified user!");
             return;
         }
         
         if(!event.getMember().canInteract(member))
         {
-            event.replyError("You can't softban the specified user!");
+            event.replyError("You can't ban the specified user!");
             return;
         }
         
         String success = member.getAsMention();
-        
+              
         try
         {
             builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-            builder.setTitle("Softban");
-            builder.setDescription("You were softbanned on the guild **"+event.getGuild().getName()+"** by **"
+            builder.setTitle("Ban");
+            builder.setDescription("You were banned on the guild **"+event.getGuild().getName()+"** by **"
                 +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
-                + "They gave the following reason: **"+reason+"**\n"
-                + "You can join again.\n");
+                + "They gave the following reason: **"+reason+"**\n");
             builder.setFooter("Time", null);
             builder.setTimestamp(Instant.now());
-            builder.setColor(Color.ORANGE);
+            builder.setColor(Color.RED);
             builder.setThumbnail(event.getGuild().getIconUrl());
            
             member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.SOFTBAN_SUCCESS+success), 
-                    (e) -> event.replyWarning(Messages.SOFTBAN_NODM+success)));
+                    (d) -> event.replySuccess(Messages.BAN_SUCCESS+success), 
+                    (e) -> event.replyWarning(Messages.BAN_NODM+success)));
             
-            event.getGuild().getController().ban(member, 1).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
-            
-            event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+            event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-            ModLogging.logSoftban(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
+            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
         }
         catch(Exception e)
         {
-            event.replyError(Messages.SOFTBAN_ERROR+member.getAsMention());
-            SimpleLog.getLog("SoftBan").fatal(e);
+            event.replyError(Messages.BAN_ERROR+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
+            SimpleLog.getLog("Ban").fatal(e);
             e.printStackTrace();
         }
     }

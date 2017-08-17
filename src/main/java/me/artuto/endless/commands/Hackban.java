@@ -1,4 +1,4 @@
-package me.artuto.endless.commands.moderation;
+package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;

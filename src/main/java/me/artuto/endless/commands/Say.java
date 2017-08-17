@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.others;
+package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
@@ -26,40 +26,23 @@ import net.dv8tion.jda.core.Permission;
  * @author Artu
  */
 
-public class Choose extends Command
+public class Say extends Command 
 {
-    public Choose()
+    public Say()
     {
-        this.name = "choose";
-        this.aliases = new String[]{"pickone"};
-        this.help = "Chooses between the given options.";
-        this.arguments = "<option 1> <option 2> ...";
-        this.category = new Command.Category("Others");
+        this.name = "say";
+        this.help = "Say something!";
+        this.arguments = "<text>";
+        this.category = new Command.Category("Other");
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guildOnly = true;
     }
     
     @Override
     protected void execute(CommandEvent event)
     {
-        if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("You didn't give me any choices!");
-        }
-        else
-        {
-            String[] options = event.getArgs().split("\\s+");
-            
-            if(options.length==1)
-            {
-                event.replyWarning("You only gave me one option: `"+options[0]+"`");
-            }
-            else
-            {
-                event.reply("I choose `"+options[(int)(Math.random()*options.length)]+"`");
-            }
-        }
+        event.reply(event.getArgs());
     }
 }
