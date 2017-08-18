@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -90,8 +91,28 @@ public class UserInfo extends Command
         }
 
         List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
-        Collections.sort(joins, (Member a, Member b) -> event.getGuild().getMember(a.getUser()).getJoinDate().compareTo(event.getGuild().getMember(b.getUser()).getJoinDate()));
-        int order = joins.indexOf(member);
+        joins.sort(Comparator.comparing(Member::getJoinDate));
+        int index = joins.indexOf(member);
+        int i;
+
+        index -= 3;
+        if(index < 0)
+            index = 0;
+        if(joins.get(index).equals(member))
+            joinsorder = "**"+joins.get(index).getUser().getName()+"**";
+        else
+            joinsorder = joins.get(index).getUser().getName();
+        for(i = index + 1;i<index + 7;i++)
+            if(i>=joins.size())
+                break;
+
+        Member m = joins.get(i);
+        String name = m.getUser().getName();
+
+        if(m.equals(member))
+            name = "**"+name+"";
+
+        joinsorder = "> "+name;
 
         StringBuilder rolesbldr = new StringBuilder();
         member.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
@@ -148,6 +169,8 @@ public class UserInfo extends Command
             }
         }
 
+
+
         String title=(member.getUser().isBot()?":information_source: Information about the bot **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** <:bot:334859813915983872>":":information_source: Information about the user **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** "+ranks);
         
         try
@@ -159,38 +182,8 @@ public class UserInfo extends Command
       	       	            + (member.getGame().getType()==Game.GameType.TWITCH?"On Live at [*"+member.getGame().getName()+"*]"
 	                        : "Playing **"+member.getGame().getName()+"**")+")"+""), false);
     	    builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
-    	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"** `("+(order+1)+")`", true);
-    	    builder.addField("Join Order: ",  order-=3;
-            if(order<0)
-            {
-                order = 0;
-            }
-
-            if(joins.get(order).equals(member))
-            {
-                joinsorder = "**"+joins.get(order).getUser().getName()+"**";
-            }
-            else
-            {
-                joinsorder = joins.get(order).getUser().getName();
-            }
-            for(int i=order+1;i<order+7;i++)
-            {
-                if(1>=joins.size())
-                {
-                    break;
-                }
-
-                Member m = joins.get(i);
-                String name = m.getUser().getName();
-
-                if(m.equals(member))
-                {
-                    name = "**"+name+"";
-                }
-
-                joinsorder = "> "+name;
-            }, false);
+    	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"** `("+(index+1)+")`", true);
+    	    builder.addField("Join Order: ", joinsorder , false);
 	        builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
     	    builder.setColor(member.getColor());
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
