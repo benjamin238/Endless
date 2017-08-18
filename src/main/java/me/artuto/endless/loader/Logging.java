@@ -30,6 +30,7 @@ import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
  *
@@ -59,7 +60,19 @@ public class Logging extends ListenerAdapter
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        if(event.getMessage().getContent().startsWith(Config.getPrefix()))
+        Config config;
+
+        try
+        {
+            config = new Config();
+        }
+        catch(Exception e)
+        {
+            SimpleLog.getLog("Config").fatal(e);
+            return;
+        }
+
+        if(event.getMessage().getContent().startsWith(config.getPrefix()))
         {
             if(event.isFromType(ChannelType.PRIVATE))
             {

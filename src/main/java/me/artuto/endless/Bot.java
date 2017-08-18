@@ -26,6 +26,7 @@ import java.util.HashMap;
 import me.artuto.endless.data.Settings;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -167,7 +168,7 @@ public class Bot extends ListenerAdapter
         guild = event.getGuild();
         
         User owner;
-        owner = event.getJDA().getUserById(Config.getOwnerId());
+        owner = event.getJDA().getUserById(config.getOwnerId());
         
         String leavemsg;
         leavemsg = "Hi! Sorry, but you can't have a copy of Endless on Discord Bots, this is for my own security.\n"
@@ -188,18 +189,26 @@ public class Bot extends ListenerAdapter
     @Override
     public void onReady(ReadyEvent event)
     {
+
+        SimpleLog LOG = SimpleLog.getLog("Startup");
         File logs = new File("logs");
         if(!logs.exists())
         {
             logs.mkdir();
-            SimpleLog.getLog("Startup").info("'logs' directory created!");
+            LOG.info("'logs' directory created!");
         }
         
         File data = new File("data");
         if(!data.exists())
         {
             data.mkdir();
-            SimpleLog.getLog("Startup").info("'data' directory created!");
+            LOG.info("'data' directory created!");
+        }
+
+        if(event.getJDA().getGuilds().isEmpty())
+        {
+            LOG.warn("Looks like your bot isn't on any guild! Add your bot using the following link:");
+            LOG.warn(event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR));
         }
     }
 }

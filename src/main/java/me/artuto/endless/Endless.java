@@ -30,6 +30,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import me.artuto.endless.loader.*;
@@ -64,21 +65,19 @@ public class Endless extends ListenerAdapter
         EventWaiter waiter = new EventWaiter();
         Bot bot = new Bot(waiter, config);
         ModLogging modlog = new ModLogging(bot);
-        JDA jda;
-        CommandClient cmdclient = null;
         CommandClientBuilder client = new CommandClientBuilder();
 
-        client.setOwnerId(Config.getOwnerId());
+        client.setOwnerId(config.getOwnerId());
         client.setServerInvite(Const.INVITE);
         client.setEmojis(Const.DONE_E, Const.WARN_E, Const.FAIL_E);
-        client.setPrefix(Config.getPrefix());
-        if(!Config.getCoOwnerId().isEmpty())
+        client.setPrefix(config.getPrefix());
+        if(!(config.getCoOwnerId().isEmpty()))
         {
-            client.setCoOwnerIds(Config.getCoOwnerId());
+            client.setCoOwnerIds(config.getCoOwnerId());
         }
-        if(!Config.getDBotsToken().isEmpty())
+        if(!(config.getDBotsToken().isEmpty()))
         {
-            client.setDiscordBotsKey(Config.getDBotsToken());
+            client.setDiscordBotsKey(config.getDBotsToken());
         }
         client.addCommands(
         		
@@ -137,21 +136,37 @@ public class Endless extends ListenerAdapter
             .addEventListener(new Logging())
             .buildBlocking();                
     }    
-        
-        //When ready print the bot info
+
+    //When ready print the bot info
     
     @Override
     public void onReady(ReadyEvent event)
     {
         SimpleLog LOG = SimpleLog.getLog("Endless");
+        Config config;
+
+        try
+        {
+            config = new Config();
+        }
+        catch(Exception e)
+        {
+            SimpleLog.getLog("Config").fatal(e);
+            return;
+        }
+
+        User selfuser = event.getJDA().getSelfUser();
+        User owner = event.getJDA().retrieveUserById(config.getOwnerId()).complete();
+        String selfname = selfuser.getName()+"#"+selfuser.getDiscriminator();
+        String selfid = selfuser.getId();
+        String ownername = owner.getName()+"#"+owner.getDiscriminator();
+        String ownerid = owner.getId();
 
         LOG.info("My robotic body is ready!");
-        LOG.info("Logged in as: "+event.getJDA().getSelfUser().getName()+"#"+event.getJDA().getSelfUser().getDiscriminator()
-                + " ("+event.getJDA().getSelfUser().getId()+")");
-        LOG.info("Using prefix: "+Config.getPrefix());
-        LOG.info("Owner: "+event.getJDA().getUserById(Config.getOwnerId()).getName()+"#"+event.getJDA().getUserById(Config.getOwnerId()).getDiscriminator()
-                + " ("+event.getJDA().getUserById(Config.getOwnerId()).getId()+")");
+        LOG.info("Logged in as: "+selfname+" ("+selfid+")");
+        LOG.info("Using prefix: "+config.getPrefix());
+        LOG.info("Owner: "+ownername+" ("+ownerid+")");
 
-        event.getJDA().getPresence().setGame(Game.of("Type "+Config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+        event.getJDA().getPresence().setGame(Game.of("Type "+config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
     }
 }

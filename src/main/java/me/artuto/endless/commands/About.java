@@ -17,15 +17,19 @@
 
 package me.artuto.endless.commands;
 
+import com.jagrosh.jdautilities.JDAUtilitiesInfo;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.awt.Color;
 import me.artuto.endless.Const;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.JDAInfo;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
  *
@@ -48,7 +52,8 @@ public class About extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-       Color color;
+        Color color;
+        Config config;
         
         if(event.isFromType(ChannelType.PRIVATE))
         {
@@ -58,16 +63,29 @@ public class About extends Command
         {
             color = event.getGuild().getSelfMember().getColor();
         }
+
+        try
+        {
+            config = new Config();
+        }
+        catch(Exception e)
+        {
+            SimpleLog.getLog("Config").fatal(e);
+            return;
+        }
         
        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
        EmbedBuilder builder = new EmbedBuilder();
+       User owner = event.getJDA().retrieveUserById(config.getOwnerId()).complete();
+       String ownername = owner.getName()+""+owner.getDiscriminator();
+       String ownerid = owner.getId();
+
 
               builder.setDescription("Hi, I'm Endless! A multipurpose bot designed to be smart.\n"
               		+ "If you found a bug please contact my dad\n"
               		+ "("+Const.DEV+")!\n");
-              builder.addField(":bust_in_silhouette: Owner:", "**"+Config.getOwnerTag()+"** (**"+Config.getOwnerId()+"**)", false);
-              builder.addField(":busts_in_silhouette: Co-Owner(s):", "**"+Config.getCoOwnerTag()+"** (**"+Config.getCoOwnerId()+"**)", false);
-              builder.addField(":books:  Library:", "Java Discord API (JDA) and JDA Utilities <:jda:325395909347115008>", false);
+              builder.addField(":bust_in_silhouette: Owner:", "**"+ownername+"** (**"+ownerid+"**)", false);
+              builder.addField("<:jda:325395909347115008>  Library:", "Java Discord API (JDA) "+JDAInfo.VERSION+" and JDA Utilities "+JDAUtilitiesInfo.VERSION, false);
               builder.addField("<:github:326118305062584321> GitHub:", "Did you found a bug? Want improve something?\n"
               		+ "Please open an Issue or create a PR on GitHub\n"
               		+ "**https://github.com/ArtutoGamer/Endless**\n", false);

@@ -31,13 +31,11 @@ public class Config
 {
     private final SimpleLog LOG = SimpleLog.getLog("Config");
     private String token;
-    private static String prefix;
-    private static String owner;
-    private static String ownertag;
-    private static String coownerid;
-    private static String coownertag;
-    private static String dbanstoken;
-    private static String dbotstoken;
+    private String prefix;
+    private String ownerid;
+    private String coownerid;
+    private String dbanstoken;
+    private String dbotstoken;
 
     public Config() throws Exception
     {
@@ -61,17 +59,11 @@ public class Config
                     else
                         prefix = value;
                     break;
-                case "owner":
-                    owner = value;
-                    break;
-                case "ownertag":
-                    ownertag = value;
+                case "ownerid":
+                    ownerid = value;
                     break;
                 case "coownerid":
                     coownerid = value;
-                    break;
-                case "coownertag":
-                    coownertag = value;
                     break;
                 case "dbanstoken":
                     dbanstoken = value;
@@ -86,13 +78,9 @@ public class Config
             throw new Exception("No token provided in the config file!");
         if(prefix==null)
             throw new Exception("No prefix provided in the config file!");
-        if(owner==null)
+        if(ownerid==null)
             throw new Exception("No Owner ID provided in the config file!");
-        if(ownertag==null)
-            throw new Exception("No Owner Tag provided in the config file!");
         if(coownerid==null)
-            LOG.warn("No Co-Owner provided in the config file! Disabling feature...");
-        if(coownertag==null)
             LOG.warn("No Co-Owner provided in the config file! Disabling feature...");
         if(dbanstoken==null)
             LOG.warn("No Discord Bans token provided in the config file! Disabling feature...");
@@ -103,37 +91,27 @@ public class Config
         return token;
     }
     
-    public static String getPrefix()
+    public String getPrefix()
     {
         return prefix;
     }
     
-    public static String getOwnerId()
+    public String getOwnerId()
     {
-        return owner;
+        return ownerid;
     }
-    
-    public static String getOwnerTag()
-    {
-        return ownertag;
-    }
-    
-    public static String getCoOwnerId()
+
+    public String getCoOwnerId()
     {
         return coownerid;
     }
-    
-    public static String getCoOwnerTag()
-    {
-        return coownertag;
-    }
 
-    public static String getDBansToken()
+    public String getDBansToken()
     {
         return dbanstoken;
     }
 
-    public static String getDBotsToken()
+    public String getDBotsToken()
     {
         return dbotstoken;
     }
