@@ -21,7 +21,7 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.util.List;
 import me.artuto.endless.Messages;
-import me.artuto.endless.utils.FinderUtil2;
+import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -78,7 +78,7 @@ public class Unban extends Command
             return;
         }
               
-        List<User> list = FinderUtil2.findBannedUsers(target, event.getGuild());
+        List<User> list = FinderUtil.findBannedUsers(target, event.getGuild());
             
         if(list.isEmpty())
         {

@@ -29,7 +29,7 @@ import net.dv8tion.jda.core.entities.User;
  * @author Artu
  */
 
-public class FinderUtil2 
+public class FinderUtil
 {
     public final static String USER_MENTION = "<@!?(\\d+)";
     
