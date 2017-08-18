@@ -77,7 +77,7 @@ public class About extends Command
        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
        EmbedBuilder builder = new EmbedBuilder();
        User owner = event.getJDA().retrieveUserById(config.getOwnerId()).complete();
-       String ownername = owner.getName()+""+owner.getDiscriminator();
+       String ownername = owner.getName()+"#"+owner.getDiscriminator();
        String ownerid = owner.getId();
 
 
