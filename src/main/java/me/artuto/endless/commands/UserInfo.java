@@ -22,6 +22,8 @@ import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.awt.Color;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -30,6 +32,7 @@ import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Member;
 import me.artuto.endless.utils.FormatUtil;
+import net.dv8tion.jda.core.entities.User;
 
 /**
  *
@@ -58,6 +61,7 @@ public class UserInfo extends Command
         String roles = null;
         String emote = null;
         String status = null;
+        String joinsorder;
     	EmbedBuilder builder = new EmbedBuilder();
     	Member member = null;
                 
@@ -84,7 +88,11 @@ public class UserInfo extends Command
                 member = list.get(0);
             }
         }
-        
+
+        List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
+        Collections.sort(joins, (Member a, Member b) -> event.getGuild().getMember(a.getUser()).getJoinDate().compareTo(event.getGuild().getMember(b.getUser()).getJoinDate()));
+        int order = joins.indexOf(member);
+
         StringBuilder rolesbldr = new StringBuilder();
         member.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
               
@@ -149,16 +157,47 @@ public class UserInfo extends Command
     	    builder.addField(":hammer: Roles: ", roles, false);
     	    builder.addField(emote+" Status: ", status+(member.getGame()==null?"":" ("
       	       	            + (member.getGame().getType()==Game.GameType.TWITCH?"On Live at [*"+member.getGame().getName()+"*]"
-	                        : "Playing **"+member.getGame().getName()+"**")+")"+""), true);
+	                        : "Playing **"+member.getGame().getName()+"**")+")"+""), false);
     	    builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
-    	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);    
+    	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"** `("+(order+1)+")`", true);
+    	    builder.addField("Join Order: ",  order-=3;
+            if(order<0)
+            {
+                order = 0;
+            }
+
+            if(joins.get(order).equals(member))
+            {
+                joinsorder = "**"+joins.get(order).getUser().getName()+"**";
+            }
+            else
+            {
+                joinsorder = joins.get(order).getUser().getName();
+            }
+            for(int i=order+1;i<order+7;i++)
+            {
+                if(1>=joins.size())
+                {
+                    break;
+                }
+
+                Member m = joins.get(i);
+                String name = m.getUser().getName();
+
+                if(m.equals(member))
+                {
+                    name = "**"+name+"";
+                }
+
+                joinsorder = "> "+name;
+            }, false);
 	        builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
     	    builder.setColor(member.getColor());
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
         }
     	catch(Exception e)
         {
-            event.replyError("Something went wrong when getting the role info: \n```"+e+"```");
+            event.replyError("Something went wrong when getting the user info: \n```"+e+"```");
         }   		   
     }
 }
