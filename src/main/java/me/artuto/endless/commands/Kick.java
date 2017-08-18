@@ -70,7 +70,7 @@ public class Kick extends Command
 
         try
         {
-            String[] args = event.getArgs().split(" for ");
+            String[] args = event.getArgs().split(" for", 2);
             target = args[0];
             reason = args[1];
         }

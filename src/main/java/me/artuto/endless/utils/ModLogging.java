@@ -61,7 +61,7 @@ public class ModLogging
         else
         {
             tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Ban:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
-                    + "`Reason:` *"+reason+"*").queue();
+                    + "`Reason:` "+reason).queue();
         }
     }
 
@@ -85,7 +85,7 @@ public class ModLogging
         else
         {
             tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Hackban:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") hackbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
-                    + "`Reason:` *"+reason+"*").queue();
+                    + "`Reason:` "+reason).queue();
         }
     }
 
@@ -109,7 +109,7 @@ public class ModLogging
         else
         {
             tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Kick:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
-                    + "`Reason:` *"+reason+"*").queue();
+                    + "`Reason:` "+reason).queue();
         }
     }
 
@@ -133,7 +133,7 @@ public class ModLogging
         else
         {
             tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Softban:` :banana: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") softbanned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
-                    + "`Reason:` *"+reason+"*").queue();
+                    + "`Reason:` "+reason).queue();
         }
     }
 
@@ -157,7 +157,7 @@ public class ModLogging
         else
         {
             tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Unban:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
-                    + "`Reason:` *"+reason+"*").queue();
+                    + "`Reason:` "+reason).queue();
         }
     }
 }
