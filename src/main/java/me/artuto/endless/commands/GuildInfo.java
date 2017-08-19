@@ -53,8 +53,7 @@ public class GuildInfo extends Command
         EmbedBuilder builder2 = new EmbedBuilder();
         String roles ;
         String voicech;
-        Guild guild;
-        guild = event.getJDA().getGuildById(event.getArgs());
+        Guild guild = event.getGuild();
         Member owner;
         owner = guild.getOwner();
         String title =":information_source: Information about the guild **"+guild.getName()+"**";
