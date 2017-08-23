@@ -122,10 +122,17 @@ public class Kick extends Command
                     + "They gave the following reason: **"+reason+"**\n");
             builder.setFooter("Time", null);
             builder.setTimestamp(Instant.now());
-
-            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
+            
+            if(!member.getUser().isBot())
+            {
+               member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
                     (d) -> event.replySuccess(Messages.KICK_SUCCESS+success),
                     (e) -> event.replyWarning(Messages.KICK_NODM+success)));
+            }
+            else
+            {
+               event.replySuccess(Messages.KICK_SUCCESS+success);
+            }
             
            event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
