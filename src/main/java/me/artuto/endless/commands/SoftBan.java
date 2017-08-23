@@ -125,9 +125,16 @@ public class SoftBan extends Command
             builder.setColor(Color.ORANGE);
             builder.setThumbnail(event.getGuild().getIconUrl());
            
-            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.SOFTBAN_SUCCESS+success), 
-                    (e) -> event.replyWarning(Messages.SOFTBAN_NODM+success)));
+            if(!member.getUser().isBot())
+            {
+               member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
+                    (d) -> event.replySuccess(Messages.KICK_SUCCESS+success),
+                    (e) -> event.replyWarning(Messages.KICK_NODM+success)));
+            }
+            else
+            {
+               event.replySuccess(Messages.KICK_SUCCESS+success);
+            }
             
             event.getGuild().getController().ban(member, 1).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
             

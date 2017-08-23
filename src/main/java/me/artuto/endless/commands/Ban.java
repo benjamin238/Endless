@@ -124,9 +124,16 @@ public class Ban extends Command
             builder.setColor(Color.RED);
             builder.setThumbnail(event.getGuild().getIconUrl());
            
-            member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.BAN_SUCCESS+success), 
-                    (e) -> event.replyWarning(Messages.BAN_NODM+success)));
+            if(!member.getUser().isBot())
+            {
+               member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
+                    (d) -> event.replySuccess(Messages.KICK_SUCCESS+success),
+                    (e) -> event.replyWarning(Messages.KICK_NODM+success)));
+            }
+            else
+            {
+               event.replySuccess(Messages.KICK_SUCCESS+success);
+            }
             
             event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
