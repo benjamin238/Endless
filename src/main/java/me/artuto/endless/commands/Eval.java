@@ -101,7 +101,7 @@ public class Eval extends Command
             
             Object out = engine.eval(
                     "(function() {"
-                        + "with (imports) { return"
+                        + "with (imports) { return "
                             + event.getArgs()
                         + "}"
                         + "})();");
