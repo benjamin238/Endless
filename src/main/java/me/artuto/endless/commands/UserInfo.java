@@ -90,7 +90,7 @@ public class UserInfo extends Command
             }
         }
 
-        List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
+        /*List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
         joins.sort(Comparator.comparing(Member::getJoinDate));
         int index = joins.indexOf(member);
         int i;
@@ -112,7 +112,7 @@ public class UserInfo extends Command
         if(m.equals(member))
             name = "**"+name+"";
 
-        joinsorder = "> "+name;
+        joinsorder = "> "+name;*/
 
         StringBuilder rolesbldr = new StringBuilder();
         member.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
@@ -182,9 +182,9 @@ public class UserInfo extends Command
       	       	            + (member.getGame().getType()==Game.GameType.TWITCH?"On Live at [*"+member.getGame().getName()+"*]"
 	                        : "Playing **"+member.getGame().getName()+"**")+")"+""), false);
     	    builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
-    	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"** `("+(index+1)+")`", true);
-    	    builder.addField("Join Order: ", joinsorder , false);
-	        builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
+    	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
+    	    // builder.addField("Join Order: ", joinsorder , false);
+	    builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
     	    builder.setColor(member.getColor());
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
         }
