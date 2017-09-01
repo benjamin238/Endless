@@ -182,7 +182,7 @@ public class UserInfo extends Command
     	    builder.addField(":bust_in_silhouette: Nickname: ", (member.getNickname()==null ? "None" : "**"+member.getNickname()+"**"), true);
     	    builder.addField(":hammer: Roles: ", roles, false);
     	    builder.addField(emote+" Status: ", status+(member.getGame()==null?"":" ("
-      	       	            + (member.getGame().getType()==Game.GameType.TWITCH?"On Live at [*"+member.getGame().getName()+"*]"
+      	       	            + (member.getGame().getType()==Game.GameType.STREAMING?"On Live at [*"+member.getGame().getName()+"*]"
 	                        : "Playing **"+member.getGame().getName()+"**")+")"+""), false);
     	    builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
     	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"** `(#"+(index+4)+")`", true);

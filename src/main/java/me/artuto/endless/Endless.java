@@ -79,6 +79,10 @@ public class Endless extends ListenerAdapter
         {
             client.setDiscordBotsKey(config.getDBotsToken());
         }
+        if(!(config.getDBotsListToken().isEmpty()))
+        {
+            client.setDiscordBotListKey(config.getDBotsListToken());
+        }
         client.addCommands(
         		
         	    //Bot

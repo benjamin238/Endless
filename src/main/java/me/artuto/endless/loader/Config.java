@@ -36,6 +36,7 @@ public class Config
     private String coownerid;
     private String dbanstoken;
     private String dbotstoken;
+    private String dbotslisttoken;
 
     public Config() throws Exception
     {
@@ -71,6 +72,9 @@ public class Config
                 case "dbotstoken":
                     dbotstoken = value;
                     break;
+                case "dbotslisttoken":
+                    dbotslisttoken = value;
+                    break;
 
             }
         }
@@ -84,6 +88,11 @@ public class Config
             LOG.warn("No Co-Owner provided in the config file! Disabling feature...");
         if(dbanstoken==null)
             LOG.warn("No Discord Bans token provided in the config file! Disabling feature...");
+        if(dbotstoken==null)
+            LOG.warn("No Discord Bots token provided in the config file! Disabling feature...");
+        if(dbotslisttoken==null)
+            LOG.warn("No Discord Bots List token provided in the config file! Disabling feature...");
+
     }
     
     public String getToken()
@@ -115,6 +124,9 @@ public class Config
     {
         return dbotstoken;
     }
-    
 
+    public String getDBotsListToken()
+    {
+        return dbotslisttoken;
+    }
 }
