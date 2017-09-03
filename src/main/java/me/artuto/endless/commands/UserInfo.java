@@ -20,20 +20,19 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
-import java.awt.Color;
+
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+
+import me.artuto.endless.tools.InfoTools;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Member;
 import me.artuto.endless.utils.FormatUtil;
-import net.dv8tion.jda.core.entities.User;
 
 /**
  *
@@ -58,10 +57,9 @@ public class UserInfo extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        String ranks = null;
-        String roles = null;
-        String emote = null;
-        String status = null;
+        String ranks;
+        String roles;
+        String emote;
         String joinsorder;
     	EmbedBuilder builder = new EmbedBuilder();
     	Member member;
@@ -114,79 +112,34 @@ public class UserInfo extends Command
             Member m2 = joins.get(i-5);
             Member m1 = joins.get(i-6);
 
-            String name = m1.getUser().getName()+" > "+m2.getUser().getName()+" > "+m3.getUser().getName()+" > **"+m.getUser().getName()+"** > "+m4.getUser().getName()+" > "+m5.getUser().getName()+" > "+m6.getUser().getName();
-
-            joinsorder = name;
+            joinsorder = m1.getUser().getName()+" > "+m2.getUser().getName()+" > "+m3.getUser().getName()+" > **"+m.getUser().getName()+"** > "+m4.getUser().getName()+" > "+m5.getUser().getName()+" > "+m6.getUser().getName();
         }
 
-        StringBuilder rolesbldr = new StringBuilder();
-        member.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
-              
-        if(member.getOnlineStatus().toString().equals("ONLINE"))
+        roles = InfoTools.mentionUserRoles(member);
+        emote = InfoTools.onlineStatus(member);
+
+        if(InfoTools.nitroCheck(member.getUser()))
         {
-            emote = "<:online:334859814410911745>";
-            status = "Online ";
-        }
-        else if(member.getOnlineStatus().toString().equals("IDLE"))
-        {
-            emote = "<:away:334859813869584384>";
-            status = "Away ";
-        }
-        else if(member.getOnlineStatus().toString().equals("DO_NOT_DISTURB"))
-        {
-            emote = "<:dnd:334859814029099008>";
-            status = "Do Not Disturb ";
-        }
-        else if(member.getOnlineStatus().toString().equals("INVISIBLE"))
-        {
-            emote = "<:invisible:334859814410649601>";
-            status = "Invisible ";
-        }
-        else if(member.getOnlineStatus().toString().equals("OFFLINE"))
-        {
-            emote = "<:offline:334859814423232514>";
-            status = "Offline ";
-        }
-        else if(member.getOnlineStatus().toString().equals("UNKNOWN"))
-        {
-            emote = ":interrobang:";
-            status = "Unknown ";
-        }
-        
-        if(rolesbldr.toString().isEmpty())
-        {
-            roles = "None";
+            ranks = "<:nitro:334859814566101004>";
         }
         else
         {
-            roles = rolesbldr.toString();
-        }
-
-        if(!(member.getUser().getAvatarId()==null))
-        {
-            if(member.getUser().getAvatarId().startsWith("a_"))
-            {
-                ranks = "<:nitro:334859814566101004>";
-            }
-            else
-            {
-                ranks = "";
-            }
+            ranks = "";
         }
 
         String title=(member.getUser().isBot()?":information_source: Information about the bot **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** <:bot:334859813915983872>":":information_source: Information about the user **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** "+ranks);
         
         try
         {	
-            builder.addField(":1234: ID: ", "**"+member.getUser().getId()+"**", true);
-    	    builder.addField(":bust_in_silhouette: Nickname: ", (member.getNickname()==null ? "None" : "**"+member.getNickname()+"**"), true);
+            builder.addField(":1234: ID: ", member.getUser().getId(), true);
+    	    builder.addField(":bust_in_silhouette: Nickname: ", (member.getNickname()==null ? "None" : member.getNickname()), true);
     	    builder.addField(":hammer: Roles: ", roles, false);
-    	    builder.addField(emote+" Status: ", status+(member.getGame()==null?"":" ("
+    	    builder.addField(emote+" Status: ", member.getOnlineStatus()+(member.getGame()==null?"":" ("
       	       	            + (member.getGame().getType()==Game.GameType.STREAMING?"On Live at [*"+member.getGame().getName()+"*]"
-	                        : "Playing **"+member.getGame().getName()+"**")+")"+""), false);
-    	    builder.addField(":calendar_spiral: Account Creation Date: ", "**"+member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
-    	    builder.addField(":calendar_spiral: Guild Join Date: ", "**"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"** `(#"+(index+4)+")`", true);
-    	    builder.addField("Join Order: ", joinsorder, false);
+	                        : "Playing "+member.getGame().getName())+")"+""), false);
+    	    builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
+    	    builder.addField(":calendar_spiral: Guild Join Date: ", member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
+    	    builder.addField("Join Order: `(#"+(index+4)+")`", joinsorder, false);
 	        builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
     	    builder.setColor(member.getColor());
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 

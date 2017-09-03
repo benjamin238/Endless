@@ -21,14 +21,15 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.awt.Color;
 import java.time.format.DateTimeFormatter;
+
+import me.artuto.endless.Const;
+import me.artuto.endless.tools.InfoTools;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.entities.Invite;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.utils.WidgetUtil;
 
 /**
  *
@@ -41,7 +42,7 @@ public class Lookup extends Command
         {
             this.name = "lookup";
             this.help = "Retrieves info about an invite, a guild or an user using their ID from Discord's servers.";
-            this.arguments = "User ID | Invite code | Invite URL (only discord.gg) | Guild ID";
+            this.arguments = "<User ID | Invite code | Invite URL (only discord.gg) | Guild ID>";
             this.category = new Command.Category("Tools");
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
@@ -53,7 +54,14 @@ public class Lookup extends Command
     protected void execute(CommandEvent event)
     {
         Color color;
-        
+        Invite invite;
+        Guild guild;
+        String ranks;
+        WidgetUtil.Widget widget;
+        EmbedBuilder builder = new EmbedBuilder();
+        String title;
+        String code;
+
         if(event.isFromType(ChannelType.PRIVATE))
         {
             color = Color.decode("#33ff00");
@@ -62,99 +70,117 @@ public class Lookup extends Command
         {
             color = event.getGuild().getSelfMember().getColor();
         }
-        
-        EmbedBuilder builder = new EmbedBuilder();
 
         if(event.getArgs().isEmpty())
         {
             event.replyWarning("Please specify something!");
             return;
         }
-        
-        try
-        {
-            String code = null;
-            
-            if(event.getArgs().startsWith("https"))
-            {
-                code = event.getArgs().replace("https://discord.gg/", "");
-            }
-            else
-            {
-                code = event.getArgs();
-            }
-            
-            Invite invite;
-            invite = Invite.resolve(event.getJDA(), code).complete();
-            String title = ":information_source: Invite info:";
 
-            builder.addField(":map: Guild Name: ", "**"+invite.getGuild().getName()+"**", true);
-            builder.addField(":map::1234: Guild ID: ", "**"+invite.getGuild().getId()+"**", true);
-            builder.addField(":speech_balloon: Channel: ", "**"+invite.getChannel().getName()+"**", true);
-            builder.addField(":speech_balloon::1234: Channel ID: ", "**"+invite.getChannel().getId()+"**", true);
-            builder.addField(":bust_in_silhouette: Inviter: ", "**"+invite.getInviter().getName()+"#"+invite.getInviter().getDiscriminator()+"** ("+invite.getInviter().getId()+")", false);
-            builder.setFooter("Invite Code: "+invite.getCode(), null);
-            builder.setThumbnail(invite.getGuild().getIconUrl());
-            builder.setColor(color);
-            
-            event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
-        }
-        catch(Exception ei)
-        {
-        }
-        
         try
-        {   
-            String ranks = null;
-            User user;
-            user = event.getJDA().retrieveUserById(event.getArgs()).complete();
-            
-            if(user.getAvatarId().startsWith("a_"))
+        {
+            try
             {
-                ranks = "<:nitro:334859814566101004> **Nitro**";
+                //It could be an Invite.
+
+                title = ":information_source: Invite info:";
+
+                if(event.getArgs().startsWith("https://discord.gg"))
+                    code = event.getArgs().replace("https://discord.gg/", "");
+                else
+                    code = event.getArgs();
+
+                invite = Invite.resolve(event.getJDA(), code).complete();
+
+                builder.addField(Const.LINE_START+" Guild: ", invite.getGuild().getName()+" (ID: "+invite.getGuild().getId()+")", false);
+                builder.addField(Const.LINE_START+" Channel: ", invite.getChannel().getName()+" (ID: "+invite.getChannel().getId()+")", false);
+                builder.addField(Const.LINE_START+" Inviter: ", invite.getInviter().getName()+"#"+invite.getInviter().getDiscriminator()+" (ID: "+invite.getInviter().getId()+")", false);
+                builder.setFooter((invite.getCode()+"["+invite.getURL()+"]"), null);
+                builder.setThumbnail(invite.getGuild().getIconUrl());
+                builder.setColor(color);
+
+                event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
+
             }
-            else
+            catch(Exception ignored){}
+
+            //Then try with a Guild
+
+            try
             {
-                ranks = "**None**";
+                guild = event.getJDA().getGuildById(event.getArgs());
+
+                if(guild==null)
+                {
+                    widget = WidgetUtil.getWidget(event.getArgs());
+
+
+                    if(!(widget==null))
+                    {
+                        title = ":information_source: Guild info:";
+                        Invite inv = Invite.resolve(event.getJDA(), widget.getInviteCode()).complete();
+
+                        builder.addField(Const.LINE_START+" Name: ", widget.getName(), true);
+                        builder.addField(Const.LINE_START+" ID: ", widget.getId(), true);
+                        builder.addField(Const.LINE_START+" Creation Time: ", widget.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
+                        builder.addField(Const.LINE_START+" Voice Channels: ", String.valueOf(widget.getVoiceChannels().size()), true);
+                        builder.addField(Const.LINE_START+" Invite: ", inv.getCode()+" #"+inv.getChannel().getName()+" ("+inv.getChannel().getId()+")", true);
+                        builder.setColor(color);
+
+                        event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
+                    }
+                }
+                else
+                {
+                    title = ":information_source: Guild info:";
+                    builder.addField(Const.LINE_START+" Name: ", guild.getName(), true);
+                    builder.addField(Const.LINE_START+" ID: ", guild.getId(), true);
+                    builder.addField(Const.LINE_START+" Text Channels: ", String.valueOf(guild.getTextChannels().size()), true);
+                    builder.addField(Const.LINE_START+" Voice Channels: ", String.valueOf(guild.getVoiceChannels().size()), true);
+                    builder.addField(Const.LINE_START+" Creation Time: ", guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
+                    builder.addField(Const.LINE_START+" Owner: ", guild.getOwner().getUser().getName(), true);
+                    builder.setThumbnail(guild.getIconUrl());
+                    builder.setColor(color);
+
+                    event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
+                }
             }
-            
-            String title=(user.isBot()?":information_source: Information about the bot **"+user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** <:bot:334859813915983872>":":information_source: Information about the user **"+user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"**");
-            
-            builder.addField(":1234: ID: ", "**"+user.getId()+"**", true);
-            builder.addField(":medal: Special Ranks: ", ranks, true);
-    	    builder.addField(":calendar_spiral: Account Creation Date: ", "**"+user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
-            if(user.getName().contains("Kyle2000"))
+            catch(Exception ignored) {}
+
+            try
             {
-                builder.addField(":poop: Shithead: ", "**A LOT**", true);
+                //If that wasn't a Guild, try with a User
+
+                User user = event.getJDA().retrieveUserById(event.getArgs()).complete();
+
+                if(InfoTools.nitroCheck(user))
+                {
+                    ranks = "<:nitro:334859814566101004>";
+                }
+                else
+                {
+                    ranks = "";
+                }
+
+                title = (user.isBot()?":information_source: Information about the bot **"+user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** <:bot:334859813915983872>":":information_source: Information about the user **"+user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** "+ranks);
+
+                builder.addField(Const.LINE_START+" Name: ", user.getName()+"#"+user.getDiscriminator(), true);
+                builder.addField(Const.LINE_START+" ID: ", user.getId(), true);
+                builder.addField(Const.LINE_START+" Creation Time: ", user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
+                if(user.getName().contains("Kyle2000"))
+                    builder.addField(Const.LINE_START+" Shithead: ", "A LOT", true);
+                builder.setThumbnail(user.getEffectiveAvatarUrl());
+                builder.setColor(color);
+
+                event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
             }
-	        builder.setThumbnail(user.getEffectiveAvatarUrl());
-    	    builder.setColor(color);
-            event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
+            catch(Exception ignored) {}
         }
         catch(Exception e)
         {
-        }
-        
-        try
-        {
-            Guild guild;
-    	    guild = event.getJDA().getGuildById(event.getArgs());
-            Member owner;        
-            owner = guild.getOwner();
-    	    String title =":information_source: Information about the guild **"+guild.getName()+"**";
-        
-            long botCount = guild.getMembers().stream().filter(u -> u.getUser().isBot()).count();
-        
-            builder.addField(":1234: ID: ", "**"+guild.getId()+"**", true);
-            builder.addField(":bust_in_silhouette: Owner: ", "**"+owner.getUser().getName()+"**#**"+owner.getUser().getDiscriminator()+"**", true);
-            builder.addField(":map: Region: ", "**"+guild.getRegion()+"**", true);
-            builder.addField(":one: User count: ", "**"+guild.getMembers().size()+"** (**"+botCount+"** bots)", true);
-    	    builder.setThumbnail(guild.getIconUrl());
-            builder.setColor(guild.getSelfMember().getColor());
-    	    event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
-        }
-        catch(Exception e)
-        {     
+            //Then it wasn't anything
+
+            event.replyError("Something went wrong when doing a lookup of this query: `'"+event.getArgs()+"'` \n```"+e+"```");
         }
     }
 }
