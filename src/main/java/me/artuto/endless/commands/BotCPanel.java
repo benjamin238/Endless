@@ -19,6 +19,7 @@ package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import me.artuto.endless.Const;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game;
@@ -33,9 +34,9 @@ public class BotCPanel extends Command
     public BotCPanel()
     {
         this.name = "bot";
-        this.help = "Controls ";
+        this.help = "Controls the status, game, optimized the bot and other useful things.";
         this.category = new Command.Category("Bot Administration");
-        this.children = new Command[]{new Status(), new Playing()};
+        this.children = new Command[]{new Status(), new Playing(), new DefaultGameUpdate(), new Optimize()};
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
@@ -59,7 +60,7 @@ public class BotCPanel extends Command
     
     private class Status extends Command
     {
-        public Status()
+        Status()
         {
             this.name = "status";
             this.help = "Sets the Online Status (OnlineStatus) of the bot.";
@@ -109,7 +110,7 @@ public class BotCPanel extends Command
     
     private class Playing extends Command
     {
-        public Playing()
+        Playing()
         {
             this.name = "game";
             this.help = "Sets the Game (Game.of) of the bot.";
@@ -131,20 +132,114 @@ public class BotCPanel extends Command
             }
             if(event.getArgs().isEmpty())
             {
-                event.replySuccess("Game cleaned.");
+                try
+                {
+                    event.getJDA().getPresence().setGame(null);
+                    event.replySuccess("Game cleaned.");
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Error when cleaning the game! Check the Bot console for more information.");
+                    e.printStackTrace();
+                }
             }
             
             try
             {
                 event.getJDA().getPresence().setGame(Game.of(event.getArgs()));
-                event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame()+" without error!");
+                event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame().getName()+" without error!");
             }
             catch(Exception e)
             {
-                event.replyError("Error when changing the status! Check the Bot console for more information.");
+                event.replyError("Error when changing the game! Check the Bot console for more information.");
                 e.printStackTrace();
             }
        }
+    }
+
+    private class DefaultGameUpdate extends Command
+    {
+        DefaultGameUpdate()
+        {
+            this.name = "updategame";
+            this.help = "Updates the default game.";
+            this.category = new Command.Category("Bot Administration");
+            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.ownerCommand = false;
+            this.guildOnly = false;
+        }
+
+        @Override
+        protected void execute(CommandEvent event)
+        {
+            if(!(event.isOwner()) || event.isCoOwner())
+            {
+                event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
+                return;
+
+            }
+            if(event.getArgs().isEmpty())
+            {
+                try
+                {
+                    event.getJDA().getPresence().setGame(Game.of("Type "+event.getClient().getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+                    event.replySuccess("Game updated.");
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Error when updating the game! Check the Bot console for more information.");
+                    e.printStackTrace();
+                }
+
+            }
+
+            try
+            {
+                event.getJDA().getPresence().setGame(Game.of(event.getArgs()));
+                event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame().getName()+" without error!");
+            }
+            catch(Exception e)
+            {
+                event.replyError("Error when changing the game! Check the Bot console for more information.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class Optimize extends Command
+    {
+        Optimize()
+        {
+            this.name = "optimize";
+            this.help = "Optimizes the Bot's RAM usage. Use with caution.";
+            this.category = new Command.Category("Bot Administration");
+            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.ownerCommand = false;
+            this.guildOnly = false;
+        }
+
+        @Override
+        protected void execute(CommandEvent event)
+        {
+            if(!(event.isOwner()) || event.isCoOwner())
+            {
+                event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
+                return;
+            }
+
+            try
+            {
+                System.gc();
+                event.reactSuccess();
+            }
+            catch(Exception e)
+            {
+                event.replyError("Error when optimizing the bot! Check the Bot console for more information.");
+                e.printStackTrace();
+            }
+        }
     }
 }
 
