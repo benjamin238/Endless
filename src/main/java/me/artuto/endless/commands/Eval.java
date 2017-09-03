@@ -21,9 +21,11 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -33,54 +35,58 @@ import net.dv8tion.jda.core.entities.ChannelType;
 public class Eval extends Command
 {
     private ScriptEngine engine;
+    private List<String> imports;
     
     public Eval()
     {
         this.name = "eval";
-        this.help = "Executes Nashorn code";
+        this.help = "Executes Groovy code";
         this.category = new Category("Bot Administration");
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
         this.guildOnly = false;
         
-        engine = new ScriptEngineManager().getEngineByName("Nashorn");
+        engine = new ScriptEngineManager().getEngineByName("Groovy");
+
         try
         {
-            engine.eval("var imports = new JavaImporter("
-                    + "java.io,"
-                    + "java.lang,"
-                    + "java.util,"
-                    + "Packages.net.dv8tion.jda.core,"
-                    + "Packages.net.dv8tion.jda.core.entities,"
-                    + "Packages.net.dv8tion.jda.core.entities.impl,"
-                    + "Packages.net.dv8tion.jda.core.managers,"
-                    + "Packages.net.dv8tion.jda.core.managers.impl,"
-                    + "Packages.net.dv8tion.jda.core.utils,"
-                    + "Packages.me.artuto.endless,"
-                    + "Packages.me.artuto.endless.commands.bot,"
-                    + "Packages.me.artuto.endless.botadm,"
-                    + "Packages.me.artuto.endless.moderation,"
-                    + "Packages.me.artuto.endless.others,"
-                    + "Packages.me.artuto.endless.tools,"
-                    + "Packages.me.artuto.endless.loader,"
-                    + "Packages.me.artuto.endless.utils,"
-                    + "Packages.com.jagrosh.jdautilities,"
-                    + "Packages.com.jagrosh.jdautilities.commandclient,"
-                    + "Packages.com.jagrosh.jdautilities.commandclient.impl,"
-                    + "Packages.com.jagrosh.jdautilities.entities,"
-                    + "Packages.com.jagrosh.jdautilities.menu,"
-                    + "Packages.com.jagrosh.jdautilities.utils,"
-                    + "Packages.com.jagrosh.jdautilities.waiter);");
+            imports = Arrays.asList("com.jagrosh.jdautilities",
+                    "com.jagrosh.jdautilities.commandclient",
+                    "com.jagrosh.jdautilities.commandclient.impl",
+                    "com.jagrosh.jdautilities.entities",
+                    "com.jagrosh.jdautilities.menu",
+                    "com.jagrosh.jdautilities.utils",
+                    "com.jagrosh.jdautilities.waiter",
+                    "java.io",
+                    "java.lang",
+                    "java.util",
+                    "me.artuto.endless",
+                    "me.artuto.endless.commands",
+                    "me.artuto.endless.data",
+                    "me.artuto.endless.loader",
+                    "me.artuto.endless.tools",
+                    "me.artuto.endless.utils",
+                    "net.dv8tion.jda.bot",
+                    "net.dv8tion.jda.bot.entities",
+                    "net.dv8tion.jda.bot.entities.impl",
+                    "net.dv8tion.jda.core",
+                    "net.dv8tion.jda.core.entities",
+                    "net.dv8tion.jda.core.entities.impl",
+                    "net.dv8tion.jda.core.managers",
+                    "net.dv8tion.jda.core.managers.impl",
+                    "net.dv8tion.jda.core.utils",
+                    "net.dv8tion.jda.webhook");
         }
-        catch(ScriptException e)
-        {
-        }
+        catch(Exception ignored) {}
     }
 	
     @Override
     protected void execute(CommandEvent event) 
     {
+        String importString = "";
+        String eval;
+
         if(!(event.isOwner()) && !(event.isCoOwner()))
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
@@ -97,23 +103,22 @@ public class Eval extends Command
             {
                 engine.put("member", event.getMember());
                 engine.put("guild", event.getGuild());
+                engine.put("tc", event.getTextChannel());
             }
-            
-            Object out = engine.eval(
-                    "(function() {"
-                        + "with (imports) { return "
-                            + event.getArgs()
-                        + "}"
-                        + "})();");
-            
-            if(out==null)
+
+            for(final String s : imports)
             {
+                importString += "import "+ s + ".*;";
+            }
+
+            eval = event.getArgs().replaceAll("getToken", "getSelfUser");
+            
+            Object out = engine.eval(importString + eval);
+
+            if(out==null || String.valueOf(out).isEmpty())
                 event.reactSuccess();
-            }
             else
-            {
-                event.replySuccess("Done! Output:\n```java\n"+out.toString()+" ```");
-            }
+                event.replySuccess("Done! Output:\n```java\n"+out.toString().replaceAll(event.getJDA().getToken(), "Nice try.")+" ```");
         } 
         catch(Exception e2)
         {
