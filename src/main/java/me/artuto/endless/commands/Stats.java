@@ -49,6 +49,8 @@ public class Stats extends Command
     protected void execute(CommandEvent event)
     {
         Color color;
+        double ramUse = ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024));
+        int cpus = Runtime.getRuntime().availableProcessors();
         
         if(event.isFromType(ChannelType.PRIVATE))
         {
@@ -58,16 +60,14 @@ public class Stats extends Command
         {
             color = event.getGuild().getSelfMember().getColor();
         }
-
-        double ramUse = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024;
         
         EmbedBuilder builder = new EmbedBuilder();
         builder.addField(":map: Guilds: ", ""+event.getJDA().getGuilds().size() , true);
         builder.addField(":speech_balloon: Text Channels: ", ""+event.getJDA().getTextChannels().size(), true);
-        builder.addBlankField(true);
         builder.addField(":speaker: Voice Channels: ", ""+event.getJDA().getVoiceChannels().size(), true);
         builder.addField(":bust_in_silhouette: Users: ", ""+event.getJDA().getUsers().size(), true);
         builder.addField(":computer: RAM usage: ", ramUse+" MB", true);
+        builder.addField(":gear: Available CPUs: ", String.valueOf(cpus), true);
         builder.setColor(color);
         builder.setFooter(event.getSelfUser().getName(), event.getSelfUser().getAvatarUrl());
         event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue();

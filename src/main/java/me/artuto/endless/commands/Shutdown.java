@@ -19,6 +19,7 @@ package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import me.artuto.endless.management.Optimizer;
 import net.dv8tion.jda.core.Permission;
 
 /**
@@ -44,11 +45,29 @@ public class Shutdown extends Command
     {
         if(!(event.isOwner()) && !(event.isCoOwner()))
         {
-            event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
+            event.reactSuccess();
+            try
+            {
+                Thread.sleep(5000);
+            }
+            catch (InterruptedException ignored) {}
+
+            event.reply("Not really... "+event.getAuthor().getAsMention());
+
             return;   
         }
         
         event.reactSuccess();
+        try
+        {
+            Thread.sleep(2000);
+            Optimizer.shutdown();
+        }
+        catch (InterruptedException e)
+        {
+            event.replyError("An error happened when closing the bot, check the console for more information.");
+            e.printStackTrace();
+        }
         event.getJDA().shutdown();
     }
     

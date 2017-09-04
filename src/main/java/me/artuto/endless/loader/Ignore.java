@@ -6,11 +6,23 @@ import com.jagrosh.jdautilities.commandclient.CommandListener;
 import me.artuto.endless.data.UserIgnore;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class Ignore implements CommandListener
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+
+public class Ignore /*implements CommandListener*/ extends ListenerAdapter
 {
+    public static void getIgnoredGuilds() throws IOException
+    {
 
-    @Override
+    }
+
+
+
+    /*@Override
     public void onCommand(CommandEvent event, Command command)
     {
         UserIgnore ignore = new UserIgnore();
@@ -38,5 +50,5 @@ public class Ignore implements CommandListener
     public void onNonCommandMessage(MessageReceivedEvent messageReceivedEvent)
     {
 
-    }
+    }*/
 }

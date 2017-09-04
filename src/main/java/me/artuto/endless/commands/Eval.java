@@ -99,11 +99,15 @@ public class Eval extends Command
             engine.put("jda", event.getJDA());
             engine.put("channel", event.getChannel());
             engine.put("message", event.getMessage());
+            engine.put("bot", event.getSelfUser());
+            engine.put("client", event.getClient());
+            engine.put("author", event.getAuthor());
             if(event.isFromType(ChannelType.TEXT))
             {
                 engine.put("member", event.getMember());
                 engine.put("guild", event.getGuild());
                 engine.put("tc", event.getTextChannel());
+                engine.put("selfmember", event.getGuild().getSelfMember());
             }
 
             for(final String s : imports)

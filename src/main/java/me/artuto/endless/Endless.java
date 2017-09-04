@@ -22,8 +22,10 @@ import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Timer;
 import javax.security.auth.login.LoginException;
 import me.artuto.endless.commands.*;
+import me.artuto.endless.management.Optimizer;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -66,6 +68,10 @@ public class Endless extends ListenerAdapter
         Bot bot = new Bot(waiter, config);
         ModLogging modlog = new ModLogging(bot);
         CommandClientBuilder client = new CommandClientBuilder();
+        Timer time = new Timer();
+        Optimizer free = new Optimizer();
+
+        time.schedule(free, 0, 	3600000);
 
         client.setOwnerId(config.getOwnerId());
         client.setServerInvite(Const.INVITE);
@@ -84,7 +90,6 @@ public class Endless extends ListenerAdapter
             client.setDiscordBotListKey(config.getDBotsListToken());
         }
         client.addCommands(
-        		
         	    //Bot
 
                 new About(),
@@ -138,6 +143,7 @@ public class Endless extends ListenerAdapter
             .addEventListener(bot)
             .addEventListener(new Endless())
             .addEventListener(new Logging())
+            .addEventListener(new GuildBlacklist())
             .buildBlocking();                
     }    
 
