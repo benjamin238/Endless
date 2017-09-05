@@ -18,13 +18,9 @@
 package me.artuto.endless.loader;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
@@ -39,21 +35,18 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Logging extends ListenerAdapter
 {
-    DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss");
-    Date date = new Date();
-
     //Guild Join
     @Override
     public void onGuildJoin(GuildJoinEvent event) 
     {
-        System.out.printf("[GUILD JOIN]: "+event.getGuild().getName()+" ("+event.getGuild().getId()+")\n");
+        SimpleLog.getLog("Logger").info("[GUILD JOIN]: "+event.getGuild().getName()+" (ID: "+event.getGuild().getId()+")\n");
     }
     
     //Guild Leave
     @Override
     public void onGuildLeave(GuildLeaveEvent event) 
     {
-        System.out.printf("[GUILD LEAVE]: "+event.getGuild().getName()+" ("+event.getGuild().getId()+")\n");
+        SimpleLog.getLog("Logger").info("[GUILD LEAVE]: "+event.getGuild().getName()+" (ID: "+event.getGuild().getId()+")\n");
     }
     
     //Command logger
@@ -91,7 +84,6 @@ public class Logging extends ListenerAdapter
                     System.out.println("Error when creating the commands log!\n "+e);
                 }
             }
-            
             else
             {
                 try
@@ -110,11 +102,6 @@ public class Logging extends ListenerAdapter
                     System.out.println("Error when creating the commands log!\n "+e);
                 }    
             }
-        }
-        
-        else
-        {
-            return;
         }
     }
 }

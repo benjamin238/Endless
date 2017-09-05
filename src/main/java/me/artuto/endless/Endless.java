@@ -51,14 +51,17 @@ public class Endless extends ListenerAdapter
     public static void main(String[] args) throws IOException, LoginException, IllegalArgumentException, RateLimitedException, InterruptedException, SQLException
     {        
         Config config;
+        GuildBlacklist gblacklist;
         
         try
         {
             config = new Config();
+            gblacklist = new GuildBlacklist();
         } 
         catch(Exception e) 
         {
             SimpleLog.getLog("Config").fatal(e);
+            SimpleLog.getLog("Blacklisted Guilds").fatal(e);
             return;
         }
         

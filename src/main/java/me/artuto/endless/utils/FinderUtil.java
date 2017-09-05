@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 /**
@@ -32,6 +33,17 @@ import net.dv8tion.jda.core.entities.User;
 public class FinderUtil
 {
     public final static String USER_MENTION = "<@!?(\\d+)";
+
+    public static TextChannel getDefaultChannel(Guild guild)
+    {
+
+        if(guild.getTextChannelById(guild.getId())==null)
+        {
+            return guild.getTextChannels().stream().filter(TextChannel::canTalk).findFirst().orElse(null);
+        }
+
+        return guild.getTextChannelById(guild.getId());
+    }
     
     public static List<User> findBannedUsers(String query, Guild guild)
     {

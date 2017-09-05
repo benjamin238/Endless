@@ -1,5 +1,6 @@
 package me.artuto.endless.loader;
 
+import me.artuto.endless.utils.FinderUtil;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
@@ -20,8 +21,8 @@ public class GuildBlacklist extends ListenerAdapter
     {
         String guildId = event.getGuild().getId();
         List<String> lines = null;
-        TextChannel tc = event.getGuild().getTextChannels().stream().filter(TextChannel::canTalk).findFirst().orElse(null);
         Guild guild = event.getGuild();
+        TextChannel tc = FinderUtil.getDefaultChannel(guild);
 
         try
         {
@@ -36,12 +37,9 @@ public class GuildBlacklist extends ListenerAdapter
         {
             if(lines.contains(guildId))
             {
-                if(!(tc==null))
-                {
-                    tc.sendMessage("I'm sorry, but the owner of this bot has blocked your guild from joining, if you want to know the reason or get un-blacklisted contact the owner.").complete();
-                }
-                event.getGuild().leave().queue();
                 LOG.info("Joined Blacklisted Guild: "+guild.getName()+" (ID: "+guild.getId()+")");
+                tc.sendMessage("I'm sorry, but the owner of this bot has blocked your guild from joining, if you want to know the reason or get un-blacklisted contact the owner.").complete();
+                event.getGuild().leave().complete();
             }
         }
     }
