@@ -20,6 +20,7 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.Const;
+import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game;
@@ -35,27 +36,17 @@ public class BotCPanel extends Command
     {
         this.name = "bot";
         this.help = "Controls the status, game, optimized the bot and other useful things.";
-        this.category = new Command.Category("Bot Administration");
+        this.category = Categories.BOTADM;
         this.children = new Command[]{new Status(), new Playing(), new DefaultGameUpdate(), new Optimize()};
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
+        this.ownerCommand = true;
         this.guildOnly = false;
     }
     
     @Override
     protected void execute(CommandEvent event) 
     {
-        if(!(event.isOwner()) && !(event.isCoOwner()))
-        {
-            event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-            return;   
-        }
-        
-        if(event.getArgs().isEmpty())
-        {
-            event.replyError("Please execute a valid subcommand!");
-        }
     }
     
     private class Status extends Command
@@ -64,22 +55,16 @@ public class BotCPanel extends Command
         {
             this.name = "status";
             this.help = "Sets the Online Status (OnlineStatus) of the bot.";
-            this.category = new Command.Category("Bot Administration");
+            this.category = Categories.BOTADM;
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
+            this.ownerCommand = true;
             this.guildOnly = false;
        }
         
        @Override
        protected void execute(CommandEvent event)
        {
-            if(!(event.isOwner()) && !(event.isCoOwner()))
-            {
-                event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-                return;   
-            }
-            
             if(event.getArgs().isEmpty())
             {
                 event.replyError("Please provide me a valid OnlineStatus!");
@@ -114,22 +99,16 @@ public class BotCPanel extends Command
         {
             this.name = "game";
             this.help = "Sets the Game (Game.of) of the bot.";
-            this.category = new Command.Category("Bot Administration");
+            this.category = Categories.BOTADM;
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
+            this.ownerCommand = true;
             this.guildOnly = false;
        }
         
        @Override
        protected void execute(CommandEvent event)
        {
-            if(!(event.isOwner()) || event.isCoOwner())
-            {
-                event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-                return;
-                
-            }
             if(event.getArgs().isEmpty())
             {
                 try
@@ -143,16 +122,18 @@ public class BotCPanel extends Command
                     e.printStackTrace();
                 }
             }
-            
-            try
+            else
             {
-                event.getJDA().getPresence().setGame(Game.of(event.getArgs()));
-                event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame().getName()+" without error!");
-            }
-            catch(Exception e)
-            {
-                event.replyError("Error when changing the game! Check the Bot console for more information.");
-                e.printStackTrace();
+                try
+                {
+                    event.getJDA().getPresence().setGame(Game.of(event.getArgs()));
+                    event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame().getName()+" without error!");
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Error when changing the game! Check the Bot console for more information.");
+                    e.printStackTrace();
+                }
             }
        }
     }
@@ -163,45 +144,24 @@ public class BotCPanel extends Command
         {
             this.name = "updategame";
             this.help = "Updates the default game.";
-            this.category = new Command.Category("Bot Administration");
+            this.category = Categories.BOTADM;
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
+            this.ownerCommand = true;
             this.guildOnly = false;
         }
 
         @Override
         protected void execute(CommandEvent event)
         {
-            if(!(event.isOwner()) || event.isCoOwner())
-            {
-                event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-                return;
-
-            }
-            if(event.getArgs().isEmpty())
-            {
-                try
-                {
-                    event.getJDA().getPresence().setGame(Game.of("Type "+event.getClient().getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
-                    event.replySuccess("Game updated.");
-                }
-                catch(Exception e)
-                {
-                    event.replyError("Error when updating the game! Check the Bot console for more information.");
-                    e.printStackTrace();
-                }
-
-            }
-
             try
             {
-                event.getJDA().getPresence().setGame(Game.of(event.getArgs()));
-                event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame().getName()+" without error!");
+                event.getJDA().getPresence().setGame(Game.of("Type "+event.getClient().getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+                event.replySuccess("Game updated.");
             }
             catch(Exception e)
             {
-                event.replyError("Error when changing the game! Check the Bot console for more information.");
+                event.replyError("Error when updating the game! Check the Bot console for more information.");
                 e.printStackTrace();
             }
         }
@@ -213,22 +173,16 @@ public class BotCPanel extends Command
         {
             this.name = "optimize";
             this.help = "Optimizes the Bot's RAM usage. Use with caution.";
-            this.category = new Command.Category("Bot Administration");
+            this.category = Categories.BOTADM;
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
+            this.ownerCommand = true;
             this.guildOnly = false;
         }
 
         @Override
         protected void execute(CommandEvent event)
         {
-            if(!(event.isOwner()) || event.isCoOwner())
-            {
-                event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-                return;
-            }
-
             try
             {
                 System.gc();

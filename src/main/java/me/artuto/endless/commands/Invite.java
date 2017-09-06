@@ -19,6 +19,7 @@ package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 
 /**
@@ -32,7 +33,7 @@ public class Invite extends Command
     {
         this.name = "invite";
         this.help = "Shows the bot invite";
-        this.category = new Command.Category("Bot");
+        this.category = Categories.BOT;
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;

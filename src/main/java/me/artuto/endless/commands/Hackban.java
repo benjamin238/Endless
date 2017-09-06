@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
 import me.artuto.endless.Messages;
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -23,8 +24,8 @@ public class Hackban extends Command
     {
         this.name = "hackban";
         this.help = "Bans the specified user";
-        this.arguments = "User ID";
-        this.category = new Command.Category("Moderation");
+        this.arguments = "<User ID>";
+        this.category = Categories.MODERATION;
         this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
         this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
         this.ownerCommand = false;

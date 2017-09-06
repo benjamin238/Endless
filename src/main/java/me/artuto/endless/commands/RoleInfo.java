@@ -3,6 +3,7 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -19,8 +20,10 @@ public class RoleInfo extends Command
     public RoleInfo()
     {
         this.name = "roleinfo";
+        this.aliases = new String[]{"role"};
         this.help = "Displays info about the specified role";
-        this.category = new Command.Category("Tools");
+        this.arguments = "<role>";
+        this.category = Categories.TOOLS;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
@@ -40,7 +43,7 @@ public class RoleInfo extends Command
 
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("");
+            event.replyWarning("Please specify something!");
         }
         else
         {

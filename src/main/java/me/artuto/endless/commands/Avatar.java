@@ -23,6 +23,7 @@ import com.jagrosh.jdautilities.utils.FinderUtil;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -40,8 +41,8 @@ public class Avatar extends Command
     {
         this.name = "avatar";
         this.help = "Displays the avatar of the specified user.";
-        this.arguments = "@user | ID | nickname | username";
-        this.category = new Command.Category("Tools");
+        this.arguments = "<user>";
+        this.category = Categories.TOOLS;
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_WRITE};
         this.ownerCommand = false;

@@ -20,6 +20,8 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.io.IOException;
+
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.utils.SimpleLog;
@@ -44,7 +46,7 @@ public class DBansCheck extends Command
         this.name = "discordbans";
         this.help = "Checks if the specified user ID is registered on Discord Bans";
         this.arguments = "User ID";
-        this.category = new Command.Category("Tools");
+        this.category = Categories.TOOLS;
         this.aliases = new String[]{"checkbans", "dbans"};
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};

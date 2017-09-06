@@ -22,6 +22,7 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.awt.Color;
 import me.artuto.endless.Const;
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDAInfo;
@@ -42,7 +43,7 @@ public class About extends Command
     {
         this.name = "about";
         this.help = "Info about the bot";
-        this.category = new Command.Category("Bot");
+        this.category = Categories.BOT;
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;

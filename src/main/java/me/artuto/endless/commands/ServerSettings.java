@@ -3,6 +3,7 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -24,7 +25,7 @@ public class ServerSettings extends Command
         this.children = new Command[]{new ModLog(bot), new ServerLog(bot)};
         this.aliases = new String[]{"settings"};
         this.help = "Displays the settings of the server";
-        this.category = new Command.Category("Settings");
+        this.category = Categories.TOOLS;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
@@ -38,7 +39,6 @@ public class ServerSettings extends Command
         TextChannel modlog = event.getGuild().getTextChannelById(s.getModLogId());
         TextChannel serverlog = event.getGuild().getTextChannelById(s.getServerLogId());
         EmbedBuilder builder = new EmbedBuilder();
-
         String title = ":information_source: Settings of **"+event.getGuild().getName()+"**";
 
         try

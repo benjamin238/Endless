@@ -20,6 +20,8 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.awt.Color;
+
+import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -37,8 +39,7 @@ public class Donate extends Command
         this.name = "donate";
         this.children = new Command[]{new Add()};
         this.help = "Info about donations";
-        this.arguments = "";
-        this.category = new Command.Category("Bot");
+        this.category = Categories.BOT;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
@@ -48,7 +49,8 @@ public class Donate extends Command
     @Override
     protected void execute(CommandEvent event)
     {        
-      Color color;
+        Color color;
+        EmbedBuilder builder = new EmbedBuilder();
         
         if(event.isFromType(ChannelType.PRIVATE))
         {
@@ -57,17 +59,16 @@ public class Donate extends Command
         else
         {
             color = event.getGuild().getSelfMember().getColor();
-        }  
-        
-      EmbedBuilder builder = new EmbedBuilder();
-           builder.setColor(color);
-           builder.addField(":moneybag: Donations:", "Actually, I host Endless on a very basic VPS, which can cause some lag sometimes.\n"
-                   + "I'll appreciate your donation. All the recauded money will be for get a new and better VPS.\n", false);
-           builder.addField(":money_mouth: How to donate:", "If you want donate please go to **https://paypal.me/artuto**\n"
-                   + "You'll get a special role on my server and some perks!", false);
-           builder.addField(":heart: Donators:", "Thanks to all donators!\n"
-                   + "-**mogana from persona 5** - Host\n", false);
-           event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue();
+        }
+
+        builder.setColor(color);
+        builder.addField(":moneybag: Donations:", "Actually, I host Endless on a very basic VPS, which can cause some lag sometimes.\n"
+                + "I'll appreciate your donation. All the recauded money will be for get a new and better VPS.\n", false);
+        builder.addField(":money_mouth: How to donate:", "If you want donate please go to **https://paypal.me/artuto**\n"
+                + "You'll get a special role on my server and some perks!", false);
+        builder.addField(":heart: Donators:", "Thanks to all donators!\n"
+                + "-**mogana from persona 5** - Host\n", false);
+        event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue();
     }
     
     private class Add extends Command
@@ -76,22 +77,16 @@ public class Donate extends Command
         {
             this.name = "add";
             this.help = "Adds a donator to the list";
-            this.category = new Command.Category("Bot Administration");
+            this.category = Categories.BOTADM;
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
+            this.ownerCommand = true;
             this.guildOnly = false;
         }
         
         @Override
         protected void execute(CommandEvent event)
         {
-            if(!(event.isOwner()) && !(event.isCoOwner()))
-            {
-                event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-                return;   
-            }
-            
             event.reply("reeee");
         }
     }

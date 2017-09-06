@@ -20,6 +20,8 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.time.format.DateTimeFormatter;
+
+import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -39,7 +41,7 @@ public class GuildInfo extends Command
         this.name = "guild";
         this.aliases = new String[]{"server", "serverinfo", "guildinfo", "ginfo", "sinfo"};
         this.help = "Shows info about the current guild";
-        this.category = new Command.Category("Tools");
+        this.category = Categories.TOOLS;
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;

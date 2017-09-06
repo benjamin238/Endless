@@ -33,7 +33,7 @@ public class GuildBlacklist extends ListenerAdapter
             LOG.warn("Failed to load blacklisted guilds: "+e);
         }
 
-        if(!(lines==null) || !(lines.isEmpty()))
+        if(!(lines==null))
         {
             if(lines.contains(guildId))
             {

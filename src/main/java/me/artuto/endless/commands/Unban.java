@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.util.List;
 import me.artuto.endless.Messages;
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.ModLogging;
@@ -41,8 +42,8 @@ public class Unban extends Command
     {
         this.name = "unban";
         this.help = "Unbans the specified user";
-        this.arguments = "@user | ID | nickname | username";
-        this.category = new Command.Category("Moderation");
+        this.arguments = "<user>";
+        this.category = Categories.MODERATION;
         this.botPermissions = new Permission[]{Permission.KICK_MEMBERS};
         this.userPermissions = new Permission[]{Permission.KICK_MEMBERS};
         this.ownerCommand = false;

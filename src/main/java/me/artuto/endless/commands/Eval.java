@@ -21,6 +21,8 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+
+import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 
@@ -41,10 +43,10 @@ public class Eval extends Command
     {
         this.name = "eval";
         this.help = "Executes Groovy code";
-        this.category = new Category("Bot Administration");
+        this.category = Categories.BOTADM;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
+        this.ownerCommand = true;
         this.guildOnly = false;
         
         engine = new ScriptEngineManager().getEngineByName("Groovy");
@@ -86,12 +88,6 @@ public class Eval extends Command
     {
         String importString = "";
         String eval;
-
-        if(!(event.isOwner()) && !(event.isCoOwner()))
-        {
-            event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-            return;   
-        }
         
         try
         {

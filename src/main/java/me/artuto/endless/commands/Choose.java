@@ -19,6 +19,7 @@ package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 
 /**
@@ -34,7 +35,7 @@ public class Choose extends Command
         this.aliases = new String[]{"pickone"};
         this.help = "Chooses between the given options.";
         this.arguments = "<option 1> <option 2> ...";
-        this.category = new Command.Category("Others");
+        this.category = Categories.FUN;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;

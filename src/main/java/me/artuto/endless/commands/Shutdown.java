@@ -19,6 +19,7 @@ package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.management.Optimizer;
 import net.dv8tion.jda.core.Permission;
 
@@ -32,42 +33,24 @@ public class Shutdown extends Command
     public Shutdown()
     {
         this.name = "shutdown";
-        this.help = "Turns OFf the bot";
-        this.category = new Command.Category("Bot Administration");
+        this.help = "Turns Off the bot";
+        this.category = Categories.BOTADM;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
+        this.ownerCommand = true;
         this.guildOnly = false;
     }
     
     @Override
     protected void execute(CommandEvent event)
     {
-        if(!(event.isOwner()) && !(event.isCoOwner()))
-        {
-            event.reactSuccess();
-            try
-            {
-                Thread.sleep(5000);
-            }
-            catch (InterruptedException ignored) {}
-
-            event.reply("Not really... "+event.getAuthor().getAsMention());
-
-            return;   
-        }
-        
-        event.reactSuccess();
         try
         {
             Thread.sleep(2000);
             Optimizer.shutdown();
         }
-        catch (InterruptedException e)
-        {
-            event.replyError("An error happened when closing the bot, check the console for more information.");
-            e.printStackTrace();
-        }
+        catch (InterruptedException ignored) {}
+
         event.getJDA().shutdown();
     }
     

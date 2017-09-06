@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.time.format.DateTimeFormatter;
 
 import me.artuto.endless.Const;
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.tools.InfoTools;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -43,7 +44,7 @@ public class Lookup extends Command
             this.name = "lookup";
             this.help = "Retrieves info about an invite, a guild or an user using their ID from Discord's servers.";
             this.arguments = "<User ID | Invite code | Invite URL (only discord.gg) | Guild ID>";
-            this.category = new Command.Category("Tools");
+            this.category = Categories.TOOLS;
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.tools.InfoTools;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -46,8 +47,8 @@ public class UserInfo extends Command
         this.name = "user";
         this.aliases = new String[]{"member", "userinfo", "i", "info", "memberinfo", "whois"};
         this.help = "Shows info about the specified user";
-        this.arguments= "@user | ID | nickname | username";
-        this.category = new Command.Category("Tools");
+        this.arguments= "<user>";
+        this.category = Categories.TOOLS;
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;

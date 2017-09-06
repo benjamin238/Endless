@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.List;
 
 import me.artuto.endless.Messages;
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -44,8 +45,8 @@ public class Ban extends Command
     {
         this.name = "ban";
         this.help = "Bans the specified user";
-        this.arguments = "@user | ID | nickname | username";
-        this.category = new Command.Category("Moderation");
+        this.arguments = "<user> for <reason>";
+        this.category = Categories.MODERATION;
         this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
         this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
         this.ownerCommand = false;

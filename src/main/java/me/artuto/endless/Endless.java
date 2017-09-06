@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Timer;
 import javax.security.auth.login.LoginException;
+
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.*;
 import me.artuto.endless.management.Optimizer;
 import me.artuto.endless.utils.ModLogging;
@@ -52,16 +54,17 @@ public class Endless extends ListenerAdapter
     {        
         Config config;
         GuildBlacklist gblacklist;
+        Categories categories;
         
         try
         {
             config = new Config();
             gblacklist = new GuildBlacklist();
+            categories = new Categories();
         } 
         catch(Exception e) 
         {
-            SimpleLog.getLog("Config").fatal(e);
-            SimpleLog.getLog("Blacklisted Guilds").fatal(e);
+            LOG.fatal(e);
             return;
         }
         

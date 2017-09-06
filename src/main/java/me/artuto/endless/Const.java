@@ -24,7 +24,7 @@ package me.artuto.endless;
 
 public class Const
 {
-    public static String VERSION = ("1.5.0");
+    public static String VERSION = ("1.5.1");
     public static String DONE_E = ("✅");
     public static String WARN_E = ("⚠");
     public static String FAIL_E = ("❌");

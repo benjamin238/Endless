@@ -22,6 +22,8 @@ import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 
 /**
@@ -35,22 +37,16 @@ public class Bash extends Command
     {
         this.name = "bash";
         this.help = "Executes a bash command";
-        this.category = new Command.Category("Bot Administration");
+        this.category = Categories.BOTADM;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
+        this.ownerCommand = true;
         this.guildOnly = false;
     }
     
     @Override
     protected void execute(CommandEvent event) 
-    {       
-        if(!(event.isOwner()) && !(event.isCoOwner()))
-        {
-            event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-            return;   
-        }
-        
+    {
         if(event.getArgs().isEmpty())
         {
             event.replyError("Cannot execute a empty command");
