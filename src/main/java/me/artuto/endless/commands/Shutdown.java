@@ -45,6 +45,7 @@ public class Shutdown extends Command
     protected void execute(CommandEvent event)
     {
         Optimizer.shutdown();
+        event.reactSuccess();
         event.getJDA().shutdown();
     }
     
