@@ -20,6 +20,9 @@ package me.artuto.endless.loader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+
+import net.dv8tion.jda.core.OnlineStatus;
+import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
@@ -29,18 +32,22 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Config 
 {
-    private final SimpleLog LOG = SimpleLog.getLog("Config");
-    private String token;
-    private String prefix;
-    private String ownerid;
-    private String coownerid;
-    private String dbanstoken;
-    private String dbotstoken;
-    private String dbotslisttoken;
+    private static String token;
+    private static String prefix;
+    private static String ownerid;
+    private static String coownerid;
+    private static OnlineStatus status;
+    private static String dbanstoken;
+    private static String dbotstoken;
+    private static String dbotslisttoken;
+    private static String done_e;
+    private static String warn_e;
+    private static String fail_e;
 
     public Config() throws Exception
     {
         List<String> lines = Files.readAllLines(Paths.get("config.yml"));
+        SimpleLog LOG = SimpleLog.getLog("Config");
         for(String str : lines)
         {
             String[] parts = str.split("=",2);
@@ -66,6 +73,9 @@ public class Config
                 case "coownerid":
                     coownerid = value;
                     break;
+                case "status":
+                    status = OnlineStatus.fromKey(value);
+                    break;
                 case "dbanstoken":
                     dbanstoken = value;
                     break;
@@ -74,6 +84,15 @@ public class Config
                     break;
                 case "dbotslisttoken":
                     dbotslisttoken = value;
+                    break;
+                case "done_e":
+                    done_e = value;
+                    break;
+                case "warn_e":
+                    warn_e=value;
+                    break;
+                case "fail_e":
+                    fail_e=value;
                     break;
 
             }
@@ -86,47 +105,74 @@ public class Config
             throw new Exception("No Owner ID provided in the config file!");
         if(coownerid==null)
             LOG.warn("No Co-Owner provided in the config file! Disabling feature...");
+        if(status==OnlineStatus.UNKNOWN)
+            LOG.warn("Invalid OnlineStatus! Using ONLINE.");
         if(dbanstoken==null)
             LOG.warn("No Discord Bans token provided in the config file! Disabling feature...");
         if(dbotstoken==null)
             LOG.warn("No Discord Bots token provided in the config file! Disabling feature...");
         if(dbotslisttoken==null)
             LOG.warn("No Discord Bots List token provided in the config file! Disabling feature...");
-
+        if(done_e==null)
+            LOG.warn("No Done Emote provided in the config file! Using the default emote...");
+        if(warn_e==null)
+            LOG.warn("No Warn Emote provided in the config file! Using the default emote...");
+        if(fail_e==null)
+            LOG.warn("No Error Emote provided in the config file! Using the default emote...");
     }
     
-    public String getToken()
+    public static String getToken()
     {
         return token;
     }
     
-    public String getPrefix()
+    public static String getPrefix()
     {
         return prefix;
     }
     
-    public String getOwnerId()
+    public static String getOwnerId()
     {
         return ownerid;
     }
 
-    public String getCoOwnerId()
+    public static String getCoOwnerId()
     {
         return coownerid;
     }
 
-    public String getDBansToken()
+    public static OnlineStatus getStatus()
+    {
+        return status==OnlineStatus.UNKNOWN?OnlineStatus.ONLINE:status;
+    }
+
+    public static String getDBansToken()
     {
         return dbanstoken;
     }
 
-    public String getDBotsToken()
+    public static String getDBotsToken()
     {
         return dbotstoken;
     }
 
-    public String getDBotsListToken()
+    public static String getDBotsListToken()
     {
         return dbotslisttoken;
+    }
+
+    public static String getDoneEmote()
+    {
+        return done_e==null?"✅":done_e;
+    }
+
+    public static String getWarnEmote()
+    {
+        return warn_e==null?"⚠":warn_e;
+    }
+
+    public static String getErrorEmote()
+    {
+        return fail_e==null?"❌":fail_e;
     }
 }

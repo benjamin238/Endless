@@ -30,7 +30,6 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.utils.SimpleLog;
 
 /**
  *
@@ -54,7 +53,6 @@ public class About extends Command
     protected void execute(CommandEvent event)
     {
         Color color;
-        Config config;
         
         if(event.isFromType(ChannelType.PRIVATE))
         {
@@ -64,20 +62,10 @@ public class About extends Command
         {
             color = event.getGuild().getSelfMember().getColor();
         }
-
-        try
-        {
-            config = new Config();
-        }
-        catch(Exception e)
-        {
-            SimpleLog.getLog("Config").fatal(e);
-            return;
-        }
         
        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
        EmbedBuilder builder = new EmbedBuilder();
-       User owner = event.getJDA().retrieveUserById(config.getOwnerId()).complete();
+       User owner = event.getJDA().retrieveUserById(Config.getOwnerId()).complete();
        String ownername = owner.getName()+"#"+owner.getDiscriminator();
        String ownerid = owner.getId();
 

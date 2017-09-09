@@ -1,4 +1,5 @@
 //////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 //            Configuration of Endless                  //
 //////////////////////////////////////////////////////////
 // Thanks for downloading your own instance of Endless! //
@@ -16,14 +17,21 @@ prefix=e!
 
 // Now setup the owner info.
 
-owner=
-ownertag=
+ownerid=
 
 // Now, if needed, setup CoOwner's info
 
 coownerid=
-coownertag=
 
 // Others
 
 dbanstoken=
+dbotstoken=
+dbotslisttoken=
+
+// Custom emotes, in order: Done emote, warning emote and error emote, if they are empty it defaults to the Discord's one.
+// You can use custom emotes.
+
+done_e=
+warn_e=
+fail_e=

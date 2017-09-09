@@ -24,13 +24,10 @@ package me.artuto.endless;
 
 public class Const
 {
-    public static String VERSION = ("1.5.1");
-    public static String DONE_E = ("✅");
-    public static String WARN_E = ("⚠");
-    public static String FAIL_E = ("❌");
+    public static String VERSION = ("1.5.2");
     public static String INVITE = ("https://discord.gg/CXKfYW3");
     public static String GAME_0 = ("[ENDLESS] loading...");
     public static String DEV = ("`@Artuto#0424 | 264499432538505217`");
     public static String DONATORS = "data/donators.txt";
     public static String LINE_START = ":white_medium_small_square:";
- }
+}

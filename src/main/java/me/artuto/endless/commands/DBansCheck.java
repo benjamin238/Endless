@@ -58,18 +58,6 @@ public class DBansCheck extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        Config config;
-
-        try
-        {
-            config = new Config();
-        }
-        catch(Exception e)
-        {
-            SimpleLog.getLog("Config").fatal(e);
-            return;
-        }
-
         User user;
 
         if(event.getArgs().isEmpty())
@@ -88,7 +76,7 @@ public class DBansCheck extends Command
             return;
         }
          
-        if(config.getDBansToken().isEmpty())
+        if(Config.getDBansToken().isEmpty())
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
             LOG.warn("Someone triggered the Discord Bans Check command, but there's not a token in the config file. In order to stop this message add a token to the config file.");
@@ -100,7 +88,7 @@ public class DBansCheck extends Command
             OkHttpClient client = new OkHttpClient();
            
             RequestBody formBody = new FormBody.Builder()
-                .add("token", config.getDBansToken())
+                .add("token", Config.getDBansToken())
                 .add("userid", user.getId())
                 .build();
             
@@ -124,7 +112,6 @@ public class DBansCheck extends Command
        {
             event.replyError("An error was thrown when doing the check! Ask the Owner to check the Console.");
             LOG.fatal(e);
-            return;
        }              
        
        

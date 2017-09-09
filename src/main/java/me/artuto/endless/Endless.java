@@ -17,7 +17,6 @@
 
 package me.artuto.endless;
 
-import com.jagrosh.jdautilities.commandclient.CommandClient;
 import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
 import java.io.IOException;
@@ -25,12 +24,10 @@ import java.sql.SQLException;
 import java.util.Timer;
 import javax.security.auth.login.LoginException;
 
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.*;
 import me.artuto.endless.management.Optimizer;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
@@ -50,50 +47,35 @@ public class Endless extends ListenerAdapter
 {   
     private static final SimpleLog LOG = SimpleLog.getLog("Startup Checker");
 
-    public static void main(String[] args) throws IOException, LoginException, IllegalArgumentException, RateLimitedException, InterruptedException, SQLException
-    {        
-        Config config;
-        GuildBlacklist gblacklist;
-        Categories categories;
-        
-        try
-        {
-            config = new Config();
-            gblacklist = new GuildBlacklist();
-            categories = new Categories();
-        } 
-        catch(Exception e) 
-        {
-            LOG.fatal(e);
-            return;
-        }
-        
+    public static void main(String[] args) throws IOException, LoginException, IllegalArgumentException, RateLimitedException, InterruptedException, SQLException, Exception
+    {
         //Register Commands and some other things
-        
+
         EventWaiter waiter = new EventWaiter();
-        Bot bot = new Bot(waiter, config);
+        Bot bot = new Bot(waiter, new Config());
         ModLogging modlog = new ModLogging(bot);
         CommandClientBuilder client = new CommandClientBuilder();
         Timer time = new Timer();
         Optimizer free = new Optimizer();
 
-        time.schedule(free, 0, 	3600000);
+        time.schedule(free, 10000,3600000);
 
-        client.setOwnerId(config.getOwnerId());
+        client.setOwnerId(Config.getOwnerId());
         client.setServerInvite(Const.INVITE);
-        client.setEmojis(Const.DONE_E, Const.WARN_E, Const.FAIL_E);
-        client.setPrefix(config.getPrefix());
-        if(!(config.getCoOwnerId().isEmpty()))
+        client.setEmojis(Config.getDoneEmote(), Config.getWarnEmote(), Config.getErrorEmote());
+        client.setPrefix(Config.getPrefix());
+        client.setStatus(Config.getStatus());
+        if(!(Config.getCoOwnerId().isEmpty()))
         {
-            client.setCoOwnerIds(config.getCoOwnerId());
+            client.setCoOwnerIds(Config.getCoOwnerId());
         }
-        if(!(config.getDBotsToken().isEmpty()))
+        if(!(Config.getDBotsToken().isEmpty()))
         {
-            client.setDiscordBotsKey(config.getDBotsToken());
+            client.setDiscordBotsKey(Config.getDBotsToken());
         }
-        if(!(config.getDBotsListToken().isEmpty()))
+        if(!(Config.getDBotsListToken().isEmpty()))
         {
-            client.setDiscordBotListKey(config.getDBotsListToken());
+            client.setDiscordBotListKey(Config.getDBotsListToken());
         }
         client.addCommands(
         	    //Bot
@@ -140,7 +122,7 @@ public class Endless extends ListenerAdapter
         //JDA Connection
           
         new JDABuilder(AccountType.BOT)
-            .setToken(config.getToken())
+            .setToken(Config.getToken())
             .setStatus(OnlineStatus.DO_NOT_DISTURB)
             .setGame(Game.of(Const.GAME_0))
             .addEventListener(waiter)
@@ -159,20 +141,9 @@ public class Endless extends ListenerAdapter
     public void onReady(ReadyEvent event)
     {
         SimpleLog LOG = SimpleLog.getLog("Endless");
-        Config config;
-
-        try
-        {
-            config = new Config();
-        }
-        catch(Exception e)
-        {
-            SimpleLog.getLog("Config").fatal(e);
-            return;
-        }
 
         User selfuser = event.getJDA().getSelfUser();
-        User owner = event.getJDA().retrieveUserById(config.getOwnerId()).complete();
+        User owner = event.getJDA().retrieveUserById(Config.getOwnerId()).complete();
         String selfname = selfuser.getName()+"#"+selfuser.getDiscriminator();
         String selfid = selfuser.getId();
         String ownername = owner.getName()+"#"+owner.getDiscriminator();
@@ -180,9 +151,9 @@ public class Endless extends ListenerAdapter
 
         LOG.info("My robotic body is ready!");
         LOG.info("Logged in as: "+selfname+" ("+selfid+")");
-        LOG.info("Using prefix: "+config.getPrefix());
+        LOG.info("Using prefix: "+Config.getPrefix());
         LOG.info("Owner: "+ownername+" ("+ownerid+")");
 
-        event.getJDA().getPresence().setGame(Game.of("Type "+config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+        event.getJDA().getPresence().setGame(Game.of("Type "+Config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
     }
 }
