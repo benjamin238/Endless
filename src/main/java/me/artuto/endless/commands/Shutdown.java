@@ -44,13 +44,7 @@ public class Shutdown extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        try
-        {
-            Thread.sleep(2000);
-            Optimizer.shutdown();
-        }
-        catch (InterruptedException ignored) {}
-
+        Optimizer.shutdown();
         event.getJDA().shutdown();
     }
     
