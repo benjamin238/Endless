@@ -51,7 +51,7 @@ public class Blacklists
     public static void addGuild(String id) throws IOException
     {
         output = new BufferedWriter(new FileWriter("data/blacklisted_guilds.txt", true));
-        output.append(id);
+        output.append("\n"+id);
         output.close();
     }
 
@@ -83,7 +83,7 @@ public class Blacklists
         File list = new File("data/blacklisted_guilds.txt");
         File tempList = new File("data/tmp_blacklisted_guilds.txt");
         BufferedReader reader = new BufferedReader(new FileReader(list));
-        BufferedWriter writer = new BufferedWriter(new FileWriter(tempList));
+        Writer writer = new BufferedWriter(new FileWriter(tempList, true));
         String line;
         String trim;
         boolean success;
@@ -92,11 +92,12 @@ public class Blacklists
         {
             trim = line.trim();
             if(trim.equals(id)) continue;
-            writer.write(line + System.getProperty("line.separator"));
+            writer.append(line);
         }
 
         writer.close();
         reader.close();
+        list.delete();
         success = tempList.renameTo(list);
     }
 }
