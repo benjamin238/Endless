@@ -1,6 +1,7 @@
 package me.artuto.endless.cmddata;
 
 import com.jagrosh.jdautilities.commandclient.Command.Category;
+import me.artuto.endless.data.Blacklists;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
@@ -15,35 +16,29 @@ public class Categories
     {
         SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         String userId = event.getAuthor().getId();
-        List<String> lines = null;
         User user = event.getAuthor();
 
         try
         {
-            lines = Files.readAllLines(Paths.get("data/blacklisted_users.txt"));
-        }
-        catch(IOException e)
-        {
-            LOG.warn("Failed to load blacklisted users: "+e);
-        }
-
-        if(!(lines==null))
-        {
-            if(lines.contains(userId))
+            if(Blacklists.isUserListed(userId))
             {
                 LOG.info("A Blacklisted user executed a command: "+user.getName()+"#"+user.getDiscriminator()+" (ID: "+user.getId()+")");
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else {return true;}
-        }
-        else
-        {
-            if(event.isOwner() || event.isCoOwner())
+            else
             {
-                return true;
+                if(event.isOwner() && event.isCoOwner())
+                {
+                    return true;
+                }
+                else {return false;}
             }
-            else {return false;}
+        }
+        catch(IOException e)
+        {
+            LOG.fatal("Failed to load blacklisted users: "+e);
+            return true;
         }
     });
 
@@ -61,35 +56,29 @@ public class Categories
     {
         SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         String userId = event.getAuthor().getId();
-        List<String> lines = null;
         User user = event.getAuthor();
 
         try
         {
-            lines = Files.readAllLines(Paths.get("data/blacklisted_users.txt"));
-        }
-        catch(IOException e)
-        {
-            LOG.warn("Failed to load blacklisted users: "+e);
-        }
-
-        if(!(lines==null))
-        {
-            if(lines.contains(userId))
+            if(Blacklists.isUserListed(userId))
             {
                 LOG.info("A Blacklisted user executed a command: "+user.getName()+"#"+user.getDiscriminator()+" (ID: "+user.getId()+")");
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else {return true;}
-        }
-        else
-        {
-            if(event.isOwner() || event.isCoOwner())
+            else
             {
-                return true;
+                if(event.isOwner() && event.isCoOwner())
+                {
+                    return true;
+                }
+                else {return false;}
             }
-            else {return false;}
+        }
+        catch(IOException e)
+        {
+            LOG.fatal("Failed to load blacklisted users: "+e);
+            return true;
         }
     });
 
@@ -97,35 +86,29 @@ public class Categories
     {
         SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         String userId = event.getAuthor().getId();
-        List<String> lines = null;
         User user = event.getAuthor();
 
         try
         {
-            lines = Files.readAllLines(Paths.get("data/blacklisted_users.txt"));
-        }
-        catch(IOException e)
-        {
-            LOG.warn("Failed to load blacklisted users: "+e);
-        }
-
-        if(!(lines==null))
-        {
-            if(lines.contains(userId))
+            if(Blacklists.isUserListed(userId))
             {
                 LOG.info("A Blacklisted user executed a command: "+user.getName()+"#"+user.getDiscriminator()+" (ID: "+user.getId()+")");
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else {return true;}
-        }
-        else
-        {
-            if(event.isOwner() || event.isCoOwner())
+            else
             {
-                return true;
+                if(event.isOwner() && event.isCoOwner())
+                {
+                    return true;
+                }
+                else {return false;}
             }
-            else {return false;}
+        }
+        catch(IOException e)
+        {
+            LOG.fatal("Failed to load blacklisted users: "+e);
+            return true;
         }
     });
 
@@ -133,35 +116,29 @@ public class Categories
     {
         SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         String userId = event.getAuthor().getId();
-        List<String> lines = null;
         User user = event.getAuthor();
 
         try
         {
-            lines = Files.readAllLines(Paths.get("data/blacklisted_users.txt"));
-        }
-        catch(IOException e)
-        {
-            LOG.warn("Failed to load blacklisted users: "+e);
-        }
-
-        if(!(lines==null))
-        {
-            if(lines.contains(userId))
+            if(Blacklists.isUserListed(userId))
             {
                 LOG.info("A Blacklisted user executed a command: "+user.getName()+"#"+user.getDiscriminator()+" (ID: "+user.getId()+")");
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else {return true;}
-        }
-        else
-        {
-            if(event.isOwner() || event.isCoOwner())
+            else
             {
-                return true;
+                if(event.isOwner() && event.isCoOwner())
+                {
+                    return true;
+                }
+                else {return false;}
             }
-            else {return false;}
+        }
+        catch(IOException e)
+        {
+            LOG.fatal("Failed to load blacklisted users: "+e);
+            return true;
         }
     });
 
@@ -169,37 +146,29 @@ public class Categories
     {
         SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         String userId = event.getAuthor().getId();
-        List<String> lines = null;
         User user = event.getAuthor();
 
         try
         {
-            lines = Files.readAllLines(Paths.get("data/blacklisted_users.txt"));
-        }
-        catch(IOException e)
-        {
-            LOG.warn("Failed to load blacklisted users: "+e);
-        }
-
-        if(!(lines==null))
-        {
-            if(lines.contains(userId))
+            if(Blacklists.isUserListed(userId))
             {
                 LOG.info("A Blacklisted user executed a command: "+user.getName()+"#"+user.getDiscriminator()+" (ID: "+user.getId()+")");
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else {return true;}
-        }
-        else
-        {
-            if(event.isOwner() || event.isCoOwner())
+            else
             {
-                return true;
+                if(event.isOwner() && event.isCoOwner())
+                {
+                    return true;
+                }
+                else {return false;}
             }
-            else {return false;}
+        }
+        catch(IOException e)
+        {
+            LOG.fatal("Failed to load blacklisted users: "+e);
+            return true;
         }
     });
-
-
 }
