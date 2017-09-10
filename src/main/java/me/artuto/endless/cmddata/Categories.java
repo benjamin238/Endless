@@ -4,11 +4,7 @@ import com.jagrosh.jdautilities.commandclient.Command.Category;
 import me.artuto.endless.data.Blacklists;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.utils.SimpleLog;
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
 
 public class Categories
 {
@@ -28,11 +24,7 @@ public class Categories
             }
             else
             {
-                if(event.isOwner() && event.isCoOwner())
-                {
-                    return true;
-                }
-                else {return false;}
+                return event.isOwner() && event.isCoOwner();
             }
         }
         catch(IOException e)
@@ -68,11 +60,7 @@ public class Categories
             }
             else
             {
-                if(event.isOwner() && event.isCoOwner())
-                {
-                    return true;
-                }
-                else {return false;}
+                return event.isOwner() && event.isCoOwner();
             }
         }
         catch(IOException e)
@@ -98,11 +86,7 @@ public class Categories
             }
             else
             {
-                if(event.isOwner() && event.isCoOwner())
-                {
-                    return true;
-                }
-                else {return false;}
+                return event.isOwner() && event.isCoOwner();
             }
         }
         catch(IOException e)
@@ -128,11 +112,7 @@ public class Categories
             }
             else
             {
-                if(event.isOwner() && event.isCoOwner())
-                {
-                    return true;
-                }
-                else {return false;}
+                return event.isOwner() && event.isCoOwner();
             }
         }
         catch(IOException e)
@@ -158,11 +138,7 @@ public class Categories
             }
             else
             {
-                if(event.isOwner() && event.isCoOwner())
-                {
-                    return true;
-                }
-                else {return false;}
+                return event.isOwner() && event.isCoOwner();
             }
         }
         catch(IOException e)
