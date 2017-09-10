@@ -47,6 +47,24 @@ public class BotCPanel extends Command
     @Override
     protected void execute(CommandEvent event) 
     {
+        String prefix = event.getClient().getPrefix();
+
+        if(event.getArgs().isEmpty())
+        {
+            event.replyWarning("Please choose a subcommand:\n" +
+                    "- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n" +
+                    "- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n" +
+                    "- `"+prefix+"bot updategame`: Updates the default game.\n" +
+                    "- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
+        }
+        else if(!(event.getArgs().contains("status")) || !(event.getArgs().contains("game") || !(event.getArgs().contains("updategame"))) || !(event.getArgs().contains("optimize")))
+        {
+            event.replyWarning("Please choose a subcommand:\n" +
+                    "- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n" +
+                    "- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n" +
+                    "- `"+prefix+"bot updategame`: Updates the default game.\n" +
+                    "- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
+        }
     }
     
     private class Status extends Command

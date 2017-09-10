@@ -65,7 +65,7 @@ public class Logging extends ListenerAdapter
             return;
         }
 
-        if(event.getMessage().getContent().startsWith(config.getPrefix()))
+        if(event.getMessage().getContent().startsWith(Config.getPrefix()))
         {
             if(event.isFromType(ChannelType.PRIVATE))
             {

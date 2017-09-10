@@ -89,6 +89,7 @@ public class Endless extends ListenerAdapter
                 //Bot Administration
                 
                 new Bash(),
+                new BlacklistUsers(),
                 new BotCPanel(),
                 new Eval(),
                 new Shutdown(),
