@@ -39,7 +39,7 @@ public class Categories
 
     public static final Category BOTADM = new Category("Bot Administration", event ->
     {
-        if(event.isOwner()) || event.isCoOwner())
+        if(event.isOwner() || event.isCoOwner())
         {
             return true;
         }
