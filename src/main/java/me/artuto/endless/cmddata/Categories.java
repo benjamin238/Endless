@@ -39,12 +39,15 @@ public class Categories
 
     public static final Category BOTADM = new Category("Bot Administration", event ->
     {
-        if(!(event.isOwner()) || !(event.isCoOwner()))
+        if(event.isOwner()) || event.isCoOwner())
+        {
+            return true;
+        }
+        else 
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
             return false;
         }
-        else {return true;}
     });
 
     public static final Category MODERATION = new Category("Moderation", event ->
