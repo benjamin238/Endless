@@ -92,7 +92,7 @@ public class Endless extends ListenerAdapter
                 new BlacklistUsers(),
                 new BotCPanel(),
                 new Eval(),
-                new Shutdown(),
+                new Shutdown(free, time),
                 
                 //Moderation
                 

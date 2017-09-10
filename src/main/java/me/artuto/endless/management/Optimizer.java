@@ -13,9 +13,4 @@ public class Optimizer extends TimerTask
         System.gc();
         SimpleLog.getLog("Optimizer").info("Executed!");
     }
-
-    public static void shutdown() throws InterruptedException
-    {
-        SimpleLog.getLog("Optimizer").info("Optimizer shutdown...");
-    }
 }

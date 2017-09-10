@@ -23,6 +23,8 @@ import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.management.Optimizer;
 import net.dv8tion.jda.core.Permission;
 
+import java.util.Timer;
+
 /**
  *
  * @author Artu
@@ -30,8 +32,13 @@ import net.dv8tion.jda.core.Permission;
 
 public class Shutdown extends Command
 {
-    public Shutdown()
+    private final Optimizer free;
+    private final Timer time;
+
+    public Shutdown(Optimizer free, Timer time)
     {
+        this.free = free;
+        this.time = time;
         this.name = "shutdown";
         this.help = "Turns Off the bot";
         this.category = Categories.BOTADM;
@@ -45,6 +52,9 @@ public class Shutdown extends Command
     protected void execute(CommandEvent event)
     {
         event.reactSuccess();
+        free.cancel();
+        time.cancel();
+        time.purge();
         event.getJDA().shutdown();
     }
     
