@@ -24,7 +24,10 @@ public class Categories
             }
             else
             {
-                return event.isOwner() && event.isCoOwner();
+                if(event.isOwner() || event.isCoOwner())
+                    return true;
+                else
+                    return true;
             }
         }
         catch(IOException e)
@@ -36,7 +39,7 @@ public class Categories
 
     public static final Category BOTADM = new Category("Bot Administration", event ->
     {
-        if(!(event.isOwner()) && !(event.isCoOwner()))
+        if(!(event.isOwner()) || !(event.isCoOwner()))
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
             return false;
@@ -60,7 +63,10 @@ public class Categories
             }
             else
             {
-                return event.isOwner() && event.isCoOwner();
+                if(event.isOwner() || event.isCoOwner())
+                    return true;
+                else
+                    return true; event.isOwner() && event.isCoOwner();
             }
         }
         catch(IOException e)
@@ -86,7 +92,10 @@ public class Categories
             }
             else
             {
-                return event.isOwner() && event.isCoOwner();
+                if(event.isOwner() || event.isCoOwner())
+                    return true;
+                else
+                    return true;
             }
         }
         catch(IOException e)
@@ -112,7 +121,10 @@ public class Categories
             }
             else
             {
-                return event.isOwner() && event.isCoOwner();
+                if(event.isOwner() || event.isCoOwner())
+                    return true;
+                else
+                    return true;
             }
         }
         catch(IOException e)
@@ -138,7 +150,10 @@ public class Categories
             }
             else
             {
-                return event.isOwner() && event.isCoOwner();
+                if(event.isOwner() || event.isCoOwner())
+                    return true;
+                else
+                    return true;
             }
         }
         catch(IOException e)
