@@ -66,7 +66,7 @@ public class Categories
                 if(event.isOwner() || event.isCoOwner())
                     return true;
                 else
-                    return true; event.isOwner() && event.isCoOwner();
+                    return true;
             }
         }
         catch(IOException e)
