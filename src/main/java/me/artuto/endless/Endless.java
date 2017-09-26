@@ -17,17 +17,19 @@
 
 package me.artuto.endless;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Timer;
 import javax.security.auth.login.LoginException;
 
 import me.artuto.endless.commands.*;
-import me.artuto.endless.management.Optimizer;
+import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
@@ -37,6 +39,7 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 import me.artuto.endless.loader.*;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -55,10 +58,8 @@ public class Endless extends ListenerAdapter
         Bot bot = new Bot(waiter, new Config());
         ModLogging modlog = new ModLogging(bot);
         CommandClientBuilder client = new CommandClientBuilder();
-        Timer time = new Timer();
-        Optimizer free = new Optimizer();
-
-        time.schedule(free, 10000,3600000);
+        Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        log.setLevel(Level.INFO);
 
         client.setOwnerId(Config.getOwnerId());
         client.setServerInvite(Const.INVITE);
@@ -92,7 +93,7 @@ public class Endless extends ListenerAdapter
                 new BlacklistUsers(),
                 new BotCPanel(),
                 new Eval(),
-                new Shutdown(free, time),
+                new Shutdown(),
                 
                 //Moderation
                 
@@ -121,18 +122,18 @@ public class Endless extends ListenerAdapter
                 new Say());
         
         //JDA Connection
-          
-        new JDABuilder(AccountType.BOT)
+
+        JDA jda = new JDABuilder(AccountType.BOT)
             .setToken(Config.getToken())
             .setStatus(OnlineStatus.DO_NOT_DISTURB)
             .setGame(Game.of(Const.GAME_0))
             .addEventListener(waiter)
             .addEventListener(client.build())
-            //.addEventListener(new ServerLogging())
             .addEventListener(bot)
             .addEventListener(new Endless())
             .addEventListener(new Logging())
             .addEventListener(new GuildBlacklist())
+            .addEventListener(new ServerLogging(bot))
             .buildBlocking();                
     }    
 
