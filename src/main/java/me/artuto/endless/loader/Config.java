@@ -17,13 +17,13 @@
 
 package me.artuto.endless.loader;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.utils.SimpleLog;
+
+import java.io.File;
+import java.lang.reflect.Field;
 
 /**
  *
@@ -32,21 +32,128 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Config 
 {
-    private static String token;
-    private static String prefix;
-    private static String ownerid;
-    private static String coownerid;
-    private static OnlineStatus status;
-    private static String dbanstoken;
-    private static String dbotstoken;
-    private static String dbotslisttoken;
-    private static String done_e;
-    private static String warn_e;
-    private static String fail_e;
+    private final SimpleLog LOG = SimpleLog.getLog("Config");
+    private static ConfigFormat format;
 
     public Config() throws Exception
     {
-        List<String> lines = Files.readAllLines(Paths.get("config.yml"));
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        format = mapper.readValue(new File("data/config.yml"), ConfigFormat.class);
+
+        for (Field field : format.getClass().getDeclaredFields())
+        {
+            if (field.get(format) == null)
+            {
+                throw new Exception(field.getName() + " in your config was null!");
+            }
+        }
+    }
+
+    public String getToken()
+    {
+        return format.token;
+    }
+
+    public String getPrefix()
+    {
+        return format.prefix;
+    }
+
+    public String getGame()
+    {
+        return format.game;
+    }
+
+    public String getDBotsToken()
+    {
+        return format.discordBotsToken;
+    }
+
+    public String getDBotsListToken()
+    {
+        return format.discordBotListToken;
+    }
+
+    public String getDBansToken()
+    {
+        return format.discordBansToken;
+    }
+
+    public String getDoneEmote()
+    {
+        return format.doneEmote;
+    }
+
+    public String getWarnEmote()
+    {
+        return format.warnEmote;
+    }
+
+    public String getErrorEmote()
+    {
+        return format.errorEmote;
+    }
+
+    public String getDatabaseUrl()
+    {
+        return format.dbUrl;
+    }
+
+    public String getDatabasePort()
+    {
+        return format.dbPort;
+    }
+
+    public String getDatabase()
+    {
+        return format.database;
+    }
+
+    public String getDatabaseUsername()
+    {
+        return format.dbUsername;
+    }
+
+    public String getDatabasePassword()
+    {
+        return format.dbPassword;
+    }
+
+    public int getPoolSize()
+    {
+        return format.poolSize;
+    }
+
+    public Long getOwnerId()
+    {
+        return format.ownerId;
+    }
+
+    public Long[] getCoOwnersId()
+    {
+        return format.coOwnersIds;
+    }
+
+    public Long getRootGuildId()
+    {
+        return format.rootGuildId;
+    }
+
+    public Long getBotlogChannelId()
+    {
+        return format.botlogChannelId;
+    }
+
+    public OnlineStatus getStatus()
+    {
+        return format.status;
+    }
+
+    public Boolean isDebugEnabled()
+    {
+        return format.isDebugEnabled;
+    }
+        /*List<String> lines = Files.readAllLines(Paths.get("config.yml"));
         SimpleLog LOG = SimpleLog.getLog("Config");
         for(String str : lines)
         {
@@ -174,5 +281,5 @@ public class Config
     public static String getErrorEmote()
     {
         return fail_e==null?"❌":fail_e;
-    }
+    }*/
 }
