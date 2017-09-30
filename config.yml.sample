@@ -1,37 +1,69 @@
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
-//            Configuration of Endless                  //
-//////////////////////////////////////////////////////////
-// Thanks for downloading your own instance of Endless! //
-// Here are some configuration parameters needed for    //
-// running the bot correctly.                           //
-//////////////////////////////////////////////////////////
+﻿---
+# Your BOT token here. If you don't have a token, get one at https://discordapp.com/developers/applications/me
+token: 'Put your token here!'
 
-// Put here your token, you can get one at https://discordapp.com/developers/
+# The commands needs to start with a prefix
+prefix: 'e!'
 
-token=
+# This will change the game at startup, set it to 'none' to enable the default game (Shows Help word, Guild, TextChannels, VoiceChannels and Users count)
+game: 'Type e!help'
 
-// Here goes the prefix
+# This is used for sending stats to DiscordBots.pw.
+discordBotsToken: ''
 
-prefix=e!
+# This is used for sending stats to DiscordBotList.org.
+discordBotList: ''
 
-// Now setup the owner info.
+# This is for accessing Discord Bans API.
+discordBansToken: ''
 
-ownerid=
+# Done (Success) emote.
+doneEmote: ':white_check_mark:'
 
-// Now, if needed, setup CoOwner's info
+# Warning emote.
+warnEmote: ':warning:'
 
-coownerid=
+# Error emote.
+errorEmote: ':x:'
 
-// Others
+# Database Url.
+dbUrl: 'localhost'
 
-dbanstoken=
-dbotstoken=
-dbotslisttoken=
+# Database Port.
+dbPort: 3306
 
-// Custom emotes, in order: Done emote, warning emote and error emote, if they are empty it defaults to the Discord's one.
-// You can use custom emotes.
+# Database Name.
+database: 'endless'
 
-done_e=
-warn_e=
-fail_e=
+# Database Username.
+dbUsername: 'root'
+
+# Database Password.
+dbPassword: ''
+
+# Database Connection Pool size.
+poolSize: 10
+
+# Owner Access: The following list of users will have FULL ACCESS to the bot, (and by extension), machine control.
+# This only should give to trustly users. Choose with care!! (Replace this with your IDs).
+ownerId: 264499432538505217 
+coOwnerIds:
+  - 302534881370439681
+  
+# A Guild ID where the bot is based off (Replace this with your Guild ID).
+rootGuildId: 312776731704426496
+
+# A TextChannel ID where the bot sends logs (Replace this with your TextChannel ID).
+botlogChannelId: 341041806508818432
+  
+# OnlineStatus of the bot. Valid OnlineStatus: ONLINE, IDLE, DO_NOT_DISTURB, INVISIBLE and OFFLINE.
+status: ONLINE
+
+# Turns the status of the BotLog channel.
+botlog: false
+
+# Enables DEBUG mode, this prints to the CONSOLE when a command has an exception, when a web request is made, etc.
+debug: false
+
+# Enables DEEP DEBUG mode, this changes the log level of JDA. Used for debugging JDA internal errors.
+deepDebug: false

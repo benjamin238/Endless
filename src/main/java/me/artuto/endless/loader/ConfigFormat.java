@@ -20,9 +20,11 @@ public class ConfigFormat
     public String dbPassword;
     public int poolSize;
     public Long ownerId;
-    public Long[] coOwnersIds;
+    public Long[] coOwnerIds;
     public Long rootGuildId;
     public Long botlogChannelId;
     public OnlineStatus status;
-    public Boolean isDebugEnabled;
+    public Boolean botlog;
+    public Boolean debug;
+    public Boolean deepDebug;
 }

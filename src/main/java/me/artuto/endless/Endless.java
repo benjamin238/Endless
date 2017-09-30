@@ -64,7 +64,7 @@ public class Endless extends ListenerAdapter
         log.setLevel(Level.INFO);
         DatabaseManager db = new DatabaseManager();
         db.getDataSource();
-        Long[] coOwners = config.getCoOwnersId();
+        Long[] coOwners = config.getCoOwnerIds();
         String[] owners = new String[coOwners.length];
 
         for(int i = 0; i < owners.length; i++)
