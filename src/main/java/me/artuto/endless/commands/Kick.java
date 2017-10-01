@@ -137,7 +137,7 @@ public class Kick extends Command
             
            event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-           ModLogging.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
+           ModLogging.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
         }
         catch(Exception e)
         {
