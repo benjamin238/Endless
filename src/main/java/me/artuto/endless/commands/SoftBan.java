@@ -141,7 +141,7 @@ public class SoftBan extends Command
             
             event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-            ModLogging.logSoftban(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
+            ModLogging.logSoftban(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
         }
         catch(Exception e)
         {
