@@ -101,7 +101,7 @@ public class Unban extends Command
             event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
             event.replySuccess(Messages.UNBAN_SUCCESS+success);
 
-            ModLogging.logUnban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
+            ModLogging.logUnban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
         }
         catch(Exception e)
         {
