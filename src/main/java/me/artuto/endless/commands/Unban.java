@@ -42,7 +42,7 @@ public class Unban extends Command
     {
         this.name = "unban";
         this.help = "Unbans the specified user";
-        this.arguments = "<user>";
+        this.arguments = "<@user|ID|username> for [reason]";
         this.category = Categories.MODERATION;
         this.botPermissions = new Permission[]{Permission.KICK_MEMBERS};
         this.userPermissions = new Permission[]{Permission.KICK_MEMBERS};
@@ -53,8 +53,6 @@ public class Unban extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        EmbedBuilder builder = new EmbedBuilder();
-        Member member;
         User author;
         User user;
         author = event.getAuthor();
@@ -63,7 +61,7 @@ public class Unban extends Command
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban <@user|ID|username> for [reason]");
             return;
         }
 
@@ -75,8 +73,8 @@ public class Unban extends Command
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban @user | ID | nickname | username for *reason*");
-            return;
+            target = event.getArgs();
+            reason = "[no reason specified]";
         }
               
         List<User> list = FinderUtil.findBannedUsers(target, event.getGuild());

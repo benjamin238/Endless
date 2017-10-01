@@ -17,13 +17,13 @@
 
 package me.artuto.endless.loader;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.utils.SimpleLog;
+
+import java.io.File;
+import java.lang.reflect.Field;
 
 /**
  *
@@ -32,147 +32,121 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Config 
 {
-    private static String token;
-    private static String prefix;
-    private static String ownerid;
-    private static String coownerid;
-    private static OnlineStatus status;
-    private static String dbanstoken;
-    private static String dbotstoken;
-    private static String dbotslisttoken;
-    private static String done_e;
-    private static String warn_e;
-    private static String fail_e;
+    private final SimpleLog LOG = SimpleLog.getLog("Config");
+    private static ConfigFormat format;
 
     public Config() throws Exception
     {
-        List<String> lines = Files.readAllLines(Paths.get("config.yml"));
-        SimpleLog LOG = SimpleLog.getLog("Config");
-        for(String str : lines)
-        {
-            String[] parts = str.split("=",2);
-            String key = parts[0].trim().toLowerCase();
-            String value = parts.length>1 ? parts[1].trim() : null;
-            switch(key) 
-            {
-                case "token":
-                    token = value;
-                    break;
-                case "prefix":
-                    if(value==null)
-                    {
-                        prefix = "";
-                        LOG.warn("The prefix was defined as empty!");
-                    }
-                    else
-                        prefix = value;
-                    break;
-                case "ownerid":
-                    ownerid = value;
-                    break;
-                case "coownerid":
-                    coownerid = value;
-                    break;
-                case "status":
-                    status = OnlineStatus.fromKey(value);
-                    break;
-                case "dbanstoken":
-                    dbanstoken = value;
-                    break;
-                case "dbotstoken":
-                    dbotstoken = value;
-                    break;
-                case "dbotslisttoken":
-                    dbotslisttoken = value;
-                    break;
-                case "done_e":
-                    done_e = value;
-                    break;
-                case "warn_e":
-                    warn_e=value;
-                    break;
-                case "fail_e":
-                    fail_e=value;
-                    break;
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        format = mapper.readValue(new File("config.yml"), ConfigFormat.class);
 
+        for (Field field : format.getClass().getDeclaredFields())
+        {
+            if (field.get(format) == null)
+            {
+                LOG.fatal("Error when reading the config!");
+                throw new Exception(field.getName() + " in your config was null!");
             }
         }
-        if(token==null)
-            throw new Exception("No token provided in the config file!");
-        if(prefix==null)
-            throw new Exception("No prefix provided in the config file!");
-        if(ownerid==null)
-            throw new Exception("No Owner ID provided in the config file!");
-        if(coownerid==null)
-            LOG.warn("No Co-Owner provided in the config file! Disabling feature...");
-        if(status==OnlineStatus.UNKNOWN)
-            LOG.warn("Invalid OnlineStatus! Using ONLINE.");
-        if(dbanstoken==null)
-            LOG.warn("No Discord Bans token provided in the config file! Disabling feature...");
-        if(dbotstoken==null)
-            LOG.warn("No Discord Bots token provided in the config file! Disabling feature...");
-        if(dbotslisttoken==null)
-            LOG.warn("No Discord Bots List token provided in the config file! Disabling feature...");
-        if(done_e==null)
-            LOG.warn("No Done Emote provided in the config file! Using the default emote...");
-        if(warn_e==null)
-            LOG.warn("No Warn Emote provided in the config file! Using the default emote...");
-        if(fail_e==null)
-            LOG.warn("No Error Emote provided in the config file! Using the default emote...");
-    }
-    
-    public static String getToken()
-    {
-        return token;
-    }
-    
-    public static String getPrefix()
-    {
-        return prefix;
-    }
-    
-    public static String getOwnerId()
-    {
-        return ownerid;
     }
 
-    public static String getCoOwnerId()
+    public String getToken()
     {
-        return coownerid;
+        return format.token;
     }
 
-    public static OnlineStatus getStatus()
+    public String getPrefix()
     {
-        return status==OnlineStatus.UNKNOWN?OnlineStatus.ONLINE:status;
+        return format.prefix;
     }
 
-    public static String getDBansToken()
+    public String getGame()
     {
-        return dbanstoken;
+        return format.game;
     }
 
-    public static String getDBotsToken()
+    public String getDBotsToken()
     {
-        return dbotstoken;
+        return format.discordBotsToken;
     }
 
-    public static String getDBotsListToken()
+    public String getDBotsListToken()
     {
-        return dbotslisttoken;
+        return format.discordBotListToken;
     }
 
-    public static String getDoneEmote()
+    public String getDBansToken()
     {
-        return done_e==null?"✅":done_e;
+        return format.discordBansToken;
     }
 
-    public static String getWarnEmote()
+    public String getDoneEmote()
     {
-        return warn_e==null?"⚠":warn_e;
+        return format.doneEmote;
     }
 
-    public static String getErrorEmote()
+    public String getWarnEmote()
     {
-        return fail_e==null?"❌":fail_e;
+        return format.warnEmote;
+    }
+
+    public String getErrorEmote()
+    {
+        return format.errorEmote;
+    }
+
+    public String getDatabaseUrl()
+    {
+        return format.dbUrl;
+    }
+
+    public String getDatabaseUsername()
+    {
+        return format.dbUsername;
+    }
+
+    public String getDatabasePassword()
+    {
+        return format.dbPassword;
+    }
+
+    public Long getOwnerId()
+    {
+        return format.ownerId;
+    }
+
+    public Long[] getCoOwnerIds()
+    {
+        return format.coOwnerIds;
+    }
+
+    public Long getRootGuildId()
+    {
+        return format.rootGuildId;
+    }
+
+    public Long getBotlogChannelId()
+    {
+        return format.botlogChannelId;
+    }
+
+    public OnlineStatus getStatus()
+    {
+        return format.status;
+    }
+
+    public Boolean isBotlogEnabled()
+    {
+        return format.botlog;
+    }
+
+    public Boolean isDebugEnabled()
+    {
+        return format.debug;
+    }
+
+    public Boolean isDeepDebugEnabled()
+    {
+        return format.deepDebug;
     }
 }

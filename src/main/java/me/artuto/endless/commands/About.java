@@ -38,6 +38,8 @@ import net.dv8tion.jda.core.entities.User;
 
 public class About extends Command
 {
+    private static Config config;
+
     public About()
     {
         this.name = "about";
@@ -65,7 +67,7 @@ public class About extends Command
         
        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
        EmbedBuilder builder = new EmbedBuilder();
-       User owner = event.getJDA().retrieveUserById(Config.getOwnerId()).complete();
+       User owner = event.getJDA().getUserById(config.getOwnerId());
        String ownername = owner.getName()+"#"+owner.getDiscriminator();
        String ownerid = owner.getId();
 

@@ -45,7 +45,7 @@ public class Ban extends Command
     {
         this.name = "ban";
         this.help = "Bans the specified user";
-        this.arguments = "<user> for <reason>";
+        this.arguments = "<@user|ID|nickname|username> for [reason]";
         this.category = Categories.MODERATION;
         this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
         this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
@@ -66,7 +66,7 @@ public class Ban extends Command
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban <@user|ID|nickname|username> for [reason]");
             return;
         }
 
@@ -78,8 +78,8 @@ public class Ban extends Command
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"ban @user | ID | nickname | username for *reason*");
-            return;
+            target = event.getArgs();
+            reason = "[no reason specified]";
         }
         
         List<Member> list = FinderUtil.findMembers(target, event.getGuild());
@@ -128,8 +128,8 @@ public class Ban extends Command
             if(!member.getUser().isBot())
             {
                member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.KICK_SUCCESS+success),
-                    (e) -> event.replyWarning(Messages.KICK_NODM+success)));
+                    (d) -> event.replySuccess(Messages.BAN_SUCCESS+success),
+                    (e) -> event.replyWarning(Messages.BAN_NODM+success)));
             }
             else
             {

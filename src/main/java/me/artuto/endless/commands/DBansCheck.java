@@ -40,6 +40,7 @@ import okhttp3.Response;
 public class DBansCheck extends Command
 {
     private final SimpleLog LOG = SimpleLog.getLog("Discord Bans");
+    private static Config config;
     
     public DBansCheck()
     {
@@ -76,7 +77,7 @@ public class DBansCheck extends Command
             return;
         }
          
-        if(Config.getDBansToken().isEmpty())
+        if(config.getDBansToken().isEmpty())
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
             LOG.warn("Someone triggered the Discord Bans Check command, but there's not a token in the config file. In order to stop this message add a token to the config file.");
@@ -88,7 +89,7 @@ public class DBansCheck extends Command
             OkHttpClient client = new OkHttpClient();
            
             RequestBody formBody = new FormBody.Builder()
-                .add("token", Config.getDBansToken())
+                .add("token", config.getDBansToken())
                 .add("userid", user.getId())
                 .build();
             

@@ -4,25 +4,28 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.data.DatabaseManager;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 
+import java.sql.SQLException;
 import java.util.List;
 import me.artuto.endless.Bot;
 import me.artuto.endless.data.Settings;
 
 public class ServerSettings extends Command
 {
-    private final Bot bot;
+    private final DatabaseManager db;
 
-    public ServerSettings(Bot bot)
+    public ServerSettings(DatabaseManager db)
     {
-        this.bot = bot;
+        this.db = db;
         this.name = "config";
-        this.children = new Command[]{new ModLog(bot), new ServerLog(bot)};
+        this.children = new Command[]{new ModLog(db), new ServerLog(db)};
         this.aliases = new String[]{"settings"};
         this.help = "Displays the settings of the server";
         this.category = Categories.TOOLS;
@@ -35,9 +38,9 @@ public class ServerSettings extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        Settings s = bot.getSettings(event.getGuild());
-        TextChannel modlog = event.getGuild().getTextChannelById(s.getModLogId());
-        TextChannel serverlog = event.getGuild().getTextChannelById(s.getServerLogId());
+        Guild guild = event.getGuild();
+        TextChannel modlog = db.getModlogChannel(guild);
+        TextChannel serverlog = db.getServerlogChannel(guild);
         EmbedBuilder builder = new EmbedBuilder();
         String title = ":information_source: Settings of **"+event.getGuild().getName()+"**";
 
@@ -51,22 +54,22 @@ public class ServerSettings extends Command
         }
         catch(Exception e)
         {
-            event.replyError("An error happened when getting the settings!");
+            event.replyError("Something went wrong when getting the settings: \n```"+e+"```");
         }
 
     }
 
     private class ModLog extends Command
     {
-        private final Bot bot;
+        private final DatabaseManager db;
 
-        public ModLog(Bot bot)
+        public ModLog(DatabaseManager db)
         {
-            this.bot = bot;
+            this.db = db;
             this.name = "modlog";
             this.aliases = new String[]{"banlog", "kicklog", "banslog", "kickslog"};
             this.help = "Sets the modlog channel";
-            this.arguments = "#channel | Channel ID | Channel name";
+            this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = new Command.Category("Settings");
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -83,8 +86,12 @@ public class ServerSettings extends Command
             }
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                bot.clearModLogChannel(event.getGuild());
-                event.replySuccess("Modlogging disabled");
+                boolean is = db.clearModlogChannel(event.getGuild());
+
+                if(is)
+                    event.replySuccess("Modlogging disabled");
+                else
+                    event.replyError("You don't have any channel configured as Modlog!");
             }
             else
             {
@@ -95,7 +102,7 @@ public class ServerSettings extends Command
                     event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    bot.setModLogChannel(list.get(0));
+                    db.setModlogChannel(event.getGuild(), list.get(0));
                     event.replySuccess("Modlogging actions will be logged in "+list.get(0).getAsMention());
                 }
             }
@@ -104,14 +111,14 @@ public class ServerSettings extends Command
 
     private class ServerLog extends Command
     {
-        private final Bot bot;
+        private final DatabaseManager db;
 
-        public ServerLog(Bot bot)
+        public ServerLog(DatabaseManager db)
         {
-            this.bot = bot;
+            this.db = db;
             this.name = "serverlog";
             this.help = "Sets the serverlog channel";
-            this.arguments = "#channel | Channel ID | Channel name";
+            this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = new Command.Category("Settings");
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -128,8 +135,12 @@ public class ServerSettings extends Command
             }
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                bot.clearModLogChannel(event.getGuild());
-                event.replySuccess("Serverlogging disabled");
+                boolean is = db.clearServerlogChannel(event.getGuild());
+
+                if(is)
+                    event.replySuccess("Serverlogging disabled");
+                else
+                    event.replyError("You don't have any channel configured as Serverlog!");
             }
             else
             {
@@ -140,88 +151,10 @@ public class ServerSettings extends Command
                     event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    bot.setServerLogChannel(list.get(0));
+                    db.setServerlogChannel(event.getGuild(), list.get(0));
                     event.replySuccess("Serverlogging actions will be logged in "+list.get(0).getAsMention());
                 }
             }
         }
     }
-
-    /*private class ModLogSwitch extends Command
-    {
-        private final Database database;
-        private final ModLogging modlog;
-
-        public ModLogSwitch(Database database, ModLogging modlog)
-        {
-            this.database = database;
-            this.modlog = modlog;
-            this.name = "switch modlog";
-            this.help = "Sets the modlog channel";
-            this.arguments = "true | false";
-            this.category = new Command.Category("Settings");
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-            this.ownerCommand = false;
-            this.guildOnly = true;
-        }
-
-        @Override
-        protected void execute(CommandEvent event)
-        {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("No arguments found. Valid: `ON`, `OFF`");
-            }
-            else if(event.getArgs().equalsIgnoreCase("on"))
-            {
-                database.setModlogSwitch(event.getGuild(), true);
-                event.replySuccess("Modlogging enabled!");
-            }
-            else if(event.getArgs().equalsIgnoreCase("off"))
-            {
-                database.setModlogSwitch(event.getGuild(), false);
-                event.replySuccess("Modlogging disabled!");
-            }
-        }
-    }
-
-    private class ServerLogSwitch extends Command
-    {
-        private final Database database;
-        private final ModLogging modlog;
-
-        public ServerLogSwitch(Database database, ModLogging modlog)
-        {
-            this.database = database;
-            this.modlog = modlog;
-            this.name = "switch serverlog";
-            this.help = "Sets the modlog channel";
-            this.arguments = "on | off";
-            this.category = new Command.Category("Settings");
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-            this.ownerCommand = false;
-            this.guildOnly = true;
-        }
-
-        @Override
-        protected void execute(CommandEvent event)
-        {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("No arguments found. Valid: `ON`, `OFF`");
-            }
-            else if(event.getArgs().equalsIgnoreCase("on"))
-            {
-                database.setServerlogSwitch(event.getGuild(), true);
-                event.replySuccess("Serverlogging enabled!");
-            }
-            else if(event.getArgs().equalsIgnoreCase("off"))
-            {
-                database.setServerlogSwitch(event.getGuild(), false);
-                event.replySuccess("Serverlogging disabled!");
-            }
-        }
-    }*/
 }
