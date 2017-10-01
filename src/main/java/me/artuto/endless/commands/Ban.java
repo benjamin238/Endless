@@ -138,7 +138,7 @@ public class Ban extends Command
             
             event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
+            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
         }
         catch(Exception e)
         {
