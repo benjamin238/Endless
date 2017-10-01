@@ -33,6 +33,7 @@ import me.artuto.endless.data.Settings;
 /**
  *
  * @author Artu
+ * Class used for ModLog actions.
  */
 
 public class ModLogging 
