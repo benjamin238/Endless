@@ -68,11 +68,10 @@
         <scope>compile</scope>
      </dependency>
      <dependency>
-        <groupId>com.google.apis</groupId>
-        <artifactId>google-api-services-translate</artifactId>
-        <version>LATEST</version>
-        <scope>compile</scope>
-     </dependency>
+	    <groupId>com.github.wihoho</groupId>
+	    <artifactId>java-google-translate-text-to-speech</artifactId>
+	    <version>v1.0</version>
+	</dependency>
      <dependency>
          <groupId>com.google.code.gson</groupId>
          <artifactId>gson</artifactId>
