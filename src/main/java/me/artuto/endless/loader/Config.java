@@ -100,16 +100,6 @@ public class Config
         return format.dbUrl;
     }
 
-    public String getDatabasePort()
-    {
-        return format.dbPort;
-    }
-
-    public String getDatabase()
-    {
-        return format.database;
-    }
-
     public String getDatabaseUsername()
     {
         return format.dbUsername;
@@ -118,11 +108,6 @@ public class Config
     public String getDatabasePassword()
     {
         return format.dbPassword;
-    }
-
-    public int getPoolSize()
-    {
-        return format.poolSize;
     }
 
     public Long getOwnerId()

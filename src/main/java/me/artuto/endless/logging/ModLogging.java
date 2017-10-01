@@ -18,10 +18,15 @@
 package me.artuto.endless.logging;
 
 import me.artuto.endless.Messages;
+import me.artuto.endless.data.DatabaseManager;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import java.time.OffsetDateTime;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import me.artuto.endless.Bot;
 import me.artuto.endless.data.Settings;
 
@@ -33,22 +38,21 @@ import me.artuto.endless.data.Settings;
 public class ModLogging 
 {
     private final SimpleLog LOG = SimpleLog.getLog("ModLog");
-    private static Settings settings;
-    private static Bot bot;
+    private static DatabaseManager db;
 
-    public ModLogging(Bot bot)
+    public ModLogging(DatabaseManager db)
     {
-        ModLogging.bot = bot;
+        ModLogging.db = db;
     }
 
-    public static void logBan(User author, Member target, String reason, Guild guild, TextChannel channel, Message message)
+    public static void logBan(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        Settings set = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(set.getModLogId());
-        OffsetDateTime time = message.getCreationTime();
-        int hour = time.getHour();
-        int min = time.getMinute();
-        int sec = time.getSecond();
+        TextChannel tc = db.getModlogChannel(guild);
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         if(!(tc==null))
         {
@@ -59,20 +63,20 @@ public class ModLogging
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Ban:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
-                        + "`Reason:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Ban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
+                        + "`[Reason]:` "+reason).queue();
             }
         }
     }
 
-    public static void logHackban(User author, User target, String reason, Guild guild, TextChannel channel, Message message)
+    public static void logHackban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
-        Settings set = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(set.getModLogId());
-        OffsetDateTime time = message.getCreationTime();
-        int hour = time.getHour();
-        int min = time.getMinute();
-        int sec = time.getSecond();
+        TextChannel tc = db.getModlogChannel(guild);
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         if(!(tc==null))
         {
@@ -83,20 +87,20 @@ public class ModLogging
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Hackban:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") hackbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
-                        + "`Reason:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Hackban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") hackbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
+                        + "`[Reason]:` "+reason).queue();
             }
         }
     }
 
-    public static void logKick(User author, Member target, String reason, Guild guild, TextChannel channel, Message message)
+    public static void logKick(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        Settings set = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(set.getModLogId());
-        OffsetDateTime time = message.getCreationTime();
-        int hour = time.getHour();
-        int min = time.getMinute();
-        int sec = time.getSecond();
+        TextChannel tc = db.getModlogChannel(guild);
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         if(!(tc==null))
         {
@@ -107,20 +111,20 @@ public class ModLogging
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Kick:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
-                        + "`Reason:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Kick]:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
+                        + "`[Reason]:` "+reason).queue();
             }
         }
     }
 
-    public static void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel, Message message)
+    public static void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        Settings set = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(set.getModLogId());
-        OffsetDateTime time = message.getCreationTime();
-        int hour = time.getHour();
-        int min = time.getMinute();
-        int sec = time.getSecond();
+        TextChannel tc = db.getModlogChannel(guild);
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         if(!(tc==null))
         {
@@ -131,20 +135,20 @@ public class ModLogging
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Softban:` :banana: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") softbanned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
-                        + "`Reason:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Softban]:` :banana: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") softbanned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
+                        + "`[Reason]:` "+reason).queue();
             }
         }
     }
 
-    public static void logUnban(User author, User target, String reason, Guild guild, TextChannel channel, Message message)
+    public static void logUnban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
-        Settings set = bot.getSettings(guild);
-        TextChannel tc = guild.getTextChannelById(set.getModLogId());
-        OffsetDateTime time = message.getCreationTime();
-        int hour = time.getHour();
-        int min = time.getMinute();
-        int sec = time.getSecond();
+        TextChannel tc = db.getModlogChannel(guild);
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         if(!(tc==null))
         {
@@ -155,8 +159,8 @@ public class ModLogging
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"]` `Unban:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
-                        + "`Reason:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Unban]:` :wrench: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
+                        + "`[Reason]:` "+reason).queue();
             }
         }
     }

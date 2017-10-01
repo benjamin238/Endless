@@ -1,8 +1,7 @@
 package me.artuto.endless.logging;
 
-import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.Settings;
+import me.artuto.endless.data.DatabaseManager;
 import me.artuto.endless.utils.FinderUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -23,20 +22,18 @@ import java.util.*;
 
 public class ServerLogging extends ListenerAdapter
 {
-    private static Bot bot;
-    private static Settings settings;
-    public ServerLogging(Bot bot)
+    private static DatabaseManager db;
+    public ServerLogging(DatabaseManager db)
     {
-        ServerLogging.bot = bot;
+        ServerLogging.db = db;
     }
     private EmbedBuilder builder = new EmbedBuilder();
 
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event)
     {
-        Settings set = bot.getSettings(event.getGuild());
-        TextChannel tc = event.getGuild().getTextChannelById(set.getServerLogId());
         Guild guild = event.getGuild();
+        TextChannel tc = db.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User newmember = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
@@ -62,9 +59,8 @@ public class ServerLogging extends ListenerAdapter
     @Override
     public void onGuildMemberLeave(GuildMemberLeaveEvent event)
     {
-        Settings set = bot.getSettings(event.getGuild());
-        TextChannel tc = event.getGuild().getTextChannelById(set.getServerLogId());
         Guild guild = event.getGuild();
+        TextChannel tc = db.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User oldmember = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
@@ -90,8 +86,7 @@ public class ServerLogging extends ListenerAdapter
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event)
     {
-        Settings set = bot.getSettings(event.getGuild());
-        TextChannel tc = event.getGuild().getTextChannelById(set.getServerLogId());
+        TextChannel tc = db.getServerlogChannel(event.getGuild());
 
         if(!(tc==null) && !(event.getAuthor().isBot()))
         {
@@ -102,13 +97,12 @@ public class ServerLogging extends ListenerAdapter
     @Override
     public void onGuildMessageUpdate(GuildMessageUpdateEvent event)
     {
-        Settings set = bot.getSettings(event.getGuild());
-        TextChannel tc = event.getGuild().getTextChannelById(set.getServerLogId());
+        Guild guild = event.getGuild();
+        TextChannel tc = db.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         Message newmsg = event.getMessage();
         String title;
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-        Guild guild = event.getGuild();
 
         if(!(message.getContent().equals("No cached message")) && !(tc==null))
         {
@@ -166,12 +160,11 @@ public class ServerLogging extends ListenerAdapter
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent event)
     {
-        Settings set = bot.getSettings(event.getGuild());
-        TextChannel tc = event.getGuild().getTextChannelById(set.getServerLogId());
+        Guild guild = event.getGuild();
+        TextChannel tc = db.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         String title;
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-        Guild guild = event.getGuild();
 
         if(!(message.getContent().equals("No cached message")) && !(tc==null))
         {
@@ -232,8 +225,7 @@ public class ServerLogging extends ListenerAdapter
         {
             for(Guild guild : guilds)
             {
-                Settings set = bot.getSettings(guild);
-                TextChannel tc = guild.getTextChannelById(set.getServerLogId());
+                TextChannel tc = db.getServerlogChannel(guild);
                 TextChannel channel = FinderUtil.getDefaultChannel(guild);
 
                 if(!(tc==null))
@@ -260,10 +252,9 @@ public class ServerLogging extends ListenerAdapter
     @Override
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
     {
-        Settings set = bot.getSettings(event.getGuild());
-        TextChannel tc = event.getGuild().getTextChannelById(set.getServerLogId());
-        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         Guild guild = event.getGuild();
+        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelJoined();
         User user = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
@@ -289,10 +280,9 @@ public class ServerLogging extends ListenerAdapter
     @Override
     public void onGuildVoiceMove(GuildVoiceMoveEvent event)
     {
-        Settings set = bot.getSettings(event.getGuild());
-        TextChannel tc = event.getGuild().getTextChannelById(set.getServerLogId());
-        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         Guild guild = event.getGuild();
+        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vcold = event.getChannelLeft();
         VoiceChannel vcnew = event.getChannelJoined();
         User user = event.getMember().getUser();
@@ -319,10 +309,9 @@ public class ServerLogging extends ListenerAdapter
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event)
     {
-        Settings set = bot.getSettings(event.getGuild());
-        TextChannel tc = event.getGuild().getTextChannelById(set.getServerLogId());
-        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         Guild guild = event.getGuild();
+        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelLeft();
         User user = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();

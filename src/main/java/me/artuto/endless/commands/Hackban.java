@@ -24,7 +24,7 @@ public class Hackban extends Command
     {
         this.name = "hackban";
         this.help = "Bans the specified user";
-        this.arguments = "<User ID>";
+        this.arguments = "<ID> for [reason]";
         this.category = Categories.MODERATION;
         this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
         this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
@@ -43,7 +43,7 @@ public class Hackban extends Command
 
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"hackban User ID for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"hackban <ID> for [reason]");
             return;
         }
 
@@ -55,8 +55,8 @@ public class Hackban extends Command
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"hackban User ID for *reason*");
-            return;
+            target = event.getArgs();
+            reason = "[no reason specified]";
         }
 
         try
@@ -79,10 +79,9 @@ public class Hackban extends Command
         {
             try
             {
-
                 event.getGuild().getController().ban(user, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-                ModLogging.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
+                ModLogging.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
 
                 event.replySuccess(Messages.HACKBAN_SUCCESS+success);
             }

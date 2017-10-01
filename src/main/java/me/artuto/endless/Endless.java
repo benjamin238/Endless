@@ -52,18 +52,29 @@ public class Endless extends ListenerAdapter
     private static final SimpleLog LOG = SimpleLog.getLog("Startup Checker");
     private static Config config;
 
-    public static void main(String[] args) throws IOException, LoginException, IllegalArgumentException, RateLimitedException, InterruptedException, SQLException, Exception
+    public static void main(String[] args) throws IOException, LoginException, IllegalArgumentException, RateLimitedException, InterruptedException, SQLException
     {
+        try
+        {
+            config = new Config();
+        }
+        catch(Exception e)
+        {
+            LOG.fatal(e);
+            e.printStackTrace();
+            return;
+        }
+
         //Register Commands and some other things
 
         EventWaiter waiter = new EventWaiter();
-        Bot bot = new Bot(waiter, new Config());
+        Bot bot = new Bot(waiter, config);
         ModLogging modlog = new ModLogging(bot);
         CommandClientBuilder client = new CommandClientBuilder();
         Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         log.setLevel(Level.INFO);
-        DatabaseManager db = new DatabaseManager();
-        db.getDataSource();
+        DatabaseManager db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
+
         Long[] coOwners = config.getCoOwnerIds();
         String[] owners = new String[coOwners.length];
 
@@ -117,7 +128,7 @@ public class Endless extends ListenerAdapter
                 
                 //Settings
                 
-                new ServerSettings(bot),               
+                new ServerSettings(db),
                 
                 //Tools
                
@@ -145,7 +156,7 @@ public class Endless extends ListenerAdapter
             .addEventListener(new Endless())
             .addEventListener(new Logging())
             .addEventListener(new GuildBlacklist())
-            .addEventListener(new ServerLogging(bot))
+            .addEventListener(new ServerLogging(db))
             .buildBlocking();                
     }    
 

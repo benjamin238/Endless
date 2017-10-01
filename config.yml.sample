@@ -26,23 +26,14 @@ warnEmote: ':warning:'
 # Error emote.
 errorEmote: ':x:'
 
-# Database Url.
-dbUrl: 'localhost'
-
-# Database Port.
-dbPort: 3306
-
-# Database Name.
-database: 'endless'
+# Database Url. In order: jdbc:mysql://IP:PORT/DATABASE
+dbUrl: 'jdbc:mysql://localhost:3306/endless'
 
 # Database Username.
 dbUsername: 'root'
 
 # Database Password.
 dbPassword: ''
-
-# Database Connection Pool size.
-poolSize: 10
 
 # Owner Access: The following list of users will have FULL ACCESS to the bot, (and by extension), machine control.
 # This only should give to trustly users. Choose with care!! (Replace this with your IDs).

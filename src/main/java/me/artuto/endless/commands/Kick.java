@@ -45,7 +45,7 @@ public class Kick extends Command
     {
         this.name = "kick";
         this.help = "Kicks the specified user";
-        this.arguments = "<user>";
+        this.arguments = "<@user|ID|nickname|username> for [reason]";
         this.category = Categories.MODERATION;
         this.botPermissions = new Permission[]{Permission.KICK_MEMBERS};
         this.userPermissions = new Permission[]{Permission.KICK_MEMBERS};
@@ -65,7 +65,7 @@ public class Kick extends Command
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick <@user|ID|nickname|username> for [reason]");
             return;
         }
 
@@ -77,8 +77,8 @@ public class Kick extends Command
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick @user | ID | nickname | username for *reason*");
-            return;
+            target = event.getArgs();
+            reason = "[no reason specified]";
         }
 
         List<Member> list = FinderUtil.findMembers(target, event.getGuild());
@@ -137,7 +137,7 @@ public class Kick extends Command
             
            event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-           ModLogging.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
+           ModLogging.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {

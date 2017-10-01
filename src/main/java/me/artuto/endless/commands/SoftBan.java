@@ -45,7 +45,7 @@ public class SoftBan extends Command
     {
         this.name = "softban";
         this.help = "Softbans the specified user";
-        this.arguments = "<user>";
+        this.arguments = "<@user|ID|niokname|username> for [reason]";
         this.category = Categories.MODERATION;
         this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
         this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
@@ -66,7 +66,7 @@ public class SoftBan extends Command
         
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"softban @user | ID | nickname | username for *reason*");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"softban <@user|ID|nickname|username> for [reason]");
             return;
         }
 
@@ -78,10 +78,10 @@ public class SoftBan extends Command
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"softban @user | ID | nickname | username for *reason*");
-            return;
+            target = event.getArgs();
+            reason = "[no reason specified]";
         }
-        
+
         List<Member> list = FinderUtil.findMembers(target, event.getGuild());
             
         if(list.isEmpty())
@@ -141,7 +141,7 @@ public class SoftBan extends Command
             
             event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-            ModLogging.logSoftban(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
+            ModLogging.logSoftban(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {
