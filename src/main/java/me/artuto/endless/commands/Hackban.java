@@ -81,7 +81,7 @@ public class Hackban extends Command
             {
                 event.getGuild().getController().ban(user, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-                ModLogging.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
+                ModLogging.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
 
                 event.replySuccess(Messages.HACKBAN_SUCCESS+success);
             }
