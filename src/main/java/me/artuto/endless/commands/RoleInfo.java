@@ -100,8 +100,6 @@ public class RoleInfo extends Command
 
         String title = ":performing_arts: Information about the role **"+rol.getName()+"**";
 
-        
-
         try
         {
             builder.addField(":1234: ID: ", rol.getId(), true);
@@ -120,7 +118,6 @@ public class RoleInfo extends Command
         catch(Exception e)
         {
             event.replyError("Something went wrong when getting the role info: \n```"+e+"```");
-
         }
     }
 }

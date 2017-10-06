@@ -41,12 +41,10 @@
         <name>bintray</name>
         <url>http://jcenter.bintray.com</url>
      </repository>
-
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	
+     <repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	 </repository>
     </repositories>
     <dependencies>
      <dependency>
@@ -68,10 +66,16 @@
         <scope>compile</scope>
      </dependency>
      <dependency>
-	    <groupId>com.github.wihoho</groupId>
-	    <artifactId>java-google-translate-text-to-speech</artifactId>
-	    <version>v1.0</version>
-	</dependency>
+        <groupId>com.github.ArtutoGamer</groupId>
+        <artifactId>google-api-translator-java</artifactId>
+        <version>1.0</version>
+     </dependency>
+     <dependency>
+         <groupId>com.google.apis</groupId>
+         <artifactId>google-api-services-customsearch</artifactId>
+         <version>LATEST</version>
+         <scope>compile</scope>
+     </dependency>
      <dependency>
          <groupId>com.google.code.gson</groupId>
          <artifactId>gson</artifactId>

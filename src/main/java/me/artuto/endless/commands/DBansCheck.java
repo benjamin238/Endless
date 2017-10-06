@@ -46,7 +46,7 @@ public class DBansCheck extends Command
     {
         this.name = "discordbans";
         this.help = "Checks if the specified user ID is registered on Discord Bans";
-        this.arguments = "User ID";
+        this.arguments = "<User ID>";
         this.category = Categories.TOOLS;
         this.aliases = new String[]{"checkbans", "dbans"};
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};

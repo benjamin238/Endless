@@ -38,10 +38,11 @@ import net.dv8tion.jda.core.entities.User;
 
 public class About extends Command
 {
-    private static Config config;
+    private final Config config;
 
-    public About()
+    public About(Config config)
     {
+        this.config = config;
         this.name = "about";
         this.help = "Info about the bot";
         this.category = Categories.BOT;

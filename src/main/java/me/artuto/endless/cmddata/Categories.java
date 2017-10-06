@@ -108,6 +108,35 @@ public class Categories
         }
     });
 
+    public static final Category UTILS = new Category("Utilities", event ->
+    {
+        SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
+        String userId = event.getAuthor().getId();
+        User user = event.getAuthor();
+
+        try
+        {
+            if(Blacklists.isUserListed(userId))
+            {
+                LOG.info("A Blacklisted user executed a command: "+user.getName()+"#"+user.getDiscriminator()+" (ID: "+user.getId()+")");
+                event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
+                return false;
+            }
+            else
+            {
+                if(event.isOwner() || event.isCoOwner())
+                    return true;
+                else
+                    return true;
+            }
+        }
+        catch(IOException e)
+        {
+            LOG.fatal("Failed to load blacklisted users: "+e);
+            return true;
+        }
+    });
+
     public static final Category FUN = new Category("Fun", event ->
     {
         SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");

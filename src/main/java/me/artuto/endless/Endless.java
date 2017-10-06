@@ -104,7 +104,7 @@ public class Endless extends ListenerAdapter
         client.addCommands(
         	    //Bot
 
-                new About(),
+                new About(config),
                 new Donate(),
                 new Invite(),
                 new Ping(),
@@ -142,7 +142,12 @@ public class Endless extends ListenerAdapter
                 //Others
                 
                 new Choose(),
-                new Say());
+                new Say(),
+
+                //Utils
+
+                new GoogleSearch(),
+                new Translate());
         
         //JDA Connection
 
