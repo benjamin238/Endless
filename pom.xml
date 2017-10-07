@@ -66,11 +66,6 @@
         <scope>compile</scope>
      </dependency>
      <dependency>
-        <groupId>com.github.ArtutoGamer</groupId>
-        <artifactId>google-api-translator-java</artifactId>
-        <version>1.0</version>
-     </dependency>
-     <dependency>
          <groupId>com.google.apis</groupId>
          <artifactId>google-api-services-customsearch</artifactId>
          <version>LATEST</version>
