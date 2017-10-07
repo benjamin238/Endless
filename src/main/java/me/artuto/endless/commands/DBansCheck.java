@@ -40,7 +40,6 @@ import okhttp3.Response;
 public class DBansCheck extends Command
 {
     private final SimpleLog LOG = SimpleLog.getLog("Discord Bans");
-    private static Config config;
     
     public DBansCheck()
     {
@@ -76,7 +75,14 @@ public class DBansCheck extends Command
             event.replyError("That user was not found!");
             return;
         }
-         
+
+        Config config = null;
+        try {
+            config = new Config();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if(config.getDBansToken().isEmpty())
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");

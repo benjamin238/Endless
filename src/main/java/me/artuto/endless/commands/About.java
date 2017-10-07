@@ -38,11 +38,8 @@ import net.dv8tion.jda.core.entities.User;
 
 public class About extends Command
 {
-    private final Config config;
-
-    public About(Config config)
+    public About()
     {
-        this.config = config;
         this.name = "about";
         this.help = "Info about the bot";
         this.category = Categories.BOT;
@@ -56,6 +53,7 @@ public class About extends Command
     protected void execute(CommandEvent event)
     {
         Color color;
+        Config config = null;
         
         if(event.isFromType(ChannelType.PRIVATE))
         {
@@ -64,6 +62,15 @@ public class About extends Command
         else
         {
             color = event.getGuild().getSelfMember().getColor();
+        }
+
+        try
+        {
+            config = new Config();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
         }
         
        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.security.auth.login.LoginException;
 
+import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.*;
 import me.artuto.endless.data.DatabaseManager;
 import me.artuto.endless.logging.ServerLogging;
@@ -74,7 +75,7 @@ public class Endless extends ListenerAdapter
         Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         log.setLevel(Level.INFO);
         DatabaseManager db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
-
+        Categories cat = new Categories(db);
         Long[] coOwners = config.getCoOwnerIds();
         String[] owners = new String[coOwners.length];
 
@@ -104,7 +105,7 @@ public class Endless extends ListenerAdapter
         client.addCommands(
         	    //Bot
 
-                new About(config),
+                new About(),
                 new Donate(),
                 new Invite(),
                 new Ping(),
@@ -113,7 +114,7 @@ public class Endless extends ListenerAdapter
                 //Bot Administration
                 
                 new Bash(),
-                new BlacklistUsers(),
+                new BlacklistUsers(db),
                 new BotCPanel(),
                 new Eval(),
                 new Shutdown(db),

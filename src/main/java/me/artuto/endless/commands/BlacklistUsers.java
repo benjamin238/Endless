@@ -3,21 +3,23 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.Blacklists;
+import me.artuto.endless.data.DatabaseManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
-import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BlacklistUsers extends Command
 {
-    public BlacklistUsers()
+    private final DatabaseManager db;
+
+    public BlacklistUsers(DatabaseManager db)
     {
+        this.db = db;
         this.name = "ignoreuser";
         this.help = "Adds, removes or displays the list with ignored users.";
         this.category = Categories.BOTADM;
@@ -86,28 +88,20 @@ public class BlacklistUsers extends Command
                 return;
             }
 
-            try
+            if(db.isUserBlacklisted(user))
             {
-                if(Blacklists.isUserListed(user.getId()))
-                {
-                    event.replyError("That user is already on the blacklist!");
-                    return;
-                }
-            }
-            catch(IOException e)
-            {
-                event.replyError("Something went wrong when writing to the blacklisted users file: \n```"+e+"```");
+                event.replyError("That user is already on the blacklist!");
                 return;
             }
 
             try
             {
-                Blacklists.addUser(user.getId());
+                db.addBlacklistUser(user);
                 event.replySuccess("Added **"+user.getName()+"#"+user.getDiscriminator()+"** to the blacklist.");
             }
-            catch(IOException e)
+            catch(Exception e)
             {
-                event.replyError("Something went wrong when writing to the blacklisted users file: \n```"+e+"```");
+                event.replyError("Something went wrong when adding the user: \n```"+e+"```");
             }
         }
     }
@@ -149,24 +143,24 @@ public class BlacklistUsers extends Command
 
             try
             {
-                if(!(Blacklists.isUserListed(user.getId())))
+                if(!(db.isUserBlacklisted(user)))
                 {
                     event.replyError("That ID isn't in the blacklist!");
                     return;
                 }
             }
-            catch(IOException e)
+            catch(Exception e)
             {
-                event.replyError("Something went wrong when reading the blacklisted users file: \n```"+e+"```");
+                event.replyError("Something went wrong when getting the blacklisted users list: \n```"+e+"```");
                 return;
             }
 
             try
             {
-                Blacklists.removeUser(user.getId());
+                db.removeBlacklistedUser(user);
                 event.replySuccess("Removed **"+user.getName()+"#"+user.getDiscriminator()+"** from the blacklist.");
             }
-            catch(IOException e)
+            catch(Exception e)
             {
                 event.replyError("Something went wrong when writing to the blacklisted users file: \n```"+e+"```");
             }
@@ -189,7 +183,7 @@ public class BlacklistUsers extends Command
         @Override
         protected void execute(CommandEvent event)
         {
-            List<String> list;
+            Set<User> list;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
 
@@ -204,7 +198,7 @@ public class BlacklistUsers extends Command
 
             try
             {
-                list = Blacklists.getUsersList();
+                list = db.getBlacklistedUsersList(event.getJDA());
 
                 if(list.isEmpty())
                 {
@@ -212,16 +206,15 @@ public class BlacklistUsers extends Command
                 }
                 else
                 {
-
-                    builder.setDescription(list.stream().collect(Collectors.joining("\n")));
+                    builder.setDescription(list.stream().map(u -> u.getName()+"#"+u.getDiscriminator()+" (ID: "+u.getId()+")").collect(Collectors.joining("\n")));
                     builder.setFooter(event.getSelfUser().getName()+"'s Blacklisted Users", event.getSelfUser().getEffectiveAvatarUrl());
                     builder.setColor(color);
                     event.reply(builder.build());
                 }
             }
-            catch(IOException e)
+            catch(Exception e)
             {
-                event.replyError("Something went wrong when reading the blacklisted users file: \n```"+e+"```");
+                event.replyError("Something went wrong when getting the blacklisted users list: \n```"+e+"```");
             }
         }
     }
@@ -262,7 +255,7 @@ public class BlacklistUsers extends Command
 
             try
             {
-                if(!(Blacklists.isUserListed(user.getId())))
+                if(!(db.isUserBlacklisted(user)))
                 {
                     event.replySuccess("**"+user.getName()+"#"+user.getDiscriminator()+"** isn't blacklisted!");
                 }
@@ -271,9 +264,9 @@ public class BlacklistUsers extends Command
                     event.replySuccess("**"+user.getName()+"#"+user.getDiscriminator()+"** is blacklisted!");
                 }
             }
-            catch(IOException e)
+            catch(Exception e)
             {
-                event.replyError("Something went wrong when reading the blacklisted users file: \n```"+e+"```");
+                event.replyError("Something went wrong when getting the blacklisted users list: \n```"+e+"```");
             }
         }
     }
