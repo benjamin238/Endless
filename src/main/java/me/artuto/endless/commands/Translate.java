@@ -1,7 +1,7 @@
 package me.artuto.endless.commands;
 
-import com.gtranslate.Translator;
-import com.gtranslate.text.TextTranslate;
+/*import com.gtranslate.Translator;
+import com.gtranslate.text.TextTranslate;*/
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
@@ -29,10 +29,10 @@ public class Translate extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        /*event.replyError("Command Disabled due Google having issues");
-        return;*/
+        event.replyError("Command Disabled due Google having issues");
+        return;
 
-        EmbedBuilder builder = new EmbedBuilder();
+        /*EmbedBuilder builder = new EmbedBuilder();
         Color color = Color.BLUE;
         Translator t;
         String title = "<:googleTranslate:364207511944953866> Translation finished:";
@@ -78,6 +78,6 @@ public class Translate extends Command
         {
             event.replyError("Something went wrong when translating the text: \n```"+e+"```");
             e.printStackTrace();
-        }
+        }*/
     }
 }
