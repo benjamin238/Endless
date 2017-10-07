@@ -28,7 +28,9 @@ import javax.security.auth.login.LoginException;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.*;
 import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.events.GuildBotEvents;
 import me.artuto.endless.logging.ServerLogging;
+import me.artuto.endless.utils.GuildUtils;
 import me.artuto.endless.utils.ModLogging;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -163,7 +165,12 @@ public class Endless extends ListenerAdapter
             .addEventListener(new Logging())
             .addEventListener(new GuildBlacklist())
             .addEventListener(new ServerLogging(db))
-            .buildBlocking();                
+            .addEventListener(new GuildBotEvents(config))
+            .buildBlocking();
+
+        LOG.info("Leaving Pointless Guilds...");
+        GuildUtils.leaveBadGuilds(jda);
+        LOG.info("Done!");
     }    
 
     //When ready print the bot info

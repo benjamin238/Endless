@@ -36,20 +36,6 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 public class Logging extends ListenerAdapter
 {
     private static Config config;
-
-    //Guild Join
-    @Override
-    public void onGuildJoin(GuildJoinEvent event) 
-    {
-        SimpleLog.getLog("Logger").info("[GUILD JOIN]: "+event.getGuild().getName()+" (ID: "+event.getGuild().getId()+")\n");
-    }
-    
-    //Guild Leave
-    @Override
-    public void onGuildLeave(GuildLeaveEvent event) 
-    {
-        SimpleLog.getLog("Logger").info("[GUILD LEAVE]: "+event.getGuild().getName()+" (ID: "+event.getGuild().getId()+")\n");
-    }
     
     //Command logger
     @Override
