@@ -26,8 +26,7 @@ public class GuildBotEvents extends ListenerAdapter
 
         switch (reason)
         {
-            case "LEFT: NSFW":
-                return "There are NSFW channels!";
+
             case "LEFT: BOTS":
                 return "Too many bots!";
             default:
