@@ -21,11 +21,7 @@ public class GuildUtils
         jda.getGuilds().stream().filter(g -> {
             if(db.hasSettings(g))
                 return false;
-            for(TextChannel tcs : g.getTextChannels())
-            {
-                if(tcs.isNSFW() && !(db.hasSettings(g)))
-                    return true;
-            }
+
             long botCount = g.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
             if(botCount>20 && ((double)botCount/g.getMembers().size())>.50)
                 return true;
@@ -40,14 +36,6 @@ public class GuildUtils
         if(db.hasSettings(guild))
             return "STAY";
 
-        for(TextChannel tcs : guild.getTextChannels())
-        {
-            if(tcs.isNSFW() && !(db.hasSettings(guild)))
-            {
-                guild.leave().queue();
-                return "LEFT: NSFW";
-            }
-        }
 
         if(botCount>20 && ((double)botCount/guild.getMembers().size())>.65)
         {
