@@ -83,7 +83,7 @@ public class Avatar extends Command
             
         try
         {
-                builder.setImage(target.getUser().getAvatarUrl());
+                builder.setImage(target.getUser().getEffectiveAvatarUrl());
                 builder.setColor(target.getColor());
                 event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
         }

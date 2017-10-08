@@ -119,9 +119,9 @@ public class DBansCheck extends Command
        {
             event.replyError("An error was thrown when doing the check! Ask the Owner to check the Console.");
             LOG.fatal(e);
-       }              
-       
-       
+
+            if(config.isDebugEnabled())
+                e.printStackTrace();
+       }
     }
-       
 }

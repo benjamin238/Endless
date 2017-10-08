@@ -143,8 +143,9 @@ public class Endless extends ListenerAdapter
                 new RoleInfo(),
                 new UserInfo(),
         
-                //Others
-                
+                //Fun
+
+                new Cat(config),
                 new Choose(),
                 new Say(),
 
