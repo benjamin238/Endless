@@ -78,6 +78,7 @@ public class Endless extends ListenerAdapter
         log.setLevel(Level.INFO);
         DatabaseManager db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
         Categories cat = new Categories(db);
+        GuildUtils gutils = new GuildUtils(db);
         Long[] coOwners = config.getCoOwnerIds();
         String[] owners = new String[coOwners.length];
 
