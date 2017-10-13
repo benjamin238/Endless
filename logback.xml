@@ -1,7 +1,0 @@
-<configuration scan="true">
-
-  <property scope="local" file="level.properties" />
-
-  <root level="${root_log_level}">
-  </root>
-</configuration>
