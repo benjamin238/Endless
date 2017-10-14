@@ -64,9 +64,6 @@ public class GuildBotEvents extends ListenerAdapter
                         "If you want to recieve a notification when a new update is released, report a bug or ask for an improvement please join my server: " +
                         "**<"+Const.INVITE+">** and post it on the correspondient channel.").queue();
         }
-
-
-
     }
 
     @Override

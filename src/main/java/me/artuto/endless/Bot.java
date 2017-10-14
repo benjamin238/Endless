@@ -56,21 +56,6 @@ public class Bot extends ListenerAdapter
         this.config = config;
         this.waiter = waiter;
         this.settings = new HashMap<>();
-
-        try
-        {
-            JSONObject loadedSettings = new JSONObject(new String(Files.readAllBytes(Paths.get("data/serversettings.json"))));
-            loadedSettings.keySet().forEach((id) -> {
-                JSONObject o = loadedSettings.getJSONObject(id);
-                
-                settings.put(id, new Settings(
-                        o.has("modlog_channel_id") ? o.getString("modlog_channel_id") : null,
-                        o.has("serverlog_channel_id")? o.getString("serverlog_channel_id"): null));});
-        }
-        catch(IOException | JSONException e)
-        {
-            SimpleLog.getLog("Settings").warn("Failed to load server settings: "+e);
-        }
     }
 
     public EventWaiter getWaiter()
@@ -78,139 +63,22 @@ public class Bot extends ListenerAdapter
         return waiter;
     }
     
-    public Settings getSettings(Guild guild)
-    {
-        return settings.getOrDefault(guild.getId(), Settings.DEFAULT_SETTINGS);
-    }
-    
-    public void setModLogChannel(TextChannel channel)
-    {
-        Settings s = settings.get(channel.getGuild().getId());
-
-        if(s==null)
-        {
-            settings.put(channel.getGuild().getId(), new Settings(channel.getId(),null));
-        }
-        else
-        {
-            s.setModLogId(channel.getIdLong());
-        }
-
-        writeSettings();
-    }
-    
-    public void setServerLogChannel(TextChannel channel)
-    {
-        Settings s = settings.get(channel.getGuild().getId());
-
-        if(s==null)
-        {
-            settings.put(channel.getGuild().getId(), new Settings(null, channel.getId()));
-        }
-        else
-        {
-            s.setServerLogId(channel.getIdLong());
-        }
-
-        writeSettings();
-    }
-
-    public void clearModLogChannel(Guild guild)
-    {
-        Settings s = getSettings(guild);
-        if(s!=Settings.DEFAULT_SETTINGS)
-        {
-            if(s.getServerLogId()==0)
-                settings.remove(guild.getId());
-            else
-                s.setModLogId(0);
-            writeSettings();
-        }
-    }
-
-    public void clearServerLogChannel(Guild guild)
-    {
-        Settings s = getSettings(guild);
-        if(s!=Settings.DEFAULT_SETTINGS)
-        {
-            if(s.getModLogId()==0)
-                settings.remove(guild.getId());
-            else
-                s.setServerLogId(0);
-            writeSettings();
-        }
-    }
-    
-    private void writeSettings()
-    {
-        JSONObject obj = new JSONObject();
-        settings.keySet().stream().forEach(key -> {
-            JSONObject o = new JSONObject();
-            Settings s = settings.get(key);
-            if(s.getModLogId()!=0)
-                o.put("modlog_channel_id", Long.toString(s.getModLogId()));
-            if(s.getServerLogId()!=0)
-                o.put("serverlog_channel_id", Long.toString(s.getServerLogId()));
-            obj.put(key, o);});
-
-        try
-        {
-            Files.write(Paths.get("data/serversettings.json"), obj.toString(4).getBytes());
-        }
-        catch(IOException ex)
-        {
-            SimpleLog.getLog("Settings").warn("Failed to write to file: "+ex);
-        }
-    }
-    
     @Override
     public void onGuildJoin(GuildJoinEvent event)
     {
-        Guild guild;
-        guild = event.getGuild();
-        
-        User owner;
-        owner = event.getJDA().getUserById(config.getOwnerId());
-        
-        String leavemsg;
-        leavemsg = "Hi! Sorry, but you can't have a copy of Endless on Discord Bots, this is for my own security.\n"
+        Guild guild = event.getGuild();
+        User owner = event.getJDA().getUserById(config.getOwnerId());
+        String leavemsg = "Hi! Sorry, but you can't have a copy of Endless on Discord Bots, this is for my own security.\n"
                     + "Please remove this Account from the Discord Bots list or I'll take further actions.\n"
                     + "If you think this is an error, please contact the Developer. ~Artuto";
+        String warnmsg = "<@264499432538505217>, **"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless here!";
+        Long ownerId = config.getOwnerId();
         
-        String warnmsg;
-        warnmsg = "<@264499432538505217>, **"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless here!";
-        
-        if(event.getGuild().getId().equals("110373943822540800"))
+        if(event.getGuild().getId().equals("110373943822540800") && !(ownerId==264499432538505217L))
         {
             event.getJDA().getTextChannelById("119222314964353025").sendMessage(warnmsg).complete();
             owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> SimpleLog.getLog("DISCORD BANS").fatal(leavemsg)));
             guild.leave().complete();
-        }
-    }
-    
-    @Override
-    public void onReady(ReadyEvent event)
-    {
-
-        SimpleLog LOG = SimpleLog.getLog("Startup");
-        File logs = new File("logs");
-        if(!logs.exists())
-        {
-            logs.mkdir();
-            LOG.info("'logs' directory created!");
-        }
-        
-        File data = new File("data");
-        if(!data.exists())
-        {
-            data.mkdir();
-            LOG.info("'data' directory created!");
-        }
-
-        if(event.getJDA().getGuilds().isEmpty())
-        {
-            LOG.warn("Looks like your bot isn't on any guild! Add your bot using the following link:");
-            LOG.warn(event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR));
         }
     }
 }

@@ -32,10 +32,7 @@ import me.artuto.endless.events.GuildBotEvents;
 import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.utils.GuildUtils;
 import me.artuto.endless.utils.ModLogging;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.OnlineStatus;
+import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
@@ -119,7 +116,7 @@ public class Endless extends ListenerAdapter
                 new Bash(),
                 new BlacklistUsers(db),
                 new BotCPanel(),
-                new Eval(),
+                new Eval(config, db),
                 new Shutdown(db),
                 
                 //Moderation
@@ -195,5 +192,11 @@ public class Endless extends ListenerAdapter
         LOG.info("Owner: "+ownername+" ("+ownerid+")");
 
         event.getJDA().getPresence().setGame(Game.of("Type "+config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+
+        if(event.getJDA().getGuilds().isEmpty())
+        {
+            SimpleLog.getLog("Startup Checker").warn("Looks like your bot isn't on any guild! Add your bot using the following link:");
+            SimpleLog.getLog("Startup Checker").warn(event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR));
+        }
     }
 }

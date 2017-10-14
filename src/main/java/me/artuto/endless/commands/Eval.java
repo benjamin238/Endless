@@ -23,6 +23,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 
@@ -38,9 +40,13 @@ public class Eval extends Command
 {
     private ScriptEngine engine;
     private List<String> imports;
+    private final Config config;
+    private final DatabaseManager db;
     
-    public Eval()
+    public Eval(Config config, DatabaseManager db)
     {
+        this.config = config;
+        this.db = db;
         this.name = "eval";
         this.help = "Executes Groovy code";
         this.category = Categories.BOTADM;
@@ -60,13 +66,19 @@ public class Eval extends Command
                     "com.jagrosh.jdautilities.menu",
                     "com.jagrosh.jdautilities.utils",
                     "com.jagrosh.jdautilities.waiter",
+                    "java.awt",
                     "java.io",
                     "java.lang",
                     "java.util",
+                    "java.util.stream",
                     "me.artuto.endless",
+                    "me.artuto.endless.cmddata",
                     "me.artuto.endless.commands",
                     "me.artuto.endless.data",
+                    "me.artuto.endless.events",
                     "me.artuto.endless.loader",
+                    "me.artuto.endless.logging",
+                    "me.artuto.endless.managers",
                     "me.artuto.endless.tools",
                     "me.artuto.endless.utils",
                     "net.dv8tion.jda.bot",
@@ -98,6 +110,8 @@ public class Eval extends Command
             engine.put("bot", event.getSelfUser());
             engine.put("client", event.getClient());
             engine.put("author", event.getAuthor());
+            engine.put("config", config);
+            engine.put("db", db);
             if(event.isFromType(ChannelType.TEXT))
             {
                 engine.put("member", event.getMember());
