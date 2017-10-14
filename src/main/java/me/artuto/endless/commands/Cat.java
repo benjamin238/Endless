@@ -28,10 +28,11 @@ public class Cat extends Command
         this.name = "cat";
         this.help = "Displays a cute kitty.";
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
         this.guildOnly = false;
+        this.cooldown = 10;
     }
 
     protected void execute(CommandEvent event)
@@ -59,7 +60,7 @@ public class Cat extends Command
             String data = body.string();
             JSONObject json = new JSONObject(data);
             String cat = json.getString("file");
-            
+
             builder.setAuthor("Requested by "+event.getAuthor().getName(), null, event.getAuthor().getEffectiveAvatarUrl());
             builder.setImage(cat);
             builder.setFooter("Image provided by random.cat API", null);
@@ -69,7 +70,7 @@ public class Cat extends Command
         }
         catch(IOException | RuntimeException e)
         {
-            event.replyError("An error was thrown when getting the image!! Ask the Owner to check the Console.");
+            event.replyError("An error was thrown when getting the image! Ask the Owner to check the Console.");
             LOG.fatal(e);
 
             if (config.isDebugEnabled())
