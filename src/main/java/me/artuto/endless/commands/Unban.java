@@ -24,10 +24,8 @@ import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.ModLogging;
-import net.dv8tion.jda.core.EmbedBuilder;
+import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
@@ -101,7 +99,7 @@ public class Unban extends Command
             event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
             event.replySuccess(Messages.UNBAN_SUCCESS+success);
 
-            ModLogging.logUnban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
+            ModLogging.logUnban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {

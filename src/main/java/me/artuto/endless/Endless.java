@@ -31,7 +31,7 @@ import me.artuto.endless.data.DatabaseManager;
 import me.artuto.endless.events.GuildBotEvents;
 import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.utils.GuildUtils;
-import me.artuto.endless.utils.ModLogging;
+import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.User;
@@ -69,11 +69,11 @@ public class Endless extends ListenerAdapter
 
         EventWaiter waiter = new EventWaiter();
         Bot bot = new Bot(config);
-        ModLogging modlog = new ModLogging(bot);
         CommandClientBuilder client = new CommandClientBuilder();
         Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         log.setLevel(Level.INFO);
         DatabaseManager db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
+        ModLogging modlog = new ModLogging(db);
         Categories cat = new Categories(db);
         GuildUtils gutils = new GuildUtils(config, db);
         Long[] coOwners = config.getCoOwnerIds();

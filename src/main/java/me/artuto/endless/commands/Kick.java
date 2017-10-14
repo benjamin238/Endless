@@ -26,7 +26,7 @@ import java.util.List;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.ModLogging;
+import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -137,7 +137,7 @@ public class Kick extends Command
             
            event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-           ModLogging.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
+           ModLogging.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {

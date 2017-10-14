@@ -6,7 +6,7 @@ import com.jagrosh.jdautilities.utils.FinderUtil;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.ModLogging;
+import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -81,7 +81,7 @@ public class Hackban extends Command
             {
                 event.getGuild().getController().ban(user, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-                ModLogging.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
+                ModLogging.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
 
                 event.replySuccess(Messages.HACKBAN_SUCCESS+success);
             }

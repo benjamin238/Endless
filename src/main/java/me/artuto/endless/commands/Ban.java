@@ -27,7 +27,7 @@ import java.util.List;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.ModLogging;
+import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -138,7 +138,7 @@ public class Ban extends Command
             
             event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel(), event.getMessage());
+            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {
