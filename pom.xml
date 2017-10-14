@@ -50,13 +50,13 @@
      <dependency>
         <groupId>net.dv8tion</groupId>
         <artifactId>JDA</artifactId>
-        <version>3.3.1_284</version>
+        <version>3.3.1_287</version>
         <scope>compile</scope>
      </dependency>
      <dependency>
         <groupId>com.jagrosh</groupId>
         <artifactId>JDA-Utilities</artifactId>
-        <version>1.7</version>
+        <version>1.8</version>
         <scope>compile</scope>
      </dependency>
      <dependency>
