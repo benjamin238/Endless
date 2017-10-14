@@ -77,7 +77,7 @@ public class Bot extends ListenerAdapter
         if(event.getGuild().getId().equals("110373943822540800") && !(ownerId==264499432538505217L))
         {
             event.getJDA().getTextChannelById("119222314964353025").sendMessage(warnmsg).complete();
-            owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> SimpleLog.getLog("DISCORD BANS").fatal(leavemsg)));
+            owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> SimpleLog.getLog("DISCORD BOTS").fatal(leavemsg)));
             guild.leave().complete();
         }
     }
