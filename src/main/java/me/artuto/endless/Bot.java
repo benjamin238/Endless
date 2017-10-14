@@ -48,19 +48,12 @@ public class Bot extends ListenerAdapter
 {
    private final HashMap<String,Settings> settings;
     private final Config config;
-    private final EventWaiter waiter;
     private JDA jda;
     
-    public Bot(EventWaiter waiter, Config config)
+    public Bot(Config config)
     {
         this.config = config;
-        this.waiter = waiter;
         this.settings = new HashMap<>();
-    }
-
-    public EventWaiter getWaiter()
-    {
-        return waiter;
     }
     
     @Override
@@ -74,7 +67,7 @@ public class Bot extends ListenerAdapter
         String warnmsg = "<@264499432538505217>, **"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless here!";
         Long ownerId = config.getOwnerId();
         
-        if(event.getGuild().getId().equals("110373943822540800") && !(ownerId==264499432538505217L))
+        if(event.getGuild().getId().equals("110373943822540800") || event.getGuild().getId().equals("264445053596991498") && !(ownerId==264499432538505217L))
         {
             event.getJDA().getTextChannelById("119222314964353025").sendMessage(warnmsg).complete();
             owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> SimpleLog.getLog("DISCORD BOTS").fatal(leavemsg)));

@@ -30,6 +30,8 @@ public class GuildBotEvents extends ListenerAdapter
         {
             case "LEFT: BOTS":
                 return "Too many bots!";
+            case "LEFT: BOT LIST":
+                return "Hey! You can't have this bot on a bot list!";
             default:
                 return null;
         }
@@ -48,7 +50,7 @@ public class GuildBotEvents extends ListenerAdapter
         TextChannel tc = event.getJDA().getTextChannelById(config.getBotlogChannelId());
         TextChannel defaultTc = FinderUtil.getDefaultChannel(guild);
 
-        if(!(GuildUtils.isBadGuild(guild)) && config.isBotlogEnabled() && !(tc==null) && tc.canTalk())
+        if(!(GuildUtils.isBadGuild(guild)) || !(GuildUtils.isABotListGuild(guild)) && config.isBotlogEnabled() && !(tc==null) && tc.canTalk())
         {
             tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n" +
                     "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n" +

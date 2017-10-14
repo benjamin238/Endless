@@ -68,14 +68,14 @@ public class Endless extends ListenerAdapter
         //Register Commands and some other things
 
         EventWaiter waiter = new EventWaiter();
-        Bot bot = new Bot(waiter, config);
+        Bot bot = new Bot(config);
         ModLogging modlog = new ModLogging(bot);
         CommandClientBuilder client = new CommandClientBuilder();
         Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         log.setLevel(Level.INFO);
         DatabaseManager db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
         Categories cat = new Categories(db);
-        GuildUtils gutils = new GuildUtils(db);
+        GuildUtils gutils = new GuildUtils(config, db);
         Long[] coOwners = config.getCoOwnerIds();
         String[] owners = new String[coOwners.length];
 
