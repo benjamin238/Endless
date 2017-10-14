@@ -31,12 +31,7 @@ public class GuildUtils
 
     public static String checkBadGuild(Guild guild)
     {
-        long botCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
-
-        if(db.hasSettings(guild))
-            return "STAY";
-
-        if(botCount>20 && ((double)botCount/guild.getMembers().size())>.65)
+        if(isBadGuild(guild))
         {
             String msg = "Hey! I'm leaving this guild (**"+guild.getName()+"**) because I won't allow Bot Guilds, this means you have a lot of bots compared to the real user count.";
             TextChannel tc = FinderUtil.getDefaultChannel(guild);
@@ -48,5 +43,17 @@ public class GuildUtils
         {
             return "STAY";
         }
+    }
+
+    public static boolean isBadGuild(Guild guild)
+    {
+        long botCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
+
+        if(db.hasSettings(guild))
+            return false;
+        else if(botCount>20 && ((double)botCount/guild.getMembers().size())>.65)
+            return true;
+        else
+            return false;
     }
 }
