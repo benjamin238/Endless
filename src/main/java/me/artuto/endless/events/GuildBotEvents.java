@@ -26,7 +26,6 @@ public class GuildBotEvents extends ListenerAdapter
 
         switch (reason)
         {
-
             case "LEFT: BOTS":
                 return "Too many bots!";
             default:
@@ -50,7 +49,7 @@ public class GuildBotEvents extends ListenerAdapter
         {
             tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n" +
                     "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n" +
-                    "`[Members]:` **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
+                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
         }
     }
 
@@ -70,13 +69,12 @@ public class GuildBotEvents extends ListenerAdapter
         {
             StringBuilder builder = new StringBuilder().append(":outbox_tray: `[Left Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n" +
                     "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n" +
-                    "`[Members]:` **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n");
+                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n");
 
-            if(!(reason.isEmpty()))
+            if(!(reason==null))
                 builder.append("`[Reason]:` "+reason);
 
             tc.sendMessage(builder.toString()).queue();
         }
     }
-
 }
