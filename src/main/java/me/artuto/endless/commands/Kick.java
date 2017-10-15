@@ -132,7 +132,7 @@ public class Kick extends Command
             }
             else
             {
-               event.replySuccess(Messages.KICK_SUCCESS+success);
+               event.replySuccess(Messages.KICK_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
             }
             
            event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
