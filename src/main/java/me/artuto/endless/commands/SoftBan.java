@@ -134,7 +134,7 @@ public class SoftBan extends Command
             }
             else
             {
-               event.replySuccess(Messages.KICK_SUCCESS+success);
+               event.replySuccess(Messages.KICK_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
             }
             
             event.getGuild().getController().ban(member, 1).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();

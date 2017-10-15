@@ -133,7 +133,7 @@ public class Ban extends Command
             }
             else
             {
-               event.replySuccess(Messages.KICK_SUCCESS+success);
+               event.replySuccess(Messages.KICK_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
             }
             
             event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
