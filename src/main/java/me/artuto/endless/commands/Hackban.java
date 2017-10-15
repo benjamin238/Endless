@@ -83,7 +83,7 @@ public class Hackban extends Command
 
                 ModLogging.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
 
-                event.replySuccess(Messages.HACKBAN_SUCCESS+success);
+                event.replySuccess(Messages.HACKBAN_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
             }
             catch(Exception e)
             {
