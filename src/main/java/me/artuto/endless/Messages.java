@@ -45,6 +45,7 @@ public class Messages
     
     // Warning
 
-    public static String MODLOG_NOPERMISSIONS = "A Channel as Modlog is set, but I don't have the required permissions, make sure I have: `Message Read` `Message Write`, `Send Images` and `Read History`!";
-    public static String SRVLOG_NOPERMISSIONS = "A Channel as Serverlog is set, but I don't have the required permissions, make sure I have: `Message Read` `Message Write`, `Send Images` and `Read History`!";
+    public static String MODLOG_NOPERMISSIONS = "A Channel as Modlog is configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write`, `Send Images` and `Read History`!";
+    public static String SRVLOG_NOPERMISSIONS = "A Channel as Serverlog is configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write`, `Send Images` and `Read History`!";
+    public static String WELCOME_NOPERMISSIONS = "A Channel as Serverlog is configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write` and `Read History`!";
 }

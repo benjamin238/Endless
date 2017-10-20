@@ -1,7 +1,10 @@
 package me.artuto.endless.logging;
 
+import com.jagrosh.jagtag.Parser;
+import com.jagrosh.jagtag.ParserBuilder;
 import me.artuto.endless.Messages;
 import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.FinderUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -23,17 +26,25 @@ import java.util.*;
 public class ServerLogging extends ListenerAdapter
 {
     private static DatabaseManager db;
+    private final Parser parser;
+    private EmbedBuilder builder = new EmbedBuilder();
+
     public ServerLogging(DatabaseManager db)
     {
         ServerLogging.db = db;
+        this.parser = new ParserBuilder()
+                .addMethods(Variables.getMethods())
+                .setMaxOutput(2000)
+                .setMaxIterations(1000)
+                .build();
     }
-    private EmbedBuilder builder = new EmbedBuilder();
 
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel serverlog = db.getServerlogChannel(guild);
+        TextChannel welcome = db.getWelcomeChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User newmember = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
@@ -41,18 +52,29 @@ public class ServerLogging extends ListenerAdapter
         String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+        String msg = db.getWelcomeMessage(guild);
+        parser.clear().put("user", newmember).put("guild", guild).put("channel", welcome);
 
-        if(!(tc==null))
+        if(!(serverlog==null))
         {
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
             {
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                     null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             }
             else
+                serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Join]:` :inbox_tray: :bust_in_silhouette: **"+newmember.getName()+"**#**"+newmember.getDiscriminator()+"** ("+newmember.getId()+") joined the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+        }
+
+        if(!(welcome==null) && !(msg.isEmpty()))
+        {
+            if(!(welcome.getGuild().getSelfMember().hasPermission(welcome, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)))
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Join]:` :inbox_tray: :bust_in_silhouette: **"+newmember.getName()+"**#**"+newmember.getDiscriminator()+"** ("+newmember.getId()+") joined the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue(
+                        null, (e) -> channel.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue()));
             }
+            else
+                welcome.sendMessage(parser.parse(msg).trim()).queue();
         }
     }
 

@@ -14,11 +14,18 @@ public class DatabaseManager
 {
     private final Connection connection;
     private final SimpleLog LOG = SimpleLog.getLog("MySQL Database");
-    private final GuildSettings DEFAULT = new GuildSettings("0", "0");
+    private final GuildSettings DEFAULT = new GuildSettings("0", "0", "0", "");
 
     public DatabaseManager(String host, String user, String pass) throws SQLException
     {
         connection = DriverManager.getConnection(host, user, pass);
+    }
+
+    //Connection getter
+
+    public Connection getConnection()
+    {
+        return connection;
     }
 
     //Guild settings
@@ -36,7 +43,9 @@ public class DatabaseManager
                 if(results.next())
                 {
                     gs = new GuildSettings(results.getString("modlog_id"),
-                            results.getString("serverlog_id"));
+                            results.getString("serverlog_id"),
+                            results.getString("welcome_id"),
+                            results.getString("welcomemsg"));
                 }
                 else
                     gs = DEFAULT;
@@ -80,9 +89,7 @@ public class DatabaseManager
             try (ResultSet results = statement.executeQuery(String.format("SELECT modlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
                 if(results.next())
-                {
                     tc = guild.getTextChannelById(Long.toString(results.getLong("modlog_id")));
-                }
                 else tc=null;
             }
             return tc;
@@ -104,9 +111,7 @@ public class DatabaseManager
             try (ResultSet results = statement.executeQuery(String.format("SELECT serverlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
                 if(results.next())
-                {
                     tc = guild.getTextChannelById(Long.toString(results.getLong("serverlog_id")));
-                }
                 else tc=null;
             }
             return tc;
@@ -191,9 +196,7 @@ public class DatabaseManager
                     return true;
                 }
                 else
-                {
                     return false;
-                }
             }
         }
         catch(SQLException e)
@@ -218,9 +221,159 @@ public class DatabaseManager
                     return true;
                 }
                 else
-                {
                     return false;
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e);
+            return false;
+        }
+    }
+
+    public TextChannel getWelcomeChannel(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.closeOnCompletion();
+            TextChannel tc;
+            try (ResultSet results = statement.executeQuery(String.format("SELECT welcome_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            {
+                if(results.next())
+                    tc = guild.getTextChannelById(Long.toString(results.getLong("welcome_id")));
+                else tc=null;
+            }
+            return tc;
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e);
+            return null;
+        }
+    }
+
+    public void setWelcomeChannel(Guild guild, TextChannel tc)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    results.updateLong("welcome_id", tc==null ? 0l : tc.getIdLong());
+                    results.updateRow();
                 }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateLong("welcome_id", tc==null ? 0l : tc.getIdLong());
+                    results.insertRow();
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e);
+        }
+    }
+
+    public boolean clearWelcomeChannel(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    results.deleteRow();
+                    return true;
+                }
+                else
+                    return false;
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e);
+            return false;
+        }
+    }
+
+    public String getWelcomeMessage(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.closeOnCompletion();
+            String message;
+            try (ResultSet results = statement.executeQuery(String.format("SELECT welcome_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            {
+                if(results.next())
+                    message = results.getString("welcome_msg");
+                else message="";
+            }
+            return message;
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e);
+            return null;
+        }
+    }
+
+    public void setWelcomeMessage(Guild guild, String message)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_msg FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    results.updateString("welcome_msg", message.isEmpty() ? "" : message);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateString("welcome_msg", message.isEmpty() ? "" : message);
+                    results.insertRow();
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e);
+        }
+    }
+
+    public boolean clearWelcomeMessage(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_msg FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    results.deleteRow();
+                    return true;
+                }
+                else
+                    return false;
             }
         }
         catch(SQLException e)
@@ -294,9 +447,7 @@ public class DatabaseManager
                     return true;
                 }
                 else
-                {
                     return false;
-                }
             }
         }
         catch(SQLException e)
@@ -351,11 +502,15 @@ public class DatabaseManager
     {
         final String modlogId;
         final String serverlogId;
+        final String welcomeId;
+        final String welcomeMsg;
 
-        private GuildSettings(String modlogId, String serverlogId)
+        private GuildSettings(String modlogId, String serverlogId, String welcomeId, String welcomeMsg)
         {
             this.modlogId = modlogId;
             this.serverlogId = serverlogId;
+            this.welcomeId = welcomeId;
+            this.welcomeMsg = welcomeMsg;
         }
     }
 }

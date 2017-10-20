@@ -130,6 +130,7 @@ public class Endless extends ListenerAdapter
                 //Settings
                 
                 new ServerSettings(db),
+                new Welcome(db),
                 
                 //Tools
                
