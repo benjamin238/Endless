@@ -20,7 +20,9 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.awt.Color;
+import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.text.DecimalFormat;
 
 import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -49,28 +51,33 @@ public class Stats extends Command
     @Override
     protected void execute(CommandEvent event)
     {
+        String title = ":information_source: Stats of **"+event.getSelfUser().getName()+"**:";
         Color color;
-        double ramUse = ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024));
+        String os = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getName();
+        String arch = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getArch();
+        String version = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getVersion();
+        os = os+" "+arch+" "+version;
         int cpus = Runtime.getRuntime().availableProcessors();
-        
+        String processCpuLoad = new DecimalFormat("###.###%").format(ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getProcessCpuLoad());
+        String systemCpuLoad = new DecimalFormat("###.###%").format(ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getSystemCpuLoad());
+        long ramUsed = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 100000;
+        long ramTotal = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() / 100000;
+
         if(event.isFromType(ChannelType.PRIVATE))
-        {
             color = Color.decode("#33ff00");
-        }
         else
-        {
             color = event.getGuild().getSelfMember().getColor();
-        }
         
         EmbedBuilder builder = new EmbedBuilder();
+        builder.addField("<:windows:371075985996775425> OS: ", os, true);
+        builder.addField(":computer: RAM usage: ", ramUsed+"MB/"+ramTotal+"MB", true);
+        builder.addField(":gear: CPU usage: ", processCpuLoad+" / "+systemCpuLoad+" ("+cpus+" Cores)", true);
         builder.addField(":map: Guilds: ", ""+event.getJDA().getGuilds().size() , true);
         builder.addField(":speech_balloon: Text Channels: ", ""+event.getJDA().getTextChannels().size(), true);
         builder.addField(":speaker: Voice Channels: ", ""+event.getJDA().getVoiceChannels().size(), true);
         builder.addField(":bust_in_silhouette: Users: ", ""+event.getJDA().getUsers().size(), true);
-        builder.addField(":computer: RAM usage: ", ramUse+" MB", true);
-        builder.addField(":gear: Available CPUs: ", String.valueOf(cpus), true);
+        builder.setFooter(event.getSelfUser().getName(), event.getSelfUser().getEffectiveAvatarUrl());
         builder.setColor(color);
-        builder.setFooter(event.getSelfUser().getName(), event.getSelfUser().getAvatarUrl());
-        event.getChannel().sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue();
+        event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
     }
 }
