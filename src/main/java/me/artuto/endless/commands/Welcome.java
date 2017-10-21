@@ -31,7 +31,7 @@ public class Welcome extends Command
         Guild guild = event.getGuild();
         String msg = db.getWelcomeMessage(guild);
 
-        if(!(msg.isEmpty()))
+        if(!(msg==null))
             event.replySuccess("Welcome message at **"+guild.getName()+"**: `"+msg+"`");
         else
             event.replyError("No message configured!");
