@@ -20,58 +20,58 @@ public class Variables
                 *This gets the member count
                  */
 
-                new Method("memberscount", (env, in) -> {
+                new Method("memberscount", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"2":String.valueOf(g.getMembers().size());
                 }),
 
-                new Method("userscount", (env, in) -> {
+                new Method("userscount", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"2":String.valueOf(g.getMembers().size());
                 }),
 
-                new Method("guildcount", (env, in) -> {
+                new Method("guildcount", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"2":String.valueOf(g.getMembers().size());
                 }),
 
-                new Method("servercount", (env, in) -> {
+                new Method("servercount", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"2":String.valueOf(g.getMembers().size());
                 }),
 
                 //Name of the guild
 
-                new Method("guildname", (env, in) -> {
+                new Method("guildname", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"Direct Message":g.getName();
                 }),
 
-                new Method("servername", (env, in) -> {
+                new Method("servername", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"Direct Message":g.getName();
                 }),
 
                 //Owner of the guild
 
-                new Method("guildowner", (env, in) -> {
+                new Method("guildowner", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"Direct Message":g.getOwner().getUser().getName()+"#"+g.getOwner().getUser().getDiscriminator();
                 }),
 
-                new Method("serverowner", (env, in) -> {
+                new Method("serverowner", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"Direct Message":g.getOwner().getUser().getName()+"#"+g.getOwner().getUser().getDiscriminator();
                 }),
 
                 //ID of the guild
 
-                new Method("guildid", (env, in) -> {
+                new Method("guildid", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"Direct Message":g.getId();
                 }),
 
-                new Method("serverid", (env, in) -> {
+                new Method("serverid", (env) -> {
                     Guild g = env.get("guild");
                     return g==null?"Direct Message":g.getId();
                 }),
@@ -85,40 +85,40 @@ public class Variables
 
                 //ID of the user
 
-                new Method("userid", (env, in) -> {
+                new Method("userid", (env) -> {
                     User u = env.get("user");
                     return u.getId();
                 }),
 
                 //Avatar of the user
 
-                new Method("useravatar", (env, in) -> {
+                new Method("useravatar", (env) -> {
                     User u = env.get("avatar");
                     return u.getEffectiveAvatarUrl();
                 }),
 
-                new Method("avatar", (env, in) -> {
+                new Method("avatar", (env) -> {
                     User u = env.get("user");
                     return u.getEffectiveAvatarUrl();
                 }),
 
                 //Mentions user
 
-                new Method("usermention", (env, in) -> {
+                new Method("usermention", (env) -> {
                     User u = env.get("user");
                     return u.getAsMention();
                 }),
 
                 //Name of the current channel
 
-                new Method("channelname", (env, in) -> {
+                new Method("channelname", (env) -> {
                     TextChannel tc = env.get("channel");
                     return tc==null?"Direct Message":tc.getName();
                 }),
 
                 //ID of the current channel
 
-                new Method("channelid", (env, in) -> {
+                new Method("channelid", (env) -> {
                     TextChannel tc = env.get("channel");
                     return tc==null?"Direct Message":tc.getId();
                 }));
