@@ -60,8 +60,7 @@ public class Stats extends Command
         int cpus = Runtime.getRuntime().availableProcessors();
         String processCpuLoad = new DecimalFormat("###.###%").format(ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getProcessCpuLoad());
         String systemCpuLoad = new DecimalFormat("###.###%").format(ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getSystemCpuLoad());
-        long ramUsed = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 100000;
-        long ramTotal = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() / 100000;
+        long ramUsed = ((Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()) / (1024 * 1024));
 
         if(event.isFromType(ChannelType.PRIVATE))
             color = Color.decode("#33ff00");
@@ -70,7 +69,7 @@ public class Stats extends Command
         
         EmbedBuilder builder = new EmbedBuilder();
         builder.addField("<:windows:371075985996775425> OS: ", os, true);
-        builder.addField(":computer: RAM usage: ", ramUsed+"MB/"+ramTotal+"MB", true);
+        builder.addField(":computer: RAM usage: ", ramUsed+"MB", true);
         builder.addField(":gear: CPU usage: ", processCpuLoad+" / "+systemCpuLoad+" ("+cpus+" Cores)", true);
         builder.addField(":map: Guilds: ", ""+event.getJDA().getGuilds().size() , true);
         builder.addField(":speech_balloon: Text Channels: ", ""+event.getJDA().getTextChannels().size(), true);
