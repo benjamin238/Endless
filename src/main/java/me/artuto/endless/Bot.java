@@ -56,7 +56,7 @@ public class Bot extends ListenerAdapter
         this.settings = new HashMap<>();
     }
     
-    @Override
+    /**@Override
     public void onGuildJoin(GuildJoinEvent event)
     {
         Guild guild = event.getGuild();
@@ -73,5 +73,5 @@ public class Bot extends ListenerAdapter
             owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> SimpleLog.getLog("DISCORD BOTS").fatal(leavemsg)));
             guild.leave().complete();
         }
-    }
+    }*/
 }
