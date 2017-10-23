@@ -29,11 +29,11 @@ public class GuildUtils
             if(botCount>20 && ((double)botCount/g.getMembers().size())>.50)
                 return true;
 
-            if(isABotListGuild(g))
+            /**if(isABotListGuild(g))
             {
                 jda.getUserById("264499432538505217").openPrivateChannel().queue(s -> s.sendMessage("**"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless at "+g.getName()));
                 return true;
-            }
+            }*/
 
             return false;
         }).forEach(g -> g.leave().queue());
@@ -65,11 +65,11 @@ public class GuildUtils
             return false;
     }
 
-    public static boolean isABotListGuild(Guild guild)
+    /**public static boolean isABotListGuild(Guild guild)
     {
         if(guild.getId().equals("110373943822540800") || guild.getId().equals("264445053596991498") && !(config.getOwnerId()==264499432538505217L))
             return true;
         else
             return false;
-    }
+    }*/
 }
