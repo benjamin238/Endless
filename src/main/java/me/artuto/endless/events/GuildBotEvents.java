@@ -50,13 +50,13 @@ public class GuildBotEvents extends ListenerAdapter
         TextChannel tc = event.getJDA().getTextChannelById(config.getBotlogChannelId());
         TextChannel defaultTc = FinderUtil.getDefaultChannel(guild);
 
-        if(!(GuildUtils.isBadGuild(guild)) || !(GuildUtils.isABotListGuild(guild)) && config.isBotlogEnabled() && !(tc==null) && tc.canTalk())
+        if(!(GuildUtils.isBadGuild(guild)) && config.isBotlogEnabled() && !(tc==null) && tc.canTalk())
         {
             tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n" +
                     "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n" +
                     "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
 
-            if(!(defaultTc==null))
+            if(!(defaultTc==null) && defaultTc.canTalk())
                 defaultTc.sendMessage("Hey! Thanks for adding Endless to your guild! First of all, you need to know if you activate the ModLogging/ServerLogging " +
                         "you allow me to log all your messages, users, ids, avatars, channels, roles and other guild settings.\n" +
                         "If you don't agree to this you **must** remove Endless from your guild.\n" +
