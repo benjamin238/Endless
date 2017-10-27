@@ -93,18 +93,14 @@ public class Endless extends ListenerAdapter
         client.setPrefix(config.getPrefix());
         client.setStatus(config.getStatus());
         client.setGame(Game.of(config.getGame()));
-        if(!(owners.length>16))
-        {
+        
+        if(!(owners.toString().isEmpty()))
             client.setCoOwnerIds(owners);
-        }
-        if(!(config.getDBotsToken().isEmpty()))
-        {
+        if(!(config.getDBotsToken().isEmpty() || config.getDBotsToken()==null))
             client.setDiscordBotsKey(config.getDBotsToken());
-        }
-        if(!(config.getDBotsListToken().isEmpty()))
-        {
+        if(!(config.getDBotsListToken().isEmpty() || config.getDBotsListToken()==null))
             client.setDiscordBotListKey(config.getDBotsListToken());
-        }
+
         client.addCommands(
         	    //Bot
 
