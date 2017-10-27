@@ -93,7 +93,7 @@ public class Endless extends ListenerAdapter
         client.setPrefix(config.getPrefix());
         client.setStatus(config.getStatus());
         client.setGame(Game.of(config.getGame()));
-        
+
         if(!(owners.toString().isEmpty()))
             client.setCoOwnerIds(owners);
         if(!(config.getDBotsToken().isEmpty() || config.getDBotsToken()==null))
