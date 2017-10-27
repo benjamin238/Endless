@@ -25,6 +25,7 @@ import javax.script.ScriptEngineManager;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.DatabaseManager;
 import me.artuto.endless.loader.Config;
+import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 
@@ -42,11 +43,13 @@ public class Eval extends Command
     private List<String> imports;
     private final Config config;
     private final DatabaseManager db;
+    private final ModLogging modlog;
     
-    public Eval(Config config, DatabaseManager db)
+    public Eval(Config config, DatabaseManager db, ModLogging modlog)
     {
         this.config = config;
         this.db = db;
+        this.modlog = modlog;
         this.name = "eval";
         this.help = "Executes Groovy code";
         this.category = Categories.BOTADM;
@@ -112,6 +115,7 @@ public class Eval extends Command
             engine.put("author", event.getAuthor());
             engine.put("config", config);
             engine.put("db", db);
+            engine.put("modlog", modlog);
             if(event.isFromType(ChannelType.TEXT))
             {
                 engine.put("member", event.getMember());

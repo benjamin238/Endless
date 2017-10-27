@@ -41,8 +41,11 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class SoftBan extends Command
 {
-    public SoftBan()
+    private final ModLogging modlog;
+
+    public SoftBan(ModLogging modlog)
     {
+        this.modlog = modlog;
         this.name = "softban";
         this.help = "Softbans the specified user";
         this.arguments = "<@user|ID|niokname|username> for [reason]";
@@ -141,7 +144,7 @@ public class SoftBan extends Command
             
             event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-            ModLogging.logSoftban(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
+            modlog.logSoftban(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {

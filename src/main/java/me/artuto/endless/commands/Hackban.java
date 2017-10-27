@@ -20,8 +20,11 @@ import java.util.List;
 
 public class Hackban extends Command
 {
-    public Hackban()
+    private final ModLogging modlog;
+
+    public Hackban(ModLogging modlog)
     {
+        this.modlog = modlog;
         this.name = "hackban";
         this.help = "Hackbans the specified user";
         this.arguments = "<ID> for [reason]";
@@ -81,7 +84,7 @@ public class Hackban extends Command
             {
                 event.getGuild().getController().ban(user, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-                ModLogging.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
+                modlog.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
 
                 event.replySuccess(Messages.HACKBAN_SUCCESS+success);
             }

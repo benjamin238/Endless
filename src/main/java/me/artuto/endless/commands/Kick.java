@@ -41,8 +41,11 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Kick extends Command
 {
-    public Kick()
+    private final ModLogging modlog;
+
+    public Kick(ModLogging modlog)
     {
+        this.modlog = modlog;
         this.name = "kick";
         this.help = "Kicks the specified user";
         this.arguments = "<@user|ID|nickname|username> for [reason]";
@@ -137,7 +140,7 @@ public class Kick extends Command
             
            event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-           ModLogging.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
+           modlog.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {

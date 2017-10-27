@@ -23,6 +23,8 @@ import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.security.auth.login.LoginException;
 
 import me.artuto.endless.cmddata.Categories;
@@ -67,6 +69,7 @@ public class Endless extends ListenerAdapter
 
         //Register Commands and some other things
 
+        ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
         EventWaiter waiter = new EventWaiter();
         Bot bot = new Bot(config);
         CommandClientBuilder client = new CommandClientBuilder();
@@ -116,16 +119,17 @@ public class Endless extends ListenerAdapter
                 new Bash(),
                 new BlacklistUsers(db),
                 new BotCPanel(),
-                new Eval(config, db),
+                new Eval(config, db, modlog),
                 new Shutdown(db),
                 
                 //Moderation
                 
-                new Ban(),
-                new Kick(),
-                new Hackban(),
-                new SoftBan(),
-                new Unban(),
+                new Ban(modlog),
+                new Clear(modlog, threads),
+                new Kick(modlog),
+                new Hackban(modlog),
+                new SoftBan(modlog),
+                new Unban(modlog),
                 
                 //Settings
                 
@@ -162,7 +166,7 @@ public class Endless extends ListenerAdapter
             .addEventListener(client.build())
             .addEventListener(bot)
             .addEventListener(new Endless())
-            .addEventListener(new Logging())
+            .addEventListener(new Logging(config))
             .addEventListener(new GuildBlacklist())
             .addEventListener(new ServerLogging(db))
             .addEventListener(new GuildBotEvents(config))

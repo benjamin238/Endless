@@ -42,6 +42,8 @@ public class Messages
     public static String SOFTBAN_ERROR = "An error happened when softbanning ";
     public static String HACKBAN_SUCCESS = "Successfully hackbanned user ";
     public static String HACKBAN_ERROR = "An error happened when hackbanning ";
+    public static String CLEAR_SUCCESS = "Successfully cleared **";
+    public static String CLEAR_ERROR = "An error happened when clearing **";
     
     // Warning
 

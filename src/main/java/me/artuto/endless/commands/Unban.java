@@ -36,8 +36,11 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Unban extends Command
 {
-    public Unban()
+    private final ModLogging modlog;
+
+    public Unban(ModLogging modlog)
     {
+        this.modlog = modlog;
         this.name = "unban";
         this.help = "Unbans the specified user";
         this.arguments = "<@user|ID|username> for [reason]";
@@ -99,7 +102,7 @@ public class Unban extends Command
             event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
             event.replySuccess(Messages.UNBAN_SUCCESS+success);
 
-            ModLogging.logUnban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
+            modlog.logUnban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {

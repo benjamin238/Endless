@@ -21,6 +21,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
@@ -35,24 +37,17 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Logging extends ListenerAdapter
 {
-    private static Config config;
+    private final Config config;
+
+    public Logging(Config config)
+    {
+        this.config = config;
+    }
     
     //Command logger
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        Config config;
-
-        try
-        {
-            config = new Config();
-        }
-        catch(Exception e)
-        {
-            SimpleLog.getLog("Config").fatal(e);
-            return;
-        }
-
         if(event.getMessage().getContent().startsWith(config.getPrefix()))
         {
             if(event.isFromType(ChannelType.PRIVATE))
@@ -61,7 +56,7 @@ public class Logging extends ListenerAdapter
                 {
                     Writer output;
                     output = new BufferedWriter(new FileWriter("logs/commands.log", true));
-                    output.append("\nCommand executed on a Direct Message:\n"
+                    output.append("Command executed on a Direct Message:\n"
                             + "User: "+event.getMessage().getAuthor().getName()+"#"+event.getMessage().getAuthor().getDiscriminator()
                                 + " ("+event.getMessage().getAuthor().getId()+")\n"
                             + "Command: '"+event.getMessage().getContent()+"' ("+event.getMessage().getId()+")\n");
@@ -78,7 +73,7 @@ public class Logging extends ListenerAdapter
                 {                  
                     Writer output;
                     output = new BufferedWriter(new FileWriter("logs/commands.log", true));
-                    output.append("\nGuild: "+event.getGuild().getName()+" ("+event.getGuild().getId()+")\n"
+                    output.append("Guild: "+event.getGuild().getName()+" ("+event.getGuild().getId()+")\n"
                             + "Channel: "+event.getChannel().getName()+" ("+event.getChannel().getId()+")\n"
                             + "User: "+event.getMessage().getAuthor().getName()+"#"+event.getMessage().getAuthor().getDiscriminator()
                                 + " ("+event.getMessage().getAuthor().getId()+")\n"

@@ -19,13 +19,18 @@ package me.artuto.endless.logging;
 
 import me.artuto.endless.Messages;
 import me.artuto.endless.data.DatabaseManager;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.utils.SimpleLog;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.data.Settings;
@@ -46,7 +51,7 @@ public class ModLogging
         ModLogging.db = db;
     }
 
-    public static void logBan(User author, Member target, String reason, Guild guild, TextChannel channel)
+    public void logBan(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
@@ -70,7 +75,7 @@ public class ModLogging
         }
     }
 
-    public static void logHackban(User author, User target, String reason, Guild guild, TextChannel channel)
+    public void logHackban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
@@ -94,7 +99,7 @@ public class ModLogging
         }
     }
 
-    public static void logKick(User author, Member target, String reason, Guild guild, TextChannel channel)
+    public void logKick(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
@@ -118,7 +123,7 @@ public class ModLogging
         }
     }
 
-    public static void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)
+    public void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
@@ -142,7 +147,7 @@ public class ModLogging
         }
     }
 
-    public static void logUnban(User author, User target, String reason, Guild guild, TextChannel channel)
+    public void logUnban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
@@ -162,6 +167,53 @@ public class ModLogging
             {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Unban]:` :wrench: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
                         + "`[Reason]:` "+reason).queue();
+            }
+        }
+    }
+
+    public void logClear(User author, TextChannel channel, String reason, Guild guild, List<Message> deleted)
+    {
+        TextChannel tc = db.getModlogChannel(guild);
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+        File file = new File("cleared.txt");
+
+        if(!(tc==null))
+        {
+            if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
+            {
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
+                        null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+            }
+            else
+            {
+                try
+                {
+                    Writer output = new BufferedWriter(new FileWriter(file, true));
+
+                        for(Message msg : deleted)
+                        {
+                            User a = msg.getAuthor();
+                            String toWrite = a.getName() + "#" + a.getDiscriminator() + ": " + msg.getContent()+"\n";
+                            output.append(toWrite);
+                        }
+
+                        output.close();
+                }
+                catch(Exception e)
+                {
+                    SimpleLog.getLog("Clear Modlog").fatal("Error when creating the text file with the deleted messages: "+e);
+                }
+
+                if(!(file.exists()))
+                    tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Clear]:` :trash_can: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages.\n"
+                            + "`[Reason]:` "+reason).queue();
+                else
+                    tc.sendFile(file, "cleared.txt", new MessageBuilder().append("`[" + hour + ":" + min + ":" + sec + "] [Clear]:` :trash_can: **" + author.getName() + "**#**" + author.getDiscriminator() + "** cleared **" + deleted.size() + "** messages.\n"
+                            + "`[Reason]:` " + reason).build()).queue((s) -> file.delete());
             }
         }
     }

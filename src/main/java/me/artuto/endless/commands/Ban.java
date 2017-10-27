@@ -41,8 +41,11 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Ban extends Command
 {
-    public Ban()
+    private final ModLogging modlog;
+
+    public Ban(ModLogging modlog)
     {
+        this.modlog = modlog;
         this.name = "ban";
         this.help = "Bans the specified user";
         this.arguments = "<@user|ID|nickname|username> for [reason]";
@@ -95,9 +98,7 @@ public class Ban extends Command
             return;
         }
     	else
-        {
             member = list.get(0);
-        }
     
         if(!event.getSelfMember().canInteract(member))
         {
@@ -132,13 +133,11 @@ public class Ban extends Command
                     (e) -> event.replyWarning(Messages.BAN_NODM+success)));
             }
             else
-            {
                event.replySuccess(Messages.KICK_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
-            }
             
             event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
-            ModLogging.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
+            modlog.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {
