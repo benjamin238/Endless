@@ -84,7 +84,7 @@ public class Endless extends ListenerAdapter
 
         for(int i = 0; i < owners.length; i++)
         {
-            owners[i] = String.valueOf(owners[i]);
+            owners[i] = String.valueOf(coOwners[i]);
         }
 
         client.setOwnerId(String.valueOf(config.getOwnerId()));
