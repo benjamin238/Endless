@@ -80,6 +80,11 @@ public class Config
         return format.discordBansToken;
     }
 
+    public String getGihpyKey()
+    {
+        return format.giphyKey;
+    }
+
     public String getDoneEmote()
     {
         return format.doneEmote;
