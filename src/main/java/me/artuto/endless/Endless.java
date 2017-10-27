@@ -145,6 +145,7 @@ public class Endless extends ListenerAdapter
 
                 new Cat(config),
                 new Choose(),
+                new GiphyGif(config),
                 new Say(),
 
                 //Utils

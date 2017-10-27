@@ -82,7 +82,7 @@ public class DBansCheck extends Command
         if(config.getDBansToken().isEmpty())
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
-            LOG.warn("Someone triggered the Discord Bans Check command, but there's not a token in the config file. In order to stop this message add a token to the config file.");
+            LOG.warn("Someone triggered the Discord Bans Check command, but there isn't a token in the config file. In order to stop this message add a token to the config file.");
             return;
         }
 

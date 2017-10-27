@@ -131,9 +131,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>at.mukprojects</groupId>
-            <artifactId>giphy4j</artifactId>
-            <version>1.0.1</version>
+            <groupId>com.github.kylejablonski</groupId>
+            <artifactId>simple-giphy-java</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 </project>
