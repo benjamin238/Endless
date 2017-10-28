@@ -17,16 +17,16 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.io.IOException;
 
-public class Cat extends Command
+public class Dog extends Command
 {
-    private final SimpleLog LOG = SimpleLog.getLog("Cat Image");
-    private final Config config;
+    private final SimpleLog LOG = SimpleLog.getLog("Dog Image");
+    private Config config;
 
-    public Cat(Config config)
+    public Dog(Config config)
     {
         this.config = config;
-        this.name = "cat";
-        this.help = "Displays a cute kitty.";
+        this.name = "dog";
+        this.help = "Displays a cute pupper.";
         this.category = Categories.FUN;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
@@ -35,31 +35,32 @@ public class Cat extends Command
         this.cooldown = 10;
     }
 
+    @Override
     protected void execute(CommandEvent event)
     {
         try
         {
             Color color;
 
-            if(event.isFromType(ChannelType.PRIVATE))
+            if (event.isFromType(ChannelType.PRIVATE))
                 color = Color.decode("#33ff00");
             else
                 color = event.getMember().getColor();
 
             EmbedBuilder builder = new EmbedBuilder();
             OkHttpClient client = new OkHttpClient();
-            Request req = new Request.Builder().url("https://random.cat/meow").get().build();
+            Request req = new Request.Builder().url("https://random.dog/woof.json").get().build();
             Response res = client.newCall(req).execute();
             if(!res.isSuccessful())
                 throw new RuntimeException("Error while fetching remote resource");
             ResponseBody body = res.body();
             String data = body.string();
             JSONObject json = new JSONObject(data);
-            String cat = json.getString("file");
+            String cat = json.getString("url");
 
             builder.setAuthor("Requested by "+event.getAuthor().getName(), null, event.getAuthor().getEffectiveAvatarUrl());
             builder.setImage(cat);
-            builder.setFooter("Image provided by random.cat API", null);
+            builder.setFooter("Image provided by random.dog API", null);
             builder.setColor(color);
 
             event.reply(builder.build());

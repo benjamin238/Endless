@@ -12,8 +12,10 @@ import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
@@ -29,11 +31,13 @@ public class GiphyGif extends Command
         this.aliases = new String[]{"gif"};
         this.children = new Command[]{new RandomGif()};
         this.help = "Searches a gif on Giphy using the specified serarch terms.";
+        this.arguments = "[keyword]";
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
         this.userPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guildOnly = false;
+        this.cooldown = 10;
     }
 
     @Override
@@ -55,6 +59,13 @@ public class GiphyGif extends Command
             EmbedBuilder builder = new EmbedBuilder();
             String title;
 
+            Color color;
+
+            if(event.isFromType(ChannelType.PRIVATE))
+                color = Color.decode("#33ff00");
+            else
+                color = event.getMember().getColor();
+
             if(args.isEmpty())
             {
                 title = "<:giphy:373675520099090436> Trending GIF:";
@@ -69,7 +80,7 @@ public class GiphyGif extends Command
 
                     builder.setImage(gif.getImages().getOriginal().getUrl());
                     builder.setFooter("GIF provided by Giphy API", "https://cdn.discordapp.com/attachments/304027425509998593/373674151472267265/Poweredby_640px_Badge.gif");
-                    builder.setColor(event.getMember().getColor());
+                    builder.setColor(color);
 
                     event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
                 }
@@ -88,7 +99,7 @@ public class GiphyGif extends Command
 
                     builder.setImage(gif.getImages().getOriginal().getUrl());
                     builder.setFooter("GIF provided by Giphy API", "https://cdn.discordapp.com/attachments/304027425509998593/373674151472267265/Poweredby_640px_Badge.gif");
-                    builder.setColor(event.getMember().getColor());
+                    builder.setColor(color);
 
                     event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
                 }
@@ -111,10 +122,11 @@ public class GiphyGif extends Command
             this.name = "random";
             this.help = "Retrieves a random GIF from Giphy.";
             this.category = Categories.FUN;
+            this.arguments = "[keyword]";
             this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.userPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guildOnly = false;
         }
 
         protected void execute(CommandEvent event)
@@ -134,6 +146,13 @@ public class GiphyGif extends Command
                 return;
             }
 
+            Color color;
+
+            if(event.isFromType(ChannelType.PRIVATE))
+                color = Color.decode("#33ff00");
+            else
+                color = event.getMember().getColor();
+
             SimpleGiphy.setApiKey(config.getGihpyKey());
             RandomGiphyResponse r;
             EmbedBuilder builder = new EmbedBuilder();
@@ -143,7 +162,7 @@ public class GiphyGif extends Command
 
             builder.setImage(gif.getImageOriginalUrl());
             builder.setFooter("GIF provided by Giphy API", "https://cdn.discordapp.com/attachments/304027425509998593/373674151472267265/Poweredby_640px_Badge.gif");
-            builder.setColor(event.getMember().getColor());
+            builder.setColor(color);
 
             event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
         }
