@@ -18,7 +18,7 @@ discordBotList: ''
 discordBansToken: ''
 
 # Used for accessing Giphy API
-gihpyKey: ''
+giphyKey: ''
 
 # Done (Success) emote.
 doneEmote: ':white_check_mark:'
