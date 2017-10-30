@@ -11,6 +11,7 @@
 .mtj.tmp/
 
 # Package Files #
+!jl1.0.jar
 *.jar
 *.war
 *.ear
