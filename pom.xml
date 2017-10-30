@@ -92,7 +92,7 @@
             <artifactId>jl</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/jl1.0.jar</systemPath>
+            <systemPath>${basedir}/lib/jl1.0.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
