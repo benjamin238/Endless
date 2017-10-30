@@ -152,7 +152,7 @@ public class Endless extends ListenerAdapter
                 //Utils
 
                 new GoogleSearch(),
-                new Translate());
+                new Translate(config));
         
         //JDA Connection
 

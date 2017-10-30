@@ -95,7 +95,7 @@ public class Unban extends Command
             user = list.get(0);
         }
         
-        String success = user.getAsMention();
+        String success = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
         
         try
         {

@@ -20,6 +20,9 @@ discordBansToken: ''
 # Used for accessing Giphy API
 giphyKey: ''
 
+# Used for accessing Yandex Translator API
+yandexTranslateKey: ''
+
 # Done (Success) emote.
 doneEmote: ':white_check_mark:'
 

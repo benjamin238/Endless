@@ -114,7 +114,7 @@ public class SoftBan extends Command
             return;
         }
         
-        String success = member.getAsMention();
+        String success = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
         
         try
         {
@@ -140,9 +140,9 @@ public class SoftBan extends Command
                event.replySuccess(Messages.KICK_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
             }
             
-            event.getGuild().getController().ban(member, 1).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+            event.getGuild().getController().ban(member, 7).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
             
-            event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+            event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
             modlog.logSoftban(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }

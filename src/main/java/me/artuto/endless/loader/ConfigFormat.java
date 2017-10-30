@@ -12,6 +12,7 @@ public class ConfigFormat
     public String discordBotListToken;
     public String discordBansToken;
     public String giphyKey;
+    public String yandexTranslateKey;
     public String doneEmote;
     public String warnEmote;
     public String errorEmote;

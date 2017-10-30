@@ -85,6 +85,11 @@ public class Config
         return format.giphyKey;
     }
 
+    public String getTranslateKey()
+    {
+        return format.yandexTranslateKey;
+    }
+
     public String getDoneEmote()
     {
         return format.doneEmote;

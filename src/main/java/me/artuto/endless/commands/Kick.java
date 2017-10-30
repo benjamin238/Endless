@@ -75,8 +75,8 @@ public class Kick extends Command
         try
         {
             String[] args = event.getArgs().split(" for", 2);
-            target = args[0];
-            reason = args[1];
+            target = args[0].trim();
+            reason = args[1].trim();
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
@@ -113,7 +113,7 @@ public class Kick extends Command
             return;
         }
         
-        String success = member.getAsMention();
+        String success = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
         
         try
         {

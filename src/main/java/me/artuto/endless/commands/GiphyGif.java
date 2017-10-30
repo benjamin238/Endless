@@ -37,7 +37,6 @@ public class GiphyGif extends Command
         this.userPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.ownerCommand = false;
         this.guildOnly = false;
-        this.cooldown = 10;
     }
 
     @Override

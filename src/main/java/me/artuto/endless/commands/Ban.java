@@ -76,12 +76,12 @@ public class Ban extends Command
         try
         {
             String[] args = event.getArgs().split(" for", 2);
-            target = args[0];
-            reason = args[1];
+            target = args[0].trim();
+            reason = args[1].trim();
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
-            target = event.getArgs();
+            target = event.getArgs().trim();
             reason = "[no reason specified]";
         }
         
@@ -112,7 +112,7 @@ public class Ban extends Command
             return;
         }
         
-        String success = member.getAsMention();
+        String success = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
               
         try
         {
@@ -133,9 +133,9 @@ public class Ban extends Command
                     (e) -> event.replyWarning(Messages.BAN_NODM+success)));
             }
             else
-               event.replySuccess(Messages.KICK_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
+               event.replySuccess(Messages.BAN_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
             
-            event.getGuild().getController().ban(member, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+            event.getGuild().getController().ban(member, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
             modlog.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
