@@ -209,10 +209,10 @@ public class ModLogging
                 }
 
                 if(!(file.exists()))
-                    tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Clear]:` :trash_can: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages.\n"
+                    tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Clear]:` :wastebasket: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages in "+channel.getAsMention()+".\n"
                             + "`[Reason]:` "+reason).queue();
                 else
-                    tc.sendFile(file, "cleared.txt", new MessageBuilder().append("`[" + hour + ":" + min + ":" + sec + "] [Clear]:` :trash_can: **" + author.getName() + "**#**" + author.getDiscriminator() + "** cleared **" + deleted.size() + "** messages.\n"
+                    tc.sendFile(file, "cleared.txt", new MessageBuilder().append("`[" + hour + ":" + min + ":" + sec + "] [Clear]:` :trash_can: **" + author.getName() + "**#**" + author.getDiscriminator() + "** cleared **" + deleted.size() + "** messages in "+channel.getAsMention()+".\n"
                             + "`[Reason]:` " + reason).build()).queue((s) -> file.delete());
             }
         }

@@ -216,13 +216,13 @@ public class Clear extends Command
             }
             catch(Exception e)
             {
-                event.replyError(Messages.CLEAR_ERROR+deletion.size()+"** messages!");
+                event.replyError(Messages.CLEAR_ERROR+"**"+deletion.size()+"** messages!");
                 SimpleLog.getLog("Clear").fatal(e);
                 e.printStackTrace();
                 return;
             }
 
-            event.replySuccess(Messages.CLEAR_SUCCESS+deletion.size()+"** messages!");
+            event.replySuccess(Messages.CLEAR_SUCCESS+"**"+deletion.size()+"** messages!");
             modlog.logClear(event.getAuthor(), event.getTextChannel(), finalR, event.getGuild(), deletion);
         });
     }
