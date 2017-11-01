@@ -2,29 +2,23 @@ package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
-import com.jagrosh.jdautilities.utils.FinderUtil;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.ModLogging;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.utils.SimpleLog;
-
-import java.awt.*;
-import java.time.Instant;
-import java.util.List;
 
 public class Hackban extends Command
 {
     private final ModLogging modlog;
+    private final Config config;
 
-    public Hackban(ModLogging modlog)
+    public Hackban(ModLogging modlog, Config config)
     {
         this.modlog = modlog;
+        this.config = config;
         this.name = "hackban";
         this.help = "Hackbans the specified user";
         this.arguments = "<ID> for [reason]";
@@ -38,9 +32,8 @@ public class Hackban extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        User author;
+        User author = event.getAuthor();
         User user;
-        author = event.getAuthor();
         String target;
         String reason;
 
@@ -72,27 +65,24 @@ public class Hackban extends Command
             return;
         }
 
-        String success = "**"+user.getName()+"**#**"+user.getDiscriminator()+"**";
+        String username = "**"+user.getName()+"**#**"+user.getDiscriminator()+"**";
 
         if(event.getGuild().getMembers().contains(event.getGuild().getMemberById(target)))
-        {
             event.replyWarning("This user is on this Guild! Please use `"+event.getClient().getPrefix()+"ban` instead.");
-        }
         else
         {
             try
             {
-                event.getGuild().getController().ban(user, 0).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
-
+                event.getGuild().getController().ban(user, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
+                event.replySuccess(Messages.HACKBAN_SUCCESS+username);
                 modlog.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
-
-                event.replySuccess(Messages.HACKBAN_SUCCESS+success);
             }
             catch(Exception e)
             {
-                event.replyError(Messages.HACKBAN_ERROR+user.getName()+"#"+user.getDiscriminator()+"**");
+                event.replyError(Messages.HACKBAN_ERROR+username);
                 SimpleLog.getLog("Hackban").fatal(e);
-                e.printStackTrace();
+                if(config.isDebugEnabled())
+                    e.printStackTrace();
             }
         }
     }

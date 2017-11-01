@@ -120,12 +120,12 @@ public class Endless extends ListenerAdapter
                 
                 //Moderation
                 
-                new Ban(modlog),
+                new Ban(modlog, config),
                 new Clear(modlog, threads),
-                new Kick(modlog),
-                new Hackban(modlog),
-                new SoftBan(modlog),
-                new Unban(modlog),
+                new Kick(modlog, config),
+                new Hackban(modlog, config),
+                new SoftBan(modlog, config),
+                new Unban(modlog, config),
                 
                 //Settings
                 

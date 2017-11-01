@@ -26,6 +26,7 @@ import java.util.List;
 
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.loader.Config;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -42,10 +43,12 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 public class Ban extends Command
 {
     private final ModLogging modlog;
+    private final Config config;
 
-    public Ban(ModLogging modlog)
+    public Ban(ModLogging modlog, Config config)
     {
         this.modlog = modlog;
+        this.config = config;
         this.name = "ban";
         this.help = "Bans the specified user";
         this.arguments = "<@user|ID|nickname|username> for [reason]";
@@ -61,9 +64,7 @@ public class Ban extends Command
     {
         EmbedBuilder builder = new EmbedBuilder();
         Member member;
-        User author;
-        User user;
-        author = event.getAuthor();
+        User author = event.getAuthor();
         String target;
         String reason;
         
@@ -112,38 +113,49 @@ public class Ban extends Command
             return;
         }
         
-        String success = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
+        String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
+        String r = reason;
               
         try
         {
-            builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-            builder.setTitle("Ban");
-            builder.setDescription("You were banned on the guild **"+event.getGuild().getName()+"** by **"
-                +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
-                + "They gave the following reason: **"+reason+"**\n");
-            builder.setFooter("Time", null);
-            builder.setTimestamp(Instant.now());
-            builder.setColor(Color.RED);
-            builder.setThumbnail(event.getGuild().getIconUrl());
-           
-            if(!member.getUser().isBot())
+            if(!(member.getUser().isBot()))
             {
-               member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.BAN_SUCCESS+success),
-                    (e) -> event.replyWarning(Messages.BAN_NODM+success)));
+                builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+                builder.setTitle("Ban");
+                builder.setDescription("You were banned on the guild **"+event.getGuild().getName()+"** by **"
+                        +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
+                        + "They gave the following reason: **"+reason+"**\n");
+                builder.setFooter("Time", null);
+                builder.setTimestamp(Instant.now());
+                builder.setColor(Color.RED);
+                builder.setThumbnail(event.getGuild().getIconUrl());
+
+               member.getUser().openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
+                    (d) ->
+                    {
+                        event.getGuild().getController().ban(member, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+ r).complete();
+                        event.replySuccess(Messages.BAN_SUCCESS+username);
+                    },
+                    (e) ->
+                    {
+                        event.getGuild().getController().ban(member, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+ r).complete();
+                        event.replySuccess(Messages.BAN_SUCCESS+username);
+                    }));
             }
             else
-               event.replySuccess(Messages.BAN_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
-            
-            event.getGuild().getController().ban(member, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
+            {
+                event.getGuild().getController().ban(member, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+ reason).complete();
+                event.replySuccess(Messages.BAN_SUCCESS+username);
+            }
 
             modlog.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {
-            event.replyError(Messages.BAN_ERROR+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
+            event.replyError(Messages.BAN_ERROR+username);
             SimpleLog.getLog("Ban").fatal(e);
-            e.printStackTrace();
+            if(config.isDebugEnabled())
+                e.printStackTrace();
         }
     }
 }

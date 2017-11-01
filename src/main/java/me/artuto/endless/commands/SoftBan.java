@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.List;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.loader.Config;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -42,10 +43,12 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 public class SoftBan extends Command
 {
     private final ModLogging modlog;
+    private final Config config;
 
-    public SoftBan(ModLogging modlog)
+    public SoftBan(ModLogging modlog, Config config)
     {
         this.modlog = modlog;
+        this.config = config;
         this.name = "softban";
         this.help = "Softbans the specified user";
         this.arguments = "<@user|ID|niokname|username> for [reason]";
@@ -61,9 +64,7 @@ public class SoftBan extends Command
     {
         EmbedBuilder builder = new EmbedBuilder();
         Member member;
-        User author;
-        User user;
-        author = event.getAuthor();
+        User author = event.getAuthor();
         String target;
         String reason;
         
@@ -98,9 +99,7 @@ public class SoftBan extends Command
             return;
         }
     	else
-        {
             member = list.get(0);
-        }
     
         if(!event.getSelfMember().canInteract(member))
         {
@@ -114,43 +113,54 @@ public class SoftBan extends Command
             return;
         }
         
-        String success = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
+        String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
+        String r = reason;
         
         try
         {
-            builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-            builder.setTitle("Softban");
-            builder.setDescription("You were softbanned on the guild **"+event.getGuild().getName()+"** by **"
-                +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
-                + "They gave the following reason: **"+reason+"**\n"
-                + "You can join again.\n");
-            builder.setFooter("Time", null);
-            builder.setTimestamp(Instant.now());
-            builder.setColor(Color.ORANGE);
-            builder.setThumbnail(event.getGuild().getIconUrl());
-           
-            if(!member.getUser().isBot())
+            if(!(member.getUser().isBot()))
             {
+                builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+                builder.setTitle("Softban");
+                builder.setDescription("You were softbanned on the guild **"+event.getGuild().getName()+"** by **"
+                        +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
+                        + "They gave the following reason: **"+reason+"**\n"
+                        + "You can join again.\n");
+                builder.setFooter("Time", null);
+                builder.setTimestamp(Instant.now());
+                builder.setColor(Color.ORANGE);
+                builder.setThumbnail(event.getGuild().getIconUrl());
+
                member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.KICK_SUCCESS+success),
-                    (e) -> event.replyWarning(Messages.KICK_NODM+success)));
+                    (d) ->
+                    {
+                        event.getGuild().getController().ban(member, 7).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
+                        event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
+                        event.replySuccess(Messages.SOFTBAN_SUCCESS+username);
+                    },
+                    (e) ->
+                    {
+                        event.replySuccess(Messages.SOFTBAN_SUCCESS+username);
+                        event.getGuild().getController().ban(member, 7).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
+                        event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
+                        event.replySuccess(Messages.SOFTBAN_SUCCESS+username);
+                    }));
             }
             else
             {
-               event.replySuccess(Messages.KICK_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
+                event.getGuild().getController().ban(member, 7).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
+                event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
+                event.replySuccess(Messages.SOFTBAN_SUCCESS+username);
             }
-            
-            event.getGuild().getController().ban(member, 7).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
-            
-            event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 7 DAYS]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
             modlog.logSoftban(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {
-            event.replyError(Messages.SOFTBAN_ERROR+member.getAsMention());
+            event.replyError(Messages.SOFTBAN_ERROR+username);
             SimpleLog.getLog("SoftBan").fatal(e);
-            e.printStackTrace();
+            if(config.isDebugEnabled())
+                e.printStackTrace();
         }
     }
 }

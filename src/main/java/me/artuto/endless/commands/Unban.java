@@ -22,6 +22,7 @@ import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.util.List;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.loader.Config;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.logging.ModLogging;
@@ -37,10 +38,12 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 public class Unban extends Command
 {
     private final ModLogging modlog;
+    private final Config config;
 
-    public Unban(ModLogging modlog)
+    public Unban(ModLogging modlog, Config config)
     {
         this.modlog = modlog;
+        this.config = config;
         this.name = "unban";
         this.help = "Unbans the specified user";
         this.arguments = "<@user|ID|username> for [reason]";
@@ -91,24 +94,22 @@ public class Unban extends Command
             return;
         }
     	else
-        {
             user = list.get(0);
-        }
         
-        String success = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
+        String username = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
         
         try
         {
-            event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
-            event.replySuccess(Messages.UNBAN_SUCCESS+success);
-
+            event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
+            event.replySuccess(Messages.UNBAN_SUCCESS+username);
             modlog.logUnban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {
-            event.replyError(Messages.UNBAN_ERROR+user.getAsMention());
+            event.replyError(Messages.UNBAN_ERROR+username);
             SimpleLog.getLog("Unban").fatal(e);
-            e.printStackTrace();
+            if(config.isDebugEnabled())
+                e.printStackTrace();
         }
     }
     

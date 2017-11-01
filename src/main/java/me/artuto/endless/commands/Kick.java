@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.List;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.loader.Config;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -42,10 +43,12 @@ import net.dv8tion.jda.core.utils.SimpleLog;
 public class Kick extends Command
 {
     private final ModLogging modlog;
+    private final Config config;
 
-    public Kick(ModLogging modlog)
+    public Kick(ModLogging modlog, Config config)
     {
         this.modlog = modlog;
+        this.config = config;
         this.name = "kick";
         this.help = "Kicks the specified user";
         this.arguments = "<@user|ID|nickname|username> for [reason]";
@@ -61,8 +64,7 @@ public class Kick extends Command
     {
         EmbedBuilder builder = new EmbedBuilder();
         Member member;
-        User author;
-        author = event.getAuthor();
+        User author = event.getAuthor();
         String target;
         String reason;
         
@@ -97,9 +99,7 @@ public class Kick extends Command
             return;
         }
     	else
-        {
             member = list.get(0);
-        }       
     
         if(!event.getSelfMember().canInteract(member))
         {
@@ -113,40 +113,49 @@ public class Kick extends Command
             return;
         }
         
-        String success = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
+        String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
+        String r = reason;
         
         try
         {
-            builder.setColor(Color.YELLOW);
-            builder.setThumbnail(event.getGuild().getIconUrl());
-            builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-            builder.setTitle("Kick");
-            builder.setDescription("You were kicked on the guild **"+event.getGuild().getName()+"** by **"
-                    +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
-                    + "They gave the following reason: **"+reason+"**\n");
-            builder.setFooter("Time", null);
-            builder.setTimestamp(Instant.now());
-            
-            if(!member.getUser().isBot())
+            if(!(member.getUser().isBot()))
             {
+                builder.setColor(Color.YELLOW);
+                builder.setThumbnail(event.getGuild().getIconUrl());
+                builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+                builder.setTitle("Kick");
+                builder.setDescription("You were kicked on the guild **"+event.getGuild().getName()+"** by **"
+                        +event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"
+                        + "They gave the following reason: **"+reason+"**\n");
+                builder.setFooter("Time", null);
+                builder.setTimestamp(Instant.now());
+
                member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(
-                    (d) -> event.replySuccess(Messages.KICK_SUCCESS+success),
-                    (e) -> event.replyWarning(Messages.KICK_NODM+success)));
+                    (d) ->
+                    {
+                        event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
+                        event.replySuccess(Messages.KICK_SUCCESS+username);
+                    },
+                    (e) ->
+                    {
+                        event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
+                        event.replySuccess(Messages.KICK_SUCCESS+username);
+                    }));
             }
             else
             {
-               event.replySuccess(Messages.KICK_SUCCESS+"**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**");
+                event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
+                event.replySuccess(Messages.KICK_SUCCESS+username);
             }
-            
-           event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue();
 
            modlog.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
         }
         catch(Exception e)
         {
-            event.replyError(Messages.KICK_ERROR+member.getAsMention());
+            event.replyError(Messages.KICK_ERROR+username);
             SimpleLog.getLog("Kick").fatal(e);
-            e.printStackTrace();
+            if(config.isDebugEnabled())
+                e.printStackTrace();
         }
     }
 }
