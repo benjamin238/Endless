@@ -134,6 +134,7 @@ public class Clear extends Command
         String p = pattern;
 
         String finalR = r;
+        String finalParams = params;
         threads.submit(() -> {
             int val = val2;
             List<Message> msgs = new LinkedList<>();
@@ -223,7 +224,7 @@ public class Clear extends Command
             }
 
             event.replySuccess(Messages.CLEAR_SUCCESS+"**"+deletion.size()+"** messages!");
-            modlog.logClear(event.getAuthor(), event.getTextChannel(), finalR, event.getGuild(), deletion);
+            modlog.logClear(event.getAuthor(), event.getTextChannel(), finalR, event.getGuild(), deletion, finalParams);
         });
     }
 

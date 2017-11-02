@@ -43,7 +43,6 @@ import me.artuto.endless.data.Settings;
 
 public class ModLogging 
 {
-    private final SimpleLog LOG = SimpleLog.getLog("ModLog");
     private static DatabaseManager db;
 
     public ModLogging(DatabaseManager db)
@@ -171,7 +170,7 @@ public class ModLogging
         }
     }
 
-    public void logClear(User author, TextChannel channel, String reason, Guild guild, List<Message> deleted)
+    public void logClear(User author, TextChannel channel, String reason, Guild guild, List<Message> deleted, String args)
     {
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
@@ -197,8 +196,12 @@ public class ModLogging
                         for(Message msg : deleted)
                         {
                             User a = msg.getAuthor();
-                            String toWrite = a.getName() + "#" + a.getDiscriminator() + ": " + msg.getContent()+"\n";
-                            output.append(toWrite);
+
+                            if(!(msg.getContent().isEmpty()))
+                            {
+                                String toWrite = a.getName() + "#" + a.getDiscriminator() + ": " + msg.getContent() + "\n";
+                                output.append(toWrite);
+                            }
                         }
 
                         output.close();
@@ -208,12 +211,13 @@ public class ModLogging
                     SimpleLog.getLog("Clear Modlog").fatal("Error when creating the text file with the deleted messages: "+e);
                 }
 
+                String message = "`["+hour+":"+min+":"+sec+"] [Clear]:` :wastebasket: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages in "+channel.getAsMention()+" ("+args+").\n"
+                        + "`[Reason]:` "+reason;
+
                 if(!(file.exists()))
-                    tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Clear]:` :wastebasket: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages in "+channel.getAsMention()+".\n"
-                            + "`[Reason]:` "+reason).queue();
+                    tc.sendMessage(message).queue();
                 else
-                    tc.sendFile(file, "cleared.txt", new MessageBuilder().append("`[" + hour + ":" + min + ":" + sec + "] [Clear]:` :trash_can: **" + author.getName() + "**#**" + author.getDiscriminator() + "** cleared **" + deleted.size() + "** messages in "+channel.getAsMention()+".\n"
-                            + "`[Reason]:` " + reason).build()).queue((s) -> file.delete());
+                    tc.sendFile(file, "cleared.txt", new MessageBuilder().append(message).build()).queue((s) -> file.delete());
             }
         }
     }

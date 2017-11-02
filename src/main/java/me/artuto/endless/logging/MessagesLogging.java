@@ -16,13 +16,9 @@ class MessagesLogging
     static Message getMsg(Long id)
     {
         if(messages.containsKey(id))
-        {
             return messages.get(id);
-        }
         else
-        {
             return new MessageBuilder().append("No cached message").build();
-        }
     }
 
     static HashMap<Long, Message> getMap()
@@ -34,7 +30,5 @@ class MessagesLogging
     {
         if(messages.containsKey(id))
             messages.remove(id);
-
-
     }
 }

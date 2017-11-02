@@ -22,6 +22,7 @@ import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.time.format.DateTimeFormatter;
 
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.utils.FinderUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -101,7 +102,7 @@ public class GuildInfo extends Command
             builder.addField(":hammer: Roles: ", roles, false);
             builder.addField(":speech_left: Text Channels: ", textchbldr.toString(), false);
             builder.addField(":speaker: Voice Channels: ", voicech, false);
-            builder.addField(":speech_balloon: Default Channel: ", guild.getPublicChannel().getAsMention(), true);
+            builder.addField(":speech_balloon: Default Channel: ", FinderUtil.getDefaultChannel(guild).getAsMention(), true);
             builder.addField(":date: Creation Date: ", "**" + guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME) + "**", true);
             builder.addField(":vertical_traffic_light: Verification level: ", "**" + guild.getVerificationLevel() + "**", true);
             builder.addField(":envelope: Default Notification level: ", "**" + guild.getDefaultNotificationLevel() + "**", true);

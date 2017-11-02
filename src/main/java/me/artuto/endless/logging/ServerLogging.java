@@ -22,12 +22,12 @@ import net.dv8tion.jda.core.events.user.UserAvatarUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ServerLogging extends ListenerAdapter
 {
     private static DatabaseManager db;
     private final Parser parser;
-    private EmbedBuilder builder = new EmbedBuilder();
 
     public ServerLogging(DatabaseManager db)
     {
@@ -58,10 +58,8 @@ public class ServerLogging extends ListenerAdapter
         if(!(serverlog==null))
         {
             if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-            {
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                     null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-            }
             else
                 serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Join]:` :inbox_tray: :bust_in_silhouette: **"+newmember.getName()+"**#**"+newmember.getDiscriminator()+"** ("+newmember.getId()+") joined the guild! User count: **"+guild.getMembers().size()+"** members").queue();
         }
@@ -69,12 +67,10 @@ public class ServerLogging extends ListenerAdapter
         if(!(welcome==null) && !(msg.isEmpty()))
         {
             if(!(welcome.getGuild().getSelfMember().hasPermission(welcome, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)))
-            {
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue(
                         null, (e) -> channel.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue()));
-            }
             else
-                welcome.sendMessage(parser.parse(msg).trim()).queue();
+                welcome.sendMessage(parser.parse(msg).trim()).queueAfter(2, TimeUnit.SECONDS);
         }
     }
 
@@ -94,14 +90,10 @@ public class ServerLogging extends ListenerAdapter
         if(!(tc==null))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-            {
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                     null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-            }
             else
-            {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldmember.getName()+"**#**"+oldmember.getDiscriminator()+"** ("+oldmember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
-            }
         }
     }
 
@@ -111,14 +103,13 @@ public class ServerLogging extends ListenerAdapter
         TextChannel tc = db.getServerlogChannel(event.getGuild());
 
         if(!(tc==null) && !(event.getAuthor().isBot()))
-        {
             MessagesLogging.addMessage(event.getMessage().getIdLong(), event.getMessage());
-        }
     }
 
     @Override
     public void onGuildMessageUpdate(GuildMessageUpdateEvent event)
     {
+        EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
         TextChannel tc = db.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
@@ -126,13 +117,11 @@ public class ServerLogging extends ListenerAdapter
         String title;
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
 
-        if(!(message.getContent().equals("No cached message")) && !(tc==null))
+        if(!(message.getContent().equals("No cached message")) && !(tc==null) && !(event.getAuthor().isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-            {
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                         null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-            }
             else
             {
                 title = "`[Message Edited]:` :pencil2: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was edited in "+message.getTextChannel().getAsMention()+":";
@@ -144,21 +133,19 @@ public class ServerLogging extends ListenerAdapter
                 builder.setColor(event.getGuild().getSelfMember().getColor());
                 builder.setTimestamp(message.getCreationTime());
 
-                tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
-
-                MessagesLogging.removeMessage(newmsg.getIdLong());
-                MessagesLogging.addMessage(newmsg.getIdLong(), newmsg);
+                tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> {
+                    MessagesLogging.removeMessage(newmsg.getIdLong());
+                    MessagesLogging.addMessage(newmsg.getIdLong(), newmsg);
+                });
             }
         }
         else
         {
-            if(!(tc==null))
+            if(!(tc==null) && !(event.getAuthor().isBot()))
             {
                 if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                {
                     guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                             null, (e) -> tc.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-                }
                 else
                 {
                     title = "`[Message Edited]:` :pencil2: A message was edited:";
@@ -168,10 +155,10 @@ public class ServerLogging extends ListenerAdapter
                     builder.setFooter("Message ID: " + event.getMessageId(), null);
                     builder.setColor(event.getGuild().getSelfMember().getColor());
 
-                    tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
-
-                    MessagesLogging.removeMessage(newmsg.getIdLong());
-                    MessagesLogging.addMessage(newmsg.getIdLong(), newmsg);
+                    tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> {
+                        MessagesLogging.removeMessage(newmsg.getIdLong());
+                        MessagesLogging.addMessage(newmsg.getIdLong(), newmsg);
+                    });
                 }
             }
         }
@@ -182,19 +169,18 @@ public class ServerLogging extends ListenerAdapter
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent event)
     {
+        EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
         TextChannel tc = db.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         String title;
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
 
-        if(!(message.getContent().equals("No cached message")) && !(tc==null))
+        if(!(message.getContent().equals("No cached message")) && !(tc==null) && !(message.getAuthor().isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-            {
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                         null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-            }
             else
             {
                 title = "`[Message Deleted]:` :wastebasket: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was deleted in "+message.getTextChannel().getAsMention()+":";
@@ -205,20 +191,16 @@ public class ServerLogging extends ListenerAdapter
                 builder.setColor(event.getGuild().getSelfMember().getColor());
                 builder.setTimestamp(message.getCreationTime());
 
-                tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
-
-                MessagesLogging.removeMessage(message.getIdLong());
+                tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> MessagesLogging.removeMessage(message.getIdLong()));
             }
         }
         else
         {
-            if(!(tc==null))
+            if(!(tc==null) && !(message.getAuthor()==null))
             {
                 if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                {
                     guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                             null, (e) -> tc.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-                }
                 else
                 {
                     title = "`[Message Deleted]:` :wastebasket: A message was deleted:";
@@ -227,9 +209,7 @@ public class ServerLogging extends ListenerAdapter
                     builder.setFooter("Message ID: " + event.getMessageId(), null);
                     builder.setColor(event.getGuild().getSelfMember().getColor());
 
-                    tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
-
-                    MessagesLogging.removeMessage(message.getIdLong());
+                    tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> MessagesLogging.removeMessage(message.getIdLong()));
                 }
             }
         }
@@ -243,7 +223,7 @@ public class ServerLogging extends ListenerAdapter
         User user = event.getUser();
         String title = "`[Avatar Update]:` :frame_photo: **"+user.getName()+"#"+user.getDiscriminator()+"** changed their avatar: ";
 
-        if(!(guilds.isEmpty()))
+        if(!(guilds.isEmpty()) && !(user.isBot()))
         {
             for(Guild guild : guilds)
             {
@@ -253,10 +233,8 @@ public class ServerLogging extends ListenerAdapter
                 if(!(tc==null))
                 {
                     if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                    {
                         guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                                 null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-                    }
                     else
                     {
                         builder.setAuthor(user.getName(), null, user.getEffectiveAvatarUrl());
@@ -285,17 +263,13 @@ public class ServerLogging extends ListenerAdapter
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null))
+        if(!(tc==null) && !(user.isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-            {
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                         null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-            }
             else
-            {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Join]:`  **"+user.getName()+"#"+user.getDiscriminator()+"** has joined a Voice Channel: **"+vc.getName()+"** (ID: "+vc.getId()+")").queue();
-            }
         }
     }
 
@@ -314,17 +288,13 @@ public class ServerLogging extends ListenerAdapter
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null))
+        if(!(tc==null) && !(user.isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-            {
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                         null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-            }
             else
-            {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Move]:` **"+user.getName()+"#"+user.getDiscriminator()+"** switched between Voice Channels: From: **"+vcold.getName()+"** To: **"+vcnew.getName()+"**").queue();
-            }
         }
     }
 
@@ -342,17 +312,13 @@ public class ServerLogging extends ListenerAdapter
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null))
+        if(!(tc==null) && !(user.isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-            {
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                         null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-            }
             else
-            {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Left]:` **"+user.getName()+"#"+user.getDiscriminator()+"** left a Voice Channel: **"+vc.getName()+"**").queue();
-            }
         }
     }
 }
