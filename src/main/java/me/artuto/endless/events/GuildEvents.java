@@ -2,22 +2,23 @@ package me.artuto.endless.events;
 
 import me.artuto.endless.Const;
 import me.artuto.endless.loader.Config;
+import me.artuto.endless.tempdata.AfkManager;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.GuildUtils;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
-public class GuildBotEvents extends ListenerAdapter
+public class GuildEvents extends ListenerAdapter
 {
     private final Config config;
 
-    public GuildBotEvents(Config config)
+    public GuildEvents(Config config)
     {
         this.config = config;
     }
@@ -90,6 +91,59 @@ public class GuildBotEvents extends ListenerAdapter
                 builder.append("`[Reason]:` "+reason);
 
             tc.sendMessage(builder.toString()).queue();
+        }
+    }
+
+    @Override
+    public void onGuildMessageReceived(GuildMessageReceivedEvent event)
+    {
+        SimpleLog LOG = SimpleLog.getLog("AFK Manager");
+        User author = event.getAuthor();
+        Message msg = event.getMessage();
+        String message;
+
+        if(AfkManager.isAfk(author.getIdLong()))
+        {
+            author.openPrivateChannel().queue(pc -> pc.sendMessage(config.getDoneEmote()+" I've removed your AFK status.").queue(null,
+                    (e) -> LOG.warn("I was not able to DM "+author.getName()+"#"+author.getDiscriminator()+" about removing its AFK status.")));
+            AfkManager.unsetAfk(author.getIdLong());
+        }
+
+        for(Member afk : event.getGuild().getMembers())
+        {
+            User user = afk.getUser();
+            message = ":bed: **"+user.getName()+"** is AFK!";
+
+            if(AfkManager.isAfk(user.getIdLong()))
+            {
+                if(msg.getMentionedUsers().contains(user))
+                {
+                    if(!(user.isBot()))
+                    {
+                        EmbedBuilder builder = new EmbedBuilder();
+
+                        builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
+                        builder.setDescription(msg.getContent());
+                        builder.setFooter("#"+msg.getTextChannel().getName()+", "+event.getGuild().getName(), event.getGuild().getIconUrl());
+                        builder.setTimestamp(msg.getCreationTime());
+                        builder.setColor(event.getMember().getColor());
+
+                        user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, null));
+                    }
+
+                    if(AfkManager.getMessage(user.getIdLong())==null)
+                        event.getChannel().sendMessage(message).queue();
+                    else
+                    {
+                        EmbedBuilder builder = new EmbedBuilder();
+
+                        builder.setDescription(AfkManager.getMessage(user.getIdLong()));
+                        builder.setColor(event.getGuild().getMember(user).getColor());
+
+                        event.getChannel().sendMessage(new MessageBuilder().append(message).setEmbed(builder.build()).build()).queue();
+                    }
+                }
+            }
         }
     }
 }

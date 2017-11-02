@@ -30,7 +30,8 @@ import javax.security.auth.login.LoginException;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.*;
 import me.artuto.endless.data.DatabaseManager;
-import me.artuto.endless.events.GuildBotEvents;
+import me.artuto.endless.events.GuildEvents;
+import me.artuto.endless.events.UserEvents;
 import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.utils.GuildUtils;
 import me.artuto.endless.logging.ModLogging;
@@ -133,7 +134,8 @@ public class Endless extends ListenerAdapter
                 new Welcome(db),
                 
                 //Tools
-               
+
+                new Afk(),
                 new Avatar(),
                 new DBansCheck(config),
                 new GuildInfo(),
@@ -167,7 +169,8 @@ public class Endless extends ListenerAdapter
             .addEventListener(new Logging(config))
             .addEventListener(new GuildBlacklist())
             .addEventListener(new ServerLogging(db))
-            .addEventListener(new GuildBotEvents(config))
+            .addEventListener(new GuildEvents(config))
+            .addEventListener(new UserEvents(config))
             .buildBlocking();
 
         LOG.info("Leaving Pointless Guilds...");

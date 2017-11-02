@@ -1,19 +1,19 @@
-package me.artuto.endless.logging;
+package me.artuto.endless.tempdata;
 
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import java.util.HashMap;
 
-class MessagesLogging
+public class MessagesLogging
 {
     private static HashMap<Long,Message> messages = new HashMap<>();
 
-    static void addMessage(Long id, Message msg)
+    public static void addMessage(Long id, Message msg)
     {
         messages.put(id, msg);
     }
 
-    static Message getMsg(Long id)
+    public static Message getMsg(Long id)
     {
         if(messages.containsKey(id))
             return messages.get(id);
@@ -21,12 +21,12 @@ class MessagesLogging
             return new MessageBuilder().append("No cached message").build();
     }
 
-    static HashMap<Long, Message> getMap()
+    public static HashMap<Long, Message> getMap()
     {
         return messages;
     }
 
-    static void removeMessage(Long id)
+    public static void removeMessage(Long id)
     {
         if(messages.containsKey(id))
             messages.remove(id);

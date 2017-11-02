@@ -20,13 +20,13 @@ public class BlacklistUsers extends Command
     public BlacklistUsers(DatabaseManager db)
     {
         this.db = db;
-        this.name = "ignoreuser";
-        this.help = "Adds, removes or displays the list with ignored users.";
+        this.name = "blacklistuser";
+        this.help = "Adds, removes or displays the list with blacklisted users.";
         this.category = Categories.BOTADM;
         this.children = new Command[]{new Add(), new Remove(), new Check(), new BlacklistList()};
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
+        this.ownerCommand = true;
         this.guildOnly = false;
     }
 
@@ -38,18 +38,18 @@ public class BlacklistUsers extends Command
         if(event.getArgs().isEmpty())
         {
             event.replyWarning("Please choose a subcommand:\n" +
-                    "- `"+prefix+"ignoreuser add`: Adds a user ID to the blacklisted users list.\n" +
-                    "- `"+prefix+"ignoreuser remove`: Removes a user ID from the blacklisted users list.\n" +
-                    "- `"+prefix+"ignoreuser list`: Displays blacklisted users.\n" +
-                    "- `"+prefix+"ignoreuser check`: Checks if a user ID is blacklisted.");
+                    "- `"+prefix+"blacklistuser add`: Adds a user ID to the blacklisted users list.\n" +
+                    "- `"+prefix+"blacklistuser remove`: Removes a user ID from the blacklisted users list.\n" +
+                    "- `"+prefix+"blacklistuser list`: Displays blacklisted users.\n" +
+                    "- `"+prefix+"blacklistuser check`: Checks if a user ID is blacklisted.");
         }
-        else if(!(event.getArgs().contains("add")) || !(event.getArgs().contains("remove")) || !(event.getArgs().contains("list")))
+        else if(!(event.getArgs().contains("add")) || !(event.getArgs().contains("remove")) || !(event.getArgs().contains("list") || !(event.getArgs().contains("check"))))
         {
             event.replyWarning("Please choose a subcommand:\n" +
-                    "- `"+prefix+"ignoreuser add`: Adds a user ID to the blacklisted users list.\n" +
-                    "- `"+prefix+"ignoreuser remove`: Removes a user ID from the blacklisted users list.\n" +
-                    "- `"+prefix+"ignoreuser list`: Displays blacklisted users.\n" +
-                    "- `"+prefix+"ignoreuser check`: Checks if a user ID is blacklisted.");
+                    "- `"+prefix+"blacklistuser add`: Adds a user ID to the blacklisted users list.\n" +
+                    "- `"+prefix+"blacklistuser remove`: Removes a user ID from the blacklisted users list.\n" +
+                    "- `"+prefix+"blacklistuser list`: Displays blacklisted users.\n" +
+                    "- `"+prefix+"blacklistuser check`: Checks if a user ID is blacklisted.");
         }
     }
 
