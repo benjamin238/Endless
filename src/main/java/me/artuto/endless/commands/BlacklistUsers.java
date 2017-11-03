@@ -3,7 +3,7 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.data.BlacklistDataManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 public class BlacklistUsers extends Command
 {
-    private final DatabaseManager db;
+    private final BlacklistDataManager db;
 
-    public BlacklistUsers(DatabaseManager db)
+    public BlacklistUsers(BlacklistDataManager db)
     {
         this.db = db;
         this.name = "blacklistuser";

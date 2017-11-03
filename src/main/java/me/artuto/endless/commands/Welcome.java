@@ -3,15 +3,15 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.data.LoggingDataManager;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
 public class Welcome extends Command
 {
-    private final DatabaseManager db;
+    private final LoggingDataManager db;
 
-    public Welcome(DatabaseManager db)
+    public Welcome(LoggingDataManager db)
     {
         this.db = db;
         this.name = "welcome";
@@ -39,9 +39,9 @@ public class Welcome extends Command
 
     private class Change extends Command
     {
-        private final DatabaseManager db;
+        private final LoggingDataManager db;
 
-        public Change(DatabaseManager db)
+        public Change(LoggingDataManager db)
         {
             this.db = db;
             this.name = "change";

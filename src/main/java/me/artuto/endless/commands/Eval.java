@@ -23,7 +23,10 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.data.BlacklistDataManager;
 import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.data.JLDataManager;
+import me.artuto.endless.data.LoggingDataManager;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.Permission;
@@ -43,12 +46,18 @@ public class Eval extends Command
     private List<String> imports;
     private final Config config;
     private final DatabaseManager db;
+    private final LoggingDataManager ldm;
+    private final BlacklistDataManager bdm;
+    private final JLDataManager jldm;
     private final ModLogging modlog;
     
-    public Eval(Config config, DatabaseManager db, ModLogging modlog)
+    public Eval(Config config, DatabaseManager db, LoggingDataManager ldm, BlacklistDataManager bdm, JLDataManager jldm, ModLogging modlog)
     {
-        this.config = config;
+        this.ldm = ldm;
         this.db = db;
+        this.bdm = bdm;
+        this.jldm = jldm;
+        this.config = config;
         this.modlog = modlog;
         this.name = "eval";
         this.help = "Executes Groovy code";
@@ -113,8 +122,11 @@ public class Eval extends Command
             engine.put("bot", event.getSelfUser());
             engine.put("client", event.getClient());
             engine.put("author", event.getAuthor());
-            engine.put("config", config);
+            engine.put("bdm", bdm);
+            engine.put("ldm", ldm);
+            engine.put("jldm", jldm);
             engine.put("db", db);
+            engine.put("config", config);
             engine.put("modlog", modlog);
             if(event.isFromType(ChannelType.TEXT))
             {

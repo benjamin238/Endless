@@ -18,22 +18,17 @@
 package me.artuto.endless.logging;
 
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.data.LoggingDataManager;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.time.OffsetDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-import me.artuto.endless.Bot;
-import me.artuto.endless.data.Settings;
 
 /**
  *
@@ -43,9 +38,9 @@ import me.artuto.endless.data.Settings;
 
 public class ModLogging 
 {
-    private static DatabaseManager db;
+    private static LoggingDataManager db;
 
-    public ModLogging(DatabaseManager db)
+    public ModLogging(LoggingDataManager db)
     {
         ModLogging.db = db;
     }

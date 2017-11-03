@@ -3,7 +3,7 @@ package me.artuto.endless.logging;
 import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.data.LoggingDataManager;
 import me.artuto.endless.tempdata.MessagesLogging;
 import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.FinderUtil;
@@ -27,10 +27,10 @@ import java.util.concurrent.TimeUnit;
 
 public class ServerLogging extends ListenerAdapter
 {
-    private static DatabaseManager db;
+    private static LoggingDataManager db;
     private final Parser parser;
 
-    public ServerLogging(DatabaseManager db)
+    public ServerLogging(LoggingDataManager db)
     {
         ServerLogging.db = db;
         this.parser = new ParserBuilder()

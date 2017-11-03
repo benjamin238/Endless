@@ -19,6 +19,7 @@ package me.artuto.endless;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import com.jagrosh.jdautilities.commandclient.CommandClient;
 import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
 import java.io.IOException;
@@ -29,7 +30,10 @@ import javax.security.auth.login.LoginException;
 
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.*;
+import me.artuto.endless.data.BlacklistDataManager;
 import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.data.JLDataManager;
+import me.artuto.endless.data.LoggingDataManager;
 import me.artuto.endless.events.GuildEvents;
 import me.artuto.endless.events.UserEvents;
 import me.artuto.endless.logging.ServerLogging;
@@ -52,34 +56,59 @@ import org.slf4j.LoggerFactory;
 
 public class Endless extends ListenerAdapter
 {   
-    private static final SimpleLog LOG = SimpleLog.getLog("Startup Checker");
+    private static final SimpleLog LOG = SimpleLog.getLog("Endless");
     private static Config config;
+    private ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
+    private EventWaiter waiter = new EventWaiter();
+    private Bot bot = new Bot(config);
+    private BlacklistDataManager bdm;
+    private DatabaseManager db;
+    private JLDataManager jldm;
+    private LoggingDataManager ldm;
+    private Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    private ModLogging modlog = new ModLogging(ldm);
+    private Categories cat = new Categories(bdm);
+    private GuildUtils gutils = new GuildUtils(config, db);
+    private JDA jda;
 
-    public static void main(String[] args) throws IOException, LoginException, IllegalArgumentException, RateLimitedException, InterruptedException, SQLException
+    public void main(String[] args) throws IOException, SQLException, LoginException, RateLimitedException, InterruptedException
     {
+        log.setLevel(Level.INFO);
+
+        LOG.info("Starting Endless "+Const.VERSION+"...");
+        LOG.info("Loading config file...");
+
         try
         {
             config = new Config();
         }
         catch(Exception e)
         {
-            LOG.fatal(e);
+            LOG.fatal("No valid config file found! Make sure you edited the config.yml.sample file!");
             e.printStackTrace();
             return;
         }
 
-        //Register Commands and some other things
+        LOG.info("Starting Database and Managers...");
+        initializeData();
+        LOG.info("");
 
-        ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
-        EventWaiter waiter = new EventWaiter();
-        Bot bot = new Bot(config);
+        LOG.info("Starting JDA...");
+        startJda();
+        LOG.info("");
+    }
+
+    public void initializeData() throws SQLException
+    {
+        db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
+        bdm = new BlacklistDataManager(db);
+        ldm = new LoggingDataManager(db);
+        jldm = new JLDataManager(db);
+    }
+
+    public CommandClient createClient()
+    {
         CommandClientBuilder client = new CommandClientBuilder();
-        Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        log.setLevel(Level.INFO);
-        DatabaseManager db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
-        ModLogging modlog = new ModLogging(db);
-        Categories cat = new Categories(db);
-        GuildUtils gutils = new GuildUtils(config, db);
         Long[] coOwners = config.getCoOwnerIds();
         String[] owners = new String[coOwners.length];
 
@@ -103,36 +132,36 @@ public class Endless extends ListenerAdapter
             client.setDiscordBotListKey(config.getDBotsListToken());
 
         client.addCommands(
-        	    //Bot
+                //Bot
 
                 new About(),
                 new Donate(),
                 new Invite(),
                 new Ping(),
                 new Stats(),
-                
+
                 //Bot Administration
-                
+
                 new Bash(),
-                new BlacklistUsers(db),
+                new BlacklistUsers(bdm),
                 new BotCPanel(),
-                new Eval(config, db, modlog),
+                new Eval(config, db, ldm, bdm, jldm, modlog),
                 new Shutdown(db),
-                
+
                 //Moderation
-                
+
                 new Ban(modlog, config),
                 new Clear(modlog, threads),
                 new Kick(modlog, config),
                 new Hackban(modlog, config),
                 new SoftBan(modlog, config),
                 new Unban(modlog, config),
-                
+
                 //Settings
-                
-                new ServerSettings(db),
-                new Welcome(db),
-                
+
+                new ServerSettings(ldm, jldm),
+                new Welcome(ldm),
+
                 //Tools
 
                 new Afk(),
@@ -142,7 +171,7 @@ public class Endless extends ListenerAdapter
                 new Lookup(),
                 new RoleInfo(),
                 new UserInfo(),
-        
+
                 //Fun
 
                 new Cat(config),
@@ -155,34 +184,40 @@ public class Endless extends ListenerAdapter
 
                 new GoogleSearch(),
                 new Translate(config));
-        
-        //JDA Connection
 
-        JDA jda = new JDABuilder(AccountType.BOT)
-            .setToken(config.getToken())
-            .setStatus(OnlineStatus.DO_NOT_DISTURB)
-            .setGame(Game.of(Const.GAME_0))
-            .addEventListener(waiter)
-            .addEventListener(client.build())
-            .addEventListener(bot)
-            .addEventListener(new Endless())
-            .addEventListener(new Logging(config))
-            .addEventListener(new GuildBlacklist())
-            .addEventListener(new ServerLogging(db))
-            .addEventListener(new GuildEvents(config))
-            .addEventListener(new UserEvents(config))
-            .buildBlocking();
+        return client.build();
 
-        LOG.info("Leaving Pointless Guilds...");
-        GuildUtils.leaveBadGuilds(jda);
-        LOG.info("Done!");
-    }    
+    }
+
+    public JDA startJda() throws LoginException, RateLimitedException, InterruptedException
+    {
+        jda = new JDABuilder(AccountType.BOT)
+                .setToken(config.getToken())
+                .setStatus(OnlineStatus.DO_NOT_DISTURB)
+                .setGame(Game.of(Const.GAME_0))
+                .addEventListener(waiter)
+                .addEventListener(createClient())
+                .addEventListener(bot)
+                .addEventListener(new Endless())
+                .addEventListener(new Logging(config))
+                .addEventListener(new GuildBlacklist())
+                .addEventListener(new ServerLogging(ldm))
+                .addEventListener(new GuildEvents(config))
+                .addEventListener(new UserEvents(config))
+                .buildBlocking();
+
+        return jda;
+    }
 
     //When ready print the bot info
     
     @Override
     public void onReady(ReadyEvent event)
     {
+        LOG.info("Leaving Pointless Guilds...");
+        GuildUtils.leaveBadGuilds(jda);
+        LOG.info("Done!");
+
         SimpleLog LOG = SimpleLog.getLog("Endless");
 
         User selfuser = event.getJDA().getSelfUser();

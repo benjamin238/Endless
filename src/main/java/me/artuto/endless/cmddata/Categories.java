@@ -1,15 +1,15 @@
 package me.artuto.endless.cmddata;
 
 import com.jagrosh.jdautilities.commandclient.Command.Category;
-import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.data.BlacklistDataManager;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
 public class Categories
 {
-    private static DatabaseManager db;
+    private static BlacklistDataManager db;
 
-    public Categories(DatabaseManager db)
+    public Categories(BlacklistDataManager db)
     {
         Categories.db = db;
     }
