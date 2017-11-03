@@ -58,20 +58,20 @@ public class Endless extends ListenerAdapter
 {   
     private static final SimpleLog LOG = SimpleLog.getLog("Endless");
     private static Config config;
-    private ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
-    private EventWaiter waiter = new EventWaiter();
-    private Bot bot = new Bot(config);
-    private BlacklistDataManager bdm;
-    private DatabaseManager db;
-    private JLDataManager jldm;
-    private LoggingDataManager ldm;
-    private Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-    private ModLogging modlog = new ModLogging(ldm);
+    private static ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
+    private static EventWaiter waiter = new EventWaiter();
+    private static Bot bot = new Bot(config);
+    private static BlacklistDataManager bdm;
+    private static DatabaseManager db;
+    private static JLDataManager jldm;
+    private static LoggingDataManager ldm;
+    private static Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    private static ModLogging modlog = new ModLogging(ldm);
     private Categories cat = new Categories(bdm);
     private GuildUtils gutils = new GuildUtils(config, db);
-    private JDA jda;
+    private static JDA jda;
 
-    public void main(String[] args) throws IOException, SQLException, LoginException, RateLimitedException, InterruptedException
+    public static void main(String[] args) throws IOException, SQLException, LoginException, RateLimitedException, InterruptedException
     {
         log.setLevel(Level.INFO);
 
@@ -81,6 +81,7 @@ public class Endless extends ListenerAdapter
         try
         {
             config = new Config();
+            LOG.info("Successfully loaded config file!");
         }
         catch(Exception e)
         {
@@ -91,14 +92,13 @@ public class Endless extends ListenerAdapter
 
         LOG.info("Starting Database and Managers...");
         initializeData();
-        LOG.info("");
+        LOG.info("Successfully loaded Databases and Managers!");
 
         LOG.info("Starting JDA...");
         startJda();
-        LOG.info("");
     }
 
-    public void initializeData() throws SQLException
+    public static void initializeData() throws SQLException
     {
         db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
         bdm = new BlacklistDataManager(db);
@@ -106,7 +106,7 @@ public class Endless extends ListenerAdapter
         jldm = new JLDataManager(db);
     }
 
-    public CommandClient createClient()
+    public static CommandClient createClient()
     {
         CommandClientBuilder client = new CommandClientBuilder();
         Long[] coOwners = config.getCoOwnerIds();
@@ -160,7 +160,7 @@ public class Endless extends ListenerAdapter
                 //Settings
 
                 new ServerSettings(ldm, jldm),
-                new Welcome(ldm),
+                new Welcome(jldm),
 
                 //Tools
 
@@ -189,7 +189,7 @@ public class Endless extends ListenerAdapter
 
     }
 
-    public JDA startJda() throws LoginException, RateLimitedException, InterruptedException
+    public static JDA startJda() throws LoginException, RateLimitedException, InterruptedException
     {
         jda = new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
@@ -201,7 +201,7 @@ public class Endless extends ListenerAdapter
                 .addEventListener(new Endless())
                 .addEventListener(new Logging(config))
                 .addEventListener(new GuildBlacklist())
-                .addEventListener(new ServerLogging(ldm))
+                .addEventListener(new ServerLogging(ldm, jldm))
                 .addEventListener(new GuildEvents(config))
                 .addEventListener(new UserEvents(config))
                 .buildBlocking();
@@ -215,7 +215,7 @@ public class Endless extends ListenerAdapter
     public void onReady(ReadyEvent event)
     {
         LOG.info("Leaving Pointless Guilds...");
-        GuildUtils.leaveBadGuilds(jda);
+        GuildUtils.leaveBadGuilds(event.getJDA());
         LOG.info("Done!");
 
         SimpleLog LOG = SimpleLog.getLog("Endless");

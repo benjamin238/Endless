@@ -3,19 +3,19 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.LoggingDataManager;
+import me.artuto.endless.data.JLDataManager;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
 public class Welcome extends Command
 {
-    private final LoggingDataManager db;
+    private final JLDataManager db;
 
-    public Welcome(LoggingDataManager db)
+    public Welcome(JLDataManager db)
     {
         this.db = db;
         this.name = "welcome";
-        this.children = new Command[]{new Change(db)};
+        this.children = new Command[]{new Change()};
         this.aliases = new String[]{"welcomemessage", "welcomemsg"};
         this.help = "Changes or shows the welcome message";
         this.category = Categories.TOOLS;
@@ -39,11 +39,8 @@ public class Welcome extends Command
 
     private class Change extends Command
     {
-        private final LoggingDataManager db;
-
-        public Change(LoggingDataManager db)
+        public Change()
         {
-            this.db = db;
             this.name = "change";
             this.help = "Changes the welcome message";
             this.category = Categories.TOOLS;
