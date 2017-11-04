@@ -159,6 +159,7 @@ public class Endless extends ListenerAdapter
 
                 //Settings
 
+                new Leave(jldm),
                 new ServerSettings(ldm, jldm),
                 new Welcome(jldm),
 

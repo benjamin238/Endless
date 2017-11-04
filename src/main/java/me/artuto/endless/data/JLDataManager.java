@@ -82,10 +82,10 @@ public class JLDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             TextChannel tc;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT welcome_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try (ResultSet results = statement.executeQuery(String.format("SELECT leave_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
                 if(results.next())
-                    tc = guild.getTextChannelById(Long.toString(results.getLong("welcome_id")));
+                    tc = guild.getTextChannelById(Long.toString(results.getLong("leave_id")));
                 else tc=null;
             }
             return tc;
@@ -104,18 +104,18 @@ public class JLDataManager
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, leave_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
                 if(results.next())
                 {
-                    results.updateLong("welcome_id", tc==null ? 0l : tc.getIdLong());
+                    results.updateLong("leave_id", tc==null ? 0l : tc.getIdLong());
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("welcome_id", tc==null ? 0l : tc.getIdLong());
+                    results.updateLong("leave_id", tc==null ? 0l : tc.getIdLong());
                     results.insertRow();
                 }
             }
@@ -184,10 +184,10 @@ public class JLDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             String message;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT welcome_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try (ResultSet results = statement.executeQuery(String.format("SELECT leave_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
                 if(results.next())
-                    message = results.getString("welcome_msg");
+                    message = results.getString("leave_msg");
                 else message="";
             }
             return message;
@@ -206,18 +206,18 @@ public class JLDataManager
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_msg FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, leave_msg FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
                 if(results.next())
                 {
-                    results.updateString("welcome_msg", message.isEmpty() ? "" : message);
+                    results.updateString("leave_msg", message.isEmpty() ? null : message);
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateString("welcome_msg", message.isEmpty() ? "" : message);
+                    results.updateString("leave_msg", message.isEmpty() ? null : message);
                     results.insertRow();
                 }
             }

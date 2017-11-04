@@ -46,4 +46,5 @@ public class Messages
     public static String MODLOG_NOPERMISSIONS = "You have a modlog channel configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write`, `Send Images` and `Read History`!";
     public static String SRVLOG_NOPERMISSIONS = "You have a serverlog channel configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write`, `Send Images` and `Read History`!";
     public static String WELCOME_NOPERMISSIONS = "You have a welcome channel configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write` and `Read History`!";
+    public static String LEAVE_NOPERMISSIONS = "You have a leave channel configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write` and `Read History`!";
 }

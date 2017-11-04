@@ -68,7 +68,7 @@ public class ServerLogging extends ListenerAdapter
                 serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Join]:` :inbox_tray: :bust_in_silhouette: **"+newmember.getName()+"**#**"+newmember.getDiscriminator()+"** ("+newmember.getId()+") joined the guild! User count: **"+guild.getMembers().size()+"** members").queue();
         }
 
-        if(!(welcome==null) && !(msg.isEmpty()))
+        if(!(welcome==null) && !(msg==null))
         {
             if(!(welcome.getGuild().getSelfMember().hasPermission(welcome, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue(
@@ -82,7 +82,8 @@ public class ServerLogging extends ListenerAdapter
     public void onGuildMemberLeave(GuildMemberLeaveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = ldm.getServerlogChannel(guild);
+        TextChannel serverlog = ldm.getServerlogChannel(guild);
+        TextChannel leave = jldm.getLeaveChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User oldmember = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
@@ -90,14 +91,25 @@ public class ServerLogging extends ListenerAdapter
         String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+        String msg = jldm.getLeaveMessage(guild);
+        parser.clear().put("user", oldmember).put("guild", guild).put("channel", leave);
 
-        if(!(tc==null))
+        if(!(serverlog==null))
         {
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                     null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldmember.getName()+"**#**"+oldmember.getDiscriminator()+"** ("+oldmember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+                serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldmember.getName()+"**#**"+oldmember.getDiscriminator()+"** ("+oldmember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+        }
+
+        if(!(leave==null) && !(msg==null))
+        {
+            if(!(leave.getGuild().getSelfMember().hasPermission(leave, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)))
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue(
+                        null, (e) -> channel.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue()));
+            else
+                leave.sendMessage(parser.parse(msg).trim()).queue();
         }
     }
 
@@ -166,8 +178,6 @@ public class ServerLogging extends ListenerAdapter
                 }
             }
         }
-
-
     }
 
     @Override

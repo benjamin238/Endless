@@ -217,7 +217,7 @@ public class ServerSettings extends Command
                     event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    jldm.setWelcomeChannel(event.getGuild(), list.get(0));
+                    jldm.setLeaveChannel(event.getGuild(), list.get(0));
                     event.replySuccess("The message configured will be sent in "+list.get(0).getAsMention());
                 }
             }
