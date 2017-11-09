@@ -1,6 +1,7 @@
 package me.artuto.endless.events;
 
 import me.artuto.endless.Const;
+import me.artuto.endless.data.TagDataManager;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.tempdata.AfkManager;
 import me.artuto.endless.utils.FinderUtil;
@@ -14,13 +15,17 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.utils.SimpleLog;
 
+import java.util.List;
+
 public class GuildEvents extends ListenerAdapter
 {
     private final Config config;
+    private final TagDataManager tdm;
 
-    public GuildEvents(Config config)
+    public GuildEvents(Config config, TagDataManager tdm)
     {
         this.config = config;
+        this.tdm = tdm;
     }
 
     private String getReason(Guild guild)
@@ -101,6 +106,17 @@ public class GuildEvents extends ListenerAdapter
         User author = event.getAuthor();
         Message msg = event.getMessage();
         String message;
+        List<String> importedT = tdm.getImportedTags();
+
+        for(String tag : importedT)
+        {
+            if(msg.getContent().startsWith(config.getPrefix()+tag))
+            {
+                String content = tdm.getTagContent(tag);
+
+                event.getChannel().sendMessage(content).queue();
+            }
+        }
 
         if(AfkManager.isAfk(author.getIdLong()))
         {

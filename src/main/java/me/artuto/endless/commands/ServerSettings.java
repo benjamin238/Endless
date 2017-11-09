@@ -42,14 +42,16 @@ public class ServerSettings extends Command
         TextChannel modlog = ldm.getModlogChannel(guild);
         TextChannel serverlog = ldm.getServerlogChannel(guild);
         TextChannel welcome = jldm.getWelcomeChannel(guild);
+        TextChannel leave = jldm.getLeaveChannel(guild);
         EmbedBuilder builder = new EmbedBuilder();
-        String title = ":information_source: Settings of **"+event.getGuild().getName()+"**";
+        String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
 
         try
         {
             builder.addField("Modlog Channel: ", (modlog==null?"None":modlog.getAsMention()), true);
             builder.addField("Serverlog Channel: ", (serverlog==null?"None":serverlog.getAsMention()), true);
             builder.addField("Welcome Channel: ", (welcome==null?"None":welcome.getAsMention()), true);
+            builder.addField("Leave Channel: ", (leave==null?"None":leave.getAsMention()), true);
             builder.setColor(event.getSelfMember().getColor());
 
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();

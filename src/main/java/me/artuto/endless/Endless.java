@@ -30,10 +30,7 @@ import javax.security.auth.login.LoginException;
 
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.*;
-import me.artuto.endless.data.BlacklistDataManager;
-import me.artuto.endless.data.DatabaseManager;
-import me.artuto.endless.data.JLDataManager;
-import me.artuto.endless.data.LoggingDataManager;
+import me.artuto.endless.data.*;
 import me.artuto.endless.events.GuildEvents;
 import me.artuto.endless.events.UserEvents;
 import me.artuto.endless.logging.ServerLogging;
@@ -65,6 +62,7 @@ public class Endless extends ListenerAdapter
     private static DatabaseManager db;
     private static JLDataManager jldm;
     private static LoggingDataManager ldm;
+    private static TagDataManager tdm;
     private static Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     private static ModLogging modlog = new ModLogging(ldm);
     private Categories cat = new Categories(bdm);
@@ -104,6 +102,7 @@ public class Endless extends ListenerAdapter
         bdm = new BlacklistDataManager(db);
         ldm = new LoggingDataManager(db);
         jldm = new JLDataManager(db);
+        tdm = new TagDataManager(db);
     }
 
     public static CommandClient createClient()
@@ -180,6 +179,7 @@ public class Endless extends ListenerAdapter
                 new Dog(config),
                 new GiphyGif(config),
                 new Say(),
+                new Tag(tdm),
 
                 //Utils
 
@@ -203,7 +203,7 @@ public class Endless extends ListenerAdapter
                 .addEventListener(new Logging(config))
                 .addEventListener(new GuildBlacklist())
                 .addEventListener(new ServerLogging(ldm, jldm))
-                .addEventListener(new GuildEvents(config))
+                .addEventListener(new GuildEvents(config, tdm))
                 .addEventListener(new UserEvents(config))
                 .buildBlocking();
 
