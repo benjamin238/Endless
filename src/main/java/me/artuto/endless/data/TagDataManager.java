@@ -27,19 +27,11 @@ public class TagDataManager
             statement.closeOnCompletion();
             try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name = \"%s\"", name)))
             {
-                if(results.next())
-                {
-                    results.updateString("tag_content", content);
-                    results.updateRow();
-                }
-                else
-                {
-                    results.moveToInsertRow();
-                    results.updateString("tag_name", name);
-                    results.updateString("tag_content", content);
-                    results.updateLong("tag_owner", owner);
-                    results.insertRow();
-                }
+                results.moveToInsertRow();
+                results.updateString("tag_name", name);
+                results.updateString("tag_content", content);
+                results.updateLong("tag_owner", owner);
+                results.insertRow();
             }
         }
         catch(SQLException e)
@@ -56,17 +48,9 @@ public class TagDataManager
             statement.closeOnCompletion();
             try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content FROM TAGS WHERE tag_name = \"%s\"", name)))
             {
-                if(results.next())
-                {
-                    results.updateString("tag_content", content);
-                    results.updateRow();
-                }
-                else
-                {
-                    results.moveToInsertRow();
-                    results.updateString("tag_content", content);
-                    results.insertRow();
-                }
+                results.moveToInsertRow();
+                results.updateString("tag_content", content);
+                results.insertRow();
             }
         }
         catch(SQLException e)
@@ -82,7 +66,7 @@ public class TagDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             String content;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content FROM TAGS WHERE TAG_NAME = \"%s\"", name.trim())))
+            try (ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content FROM TAGS WHERE TAG_NAME = \"%s\"", name)))
             {
                 if(results.next())
                     content = results.getString("tag_content");
@@ -102,7 +86,7 @@ public class TagDataManager
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM TAGS WHERE TAG_NAME = \"%s\"", name.trim())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM TAGS WHERE TAG_NAME = \"%s\"", name)))
             {
                 if(results.next())
                 {
@@ -140,18 +124,39 @@ public class TagDataManager
         }
     }
 
-    public void importTag(String name)
+    public boolean isTagImported(String name, Long guild)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, imported FROM TAGS WHERE tag_name = \"%s\"", name)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name FROM TAGS WHERE tag_name = \"imported-%s:%s\"", guild, name)))
+            {
+                return results.next();
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e);
+            return false;
+        }
+    }
+
+    public void importTag(String name, String content, Long owner, Long guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name = \"%s\"", name)))
             {
                 if(results.next())
                 {
-                    results.updateBoolean("imported", true);
-                    results.updateRow();
+                    results.moveToInsertRow();
+                    results.updateString("tag_name", "imported-"+guild+":"+name);
+                    results.updateString("tag_content", content);
+                    results.updateLong("tag_owner", owner);
+                    results.insertRow();
                 }
             }
         }
@@ -161,20 +166,21 @@ public class TagDataManager
         }
     }
 
-    public void unImportTag(String name)
+    public void unImportTag(String name, Long guild)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, imported FROM TAGS WHERE tag_name = \"%s\"", name)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, imported FROM TAGS WHERE tag_name = \"imported-%s:%s\"", guild, name)))
             {
                 if(results.next())
                 {
-                    results.updateBoolean("imported", false);
+                    results.updateInt("tag_id", 0);
                     results.updateRow();
                 }
             }
+            statement.executeUpdate(String.format("DELETE FROM TAGS WHERE tag_name = \"imported-%s:%s\"", guild, name));
+            statement.closeOnCompletion();
         }
         catch(SQLException e)
         {
@@ -190,12 +196,35 @@ public class TagDataManager
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name, imported FROM TAGS WHERE imported = true"))
+            try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name FROM TAGS WHERE tag_name LIKE \'imported-%\'"))
             {
-                while (results.next())
+                while(results.next())
                     names.add(results.getString("tag_name"));
 
                 return names;
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e);
+            return null;
+        }
+    }
+
+    public List<String> getImportedTagsForGuild(Long guild)
+    {
+        List<String> names = new LinkedList<String>();
+
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name FROM TAGS WHERE tag_name LIKE \'imported-"+guild+":%\'"))
+            {
+                while(results.next())
+                    names.add(results.getString("tag_name"));
+
+                return names.isEmpty()?null:names;
             }
         }
         catch(SQLException e)

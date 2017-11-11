@@ -24,9 +24,20 @@ public class Tag extends Command
                 .setMaxIterations(1000)
                 .build();
         this.name = "tag";
+        this.aliases = new String[]{"t"};
         this.help = "Retrieves a tag with the specified name";
+        this.helpBiConsumer = (event, command) -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Help for **"+command.getName()+"**:\n");
+
+            for(Command c : command.getChildren())
+                sb.append("`"+event.getClient().getPrefix()+c.getName()+" "+c.getArguments()+"` - "+c.getHelp()+"\n");
+
+            event.replyInDM(sb.toString());
+            event.reactSuccess();
+        };
         this.arguments = "<name>";
-        this.children = new Command[]{new Add(), new Delete(), new Edit(), /*new Import(),*/ new Owner(), /*new UnImport()*/};
+        this.children = new Command[]{new Add(), new Delete(), new Edit(), new Import(), new Owner(), new Raw(), new Raw2(), new UnImport()};
         this.category = Categories.FUN;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
@@ -43,7 +54,7 @@ public class Tag extends Command
             return;
         }
 
-        String tag = db.getTagContent(event.getArgs().trim());
+        String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
 
         if(tag==null)
         {
@@ -87,7 +98,7 @@ public class Tag extends Command
             try
             {
                 args = event.getArgs().split(" ", 2);
-                name = args[0].trim();
+                name = args[0].trim().toLowerCase();
                 content = args[1].trim();
             }
             catch(ArrayIndexOutOfBoundsException e)
@@ -132,8 +143,8 @@ public class Tag extends Command
                 return;
             }
 
-            String tag = db.getTagContent(event.getArgs());
-            Long owner = db.getTagOwner(event.getArgs());
+            String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
+            Long owner = db.getTagOwner(event.getArgs().trim().toLowerCase());
 
             if(tag==null)
                 event.replyError("No tag found with that name!");
@@ -141,7 +152,7 @@ public class Tag extends Command
             {
                 if(owner.equals(event.getAuthor().getIdLong()) || event.isOwner() || event.isCoOwner())
                 {
-                    db.removeTag(event.getArgs());
+                    db.removeTag(event.getArgs().trim().toLowerCase());
                     event.replySuccess("Tag successfully deleted");
                 }
                 else
@@ -180,7 +191,7 @@ public class Tag extends Command
             try
             {
                 args = event.getArgs().split(" ", 2);
-                name = args[0].trim();
+                name = args[0].trim().toLowerCase();
                 content = args[1].trim();
             }
             catch(ArrayIndexOutOfBoundsException e)
@@ -230,13 +241,13 @@ public class Tag extends Command
                 return;
             }
 
-            String tag = db.getTagContent(event.getArgs());
+            String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
             User owner = event.getJDA().retrieveUserById(db.getTagOwner(event.getArgs())).complete();
 
             if(tag==null)
                 event.replyError("No tag found with that name!");
             else
-                event.reply("The owner of the tag `"+event.getArgs()+"` is **"+owner.getName()+"#"+owner.getDiscriminator()+"** (ID: "+owner.getId()+")");
+                event.reply("The owner of the tag `"+event.getArgs().trim().toLowerCase()+"` is **"+owner.getName()+"#"+owner.getDiscriminator()+"** (ID: **"+owner.getId()+"**)");
         }
     }
 
@@ -263,15 +274,84 @@ public class Tag extends Command
                 return;
             }
 
-            String tag = db.getTagContent(event.getArgs());
+            String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
 
             if(tag==null)
                 event.replyError("No tag found with that name!");
             else
             {
-                db.importTag(event.getArgs());
-                event.replySuccess("Successfully imported tag!");
+                if(db.isTagImported(event.getArgs().trim().toLowerCase(), event.getGuild().getIdLong()))
+                    event.replyError("This tag is already imported!");
+                else
+                {
+                    db.importTag(event.getArgs().trim().toLowerCase(), tag, db.getTagOwner(event.getArgs().trim().toLowerCase()), event.getGuild().getIdLong());
+                    event.replySuccess("Successfully imported tag!");
+                }
             }
+        }
+    }
+
+    private class Raw extends Command
+    {
+        public Raw()
+        {
+            this.name = "raw";
+            this.help = "Shows the content of a tag without parsing the args";
+            this.arguments = "<name>";
+            this.category = Categories.FUN;
+            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.ownerCommand = false;
+            this.guildOnly = false;
+        }
+
+        @Override
+        protected void execute(CommandEvent event)
+        {
+            if(event.getArgs().isEmpty())
+            {
+                event.replyWarning("Specify a tag name!");
+                return;
+            }
+
+            String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
+
+            if(tag==null)
+                event.replyError("No tag found with that name!");
+            else
+                event.reply(tag);
+        }
+    }
+
+    private class Raw2 extends Command
+    {
+        public Raw2()
+        {
+            this.name = "raw2";
+            this.help = "Shows the content of a tag without parsing the args on a codeblock";
+            this.arguments = "<name>";
+            this.category = Categories.FUN;
+            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.ownerCommand = false;
+            this.guildOnly = false;
+        }
+
+        @Override
+        protected void execute(CommandEvent event)
+        {
+            if(event.getArgs().isEmpty())
+            {
+                event.replyWarning("Specify a tag name!");
+                return;
+            }
+
+            String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
+
+            if(tag==null)
+                event.replyError("No tag found with that name!");
+            else
+                event.reply("```"+tag+"```");
         }
     }
 
@@ -298,14 +378,19 @@ public class Tag extends Command
                 return;
             }
 
-            String tag = db.getTagContent(event.getArgs());
+            String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
 
             if(tag==null)
                 event.replyError("No tag found with that name!");
             else
             {
-                db.unImportTag(event.getArgs());
-                event.replySuccess("Successfully unimported tag!");
+                if(!(db.isTagImported(event.getArgs().trim().toLowerCase(), event.getGuild().getIdLong())))
+                    event.replyError("This tag isn't imported!");
+                else
+                {
+                    db.unImportTag(event.getArgs().trim().toLowerCase(), event.getGuild().getIdLong());
+                    event.replySuccess("Successfully unimported tag!");
+                }
             }
         }
     }

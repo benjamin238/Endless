@@ -38,9 +38,7 @@ public class FinderUtil
     {
 
         if(guild.getTextChannelById(guild.getId())==null)
-        {
             return guild.getTextChannels().stream().filter(TextChannel::canTalk).findFirst().orElse(null);
-        }
 
         return guild.getTextChannelById(guild.getId());
     }

@@ -144,7 +144,7 @@ public class Endless extends ListenerAdapter
                 new Bash(),
                 new BlacklistUsers(bdm),
                 new BotCPanel(),
-                new Eval(config, db, ldm, bdm, jldm, modlog),
+                new Eval(config, db, ldm, bdm, jldm, tdm, modlog),
                 new Shutdown(db),
 
                 //Moderation

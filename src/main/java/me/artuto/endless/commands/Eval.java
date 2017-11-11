@@ -23,10 +23,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.BlacklistDataManager;
-import me.artuto.endless.data.DatabaseManager;
-import me.artuto.endless.data.JLDataManager;
-import me.artuto.endless.data.LoggingDataManager;
+import me.artuto.endless.data.*;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.Permission;
@@ -49,14 +46,16 @@ public class Eval extends Command
     private final LoggingDataManager ldm;
     private final BlacklistDataManager bdm;
     private final JLDataManager jldm;
+    private final TagDataManager tdm;
     private final ModLogging modlog;
     
-    public Eval(Config config, DatabaseManager db, LoggingDataManager ldm, BlacklistDataManager bdm, JLDataManager jldm, ModLogging modlog)
+    public Eval(Config config, DatabaseManager db, LoggingDataManager ldm, BlacklistDataManager bdm, JLDataManager jldm, TagDataManager tdm, ModLogging modlog)
     {
         this.ldm = ldm;
         this.db = db;
         this.bdm = bdm;
         this.jldm = jldm;
+        this.tdm = tdm;
         this.config = config;
         this.modlog = modlog;
         this.name = "eval";
@@ -125,6 +124,7 @@ public class Eval extends Command
             engine.put("bdm", bdm);
             engine.put("ldm", ldm);
             engine.put("jldm", jldm);
+            engine.put("tdm", tdm);
             engine.put("db", db);
             engine.put("config", config);
             engine.put("modlog", modlog);

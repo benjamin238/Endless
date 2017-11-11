@@ -1,9 +1,12 @@
 package me.artuto.endless.events;
 
+import com.jagrosh.jagtag.Parser;
+import com.jagrosh.jagtag.ParserBuilder;
 import me.artuto.endless.Const;
 import me.artuto.endless.data.TagDataManager;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.tempdata.AfkManager;
+import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -21,11 +24,17 @@ public class GuildEvents extends ListenerAdapter
 {
     private final Config config;
     private final TagDataManager tdm;
+    private final Parser parser;
 
     public GuildEvents(Config config, TagDataManager tdm)
     {
         this.config = config;
         this.tdm = tdm;
+        this.parser = new ParserBuilder()
+                .addMethods(Variables.getMethods())
+                .setMaxOutput(2000)
+                .setMaxIterations(1000)
+                .build();
     }
 
     private String getReason(Guild guild)
@@ -106,15 +115,19 @@ public class GuildEvents extends ListenerAdapter
         User author = event.getAuthor();
         Message msg = event.getMessage();
         String message;
-        List<String> importedT = tdm.getImportedTags();
+        List<String> importedT = tdm.getImportedTagsForGuild(event.getGuild().getIdLong());
 
-        for(String tag : importedT)
+        if(!(importedT==null))
         {
-            if(msg.getContent().startsWith(config.getPrefix()+tag))
+            for(String tag : importedT)
             {
-                String content = tdm.getTagContent(tag);
+                String name = tag.split(":", 2)[1].toLowerCase();
 
-                event.getChannel().sendMessage(content).queue();
+                if(msg.getContent().startsWith(config.getPrefix().toLowerCase()+name))
+                {
+                    String content = tdm.getTagContent(name);
+                    event.getChannel().sendMessage(parser.parse(content)).queue();
+                }
             }
         }
 
