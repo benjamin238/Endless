@@ -262,7 +262,7 @@ public class Tag extends Command
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guildOnly = true;
         }
 
         @Override
@@ -366,7 +366,7 @@ public class Tag extends Command
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guildOnly = true;
         }
 
         @Override
