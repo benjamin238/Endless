@@ -24,6 +24,7 @@ import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.security.auth.login.LoginException;
@@ -63,11 +64,9 @@ public class Endless extends ListenerAdapter
     private static JLDataManager jldm;
     private static LoggingDataManager ldm;
     private static TagDataManager tdm;
+    private static ProfileDataManager pdm;
     private static Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-    private static ModLogging modlog = new ModLogging(ldm);
-    private Categories cat = new Categories(bdm);
-    private GuildUtils gutils = new GuildUtils(config, db);
-    private static JDA jda;
+    private static ModLogging modlog;
 
     public static void main(String[] args) throws IOException, SQLException, LoginException, RateLimitedException, InterruptedException
     {
@@ -96,16 +95,20 @@ public class Endless extends ListenerAdapter
         startJda();
     }
 
-    public static void initializeData() throws SQLException
+    private static void initializeData() throws SQLException
     {
         db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
         bdm = new BlacklistDataManager(db);
         ldm = new LoggingDataManager(db);
         jldm = new JLDataManager(db);
         tdm = new TagDataManager(db);
+        pdm = new ProfileDataManager(db);
+        modlog = new ModLogging(ldm);
+        GuildUtils gutils = new GuildUtils(config, db);
+        Categories cat = new Categories(bdm);
     }
 
-    public static CommandClient createClient()
+    private static CommandClient createClient()
     {
         CommandClientBuilder client = new CommandClientBuilder();
         Long[] coOwners = config.getCoOwnerIds();
@@ -123,7 +126,7 @@ public class Endless extends ListenerAdapter
         client.setStatus(config.getStatus());
         client.setGame(Game.of(config.getGame()));
 
-        if(!(owners.toString().isEmpty()))
+        if(!(Arrays.toString(owners).isEmpty()))
             client.setCoOwnerIds(owners);
         if(!(config.getDBotsToken().isEmpty() || config.getDBotsToken()==null))
             client.setDiscordBotsKey(config.getDBotsToken());
@@ -178,8 +181,10 @@ public class Endless extends ListenerAdapter
                 new Choose(),
                 new Dog(config),
                 new GiphyGif(config),
+                new Profile(pdm),
                 new Say(),
                 new Tag(tdm),
+                new TimeFor(pdm),
 
                 //Utils
 
@@ -190,9 +195,9 @@ public class Endless extends ListenerAdapter
 
     }
 
-    public static JDA startJda() throws LoginException, RateLimitedException, InterruptedException
+    private static void startJda() throws LoginException, RateLimitedException, InterruptedException
     {
-        jda = new JDABuilder(AccountType.BOT)
+        JDA jda = new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setGame(Game.of(Const.GAME_0))
@@ -207,6 +212,11 @@ public class Endless extends ListenerAdapter
                 .addEventListener(new UserEvents(config))
                 .buildBlocking();
 
+        getJDA(jda);
+    }
+
+    public static JDA getJDA(JDA jda)
+    {
         return jda;
     }
 
