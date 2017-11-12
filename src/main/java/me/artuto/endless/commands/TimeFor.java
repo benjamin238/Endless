@@ -10,6 +10,8 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
+import java.io.IOException;
+import java.net.URL;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,7 +27,7 @@ public class TimeFor extends Command
         this.db = db;
         this.name = "timefor";
         this.aliases = new String[]{"tf"};
-        this.children = new Command[]{new Change()};
+        this.children = new Command[]{new Change(), new TList()};
         this.help = "Shows the timezone for the specified user";
         this.arguments = "<user>";
         this.category = Categories.FUN;
@@ -156,4 +158,36 @@ public class TimeFor extends Command
             event.replySuccess("Successfully updated timezone!");
         }
     }
+
+    private class TList extends Command
+    {
+        public TList()
+        {
+            this.name = "list";
+            this.aliases = new String[]{"timezones"};
+            this.help = "Shows the list with valid timezones";
+            this.category = Categories.FUN;
+            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.ownerCommand = false;
+            this.guildOnly = false;
+        }
+
+        @Override
+        protected void execute(CommandEvent event)
+        {
+            event.replySuccess("Here is the list: ");
+            try
+            {
+                event.getChannel().sendFile(new URL("https://endless.artuto.me/Timezones.txt").openStream(), "Timezones.txt", null).queue();
+            }
+            catch(IOException e)
+            {
+                event.replyError("Error when uploading the list, please visit **https://endless.artuto.me/Timezones.txt** to see the list.");
+            }
+        }
+    }
+
+
+
 }
