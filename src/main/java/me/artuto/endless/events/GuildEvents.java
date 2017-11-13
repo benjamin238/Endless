@@ -129,7 +129,7 @@ public class GuildEvents extends ListenerAdapter
         {
             for(Message.Attachment at : msg.getAttachments())
             {
-                if(at.getName().endsWith(".js"))
+                if(at.getFileName().endsWith(".js"))
                 {
                    at.download(new File(at.getFileName()));
 
