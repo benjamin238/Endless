@@ -3,6 +3,7 @@ package me.artuto.endless.events;
 import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import me.artuto.endless.Const;
+import me.artuto.endless.data.LoggingDataManager;
 import me.artuto.endless.data.TagDataManager;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.tempdata.AfkManager;
@@ -17,19 +18,25 @@ import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.utils.SimpleLog;
+import java.io.File;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class GuildEvents extends ListenerAdapter
 {
     private final Config config;
     private final TagDataManager tdm;
+    private final LoggingDataManager ldm;
     private final Parser parser;
 
-    public GuildEvents(Config config, TagDataManager tdm)
+    public GuildEvents(Config config, TagDataManager tdm, LoggingDataManager ldm)
     {
         this.config = config;
         this.tdm = tdm;
+        this.ldm = ldm;
         this.parser = new ParserBuilder()
                 .addMethods(Variables.getMethods())
                 .setMaxOutput(2000)
@@ -116,6 +123,35 @@ public class GuildEvents extends ListenerAdapter
         Message msg = event.getMessage();
         String message;
         List<String> importedT = tdm.getImportedTagsForGuild(event.getGuild().getIdLong());
+        TextChannel modlog = ldm.getModlogChannel(event.getGuild());
+
+        if(!(msg.getAttachments().isEmpty()))
+        {
+            for(Message.Attachment at : msg.getAttachments())
+            {
+                at.download(new File(at.getFileName()));
+
+                List<String> lines = null;
+                try
+                {
+                    lines = Files.readAllLines(Paths.get(at.getFileName()));
+                    for(String str : lines)
+                    {
+                        if(str.contains("proxy.contentWindow.localStorage.token"))
+                        {
+                            if(!(modlog==null))
+                                modlog.sendMessage(":warning: **"+author.getName()+"#"+author.getDiscriminator()+"** ("+author.getId()+") has sent a suspicious file with code to steal tokens. It has been deleted. Message ID: "+msg.getId()).queue(s -> msg.delete().queue(), e -> msg.delete().queue());
+                            break;
+                        }
+                        new File(at.getFileName()).delete();
+                    }
+                }
+                catch(IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         if(!(importedT==null))
         {

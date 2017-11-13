@@ -172,7 +172,7 @@ public class Endless extends ListenerAdapter
                 new DBansCheck(config),
                 new GuildInfo(),
                 new Lookup(),
-                new RoleInfo(),
+                new RoleCmd(),
                 new UserInfo(),
 
                 //Fun
@@ -208,7 +208,7 @@ public class Endless extends ListenerAdapter
                 .addEventListener(new Logging(config))
                 .addEventListener(new GuildBlacklist())
                 .addEventListener(new ServerLogging(ldm, jldm))
-                .addEventListener(new GuildEvents(config, tdm))
+                .addEventListener(new GuildEvents(config, tdm, ldm))
                 .addEventListener(new UserEvents(config))
                 .buildBlocking();
 
