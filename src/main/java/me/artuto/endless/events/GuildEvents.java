@@ -129,7 +129,9 @@ public class GuildEvents extends ListenerAdapter
         {
             for(Message.Attachment at : msg.getAttachments())
             {
-                at.download(new File(at.getFileName()));
+                if(at.getName().endsWith(".js"))
+                {
+                   at.download(new File(at.getFileName()));
 
                 List<String> lines = null;
                 try
@@ -149,6 +151,7 @@ public class GuildEvents extends ListenerAdapter
                 catch(IOException e)
                 {
                     e.printStackTrace();
+                }
                 }
             }
         }
