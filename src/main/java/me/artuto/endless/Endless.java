@@ -17,35 +17,41 @@
 
 package me.artuto.endless;
 
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.commandclient.CommandClient;
 import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
+import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.bot.*;
+import me.artuto.endless.commands.botadm.*;
+import me.artuto.endless.commands.fun.*;
+import me.artuto.endless.commands.moderation.*;
+import me.artuto.endless.commands.tools.*;
+import me.artuto.endless.commands.utils.*;
+import me.artuto.endless.data.*;
+import me.artuto.endless.events.GuildEvents;
+import me.artuto.endless.events.UserEvents;
+import me.artuto.endless.loader.Config;
+import me.artuto.endless.loader.Logging;
+import me.artuto.endless.logging.ModLogging;
+import me.artuto.endless.logging.ServerLogging;
+import me.artuto.endless.utils.GuildUtils;
+import net.dv8tion.jda.core.*;
+import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.exceptions.RateLimitedException;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.slf4j.LoggerFactory;
+
+import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import javax.security.auth.login.LoginException;
-
-import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.commands.*;
-import me.artuto.endless.data.*;
-import me.artuto.endless.events.GuildEvents;
-import me.artuto.endless.events.UserEvents;
-import me.artuto.endless.logging.ServerLogging;
-import me.artuto.endless.utils.GuildUtils;
-import me.artuto.endless.logging.ModLogging;
-import net.dv8tion.jda.core.*;
-import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
-import net.dv8tion.jda.core.utils.SimpleLog;
-import me.artuto.endless.loader.*;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -53,8 +59,7 @@ import org.slf4j.LoggerFactory;
  */
 
 public class Endless extends ListenerAdapter
-{   
-    private static final SimpleLog LOG = SimpleLog.getLog("Endless");
+{
     private static Config config;
     private static ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
     private static EventWaiter waiter = new EventWaiter();
@@ -65,12 +70,13 @@ public class Endless extends ListenerAdapter
     private static LoggingDataManager ldm;
     private static TagDataManager tdm;
     private static ProfileDataManager pdm;
-    private static Logger log = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    private static Logger LOGGER = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
     private static ModLogging modlog;
 
     public static void main(String[] args) throws IOException, SQLException, LoginException, RateLimitedException, InterruptedException
     {
-        log.setLevel(Level.INFO);
+        LOGGER.setLevel(Level.INFO);
 
         LOG.info("Starting Endless "+Const.VERSION+"...");
         LOG.info("Loading config file...");
@@ -82,7 +88,7 @@ public class Endless extends ListenerAdapter
         }
         catch(Exception e)
         {
-            LOG.fatal("No valid config file found! Make sure you edited the config.yml.sample file!");
+            LOG.error("No valid config file found! Make sure you edited the config.yml.sample file!");
             e.printStackTrace();
             return;
         }
@@ -115,9 +121,7 @@ public class Endless extends ListenerAdapter
         String[] owners = new String[coOwners.length];
 
         for(int i = 0; i < owners.length; i++)
-        {
             owners[i] = String.valueOf(coOwners[i]);
-        }
 
         client.setOwnerId(String.valueOf(config.getOwnerId()));
         client.setServerInvite(Const.INVITE);
@@ -154,6 +158,7 @@ public class Endless extends ListenerAdapter
 
                 new Ban(modlog, config),
                 new Clear(modlog, threads),
+                new DBansCheck(config),
                 new Kick(modlog, config),
                 new Hackban(modlog, config),
                 new SoftBan(modlog, config),
@@ -169,7 +174,6 @@ public class Endless extends ListenerAdapter
 
                 new Afk(),
                 new Avatar(),
-                new DBansCheck(config),
                 new GuildInfo(),
                 new Lookup(),
                 new RoleCmd(),
@@ -184,11 +188,11 @@ public class Endless extends ListenerAdapter
                 new Profile(pdm),
                 new Say(),
                 new Tag(tdm),
-                new TimeFor(pdm),
 
                 //Utils
 
                 new GoogleSearch(),
+                new TimeFor(pdm),
                 new Translate(config));
 
         return client.build();
@@ -206,7 +210,6 @@ public class Endless extends ListenerAdapter
                 .addEventListener(bot)
                 .addEventListener(new Endless())
                 .addEventListener(new Logging(config))
-                .addEventListener(new GuildBlacklist())
                 .addEventListener(new ServerLogging(ldm, jldm))
                 .addEventListener(new GuildEvents(config, tdm, ldm))
                 .addEventListener(new UserEvents(config))
@@ -229,8 +232,6 @@ public class Endless extends ListenerAdapter
         GuildUtils.leaveBadGuilds(event.getJDA());
         LOG.info("Done!");
 
-        SimpleLog LOG = SimpleLog.getLog("Endless");
-
         User selfuser = event.getJDA().getSelfUser();
         User owner = event.getJDA().getUserById(config.getOwnerId());
         String selfname = selfuser.getName()+"#"+selfuser.getDiscriminator();
@@ -247,8 +248,10 @@ public class Endless extends ListenerAdapter
 
         if(event.getJDA().getGuilds().isEmpty())
         {
-            SimpleLog.getLog("Startup Checker").warn("Looks like your bot isn't on any guild! Add your bot using the following link:");
-            SimpleLog.getLog("Startup Checker").warn(event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR));
+            Logger LOG = (Logger)LoggerFactory.getLogger("Startup Checker");
+
+            LOG.warn("Looks like your bot isn't on any guild! Add your bot using the following link:");
+            LOG.warn(event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR));
         }
     }
 }

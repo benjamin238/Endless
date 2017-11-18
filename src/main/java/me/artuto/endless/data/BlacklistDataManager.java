@@ -2,7 +2,8 @@ package me.artuto.endless.data;
 
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -14,7 +15,7 @@ import java.util.Set;
 public class BlacklistDataManager
 {
     private static Connection connection;
-    private final SimpleLog LOG = SimpleLog.getLog("MySQL Database");
+    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public BlacklistDataManager(DatabaseManager db)
     {
@@ -40,7 +41,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return false;
         }
     }
@@ -69,7 +70,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 
@@ -93,7 +94,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return false;
         }
     }
@@ -120,7 +121,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return null;
         }
     }

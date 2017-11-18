@@ -17,7 +17,9 @@ import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 
 import java.io.IOException;
@@ -64,7 +66,7 @@ public class GuildEvents extends ListenerAdapter
     {
         Guild guild = event.getGuild();
         User owner = guild.getOwner().getUser();
-        SimpleLog.getLog("Logger").info("[GUILD JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
+        LoggerFactory.getLogger("Logging").info("[GUILD JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
         long botCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
         long userCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> !(u.isBot())).count();
         long totalCount = guild.getMembers().size();
@@ -95,7 +97,7 @@ public class GuildEvents extends ListenerAdapter
     {
         Guild guild = event.getGuild();
         User owner = guild.getOwner().getUser();
-        SimpleLog.getLog("Logger").info("[GUILD LEFT]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
+        LoggerFactory.getLogger("Logging").info("[GUILD LEFT]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
         long botCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
         long userCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> !(u.isBot())).count();
         long totalCount = guild.getMembers().size();
@@ -118,7 +120,7 @@ public class GuildEvents extends ListenerAdapter
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event)
     {
-        SimpleLog LOG = SimpleLog.getLog("AFK Manager");
+        Logger LOG = LoggerFactory.getLogger("AFK Manager");
         User author = event.getAuthor();
         Message msg = event.getMessage();
         String message;
@@ -133,25 +135,25 @@ public class GuildEvents extends ListenerAdapter
                 {
                    at.download(new File(at.getFileName()));
 
-                List<String> lines = null;
-                try
-                {
-                    lines = Files.readAllLines(Paths.get(at.getFileName()));
-                    for(String str : lines)
+                    List<String> lines;
+                    try
                     {
-                        if(str.contains("proxy.contentWindow.localStorage.token"))
+                        lines = Files.readAllLines(Paths.get(at.getFileName()));
+                        for(String str : lines)
                         {
-                            if(!(modlog==null))
-                                modlog.sendMessage(":warning: **"+author.getName()+"#"+author.getDiscriminator()+"** ("+author.getId()+") has sent a suspicious file with code to steal tokens. It has been deleted. Message ID: "+msg.getId()).queue(s -> msg.delete().queue(), e -> msg.delete().queue());
-                            break;
+                            if(str.contains("proxy.contentWindow.localStorage.token"))
+                            {
+                                if(!(modlog==null))
+                                    modlog.sendMessage(":warning: **"+author.getName()+"#"+author.getDiscriminator()+"** ("+author.getId()+") has sent a suspicious file with code to steal tokens. It has been deleted. Message ID: "+msg.getId()).queue(s -> msg.delete().queue(), e -> msg.delete().queue());
+                                break;
+                            }
+                            new File(at.getFileName()).delete();
                         }
-                        new File(at.getFileName()).delete();
                     }
-                }
-                catch(IOException e)
-                {
-                    e.printStackTrace();
-                }
+                    catch(IOException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

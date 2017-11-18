@@ -1,14 +1,15 @@
 package me.artuto.endless.data;
 
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
 public class DatabaseManager
 {
     private final Connection connection;
-    private final SimpleLog LOG = SimpleLog.getLog("MySQL Database");
+    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
     private final GuildSettings DEFAULT = new GuildSettings(0L, 0L, 0L, "", 0L,"");
 
     public DatabaseManager(String host, String user, String pass) throws SQLException
@@ -51,7 +52,7 @@ public class DatabaseManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return DEFAULT;
         }
     }
@@ -70,7 +71,7 @@ public class DatabaseManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return false;
         }
     }
@@ -103,7 +104,7 @@ public class DatabaseManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 }

@@ -1,7 +1,8 @@
 package me.artuto.endless.data;
 
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,7 +12,7 @@ import java.sql.Statement;
 public class ProfileDataManager
 {
     private final Connection connection;
-    private final SimpleLog LOG = SimpleLog.getLog("MySQL Database");
+    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
     private final Profile DEFAULT = new Profile("", 0,"", "", "", "", "", "", "", "",
             "", "", "", "", "", "", "", "", "", "", "");
 
@@ -61,7 +62,7 @@ public class ProfileDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return DEFAULT;
         }
     }
@@ -80,7 +81,7 @@ public class ProfileDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return false;
         }
     }
@@ -110,7 +111,7 @@ public class ProfileDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 

@@ -1,9 +1,10 @@
 package me.artuto.endless.managers;
 
-import net.dv8tion.jda.core.utils.SimpleLog;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 
 public class GoogleSearcher
 {
-    private final SimpleLog LOG = SimpleLog.getLog("Google Searcher");
+    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public ArrayList<String> getGoogleData(String query)
     {
@@ -24,7 +25,7 @@ public class GoogleSearcher
         }
         catch(UnsupportedEncodingException e)
         {
-            LOG.fatal(e);
+            LOG.error(e.toString());
             e.printStackTrace();
             return null;
         }
@@ -52,7 +53,7 @@ public class GoogleSearcher
         }
         catch(IOException e)
         {
-            LOG.fatal("Search went wrong!: "+e);
+            LOG.error("Search went wrong!: "+e);
             e.printStackTrace();
             return null;
         }

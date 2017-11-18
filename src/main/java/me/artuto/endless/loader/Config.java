@@ -20,7 +20,8 @@ package me.artuto.endless.loader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -32,7 +33,7 @@ import java.lang.reflect.Field;
 
 public class Config 
 {
-    private final SimpleLog LOG = SimpleLog.getLog("Config");
+    private final Logger LOG = LoggerFactory.getLogger("Config");
     private static ConfigFormat format;
 
     public Config() throws Exception
@@ -44,7 +45,7 @@ public class Config
         {
             if (field.get(format) == null)
             {
-                LOG.fatal("Error when reading the config!");
+                LOG.error("Error when reading the config!");
                 throw new Exception(field.getName() + " in your config was null!");
             }
         }

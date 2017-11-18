@@ -2,7 +2,8 @@ package me.artuto.endless.data;
 
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,7 +13,7 @@ import java.sql.Statement;
 public class JLDataManager
 {
     private Connection connection;
-    private final SimpleLog LOG = SimpleLog.getLog("MySQL Database");
+    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public JLDataManager(DatabaseManager db)
     {
@@ -41,7 +42,7 @@ public class JLDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return null;
         }
     }
@@ -57,21 +58,21 @@ public class JLDataManager
             {
                 if(results.next())
                 {
-                    results.updateLong("welcome_id", tc==null ? 0l : tc.getIdLong());
+                    results.updateLong("welcome_id", tc==null ? null : tc.getIdLong());
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("welcome_id", tc==null ? 0l : tc.getIdLong());
+                    results.updateLong("welcome_id", tc==null ? null : tc.getIdLong());
                     results.insertRow();
                 }
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 
@@ -92,7 +93,7 @@ public class JLDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return null;
         }
     }
@@ -108,21 +109,21 @@ public class JLDataManager
             {
                 if(results.next())
                 {
-                    results.updateLong("leave_id", tc==null ? 0l : tc.getIdLong());
+                    results.updateLong("leave_id", tc==null ? null : tc.getIdLong());
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("leave_id", tc==null ? 0l : tc.getIdLong());
+                    results.updateLong("leave_id", tc==null ? null : tc.getIdLong());
                     results.insertRow();
                 }
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 
@@ -143,7 +144,7 @@ public class JLDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return null;
         }
     }
@@ -173,7 +174,7 @@ public class JLDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 
@@ -194,7 +195,7 @@ public class JLDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return null;
         }
     }
@@ -224,7 +225,7 @@ public class JLDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 }

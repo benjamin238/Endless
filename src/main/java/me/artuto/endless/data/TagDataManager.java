@@ -1,6 +1,7 @@
 package me.artuto.endless.data;
 
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,7 +13,7 @@ import java.util.List;
 public class TagDataManager
 {
     private final Connection connection;
-    private final SimpleLog LOG = SimpleLog.getLog("MySQL Database");
+    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public TagDataManager(DatabaseManager db)
     {
@@ -36,7 +37,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 
@@ -55,7 +56,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 
@@ -76,7 +77,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return null;
         }
     }
@@ -99,7 +100,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 
@@ -119,7 +120,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return null;
         }
     }
@@ -137,7 +138,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return false;
         }
     }
@@ -162,7 +163,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 
@@ -184,13 +185,13 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
         }
     }
 
     public List<String> getImportedTags()
     {
-        List<String> names = new LinkedList<String>();
+        List<String> names = new LinkedList<>();
 
         try
         {
@@ -206,14 +207,14 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return null;
         }
     }
 
     public List<String> getImportedTagsForGuild(Long guild)
     {
-        List<String> names = new LinkedList<String>();
+        List<String> names = new LinkedList<>();
 
         try
         {
@@ -229,7 +230,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e);
+            LOG.warn(e.toString());
             return null;
         }
     }

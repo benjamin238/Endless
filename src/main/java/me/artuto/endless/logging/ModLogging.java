@@ -22,7 +22,8 @@ import me.artuto.endless.data.LoggingDataManager;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Calendar;
@@ -203,7 +204,7 @@ public class ModLogging
                 }
                 catch(Exception e)
                 {
-                    SimpleLog.getLog("Clear Modlog").fatal("Error when creating the text file with the deleted messages: "+e);
+                    LoggerFactory.getLogger("Clear Modlog").error("Error when creating the text file with the deleted messages: "+e);
                 }
 
                 String message = "`["+hour+":"+min+":"+sec+"] [Clear]:` :wastebasket: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages in "+channel.getAsMention()+" ("+args+").\n"

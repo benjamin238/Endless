@@ -1,26 +1,23 @@
 package me.artuto.endless.cmddata;
 
-import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.Command.Category;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.data.BlacklistDataManager;
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.utils.SimpleLog;
-
-import java.util.function.BiConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Categories
 {
     private static BlacklistDataManager db;
+    private static final Logger LOG = LoggerFactory.getLogger("Blacklisted Users");
 
     public Categories(BlacklistDataManager db)
     {
-        Categories.db = db;
+        this.db = db;
     }
 
     public static final Category BOT = new Category("Bot", event ->
     {
-        SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         User user = event.getAuthor();
 
         if(event.isOwner() || event.isCoOwner())
@@ -51,7 +48,6 @@ public class Categories
 
     public static final Category MODERATION = new Category("Moderation", event ->
     {
-        SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         User user = event.getAuthor();
 
         if(event.isOwner() || event.isCoOwner())
@@ -71,7 +67,6 @@ public class Categories
 
     public static final Category TOOLS = new Category("Tools", event ->
     {
-        SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         User user = event.getAuthor();
 
         if(event.isOwner() || event.isCoOwner())
@@ -91,7 +86,6 @@ public class Categories
 
     public static final Category UTILS = new Category("Utilities", event ->
     {
-        SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         User user = event.getAuthor();
 
         if(event.isOwner() || event.isCoOwner())
@@ -111,7 +105,6 @@ public class Categories
 
     public static final Category FUN = new Category("Fun", event ->
     {
-        SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         User user = event.getAuthor();
 
         if(event.isOwner() || event.isCoOwner())
@@ -131,7 +124,6 @@ public class Categories
 
     public static final Category OTHERS = new Category("Others", event ->
     {
-        SimpleLog LOG = SimpleLog.getLog("Blacklisted Users");
         User user = event.getAuthor();
 
         if(event.isOwner() || event.isCoOwner())

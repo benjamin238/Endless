@@ -5,7 +5,8 @@ import me.artuto.endless.tempdata.AfkManager;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.user.UserTypingEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserEvents extends ListenerAdapter
 {
@@ -19,7 +20,7 @@ public class UserEvents extends ListenerAdapter
     @Override
     public void onUserTyping(UserTypingEvent event)
     {
-        SimpleLog LOG = SimpleLog.getLog("AFK Manager");
+        Logger LOG = LoggerFactory.getLogger("AFK Manager");
         User user = event.getUser();
 
         if(AfkManager.isAfk(user.getIdLong()))
