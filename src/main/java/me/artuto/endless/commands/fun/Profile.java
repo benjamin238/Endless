@@ -15,7 +15,7 @@ public class Profile extends Command
         this.db = db;
         this.name = "profile";
         this.aliases = new String[]{"p"};
-        this.help = "Say something!";
+        this.help = "Displays or edits the profile of the specified user";
         this.arguments = "<user>";
         this.category = Categories.FUN;
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
