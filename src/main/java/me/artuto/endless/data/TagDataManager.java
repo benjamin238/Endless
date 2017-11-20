@@ -1,5 +1,6 @@
 package me.artuto.endless.data;
 
+import me.artuto.endless.entities.ImportedTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -189,20 +190,24 @@ public class TagDataManager
         }
     }
 
-    public List<String> getImportedTags()
+    public List<ImportedTag> getImportedTags()
     {
-        List<String> names = new LinkedList<>();
+        List<ImportedTag> tags = new LinkedList<>();
 
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name FROM TAGS WHERE tag_name LIKE \'imported-%\'"))
+            try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name LIKE \'imported-%\'"))
             {
                 while(results.next())
-                    names.add(results.getString("tag_name"));
+                    tags.add(new ImportedTag(results.getLong("tag_id"),
+                            results.getString("tag_name"),
+                            results.getString("tag_content"),
+                            results.getLong("tag_owner"),
+                            Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
 
-                return names;
+                return tags.isEmpty()?null:tags;
             }
         }
         catch(SQLException e)
@@ -212,20 +217,24 @@ public class TagDataManager
         }
     }
 
-    public List<String> getImportedTagsForGuild(Long guild)
+    public List<ImportedTag> getImportedTagsForGuild(Long guild)
     {
-        List<String> names = new LinkedList<>();
+        List<ImportedTag> tags = new LinkedList<>();
 
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name FROM TAGS WHERE tag_name LIKE \'imported-"+guild+":%\'"))
+            try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name LIKE \'imported-"+guild+":%\'"))
             {
                 while(results.next())
-                    names.add(results.getString("tag_name"));
+                    tags.add(new ImportedTag(results.getLong("tag_id"),
+                            results.getString("tag_name"),
+                            results.getString("tag_content"),
+                            results.getLong("tag_owner"),
+                            Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
 
-                return names.isEmpty()?null:names;
+                return tags.isEmpty()?null:tags;
             }
         }
         catch(SQLException e)

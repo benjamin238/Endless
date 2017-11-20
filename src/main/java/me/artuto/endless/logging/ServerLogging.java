@@ -2,6 +2,7 @@ package me.artuto.endless.logging;
 
 import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
+import com.jagrosh.jagtag.libraries.*;
 import me.artuto.endless.Messages;
 import me.artuto.endless.data.JLDataManager;
 import me.artuto.endless.data.LoggingDataManager;
@@ -38,6 +39,12 @@ public class ServerLogging extends ListenerAdapter
         this.jldm = jldm;
         this.parser = new ParserBuilder()
                 .addMethods(Variables.getMethods())
+                .addMethods(Arguments.getMethods())
+                .addMethods(Functional.getMethods())
+                .addMethods(Miscellaneous.getMethods())
+                .addMethods(Strings.getMethods())
+                .addMethods(Time.getMethods())
+                .addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods())
                 .setMaxOutput(2000)
                 .setMaxIterations(1000)
                 .build();

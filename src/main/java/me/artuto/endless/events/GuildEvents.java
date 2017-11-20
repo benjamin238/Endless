@@ -2,9 +2,11 @@ package me.artuto.endless.events;
 
 import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
+import com.jagrosh.jagtag.libraries.*;
 import me.artuto.endless.Const;
 import me.artuto.endless.data.LoggingDataManager;
 import me.artuto.endless.data.TagDataManager;
+import me.artuto.endless.entities.ImportedTag;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.tempdata.AfkManager;
 import me.artuto.endless.tools.Variables;
@@ -41,6 +43,12 @@ public class GuildEvents extends ListenerAdapter
         this.ldm = ldm;
         this.parser = new ParserBuilder()
                 .addMethods(Variables.getMethods())
+                .addMethods(Arguments.getMethods())
+                .addMethods(Functional.getMethods())
+                .addMethods(Miscellaneous.getMethods())
+                .addMethods(Strings.getMethods())
+                .addMethods(Time.getMethods())
+                .addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods())
                 .setMaxOutput(2000)
                 .setMaxIterations(1000)
                 .build();
@@ -124,7 +132,7 @@ public class GuildEvents extends ListenerAdapter
         User author = event.getAuthor();
         Message msg = event.getMessage();
         String message;
-        List<String> importedT = tdm.getImportedTagsForGuild(event.getGuild().getIdLong());
+        List<ImportedTag> importedT = tdm.getImportedTagsForGuild(event.getGuild().getIdLong());
         TextChannel modlog = ldm.getModlogChannel(event.getGuild());
 
         if(!(msg.getAttachments().isEmpty()))
@@ -160,14 +168,31 @@ public class GuildEvents extends ListenerAdapter
 
         if(!(importedT==null))
         {
-            for(String tag : importedT)
+            for(ImportedTag tag : importedT)
             {
-                String name = tag.split(":", 2)[1].toLowerCase();
+                String name = tag.getName();
+                String command = config.getPrefix().toLowerCase()+name;
+                String tagargs;
+                String[] args;
 
-                if(msg.getContent().startsWith(config.getPrefix().toLowerCase()+name))
+                if(msg.getContent().startsWith(command) && event.getChannel().canTalk())
                 {
-                    String content = tdm.getTagContent(name);
-                    event.getChannel().sendMessage(parser.parse(content)).queue();
+                    try
+                    {
+                        args = msg.getContent().split(command+" ", 2);
+                        tagargs = args[1];
+                    }
+                    catch(ArrayIndexOutOfBoundsException e)
+                    {
+                        tagargs = "";
+                    }
+
+                    parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getChannel()).put("args", tagargs);
+                    event.getChannel().sendMessage(parser.parse(tag.getContent())).queue();
+                }
+                else
+                {
+                    event.getChannel().sendMessage(":x: doesnt passes if statement").queue();
                 }
             }
         }

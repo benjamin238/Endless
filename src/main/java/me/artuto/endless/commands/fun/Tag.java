@@ -2,6 +2,7 @@ package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
+import com.jagrosh.jagtag.libraries.*;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
@@ -20,6 +21,12 @@ public class Tag extends Command
         this.db = db;
         this.parser = new ParserBuilder()
                 .addMethods(Variables.getMethods())
+                .addMethods(Arguments.getMethods())
+                .addMethods(Functional.getMethods())
+                .addMethods(Miscellaneous.getMethods())
+                .addMethods(Strings.getMethods())
+                .addMethods(Time.getMethods())
+                .addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods())
                 .setMaxOutput(2000)
                 .setMaxIterations(1000)
                 .build();
@@ -54,7 +61,23 @@ public class Tag extends Command
             return;
         }
 
-        String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
+        String[] args;
+        String tagname;
+        String tagargs;
+
+        try
+        {
+            args = event.getArgs().split(" ", 2);
+            tagname = args[0].toLowerCase().trim();
+            tagargs = args[1];
+        }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            tagname = event.getArgs().toLowerCase().trim();
+            tagargs = "";
+        }
+
+        String tag = db.getTagContent(tagname);
 
         if(tag==null)
         {
@@ -62,8 +85,7 @@ public class Tag extends Command
             return;
         }
 
-        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel());
-
+        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel()).put("args", tagargs);
         event.reply(parser.parse(tag));
     }
 

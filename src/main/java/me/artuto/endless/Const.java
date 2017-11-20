@@ -24,7 +24,7 @@ package me.artuto.endless;
 
 public class Const
 {
-    public static String VERSION = "2.1.3.02";
+    public static String VERSION = "2.1.4.01";
     public static String INVITE = "https://discord.gg/CXKfYW3";
     public static String GAME_0 = "[ENDLESS] loading...";
     public static String DEV = "`@Artuto#0424 | 264499432538505217`";
