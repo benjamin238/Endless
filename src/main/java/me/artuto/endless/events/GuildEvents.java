@@ -190,10 +190,6 @@ public class GuildEvents extends ListenerAdapter
                     parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getChannel()).put("args", tagargs);
                     event.getChannel().sendMessage(parser.parse(tag.getContent())).queue();
                 }
-                else
-                {
-                    event.getChannel().sendMessage(":x: doesnt passes if statement").queue();
-                }
             }
         }
 
