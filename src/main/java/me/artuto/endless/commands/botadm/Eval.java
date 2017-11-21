@@ -45,14 +45,16 @@ public class Eval extends Command
     private final DatabaseManager db;
     private final LoggingDataManager ldm;
     private final BlacklistDataManager bdm;
+    private final DonatorsDataManager ddm;
     private final JLDataManager jldm;
     private final TagDataManager tdm;
     private final ModLogging modlog;
     
-    public Eval(Config config, DatabaseManager db, LoggingDataManager ldm, BlacklistDataManager bdm, JLDataManager jldm, TagDataManager tdm, ModLogging modlog)
+    public Eval(Config config, DatabaseManager db, DonatorsDataManager ddm, LoggingDataManager ldm, BlacklistDataManager bdm, JLDataManager jldm, TagDataManager tdm, ModLogging modlog)
     {
         this.ldm = ldm;
         this.db = db;
+        this.ddm = ddm;
         this.bdm = bdm;
         this.jldm = jldm;
         this.tdm = tdm;
@@ -121,6 +123,7 @@ public class Eval extends Command
             engine.put("bot", event.getSelfUser());
             engine.put("client", event.getClient());
             engine.put("author", event.getAuthor());
+            engine.put("ddm", ddm);
             engine.put("bdm", bdm);
             engine.put("ldm", ldm);
             engine.put("jldm", jldm);

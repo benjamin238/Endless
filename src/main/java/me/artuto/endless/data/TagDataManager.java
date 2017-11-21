@@ -1,6 +1,7 @@
 package me.artuto.endless.data;
 
 import me.artuto.endless.entities.ImportedTag;
+import me.artuto.endless.entities.impl.ImportedTagImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,7 +202,7 @@ public class TagDataManager
             try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name LIKE \'imported-%\'"))
             {
                 while(results.next())
-                    tags.add(new ImportedTag(results.getLong("tag_id"),
+                    tags.add(new ImportedTagImpl(results.getLong("tag_id"),
                             results.getString("tag_name"),
                             results.getString("tag_content"),
                             results.getLong("tag_owner"),
@@ -228,7 +229,7 @@ public class TagDataManager
             try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name LIKE \'imported-"+guild+":%\'"))
             {
                 while(results.next())
-                    tags.add(new ImportedTag(results.getLong("tag_id"),
+                    tags.add(new ImportedTagImpl(results.getLong("tag_id"),
                             results.getString("tag_name"),
                             results.getString("tag_content"),
                             results.getLong("tag_owner"),

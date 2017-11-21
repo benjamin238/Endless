@@ -1,49 +1,18 @@
 package me.artuto.endless.entities;
 
-public class ImportedTag
+public interface ImportedTag
 {
-    private final Long tagId;
-    private final String name;
-    private final String content;
-    private final Long owner;
-    private final Long guild;
+    String getId();
 
-    public ImportedTag(Long tagId, String name, String content, Long owner, Long guild)
-    {
-        this.tagId = tagId;
-        this.name = name;
-        this.content = content;
-        this.owner = owner;
-        this.guild = guild;
-    }
+    Long getIdLong();
 
-    public String getId()
-    {
-        return tagId.toString();
-    }
+    String getName();
 
-    public Long getIdLong()
-    {
-        return tagId;
-    }
+    String getInternalName();
 
-    public String getName()
-    {
-        return name.toLowerCase();
-    }
+    String getContent();
 
-    public String getContent()
-    {
-        return content;
-    }
+    Long getOwnerId();
 
-    public Long getOwnerId()
-    {
-        return owner;
-    }
-
-    public Long getGuildId()
-    {
-        return guild;
-    }
+    Long getGuildId();
 }

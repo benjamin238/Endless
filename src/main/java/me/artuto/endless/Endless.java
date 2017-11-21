@@ -66,6 +66,7 @@ public class Endless extends ListenerAdapter
     private static Bot bot = new Bot(config);
     private static BlacklistDataManager bdm;
     private static DatabaseManager db;
+    private static DonatorsDataManager ddm;
     private static JLDataManager jldm;
     private static LoggingDataManager ldm;
     private static TagDataManager tdm;
@@ -105,6 +106,7 @@ public class Endless extends ListenerAdapter
     {
         db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
         bdm = new BlacklistDataManager(db);
+        ddm = new DonatorsDataManager(db);
         ldm = new LoggingDataManager(db);
         jldm = new JLDataManager(db);
         tdm = new TagDataManager(db);
@@ -141,7 +143,7 @@ public class Endless extends ListenerAdapter
                 //Bot
 
                 new About(),
-                new Donate(),
+                new Donate(ddm),
                 new Invite(),
                 new Ping(),
                 new Stats(),
@@ -151,7 +153,7 @@ public class Endless extends ListenerAdapter
                 new Bash(),
                 new BlacklistUsers(bdm),
                 new BotCPanel(),
-                new Eval(config, db, ldm, bdm, jldm, tdm, modlog),
+                new Eval(config, db, ddm, ldm, bdm, jldm, tdm, modlog),
                 new Shutdown(db),
 
                 //Moderation
