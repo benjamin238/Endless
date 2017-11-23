@@ -20,14 +20,18 @@ package me.artuto.endless.commands.bot;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import java.awt.Color;
-import java.util.stream.Collectors;
+import java.util.List;
 
+import com.jagrosh.jdautilities.utils.FinderUtil;
+import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.DonatorsDataManager;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
 /**
@@ -58,26 +62,27 @@ public class Donate extends Command
         Color color;
         EmbedBuilder builder = new EmbedBuilder();
         StringBuilder sb = new StringBuilder();
+        List<User> list = db.getUsersThatDonated(event.getJDA());
         
         if(event.isFromType(ChannelType.PRIVATE))
             color = Color.decode("#33ff00");
         else
             color = event.getGuild().getSelfMember().getColor();
 
-        for(User user : db.getUsersThatDonated(event.getJDA()))
-        {
-            sb.append(String.format("%#s - %s\n", user, db.getAmount(user)));
-        }
+        if(list.isEmpty())
+            sb.append("None has donated yet ):");
+        else
+            for(User user : list)
+                sb.append(String.format("%#s - %s\n", user, db.getAmount(user)));
 
         builder.setColor(color);
         builder.addField(":moneybag: Donations:", "Actually, I host Endless on a very basic VPS, which can cause some lag sometimes.\n"
                 + "I'll appreciate your donation. All the recauded money will be for get a new and better VPS.\n", false);
         builder.addField(":money_mouth: How to donate:", "If you want donate please go to **https://paypal.me/artuto**\n"
                 + "You'll get a special role on my server and some perks!", false);
-        builder.addField(":heart: Donators:", "Thanks to all donators!\n", false);
-        builder.setDescription(sb.toString());
+        builder.addField(":heart: Donators:", sb.toString(), false);
 
-        event.reply(new MessageBuilder().append(":moneybag: List of donators:").setEmbed(builder.build()).build());
+        event.reply(new MessageBuilder().append(":information_source: List of donators:").setEmbed(builder.build()).build());
     }
     
     private class Add extends Command
@@ -96,6 +101,12 @@ public class Donate extends Command
         @Override
         protected void execute(CommandEvent event)
         {
+            if(!(event.getClient().getOwnerId().equals(Const.ARTUTO_ID)))
+            {
+                event.replyError("This command is not available on a selfhosted instance!");
+                return;
+            }
+
             if(event.getArgs().isEmpty())
             {
                 event.replyWarning("Please specify the user ID and a donated amount!");
@@ -104,13 +115,14 @@ public class Donate extends Command
 
             String[] args;
             String id;
-            Long amount;
+            String amount;
+            User user;
 
             try
             {
                 args = event.getArgs().split(" ", 2);
                 id = args[0];
-                amount = Long.valueOf(args[1]);
+                amount = args[1];
             }
             catch(ArrayIndexOutOfBoundsException e)
             {
@@ -118,12 +130,23 @@ public class Donate extends Command
                 return;
             }
 
-            event.getJDA().retrieveUserById(id).queue(s -> {
-                db.setDonation(s, amount);
-                event.replySuccess(String.format("Successfully added %#s to the donators list!", s));
-            }, e -> {
-                event.replyError("Invalid ID!");
-            });
+            List<Member> list = FinderUtil.findMembers(id, event.getGuild());
+
+            if(list.isEmpty())
+            {
+                event.getJDA().retrieveUserById(id).queue(s -> {
+                    db.setDonation(s, amount);
+                    event.replySuccess(String.format("Successfully added %#s to the donators list!", s));
+                }, e -> event.replyError("Invalid ID!"));
+            }
+            else if(list.size()>1)
+                event.replyWarning(FormatUtil.listOfMembers(list, id));
+            else
+            {
+                user = list.get(0).getUser();
+                db.setDonation(user, amount);
+                event.replySuccess(String.format("Successfully added %#s to the donators list!", user));
+            }
         }
     }
 
@@ -143,18 +166,53 @@ public class Donate extends Command
         @Override
         protected void execute(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
+            if(!(event.getClient().getOwnerId().equals(Const.ARTUTO_ID)))
             {
-                event.replyWarning("Please specify the user ID and a donated amount!");
+                event.replyError("This command is not available on a selfhosted instance!");
                 return;
             }
 
-            event.getJDA().retrieveUserById(event.getArgs()).queue(s -> {
-                db.setDonation(s, null);
-                event.replySuccess(String.format("Successfully removed %#s from the donators list!", s));
-            }, e -> {
-                event.replyError("Invalid ID!");
-            });
+            if(event.getArgs().isEmpty())
+            {
+                event.replyWarning("Please specify the user ID!");
+                return;
+            }
+
+            User user;
+            List<Member> list = FinderUtil.findMembers(event.getArgs(), event.getGuild());
+
+            if(list.isEmpty())
+            {
+                event.getJDA().retrieveUserById(event.getArgs()).queue(s -> {
+                    if(!(db.hasDonated(s)))
+                    {
+                        db.setDonation(s, null);
+                        event.replyError("This user hasn't donated!");
+                    }
+                    else
+                    {
+                        db.setDonation(s, null);
+                        event.replySuccess(String.format("Successfully removed %#s from the donators list!", s));
+                    }
+                }, e -> event.replyError("Invalid ID!"));
+            }
+            else if(list.size()>1)
+                event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
+            else
+            {
+                user = list.get(0).getUser();
+
+                if(!(db.hasDonated(user)))
+                {
+                    db.setDonation(user, null);
+                    event.replyError("This user hasn't donated!");
+                }
+                else
+                {
+                    db.setDonation(user, null);
+                    event.replySuccess(String.format("Successfully removed %#s from the donators list!", user));
+                }
+            }
         }
     }
 }

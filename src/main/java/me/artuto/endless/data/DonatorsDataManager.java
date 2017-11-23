@@ -35,7 +35,13 @@ public class DonatorsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donated_amount FROM PROFILES WHERE user_id = %s", user.getId())))
             {
-                return getAmount(user)!=null;
+                if(results.next())
+                    if(results.getString("donated_amount")==null)
+                        return false;
+                    else
+                        return true;
+                else
+                    return false;
             }
         }
         catch(SQLException e)
@@ -45,7 +51,7 @@ public class DonatorsDataManager
         }
     }
 
-    public void setDonation(User user, Long amount)
+    public void setDonation(User user, String amount)
     {
         try
         {
@@ -56,14 +62,14 @@ public class DonatorsDataManager
             {
                 if(results.next())
                 {
-                    results.updateString("donated_amount", String.valueOf(amount));
+                    results.updateString("donated_amount", amount);
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("user_id", user.getIdLong());
-                    results.updateString("donated_amount", amount.toString());
+                    results.updateString("donated_amount", amount);
                     results.insertRow();
                 }
             }

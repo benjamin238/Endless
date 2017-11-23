@@ -106,9 +106,7 @@ public class DBansCheck extends Command
             return;
         }
         else
-        {
             user = list.get(0);
-        }
 
        try
        {
