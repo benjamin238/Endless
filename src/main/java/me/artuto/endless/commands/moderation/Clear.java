@@ -83,6 +83,8 @@ public class Clear extends Command
         List<String> text = new LinkedList<>();
         String pattern = null;
         List<String> ids = new LinkedList<>();
+        String finalR = r;
+        String finalParams = params;
 
         Matcher m = MESSAGE.matcher(params);
         while(m.find())
@@ -133,27 +135,24 @@ public class Clear extends Command
         int val2 = num+1;
         String p = pattern;
 
-        String finalR = r;
-        String finalParams = params;
         threads.submit(() -> {
             int val = val2;
             List<Message> msgs = new LinkedList<>();
             MessageHistory history = event.getTextChannel().getHistory();
             OffsetDateTime limitCheck = event.getMessage().getCreationTime().minusWeeks(2).plusMinutes(1);
 
-            while(val>100)
-            {
+            while (val > 100) {
                 msgs.addAll(history.retrievePast(100).complete());
-                val-=100;
+                val -= 100;
 
-                if(msgs.get(msgs.size()-1).getCreationTime().isBefore(limitCheck))
+                if (msgs.get(msgs.size() - 1).getCreationTime().isBefore(limitCheck))
                 {
                     val = 0;
                     break;
                 }
             }
 
-            if(val>0)
+            if (val > 0)
                 msgs.addAll(history.retrievePast(val).complete());
 
             msgs.remove(event.getMessage());
@@ -161,15 +160,15 @@ public class Clear extends Command
             boolean weeks2 = false;
             List<Message> deletion = new LinkedList<>();
 
-            for(Message msg : msgs)
+            for (Message msg : msgs)
             {
-                if(msg.getCreationTime().isBefore(limitCheck))
+                if (msg.getCreationTime().isBefore(limitCheck))
                 {
                     weeks2 = true;
                     break;
                 }
 
-                if(all || ids.contains(msg.getAuthor().getId()) || (bots && msg.getAuthor().isBot()) || (embed && !(msg.getEmbeds().isEmpty()))
+                if (all || ids.contains(msg.getAuthor().getId()) || (bots && msg.getAuthor().isBot()) || (embed && !(msg.getEmbeds().isEmpty()))
                         || (link && LINK.matcher(msg.getRawContent()).find()) || (image && hasImage(msg)))
                 {
                     deletion.add(msg);
@@ -178,7 +177,7 @@ public class Clear extends Command
 
                 String lowerCaseContent = msg.getContent().toLowerCase();
 
-                if(text.stream().anyMatch(t -> lowerCaseContent.contains(t)))
+                if (text.stream().anyMatch(t -> lowerCaseContent.contains(t)))
                 {
                     deletion.add(msg);
                     continue;
@@ -186,15 +185,14 @@ public class Clear extends Command
 
                 try
                 {
-                    if(!(p==null) && msg.getRawContent().matches(p))
+                    if (!(p == null) && msg.getRawContent().matches(p))
                         deletion.add(msg);
-                }
-                catch(Exception ignored) {}
+                } catch (Exception ignored) {}
             }
 
-            if(deletion.isEmpty())
+            if (deletion.isEmpty())
             {
-                event.replyWarning("There were no messages to clear!"+(weeks2?limit:""));
+                event.replyWarning("There were no messages to clear!" + (weeks2 ? limit : ""));
                 return;
             }
 
@@ -202,28 +200,28 @@ public class Clear extends Command
             {
                 int index = 0;
 
-                while(index<deletion.size())
+                while (index < deletion.size())
                 {
-                    if(index+100>deletion.size())
-                        if(index+1==deletion.size())
-                            deletion.get(deletion.size()-1).delete().reason("[CLEAR]["+event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"]").complete();
+                    if (index + 100 > deletion.size())
+                        if (index + 1 == deletion.size())
+                            deletion.get(deletion.size() - 1).delete().reason("[CLEAR][" + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + "]").complete();
                         else
                             event.getTextChannel().deleteMessages(deletion.subList(index, deletion.size())).complete();
                     else
-                        event.getTextChannel().deleteMessages(deletion.subList(index, index+100)).complete();
+                        event.getTextChannel().deleteMessages(deletion.subList(index, index + 100)).complete();
 
-                    index+=100;
+                    index += 100;
                 }
             }
             catch(Exception e)
             {
-                event.replyError(Messages.CLEAR_ERROR+"**"+deletion.size()+"** messages!");
+                event.replyError(Messages.CLEAR_ERROR + "**" + deletion.size() + "** messages!");
                 LoggerFactory.getLogger("MySQL Database").error(e.toString());
                 e.printStackTrace();
                 return;
             }
 
-            event.replySuccess(Messages.CLEAR_SUCCESS+"**"+deletion.size()+"** messages!");
+            event.replySuccess(Messages.CLEAR_SUCCESS + "**" + deletion.size() + "** messages!");
             modlog.logClear(event.getAuthor(), event.getTextChannel(), finalR, event.getGuild(), deletion, finalParams);
         });
     }

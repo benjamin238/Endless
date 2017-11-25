@@ -112,8 +112,8 @@ public class Endless extends ListenerAdapter
         tdm = new TagDataManager(db);
         pdm = new ProfileDataManager(db);
         modlog = new ModLogging(ldm);
-        GuildUtils gutils = new GuildUtils(config, db);
-        Categories cat = new Categories(bdm);
+        new GuildUtils(config, db);
+        new Categories(bdm);
     }
 
     private static CommandClient createClient()
@@ -130,7 +130,7 @@ public class Endless extends ListenerAdapter
         client.setEmojis(config.getDoneEmote(), config.getWarnEmote(), config.getErrorEmote());
         client.setPrefix(config.getPrefix());
         client.setStatus(config.getStatus());
-        client.setGame(Game.of(config.getGame()));
+        client.setGame(Game.playing(config.getGame()));
 
         if(!(Arrays.toString(owners).isEmpty()))
             client.setCoOwnerIds(owners);
@@ -206,7 +206,7 @@ public class Endless extends ListenerAdapter
         JDA jda = new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setGame(Game.of(Const.GAME_0))
+                .setGame(Game.playing(Const.GAME_0))
                 .addEventListener(waiter)
                 .addEventListener(createClient())
                 .addEventListener(bot)
@@ -246,7 +246,7 @@ public class Endless extends ListenerAdapter
         LOG.info("Using prefix: "+config.getPrefix());
         LOG.info("Owner: "+ownername+" ("+ownerid+")");
 
-        event.getJDA().getPresence().setGame(Game.of("Type "+config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+        event.getJDA().getPresence().setGame(Game.playing("Type "+config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
 
         if(event.getJDA().getGuilds().isEmpty())
         {

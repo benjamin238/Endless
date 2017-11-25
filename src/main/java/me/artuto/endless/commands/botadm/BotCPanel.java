@@ -144,7 +144,7 @@ public class BotCPanel extends Command
             {
                 try
                 {
-                    event.getJDA().getPresence().setGame(Game.of(event.getArgs()));
+                    event.getJDA().getPresence().setGame(Game.playing(event.getArgs()));
                     event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame().getName()+" without error!");
                 }
                 catch(Exception e)
@@ -174,7 +174,7 @@ public class BotCPanel extends Command
         {
             try
             {
-                event.getJDA().getPresence().setGame(Game.of("Type "+event.getClient().getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+                event.getJDA().getPresence().setGame(Game.playing("Type "+event.getClient().getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
                 event.replySuccess("Game updated.");
             }
             catch(Exception e)

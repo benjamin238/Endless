@@ -140,18 +140,15 @@ public class Eval extends Command
             }
 
             for(final String s : imports)
-            {
                 importString += "import "+ s + ".*;";
-            }
 
             eval = event.getArgs().replaceAll("getToken", "getSelfUser");
-            
             Object out = engine.eval(importString + eval);
 
             if(out==null || String.valueOf(out).isEmpty())
                 event.reactSuccess();
             else
-                event.replySuccess("Done! Output:\n```java\n"+out.toString().replaceAll(event.getJDA().getToken(), "Nice try.")+" ```");
+                event.replySuccess("Done! Output:\n```"+out.toString().replaceAll(event.getJDA().getToken(), "Nice try.")+" ```");
         } 
         catch(Exception e2)
         {
