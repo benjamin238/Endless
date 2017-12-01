@@ -18,11 +18,10 @@
 package me.artuto.endless.logging;
 
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.LoggingDataManager;
+import me.artuto.endless.data.GuildSettingsDataManager;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
@@ -39,9 +38,9 @@ import java.util.List;
 
 public class ModLogging 
 {
-    private static LoggingDataManager db;
+    private static GuildSettingsDataManager db;
 
-    public ModLogging(LoggingDataManager db)
+    public ModLogging(GuildSettingsDataManager db)
     {
         ModLogging.db = db;
     }

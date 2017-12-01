@@ -4,7 +4,7 @@ import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import com.jagrosh.jagtag.libraries.*;
 import me.artuto.endless.Const;
-import me.artuto.endless.data.LoggingDataManager;
+import me.artuto.endless.data.GuildSettingsDataManager;
 import me.artuto.endless.data.TagDataManager;
 import me.artuto.endless.entities.ImportedTag;
 import me.artuto.endless.loader.Config;
@@ -33,10 +33,10 @@ public class GuildEvents extends ListenerAdapter
 {
     private final Config config;
     private final TagDataManager tdm;
-    private final LoggingDataManager ldm;
+    private final GuildSettingsDataManager ldm;
     private final Parser parser;
 
-    public GuildEvents(Config config, TagDataManager tdm, LoggingDataManager ldm)
+    public GuildEvents(Config config, TagDataManager tdm, GuildSettingsDataManager ldm)
     {
         this.config = config;
         this.tdm = tdm;

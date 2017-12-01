@@ -67,8 +67,7 @@ public class Endless extends ListenerAdapter
     private static BlacklistDataManager bdm;
     private static DatabaseManager db;
     private static DonatorsDataManager ddm;
-    private static JLDataManager jldm;
-    private static LoggingDataManager ldm;
+    private static GuildSettingsDataManager gsdm;
     private static TagDataManager tdm;
     private static ProfileDataManager pdm;
     private static Logger LOGGER = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
@@ -107,11 +106,10 @@ public class Endless extends ListenerAdapter
         db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
         bdm = new BlacklistDataManager(db);
         ddm = new DonatorsDataManager(db);
-        ldm = new LoggingDataManager(db);
-        jldm = new JLDataManager(db);
+        gsdm = new GuildSettingsDataManager(db);
         tdm = new TagDataManager(db);
         pdm = new ProfileDataManager(db);
-        modlog = new ModLogging(ldm);
+        modlog = new ModLogging(gsdm);
         new GuildUtils(config, db);
         new Categories(bdm);
     }
@@ -153,7 +151,7 @@ public class Endless extends ListenerAdapter
                 new Bash(),
                 new BlacklistUsers(bdm),
                 new BotCPanel(),
-                new Eval(config, db, ddm, ldm, bdm, jldm, tdm, modlog),
+                new Eval(config, db, ddm, gsdm, bdm, tdm, modlog),
                 new Shutdown(db),
 
                 //Moderation
@@ -168,9 +166,9 @@ public class Endless extends ListenerAdapter
 
                 //Settings
 
-                new Leave(jldm),
-                new ServerSettings(ldm, jldm),
-                new Welcome(jldm),
+                new Leave(gsdm),
+                new ServerSettings(gsdm),
+                new Welcome(gsdm),
 
                 //Tools
 
@@ -212,8 +210,8 @@ public class Endless extends ListenerAdapter
                 .addEventListener(bot)
                 .addEventListener(new Endless())
                 .addEventListener(new Logging(config))
-                .addEventListener(new ServerLogging(ldm, jldm))
-                .addEventListener(new GuildEvents(config, tdm, ldm))
+                .addEventListener(new ServerLogging(gsdm))
+                .addEventListener(new GuildEvents(config, tdm, gsdm))
                 .addEventListener(new UserEvents(config))
                 .buildBlocking();
 

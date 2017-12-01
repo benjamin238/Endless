@@ -4,8 +4,7 @@ import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import com.jagrosh.jagtag.libraries.*;
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.JLDataManager;
-import me.artuto.endless.data.LoggingDataManager;
+import me.artuto.endless.data.GuildSettingsDataManager;
 import me.artuto.endless.tempdata.MessagesLogging;
 import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.FinderUtil;
@@ -29,14 +28,12 @@ import java.util.concurrent.TimeUnit;
 
 public class ServerLogging extends ListenerAdapter
 {
-    private static LoggingDataManager ldm;
-    private static JLDataManager jldm;
+    private static GuildSettingsDataManager db;
     private final Parser parser;
 
-    public ServerLogging(LoggingDataManager ldm, JLDataManager jldm)
+    public ServerLogging(GuildSettingsDataManager db)
     {
-        ServerLogging.ldm = ldm;
-        this.jldm = jldm;
+        ServerLogging.db = db;
         this.parser = new ParserBuilder()
                 .addMethods(Variables.getMethods())
                 .addMethods(Arguments.getMethods())
@@ -54,8 +51,8 @@ public class ServerLogging extends ListenerAdapter
     public void onGuildMemberJoin(GuildMemberJoinEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel serverlog = ldm.getServerlogChannel(guild);
-        TextChannel welcome = jldm.getWelcomeChannel(guild);
+        TextChannel serverlog = db.getServerlogChannel(guild);
+        TextChannel welcome = db.getWelcomeChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User newmember = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
@@ -63,7 +60,7 @@ public class ServerLogging extends ListenerAdapter
         String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
-        String msg = jldm.getWelcomeMessage(guild);
+        String msg = db.getWelcomeMessage(guild);
         parser.clear().put("user", newmember).put("guild", guild).put("channel", welcome);
 
         if(!(serverlog==null))
@@ -89,17 +86,17 @@ public class ServerLogging extends ListenerAdapter
     public void onGuildMemberLeave(GuildMemberLeaveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel serverlog = ldm.getServerlogChannel(guild);
-        TextChannel leave = jldm.getLeaveChannel(guild);
+        TextChannel serverlog = db.getServerlogChannel(guild);
+        TextChannel leave = db.getLeaveChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-        User oldmember = event.getMember().getUser();
+        User odMember = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
-        String msg = jldm.getLeaveMessage(guild);
-        parser.clear().put("user", oldmember).put("guild", guild).put("channel", leave);
+        String msg = db.getLeaveMessage(guild);
+        parser.clear().put("user", odMember).put("guild", guild).put("channel", leave);
 
         if(!(serverlog==null))
         {
@@ -107,7 +104,7 @@ public class ServerLogging extends ListenerAdapter
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                     null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
-                serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldmember.getName()+"**#**"+oldmember.getDiscriminator()+"** ("+oldmember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+                serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+odMember.getName()+"**#**"+odMember.getDiscriminator()+"** ("+odMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
         }
 
         if(!(leave==null) && !(msg==null))
@@ -123,7 +120,7 @@ public class ServerLogging extends ListenerAdapter
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event)
     {
-        TextChannel tc = ldm.getServerlogChannel(event.getGuild());
+        TextChannel tc = db.getServerlogChannel(event.getGuild());
 
         if(!(tc==null) && !(event.getAuthor().isBot()))
             MessagesLogging.addMessage(event.getMessage().getIdLong(), event.getMessage());
@@ -134,7 +131,7 @@ public class ServerLogging extends ListenerAdapter
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
-        TextChannel tc = ldm.getServerlogChannel(guild);
+        TextChannel tc = db.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         Message newmsg = event.getMessage();
         String title;
@@ -192,7 +189,7 @@ public class ServerLogging extends ListenerAdapter
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
-        TextChannel tc = ldm.getServerlogChannel(guild);
+        TextChannel tc = db.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         String title;
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
@@ -248,7 +245,7 @@ public class ServerLogging extends ListenerAdapter
         {
             for(Guild guild : guilds)
             {
-                TextChannel tc = ldm.getServerlogChannel(guild);
+                TextChannel tc = db.getServerlogChannel(guild);
                 TextChannel channel = FinderUtil.getDefaultChannel(guild);
 
                 if(!(tc==null))
@@ -274,7 +271,7 @@ public class ServerLogging extends ListenerAdapter
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = ldm.getServerlogChannel(guild);
+        TextChannel tc = db.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelJoined();
         User user = event.getMember().getUser();
@@ -298,7 +295,7 @@ public class ServerLogging extends ListenerAdapter
     public void onGuildVoiceMove(GuildVoiceMoveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = ldm.getServerlogChannel(guild);
+        TextChannel tc = db.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vcold = event.getChannelLeft();
         VoiceChannel vcnew = event.getChannelJoined();
@@ -323,7 +320,7 @@ public class ServerLogging extends ListenerAdapter
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = ldm.getServerlogChannel(guild);
+        TextChannel tc = db.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelLeft();
         User user = event.getMember().getUser();

@@ -4,8 +4,7 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import com.jagrosh.jdautilities.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.JLDataManager;
-import me.artuto.endless.data.LoggingDataManager;
+import me.artuto.endless.data.GuildSettingsDataManager;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -17,13 +16,11 @@ import java.util.List;
 
 public class ServerSettings extends Command
 {
-    private final LoggingDataManager ldm;
-    private final JLDataManager jldm;
+    private final GuildSettingsDataManager db;
 
-    public ServerSettings(LoggingDataManager ldm, JLDataManager jldm)
+    public ServerSettings(GuildSettingsDataManager db)
     {
-        this.ldm = ldm;
-        this.jldm = jldm;
+        this.db = db;
         this.name = "config";
         this.children = new Command[]{new ModLog(), new ServerLog(), new Welcome(), new Leave()};
         this.aliases = new String[]{"settings"};
@@ -39,10 +36,10 @@ public class ServerSettings extends Command
     protected void execute(CommandEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel modlog = ldm.getModlogChannel(guild);
-        TextChannel serverlog = ldm.getServerlogChannel(guild);
-        TextChannel welcome = jldm.getWelcomeChannel(guild);
-        TextChannel leave = jldm.getLeaveChannel(guild);
+        TextChannel modlog = db.getModlogChannel(guild);
+        TextChannel serverlog = db.getServerlogChannel(guild);
+        TextChannel welcome = db.getWelcomeChannel(guild);
+        TextChannel leave = db.getLeaveChannel(guild);
         EmbedBuilder builder = new EmbedBuilder();
         String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
 
@@ -85,7 +82,7 @@ public class ServerSettings extends Command
                 event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                ldm.setModlogChannel(event.getGuild(), null);
+                db.setModlogChannel(event.getGuild(), null);
                 event.replySuccess("Modlogging disabled");
             }
             else
@@ -97,7 +94,7 @@ public class ServerSettings extends Command
                     event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    ldm.setModlogChannel(event.getGuild(), list.get(0));
+                    db.setModlogChannel(event.getGuild(), list.get(0));
                     event.replySuccess("Modlogging actions will be logged in "+list.get(0).getAsMention());
                 }
             }
@@ -125,7 +122,7 @@ public class ServerSettings extends Command
                 event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                ldm.setServerlogChannel(event.getGuild(), null);
+                db.setServerlogChannel(event.getGuild(), null);
                 event.replySuccess("Serverlogging disabled");
             }
             else
@@ -137,7 +134,7 @@ public class ServerSettings extends Command
                     event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    ldm.setServerlogChannel(event.getGuild(), list.get(0));
+                    db.setServerlogChannel(event.getGuild(), list.get(0));
                     event.replySuccess("Serverlogging actions will be logged in "+list.get(0).getAsMention());
                 }
             }
@@ -166,7 +163,7 @@ public class ServerSettings extends Command
                 event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                jldm.setWelcomeChannel(event.getGuild(), null);
+                db.setWelcomeChannel(event.getGuild(), null);
                 event.replySuccess("Welcome channel disabled");
             }
             else
@@ -178,7 +175,7 @@ public class ServerSettings extends Command
                     event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    jldm.setWelcomeChannel(event.getGuild(), list.get(0));
+                    db.setWelcomeChannel(event.getGuild(), list.get(0));
                     event.replySuccess("The message configured will be sent in "+list.get(0).getAsMention());
                 }
             }
@@ -207,7 +204,7 @@ public class ServerSettings extends Command
                 event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                jldm.setLeaveChannel(event.getGuild(), null);
+                db.setLeaveChannel(event.getGuild(), null);
                 event.replySuccess("Leave channel disabled");
             }
             else
@@ -219,7 +216,7 @@ public class ServerSettings extends Command
                     event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    jldm.setLeaveChannel(event.getGuild(), list.get(0));
+                    db.setLeaveChannel(event.getGuild(), list.get(0));
                     event.replySuccess("The message configured will be sent in "+list.get(0).getAsMention());
                 }
             }

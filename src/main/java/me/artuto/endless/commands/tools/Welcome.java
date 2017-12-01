@@ -3,15 +3,15 @@ package me.artuto.endless.commands.tools;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.JLDataManager;
+import me.artuto.endless.data.GuildSettingsDataManager;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
 public class Welcome extends Command
 {
-    private final JLDataManager db;
+    private final GuildSettingsDataManager db;
 
-    public Welcome(JLDataManager db)
+    public Welcome(GuildSettingsDataManager db)
     {
         this.db = db;
         this.name = "welcome";

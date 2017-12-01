@@ -17,26 +17,9 @@
 
 package me.artuto.endless;
 
-import com.jagrosh.jdautilities.waiter.EventWaiter;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import me.artuto.endless.data.Settings;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  *
@@ -45,14 +28,11 @@ import org.json.JSONObject;
 
 public class Bot extends ListenerAdapter
 {
-   private final HashMap<String,Settings> settings;
     private final Config config;
-    private JDA jda;
     
     public Bot(Config config)
     {
         this.config = config;
-        this.settings = new HashMap<>();
     }
     
     /**@Override

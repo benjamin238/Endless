@@ -44,20 +44,18 @@ public class Eval extends Command
     private List<String> imports;
     private final Config config;
     private final DatabaseManager db;
-    private final LoggingDataManager ldm;
+    private final GuildSettingsDataManager gsdm;
     private final BlacklistDataManager bdm;
     private final DonatorsDataManager ddm;
-    private final JLDataManager jldm;
     private final TagDataManager tdm;
     private final ModLogging modlog;
     
-    public Eval(Config config, DatabaseManager db, DonatorsDataManager ddm, LoggingDataManager ldm, BlacklistDataManager bdm, JLDataManager jldm, TagDataManager tdm, ModLogging modlog)
+    public Eval(Config config, DatabaseManager db, DonatorsDataManager ddm, GuildSettingsDataManager gsdm, BlacklistDataManager bdm, TagDataManager tdm, ModLogging modlog)
     {
-        this.ldm = ldm;
+        this.gsdm = gsdm;
         this.db = db;
         this.ddm = ddm;
         this.bdm = bdm;
-        this.jldm = jldm;
         this.tdm = tdm;
         this.config = config;
         this.modlog = modlog;
@@ -126,8 +124,7 @@ public class Eval extends Command
             engine.put("author", event.getAuthor());
             engine.put("ddm", ddm);
             engine.put("bdm", bdm);
-            engine.put("ldm", ldm);
-            engine.put("jldm", jldm);
+            engine.put("gsdm", gsdm);
             engine.put("tdm", tdm);
             engine.put("db", db);
             engine.put("config", config);
