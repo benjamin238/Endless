@@ -56,13 +56,9 @@ public class About extends Command
         Config config = null;
         
         if(event.isFromType(ChannelType.PRIVATE))
-        {
             color = Color.decode("#33ff00");
-        }
         else
-        {
             color = event.getGuild().getSelfMember().getColor();
-        }
 
         try
         {

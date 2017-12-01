@@ -66,9 +66,7 @@ public class UserInfo extends Command
     	Member member;
                 
         if(event.getArgs().isEmpty())
-        {
             member = event.getMessage().getMember();
-        }
         else
         {
             List<Member> list = FinderUtil.findMembers(event.getArgs(), event.getGuild());
@@ -84,9 +82,7 @@ public class UserInfo extends Command
                 return;
             }
     	    else
-            {
                 member = list.get(0);
-            }
         }
 
         List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
@@ -120,13 +116,9 @@ public class UserInfo extends Command
         emote = InfoTools.onlineStatus(member);
 
         if(InfoTools.nitroCheck(member.getUser()))
-        {
             ranks = "<:nitro:334859814566101004>";
-        }
         else
-        {
             ranks = "";
-        }
 
         String title=(member.getUser().isBot()?":information_source: Information about the bot **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** <:bot:334859813915983872>":":information_source: Information about the user **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** "+ranks);
         
