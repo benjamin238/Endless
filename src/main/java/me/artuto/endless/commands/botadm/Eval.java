@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.*;
@@ -148,11 +149,11 @@ public class Eval extends Command
             if(out==null || String.valueOf(out).isEmpty())
                 event.reactSuccess();
             else
-                event.replySuccess("Done! Output:\n```"+out.toString().replaceAll(event.getJDA().getToken(), "Nice try.")+" ```");
+                event.replySuccess("Done! Output:\n```"+out.toString().replaceAll(event.getJDA().getToken(), "Nice try.")+"```");
         } 
-        catch(Exception e2)
+        catch(ScriptException e2)
         {
-            event.replyError("Error! Output:\n```java\n"+e2+" ```");
+            event.replyError("Error! Output:\n```"+e2+" ```");
         }
     }
 }

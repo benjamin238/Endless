@@ -61,7 +61,6 @@ public class UserInfo extends Command
         String ranks;
         String roles;
         String emote;
-        String joinsorder;
     	EmbedBuilder builder = new EmbedBuilder();
     	Member member;
                 
@@ -85,31 +84,32 @@ public class UserInfo extends Command
                 member = list.get(0);
         }
 
+        String strjoins;
         List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
-        Collections.sort(joins, (Member a, Member b) -> event.getGuild().getMember(a.getUser()).getJoinDate().compareTo(event.getGuild().getMember(b.getUser()).getJoinDate()));
+        Collections.sort(joins, (Member a, Member b) -> a.getJoinDate().compareTo(b.getJoinDate()));
         int index = joins.indexOf(member);
-
+        int joinnumber = index;
         index -= 3;
-        if(index < 0)
+        if(index<0)
             index = 0;
+
         if(joins.get(index).equals(member))
-            joinsorder = "**"+joins.get(index).getUser().getName()+"**";
+            strjoins = "**"+joins.get(index).getUser().getName()+"**";
         else
-            joinsorder = joins.get(index).getUser().getName();
-        for(int i = index + 1;i<index + 7;i++)
+            strjoins = joins.get(index).getUser().getName();
+
+        for(int i=index+1; i<index+7; i++)
         {
-            if (i >= joins.size())
+            if(i>joins.size())
                 break;
 
-            Member m6 = joins.get(i);
-            Member m5 = joins.get(i-1);
-            Member m4 = joins.get(i-2);
-            Member m = joins.get(i-3);
-            Member m3 = joins.get(i-4);
-            Member m2 = joins.get(i-5);
-            Member m1 = joins.get(i-6);
+            Member m = joins.get(i);
+            String name = m.getUser().getName();
 
-            joinsorder = m1.getUser().getName()+" > "+m2.getUser().getName()+" > "+m3.getUser().getName()+" > **"+m.getUser().getName()+"** > "+m4.getUser().getName()+" > "+m5.getUser().getName()+" > "+m6.getUser().getName();
+            if(m.equals(member))
+                name = "**"+name+"**";
+
+            strjoins += " > "+name;
         }
 
         roles = InfoTools.mentionUserRoles(member);
@@ -132,7 +132,7 @@ public class UserInfo extends Command
 	                        : "Playing "+member.getGame().getName())+")"+""), false);
     	    builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
     	    builder.addField(":calendar_spiral: Guild Join Date: ", member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
-    	    builder.addField("Join Order: `(#"+(index+4)+")`", joinsorder, false);
+    	    builder.addField("Join Order: `(#"+(joinnumber+1)+")`", strjoins, false);
 	        builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
     	    builder.setColor(member.getColor());
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
