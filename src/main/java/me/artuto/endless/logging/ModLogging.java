@@ -192,9 +192,9 @@ public class ModLogging
                         {
                             User a = msg.getAuthor();
 
-                            if(!(msg.getContent().isEmpty()))
+                            if(!(msg.getContentDisplay().isEmpty()))
                             {
-                                String toWrite = a.getName() + "#" + a.getDiscriminator() + ": " + msg.getContent() + "\n";
+                                String toWrite = a.getName() + "#" + a.getDiscriminator() + ": " + msg.getContentDisplay() + "\n";
                                 output.append(toWrite);
                             }
                         }

@@ -127,8 +127,6 @@ public class Endless extends ListenerAdapter
         client.setServerInvite(Const.INVITE);
         client.setEmojis(config.getDoneEmote(), config.getWarnEmote(), config.getErrorEmote());
         client.setPrefix(config.getPrefix());
-        client.setStatus(config.getStatus());
-        client.setGame(Game.playing(config.getGame()));
 
         if(!(Arrays.toString(owners).isEmpty()))
             client.setCoOwnerIds(owners);
@@ -199,12 +197,12 @@ public class Endless extends ListenerAdapter
 
     }
 
-    private static void startJda() throws LoginException, RateLimitedException, InterruptedException
+    private static JDA startJda() throws LoginException, RateLimitedException, InterruptedException
     {
-        JDA jda = new JDABuilder(AccountType.BOT)
+        JDABuilder jda = new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
-                .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setGame(Game.playing(Const.GAME_0))
+                .setGame(Game.playing(config.getGame()))
+                .setStatus(config.getStatus())
                 .addEventListener(waiter)
                 .addEventListener(createClient())
                 .addEventListener(bot)
@@ -212,15 +210,9 @@ public class Endless extends ListenerAdapter
                 .addEventListener(new Logging(config))
                 .addEventListener(new ServerLogging(gsdm))
                 .addEventListener(new GuildEvents(config, tdm, gsdm))
-                .addEventListener(new UserEvents(config))
-                .buildBlocking();
+                .addEventListener(new UserEvents(config));
 
-        getJDA(jda);
-    }
-
-    public static JDA getJDA(JDA jda)
-    {
-        return jda;
+        return jda.buildBlocking();
     }
 
     //When ready print the bot info

@@ -175,11 +175,11 @@ public class GuildEvents extends ListenerAdapter
                 String tagargs;
                 String[] args;
 
-                if(msg.getContent().startsWith(command) && event.getChannel().canTalk())
+                if(msg.getContentDisplay().startsWith(command) && event.getChannel().canTalk())
                 {
                     try
                     {
-                        args = msg.getContent().split(command+" ", 2);
+                        args = msg.getContentDisplay().split(command+" ", 2);
                         tagargs = args[1];
                     }
                     catch(ArrayIndexOutOfBoundsException e)
@@ -214,7 +214,7 @@ public class GuildEvents extends ListenerAdapter
                         EmbedBuilder builder = new EmbedBuilder();
 
                         builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
-                        builder.setDescription(msg.getContent());
+                        builder.setDescription(msg.getContentDisplay());
                         builder.setFooter("#"+msg.getTextChannel().getName()+", "+event.getGuild().getName(), event.getGuild().getIconUrl());
                         builder.setTimestamp(msg.getCreationTime());
                         builder.setColor(event.getMember().getColor());

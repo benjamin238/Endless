@@ -20,7 +20,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -37,7 +37,7 @@ public class Categories
 
     public static final Category BOTADM = new Category("Bot Administration", event ->
     {
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else 
         {
@@ -50,7 +50,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -69,7 +69,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -88,7 +88,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -107,7 +107,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -126,7 +126,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
