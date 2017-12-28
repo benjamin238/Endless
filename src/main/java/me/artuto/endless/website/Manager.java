@@ -30,10 +30,16 @@ public class Manager
         this.config = config;
     }
 
-    public void start()
+    public void prepare()
     {
         port(config.getDashboardPort());
-        get("/", (req, res) -> "<h2>hola hola!</h2>");
+        staticFiles.location("/public");
+        get("/", (req, res) -> /*this.getClass().getResource("/public/index.html")*/ "hola!");
+    }
+
+    public void start()
+    {
+        init();
     }
 
     public void shutdown()

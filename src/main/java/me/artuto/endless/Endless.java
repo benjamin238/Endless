@@ -89,16 +89,16 @@ public class Endless extends ListenerAdapter
             return;
         }
 
-        LOG.info("Starting Database and Managers...");
+        /*LOG.info("Starting Database and Managers...");
         initializeData();
-        LOG.info("Successfully loaded Databases and Managers!");
+        LOG.info("Successfully loaded Databases and Managers!");*/
 
         LOG.info("Starting the Dashboard...");
         startDashboard();
         LOG.info("Successfully started dashboard!");
 
-        LOG.info("Starting JDA...");
-        startJda();
+        /*LOG.info("Starting JDA...");
+        startJda();*/
     }
 
     private static void initializeData() throws SQLException
@@ -117,10 +117,11 @@ public class Endless extends ListenerAdapter
     private static void startDashboard()
     {
         dashboard = new Manager(config);
-        dashboard.start();
+        dashboard.prepare();
+        //dashboard.start();
     }
 
-    private static CommandClient createClient()
+    /*private static CommandClient createClient()
     {
         CommandClientBuilder client = new CommandClientBuilder();
         Long[] coOwners = config.getCoOwnerIds();
@@ -248,5 +249,5 @@ public class Endless extends ListenerAdapter
             LOG.warn("Looks like your bot isn't on any guild! Add your bot using the following link:");
             LOG.warn(event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR));
         }
-    }
+    }*/
 }
