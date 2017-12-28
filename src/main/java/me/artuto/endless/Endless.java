@@ -33,6 +33,7 @@ import me.artuto.endless.events.*;
 import me.artuto.endless.loader.*;
 import me.artuto.endless.logging.*;
 import me.artuto.endless.utils.GuildUtils;
+import me.artuto.endless.website.Manager;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.Game;
@@ -67,6 +68,7 @@ public class Endless extends ListenerAdapter
     private static Logger LOGGER = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
     private static ModLogging modlog;
+    private static Manager dashboard;
 
     public static void main(String[] args) throws SQLException, LoginException, RateLimitedException, InterruptedException
     {
@@ -91,6 +93,10 @@ public class Endless extends ListenerAdapter
         initializeData();
         LOG.info("Successfully loaded Databases and Managers!");
 
+        LOG.info("Starting the Dashboard...");
+        startDashboard();
+        LOG.info("Successfully started dashboard!");
+
         LOG.info("Starting JDA...");
         startJda();
     }
@@ -106,6 +112,12 @@ public class Endless extends ListenerAdapter
         modlog = new ModLogging(gsdm);
         new GuildUtils(config, db);
         new Categories(bdm);
+    }
+
+    private static void startDashboard()
+    {
+        dashboard = new Manager(config);
+        dashboard.start();
     }
 
     private static CommandClient createClient()
@@ -200,7 +212,6 @@ public class Endless extends ListenerAdapter
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
                 .setEnableShutdownHook(true)
-                .setMaxReconnectDelay(10)
                 .addEventListener(waiter, createClient(), bot,
                         new Endless(), new Logging(config), new ServerLogging(gsdm),
                         new GuildEvents(config, tdm, gsdm), new UserEvents(config))
