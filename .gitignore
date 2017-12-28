@@ -25,10 +25,6 @@ hs_err_pid*
 # Configuration files
 *.yml
 
-# Data files
-*.json
-data/*
-
 # Other things
 logs/*
 target/*

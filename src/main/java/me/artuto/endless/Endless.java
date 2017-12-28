@@ -18,10 +18,8 @@
 package me.artuto.endless;
 
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import com.jagrosh.jdautilities.commandclient.CommandClient;
-import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
+import ch.qos.logback.classic.*;
+import com.jagrosh.jdautilities.commandclient.*;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.bot.*;
@@ -31,23 +29,19 @@ import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
 import me.artuto.endless.data.*;
-import me.artuto.endless.events.GuildEvents;
-import me.artuto.endless.events.UserEvents;
-import me.artuto.endless.loader.Config;
-import me.artuto.endless.loader.Logging;
-import me.artuto.endless.logging.ModLogging;
-import me.artuto.endless.logging.ServerLogging;
+import me.artuto.endless.events.*;
+import me.artuto.endless.loader.*;
+import me.artuto.endless.logging.*;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.*;
-import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
@@ -74,7 +68,7 @@ public class Endless extends ListenerAdapter
     private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
     private static ModLogging modlog;
 
-    public static void main(String[] args) throws IOException, SQLException, LoginException, RateLimitedException, InterruptedException
+    public static void main(String[] args) throws SQLException, LoginException, RateLimitedException, InterruptedException
     {
         LOGGER.setLevel(Level.INFO);
 
@@ -197,22 +191,20 @@ public class Endless extends ListenerAdapter
 
     }
 
-    private static JDA startJda() throws LoginException, RateLimitedException, InterruptedException
+    private static void startJda() throws LoginException, RateLimitedException, InterruptedException
     {
-        JDABuilder jda = new JDABuilder(AccountType.BOT)
+        new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
                 .setGame(Game.playing(config.getGame()))
                 .setStatus(config.getStatus())
-                .addEventListener(waiter)
-                .addEventListener(createClient())
-                .addEventListener(bot)
-                .addEventListener(new Endless())
-                .addEventListener(new Logging(config))
-                .addEventListener(new ServerLogging(gsdm))
-                .addEventListener(new GuildEvents(config, tdm, gsdm))
-                .addEventListener(new UserEvents(config));
-
-        return jda.buildBlocking();
+                .setBulkDeleteSplittingEnabled(false)
+                .setAutoReconnect(true)
+                .setEnableShutdownHook(true)
+                .setMaxReconnectDelay(10)
+                .addEventListener(waiter, createClient(), bot,
+                        new Endless(), new Logging(config), new ServerLogging(gsdm),
+                        new GuildEvents(config, tdm, gsdm), new UserEvents(config))
+                .buildBlocking();
     }
 
     //When ready print the bot info
