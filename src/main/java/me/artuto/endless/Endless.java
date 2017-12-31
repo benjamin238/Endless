@@ -33,7 +33,6 @@ import me.artuto.endless.events.*;
 import me.artuto.endless.loader.*;
 import me.artuto.endless.logging.*;
 import me.artuto.endless.utils.GuildUtils;
-import me.artuto.endless.website.Manager;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.Game;
@@ -68,7 +67,7 @@ public class Endless extends ListenerAdapter
     private static Logger LOGGER = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
     private static ModLogging modlog;
-    private static Manager dashboard;
+    private static API dashboard;
 
     public static void main(String[] args) throws SQLException, LoginException, RateLimitedException, InterruptedException
     {
@@ -116,7 +115,7 @@ public class Endless extends ListenerAdapter
 
     private static void startDashboard()
     {
-        dashboard = new Manager(config);
+        dashboard = new API(config);
         dashboard.start();
     }
 
