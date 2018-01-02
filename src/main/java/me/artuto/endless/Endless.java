@@ -88,12 +88,12 @@ public class Endless extends ListenerAdapter
             return;
         }
 
-        /*LOG.info("Starting Database and Managers...");
+        LOG.info("Starting Database and Managers...");
         initializeData();
-        LOG.info("Successfully loaded Databases and Managers!");*/
+        LOG.info("Successfully loaded Databases and Managers!");
 
-        /*LOG.info("Starting JDA...");
-        startJda();*/
+        LOG.info("Starting JDA...");
+        startJda();
     }
 
     private static void initializeData() throws SQLException

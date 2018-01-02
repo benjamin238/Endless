@@ -20,6 +20,7 @@ package me.artuto.endless;
 import me.artuto.endless.Bot;
 import me.artuto.endless.loader.Config;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import spark.Request;
 import spark.Response;
@@ -37,6 +38,7 @@ public class API
                 return notAuthorizated(res);
 
             Long id;
+            JSONArray array = new JSONArray();
 
             try
             {
@@ -47,7 +49,20 @@ public class API
                 return error(res, "Invalid ID");
             }
 
-            return "WIP";
+            bot.getManagedGuildsForUser(id).stream().map(g -> {
+                JSONObject gObj = new JSONObject()
+                        .put("id", g.getIdLong())
+                        .put("name", g.getName())
+                        .put("ownerId", g.getOwner().getUser().getIdLong())
+                        .put("owner", g.getOwner().getUser().getName()+"#"+g.getOwner().getUser().getDiscriminator())
+                        .put("icon", g.getIconUrl()==null?JSONObject.NULL:g.getIconUrl());
+                return gObj;
+            }).forEachOrdered(g -> array.put(g));
+
+            res.status(200);
+            res.header("Content-Type", "applkcation-json");
+            res.body(array.toString());
+            return res.body();
         });
     }
 

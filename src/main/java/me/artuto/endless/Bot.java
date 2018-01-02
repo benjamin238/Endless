@@ -24,9 +24,11 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -50,13 +52,7 @@ public class Bot extends ListenerAdapter
         User user = jda.getUserById(id);
 
         if(!(user==null))
-        {
-            for(Guild guild : jda.getMutualGuilds(user))
-            {
-                if(guild.getMember(user).hasPermission(Permission.ADMINISTRATOR))
-                    guilds.add(guild);
-            }
-        }
+            user.getMutualGuilds().stream().filter(g -> g.getMember(user).hasPermission(Permission.MANAGE_SERVER)).forEach(g -> guilds.add(g));
 
         return guilds;
     }
