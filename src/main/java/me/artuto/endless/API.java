@@ -30,11 +30,11 @@ public class API
 {
     public static void main(String authToken, Config config, Bot bot)
     {
-        Spark.port(config.getDashboardPort());
+        Spark.port(config.getAPIPort());
 
         Spark.get("/api/users/:id/guilds", (req, res) -> {
-            if(!(isAuthenticated(req, authToken)))
-                return notAuthenticated(res);
+            if(!(isAuthorizated(req, authToken)))
+                return notAuthorizated(res);
 
             Long id;
 
@@ -51,12 +51,12 @@ public class API
         });
     }
 
-    private static boolean isAuthenticated(Request req, String authToken)
+    private static boolean isAuthorizated(Request req, String authToken)
     {
-        return !(req.headers("Authentication")==null) && req.headers("Authentication").equals(authToken);
+        return !(req.headers("Authorization")==null) && req.headers("Authorization").equals(authToken);
     }
 
-    private static String notAuthenticated(Response res)
+    private static String notAuthorizated(Response res)
     {
         res.status(401);
         res.body(new JSONObject().put("message", "Invalid auth token").toString());

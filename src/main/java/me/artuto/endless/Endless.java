@@ -54,10 +54,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class Endless extends ListenerAdapter
 {
+    private static JDA jda;
     private static Config config;
     private static ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
     private static EventWaiter waiter = new EventWaiter();
-    private static Bot bot = new Bot(config);
+    private static Bot bot = new Bot(config, jda);
     private static BlacklistDataManager bdm;
     private static DatabaseManager db;
     private static DonatorsDataManager ddm;
@@ -67,7 +68,6 @@ public class Endless extends ListenerAdapter
     private static Logger LOGGER = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
     private static ModLogging modlog;
-    private static API dashboard;
 
     public static void main(String[] args) throws SQLException, LoginException, RateLimitedException, InterruptedException
     {
@@ -88,16 +88,12 @@ public class Endless extends ListenerAdapter
             return;
         }
 
-        LOG.info("Starting Database and Managers...");
+        /*LOG.info("Starting Database and Managers...");
         initializeData();
-        LOG.info("Successfully loaded Databases and Managers!");
+        LOG.info("Successfully loaded Databases and Managers!");*/
 
-        LOG.info("Starting the Dashboard...");
-        startDashboard();
-        LOG.info("Successfully started dashboard!");
-
-        LOG.info("Starting JDA...");
-        startJda();
+        /*LOG.info("Starting JDA...");
+        startJda();*/
     }
 
     private static void initializeData() throws SQLException
@@ -113,10 +109,9 @@ public class Endless extends ListenerAdapter
         new Categories(bdm);
     }
 
-    private static void startDashboard()
+    private static void startAPI()
     {
-        dashboard = new API(config);
-        dashboard.start();
+        API.main(config.getAPIToken(), config, bot);
     }
 
     private static CommandClient createClient()
@@ -204,7 +199,7 @@ public class Endless extends ListenerAdapter
 
     private static void startJda() throws LoginException, RateLimitedException, InterruptedException
     {
-        new JDABuilder(AccountType.BOT)
+        jda = new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
                 .setGame(Game.playing(config.getGame()))
                 .setStatus(config.getStatus())
@@ -222,6 +217,10 @@ public class Endless extends ListenerAdapter
     @Override
     public void onReady(ReadyEvent event)
     {
+        LOG.info("Starting the API...");
+        startAPI();
+        LOG.info("Successfully started the API!");
+
         LOG.info("Leaving Pointless Guilds...");
         GuildUtils.leaveBadGuilds(event.getJDA());
         LOG.info("Done!");

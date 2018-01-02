@@ -141,9 +141,14 @@ public class Config
         return format.botlogChannelId;
     }
 
-    public int getDashboardPort()
+    public int getAPIPort()
     {
-        return format.dashboardPort;
+        return format.apiPort;
+    }
+
+    public String getAPIToken()
+    {
+        return format.apiToken;
     }
 
     public OnlineStatus getStatus()

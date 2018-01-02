@@ -19,7 +19,14 @@ package me.artuto.endless;
 
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -29,10 +36,29 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 public class Bot extends ListenerAdapter
 {
     private final Config config;
-    
-    public Bot(Config config)
+    private final JDA jda;
+
+    public Bot(Config config, JDA jda)
     {
         this.config = config;
+        this.jda = jda;
+    }
+
+    public List<Guild> getManagedGuildsForUser(Long id)
+    {
+        List<Guild> guilds = new LinkedList<>();
+        User user = jda.getUserById(id);
+
+        if(!(user==null))
+        {
+            for(Guild guild : jda.getMutualGuilds(user))
+            {
+                if(guild.getMember(user).hasPermission(Permission.ADMINISTRATOR))
+                    guilds.add(guild);
+            }
+        }
+
+        return guilds;
     }
     
     /**@Override
