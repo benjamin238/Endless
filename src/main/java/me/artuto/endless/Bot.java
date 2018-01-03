@@ -65,7 +65,12 @@ public class Bot extends ListenerAdapter
 
         return guilds;
     }
-    
+
+    public Guild getGuild(Long id)
+    {
+        return jda.getGuildById(id);
+    }
+
     /**@Override
     public void onGuildJoin(GuildJoinEvent event)
     {

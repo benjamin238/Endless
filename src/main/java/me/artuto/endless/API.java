@@ -20,6 +20,7 @@ package me.artuto.endless;
 import me.artuto.endless.Bot;
 import me.artuto.endless.loader.Config;
 
+import net.dv8tion.jda.core.entities.Guild;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import spark.Request;
@@ -34,8 +35,8 @@ public class API
         Spark.port(config.getAPIPort());
 
         Spark.get("/api/users/:id/guilds", (req, res) -> {
-            if(!(isAuthorizated(req, authToken)))
-                return notAuthorizated(res);
+            /*if(!(isAuthorizated(req, authToken)))
+                return notAuthorizated(res);*/
 
             Long id;
             JSONArray array = new JSONArray();
@@ -62,6 +63,42 @@ public class API
             res.body(array.toString());
             return res.body();
         });
+
+        Spark.get("/api/guilds/:id", (req, res) -> {
+            /*if(!(isAuthorizated(req, authToken)))
+                return notAuthorizated(res);*/
+
+            Long id;
+
+            try
+            {
+                id = Long.parseLong(req.params("id"));
+            }
+            catch(NumberFormatException e)
+            {
+                return error(res, "Invalid ID");
+            }
+
+            JSONObject gObj = new JSONObject();
+            Guild guild = bot.getGuild(id);
+
+            if(guild==null)
+                return nullItem(res, "Guild not found");
+            else
+            {
+                gObj.put("id", guild.getIdLong())
+                        .put("name", guild.getName())
+                        .put("", guild.getTextChannelCache().size())
+                        .put("", guild.getVoiceChannelCache().size())
+                        .put("", "");
+
+
+                res.status(200);
+                res.header("Content-Type", "application-json");
+                res.body(gObj.toString());
+                return res.body();
+            }
+        });
     }
 
     private static boolean isAuthorizated(Request req, String authToken)
@@ -79,6 +116,13 @@ public class API
     private static String error(Response res, String message)
     {
         res.status(400);
+        res.body(new JSONObject().put("message", message).toString());
+        return res.body();
+    }
+
+    private static String nullItem(Response res, String message)
+    {
+        res.status(404);
         res.body(new JSONObject().put("message", message).toString());
         return res.body();
     }
