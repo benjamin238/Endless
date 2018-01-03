@@ -58,7 +58,7 @@ public class Endless extends ListenerAdapter
     private static Config config;
     private static ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
     private static EventWaiter waiter = new EventWaiter();
-    private static Bot bot = new Bot(config, jda);
+    private static Bot bot;
     private static BlacklistDataManager bdm;
     private static DatabaseManager db;
     private static DonatorsDataManager ddm;
@@ -206,7 +206,7 @@ public class Endless extends ListenerAdapter
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
                 .setEnableShutdownHook(true)
-                .addEventListener(waiter, createClient(), bot,
+                .addEventListener(waiter, createClient(),
                         new Endless(), new Logging(config), new ServerLogging(gsdm),
                         new GuildEvents(config, tdm, gsdm), new UserEvents(config))
                 .buildBlocking();
@@ -217,6 +217,7 @@ public class Endless extends ListenerAdapter
     @Override
     public void onReady(ReadyEvent event)
     {
+        bot = new Bot(config, event.getJDA());
         LOG.info("Starting the API...");
         startAPI();
         LOG.info("Successfully started the API!");

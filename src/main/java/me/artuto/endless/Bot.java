@@ -46,6 +46,15 @@ public class Bot extends ListenerAdapter
         this.jda = jda;
     }
 
+    public List<Guild> getGuildsForUser(Long id)
+    {
+        User user = jda.getUserById(id);
+
+        if(!(user==null))
+            return user.getMutualGuilds();
+        else return null;
+    }
+
     public List<Guild> getManagedGuildsForUser(Long id)
     {
         List<Guild> guilds = new LinkedList<>();
