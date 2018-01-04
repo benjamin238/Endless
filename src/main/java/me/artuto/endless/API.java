@@ -88,10 +88,10 @@ public class API
             {
                 gObj.put("id", guild.getIdLong())
                         .put("name", guild.getName())
-                        .put("", guild.getTextChannelCache().size())
-                        .put("", guild.getVoiceChannelCache().size())
-                        .put("", "");
-
+                        .put("tcCount", guild.getTextChannelCache().size())
+                        .put("vcCount", guild.getVoiceChannelCache().size())
+                        .put("mbCount", guild.getMemberCache().size())
+                        .put("btCount", guild.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).collect(java.util.stream.Collectors.toList()).size());
 
                 res.status(200);
                 res.header("Content-Type", "application-json");
