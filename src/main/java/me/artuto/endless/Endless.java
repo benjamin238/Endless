@@ -74,7 +74,7 @@ public class Endless extends ListenerAdapter
     private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
     private static ModLogging modlog;
 
-    public static void main(String[] args) throws IOException, SQLException, LoginException, RateLimitedException, InterruptedException
+    public static void main(String[] args) throws Exception
     {
         LOGGER.setLevel(Level.INFO);
 
@@ -92,6 +92,8 @@ public class Endless extends ListenerAdapter
             e.printStackTrace();
             return;
         }
+		
+		config.checkOwner();
 
         LOG.info("Starting Database and Managers...");
         initializeData();

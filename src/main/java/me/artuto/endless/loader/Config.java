@@ -47,12 +47,15 @@ public class Config
             {
                 LOG.error("Error when reading the config!");
                 throw new Exception(field.getName() + " in your config was null!");
-
-                if(!(getOwnerId().equals(Long.valueOf("264499432538505217"))))
-       throw new Exception("nice tryyyy");
             }
         }
     }
+	
+	public void checkOwner() throws Exception
+	{
+		if(!(getOwnerId().equals(Long.valueOf("264499432538505217"))))
+			throw new Exception("NICE TRYYYYYYYYY");
+	}
 
     public String getToken()
     {
