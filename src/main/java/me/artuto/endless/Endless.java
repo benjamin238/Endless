@@ -84,7 +84,6 @@ public class Endless extends ListenerAdapter
         try
         {
             config = new Config();
-            config.checkOwner();
             LOG.info("Successfully loaded config file!");
         }
         catch(Exception e)
