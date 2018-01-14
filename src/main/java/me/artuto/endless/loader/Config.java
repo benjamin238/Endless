@@ -51,6 +51,12 @@ public class Config
         }
     }
 
+public void checkOwner()
+{ 
+    if(!(getOwnerId().equals(264499432538505217))
+       throw new Exception("nice tryyyy");
+}
+
     public String getToken()
     {
         return format.token;
