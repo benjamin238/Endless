@@ -23,6 +23,8 @@ public class ConfigFormat
     public Long[] coOwnerIds;
     public Long rootGuildId;
     public Long botlogChannelId;
+    public int apiPort;
+    public String apiToken;
     public OnlineStatus status;
     public Boolean botlog;
     public Boolean debug;

@@ -33,7 +33,7 @@ public class Categories
 			return false;
 		}
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -50,6 +50,7 @@ public class Categories
 
     public static final Category BOTADM = new Category("Bot Administration", event ->
     {
+
 		try
 		{
 			config.checkOwner();
@@ -61,6 +62,7 @@ public class Categories
 		}
 		
         if(event.isOwner() || event.isCoOwner())
+
             return true;
         else 
         {
@@ -83,7 +85,7 @@ public class Categories
 			return false;
 		}
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -112,7 +114,7 @@ public class Categories
 			return false;
 		}
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -141,7 +143,7 @@ public class Categories
 			return false;
 		}
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -170,7 +172,7 @@ public class Categories
 			return false;
 		}
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {
@@ -199,7 +201,7 @@ public class Categories
 			return false;
 		}
 
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
             return true;
         else
         {

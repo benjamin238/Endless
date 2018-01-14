@@ -40,7 +40,7 @@ public class Tag extends Command
             for(Command c : command.getChildren())
                 sb.append("`"+event.getClient().getPrefix()+c.getName()+" "+c.getArguments()+"` - "+c.getHelp()+"\n");
 
-            event.replyInDM(sb.toString());
+            event.replyInDm(sb.toString());
             event.reactSuccess();
         };
         this.arguments = "<name>";
@@ -172,7 +172,7 @@ public class Tag extends Command
                 event.replyError("No tag found with that name!");
             else
             {
-                if(owner.equals(event.getAuthor().getIdLong()) || event.isOwner() || event.isCoOwner())
+                if(owner.equals(event.getAuthor().getIdLong()) || event.isOwner())
                 {
                     db.removeTag(event.getArgs().trim().toLowerCase());
                     event.replySuccess("Tag successfully deleted");
@@ -229,7 +229,7 @@ public class Tag extends Command
                 event.replyError("No tag found with that name!");
             else
             {
-                if(owner.equals(event.getAuthor().getIdLong()) || event.isOwner() || (event.isCoOwner()))
+                if(owner.equals(event.getAuthor().getIdLong()) || event.isOwner())
                 {
                     db.editTag(name, content);
                     event.replySuccess("Tag successfully edited!");

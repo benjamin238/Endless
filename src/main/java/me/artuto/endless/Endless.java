@@ -18,10 +18,8 @@
 package me.artuto.endless;
 
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import com.jagrosh.jdautilities.commandclient.CommandClient;
-import com.jagrosh.jdautilities.commandclient.CommandClientBuilder;
+import ch.qos.logback.classic.*;
+import com.jagrosh.jdautilities.commandclient.*;
 import com.jagrosh.jdautilities.waiter.EventWaiter;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.bot.*;
@@ -31,23 +29,19 @@ import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
 import me.artuto.endless.data.*;
-import me.artuto.endless.events.GuildEvents;
-import me.artuto.endless.events.UserEvents;
-import me.artuto.endless.loader.Config;
-import me.artuto.endless.loader.Logging;
-import me.artuto.endless.logging.ModLogging;
-import me.artuto.endless.logging.ServerLogging;
+import me.artuto.endless.events.*;
+import me.artuto.endless.loader.*;
+import me.artuto.endless.logging.*;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.*;
-import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
@@ -60,10 +54,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class Endless extends ListenerAdapter
 {
+    private static JDA jda;
     private static Config config;
     private static ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
     private static EventWaiter waiter = new EventWaiter();
-    private static Bot bot = new Bot(config);
+    private static Bot bot;
     private static BlacklistDataManager bdm;
     private static DatabaseManager db;
     private static DonatorsDataManager ddm;
@@ -74,7 +69,9 @@ public class Endless extends ListenerAdapter
     private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
     private static ModLogging modlog;
 
+
     public static void main(String[] args) throws Exception
+
     {
         LOGGER.setLevel(Level.INFO);
 
@@ -116,6 +113,11 @@ public class Endless extends ListenerAdapter
         new Categories(bdm);
     }
 
+    private static void startAPI()
+    {
+        API.main(config.getAPIToken(), config, bot);
+    }
+
     private static CommandClient createClient()
     {
         CommandClientBuilder client = new CommandClientBuilder();
@@ -129,8 +131,6 @@ public class Endless extends ListenerAdapter
         client.setServerInvite(Const.INVITE);
         client.setEmojis(config.getDoneEmote(), config.getWarnEmote(), config.getErrorEmote());
         client.setPrefix(config.getPrefix());
-        client.setStatus(config.getStatus());
-        client.setGame(Game.playing(config.getGame()));
 
         if(!(Arrays.toString(owners).isEmpty()))
             client.setCoOwnerIds(owners);
@@ -203,26 +203,17 @@ public class Endless extends ListenerAdapter
 
     private static void startJda() throws LoginException, RateLimitedException, InterruptedException
     {
-        JDA jda = new JDABuilder(AccountType.BOT)
+        jda = new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
-                .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setGame(Game.playing(Const.GAME_0))
-                .addEventListener(waiter)
-                .addEventListener(createClient())
-                .addEventListener(bot)
-                .addEventListener(new Endless())
-                .addEventListener(new Logging(config))
-                .addEventListener(new ServerLogging(gsdm))
-                .addEventListener(new GuildEvents(config, tdm, gsdm))
-                .addEventListener(new UserEvents(config))
+                .setGame(Game.playing(config.getGame()))
+                .setStatus(config.getStatus())
+                .setBulkDeleteSplittingEnabled(false)
+                .setAutoReconnect(true)
+                .setEnableShutdownHook(true)
+                .addEventListener(waiter, createClient(),
+                        new Endless(), new Logging(config), new ServerLogging(gsdm),
+                        new GuildEvents(config, tdm, gsdm), new UserEvents(config))
                 .buildBlocking();
-
-        getJDA(jda);
-    }
-
-    public static JDA getJDA(JDA jda)
-    {
-        return jda;
     }
 
     //When ready print the bot info
@@ -230,6 +221,11 @@ public class Endless extends ListenerAdapter
     @Override
     public void onReady(ReadyEvent event)
     {
+        bot = new Bot(config, event.getJDA());
+        LOG.info("Starting the API...");
+        startAPI();
+        LOG.info("Successfully started the API!");
+
         LOG.info("Leaving Pointless Guilds...");
         GuildUtils.leaveBadGuilds(event.getJDA());
         LOG.info("Done!");

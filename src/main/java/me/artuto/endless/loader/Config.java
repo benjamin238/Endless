@@ -41,9 +41,9 @@ public class Config
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         format = mapper.readValue(new File("config.yml"), ConfigFormat.class);
 
-        for (Field field : format.getClass().getDeclaredFields())
+        for(Field field : format.getClass().getDeclaredFields())
         {
-            if (field.get(format) == null)
+            if(field.get(format) == null)
             {
                 LOG.error("Error when reading the config!");
                 throw new Exception(field.getName() + " in your config was null!");
@@ -145,6 +145,16 @@ public class Config
     public Long getBotlogChannelId()
     {
         return format.botlogChannelId;
+    }
+
+    public int getAPIPort()
+    {
+        return format.apiPort;
+    }
+
+    public String getAPIToken()
+    {
+        return format.apiToken;
     }
 
     public OnlineStatus getStatus()
