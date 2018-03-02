@@ -44,7 +44,7 @@ public class Logging extends ListenerAdapter
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        if(event.getMessage().getContent().startsWith(config.getPrefix()))
+        if(event.getMessage().getContentDisplay().startsWith(config.getPrefix()))
         {
             if(event.isFromType(ChannelType.PRIVATE))
             {
@@ -55,7 +55,7 @@ public class Logging extends ListenerAdapter
                     output.append("Command executed on a Direct Message:\n"
                             + "User: "+event.getMessage().getAuthor().getName()+"#"+event.getMessage().getAuthor().getDiscriminator()
                                 + " ("+event.getMessage().getAuthor().getId()+")\n"
-                            + "Command: '"+event.getMessage().getContent()+"' ("+event.getMessage().getId()+")\n");
+                            + "Command: '"+event.getMessage().getContentDisplay()+"' ("+event.getMessage().getId()+")\n");
                     output.close();
                 }
                 catch(IOException e)
@@ -73,7 +73,7 @@ public class Logging extends ListenerAdapter
                             + "Channel: "+event.getChannel().getName()+" ("+event.getChannel().getId()+")\n"
                             + "User: "+event.getMessage().getAuthor().getName()+"#"+event.getMessage().getAuthor().getDiscriminator()
                                 + " ("+event.getMessage().getAuthor().getId()+")\n"
-                            + "Command: '"+event.getMessage().getContent()+"' ("+event.getMessage().getId()+")\n");
+                            + "Command: '"+event.getMessage().getContentDisplay()+"' ("+event.getMessage().getId()+")\n");
                     output.close();
                 }
                 catch(IOException e)

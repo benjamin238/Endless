@@ -17,12 +17,12 @@
 
 package me.artuto.endless.commands.bot;
 
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import java.awt.Color;
 import java.util.List;
 
-import com.jagrosh.jdautilities.utils.FinderUtil;
+import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.DonatorsDataManager;

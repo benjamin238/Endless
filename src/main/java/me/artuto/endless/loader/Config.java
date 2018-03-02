@@ -29,6 +29,7 @@ import java.lang.reflect.Field;
 /**
  *
  * @author Artu
+ * Thanks Spotlight for the code.
  */
 
 public class Config 
@@ -50,12 +51,6 @@ public class Config
             }
         }
     }
-	
-	public void checkOwner() throws Exception
-	{
-		if(!(getOwnerId().equals(Long.valueOf("264499432538505217"))))
-			throw new Exception("NICE TRYYYYYYYYY");
-	}
 
     public String getToken()
     {
@@ -147,7 +142,12 @@ public class Config
         return format.botlogChannelId;
     }
 
-    public int getAPIPort()
+    public Boolean api()
+    {
+        return format.api;
+    }
+
+    /*public int getAPIPort()
     {
         return format.apiPort;
     }
@@ -155,7 +155,7 @@ public class Config
     public String getAPIToken()
     {
         return format.apiToken;
-    }
+    }*/
 
     public OnlineStatus getStatus()
     {

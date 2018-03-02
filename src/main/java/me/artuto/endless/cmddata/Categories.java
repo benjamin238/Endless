@@ -1,6 +1,6 @@
 package me.artuto.endless.cmddata;
 
-import com.jagrosh.jdautilities.commandclient.Command.Category;
+import com.jagrosh.jdautilities.command.Command.Category;
 import me.artuto.endless.data.BlacklistDataManager;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.entities.User;
@@ -22,16 +22,6 @@ public class Categories
     public static final Category BOT = new Category("Bot", event ->
     {
         User user = event.getAuthor();
-		
-		try
-		{
-			config.checkOwner();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return false;
-		}
 
         if(event.isOwner())
             return true;
@@ -50,18 +40,7 @@ public class Categories
 
     public static final Category BOTADM = new Category("Bot Administration", event ->
     {
-
-		try
-		{
-			config.checkOwner();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return false;
-		}
-		
-        if(event.isOwner() || event.isCoOwner())
+        if(event.isOwner())
 
             return true;
         else 
@@ -74,16 +53,6 @@ public class Categories
     public static final Category MODERATION = new Category("Moderation", event ->
     {
         User user = event.getAuthor();
-		
-		try
-		{
-			config.checkOwner();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return false;
-		}
 
         if(event.isOwner())
             return true;
@@ -103,16 +72,6 @@ public class Categories
     public static final Category TOOLS = new Category("Tools", event ->
     {
         User user = event.getAuthor();
-		
-		try
-		{
-			config.checkOwner();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return false;
-		}
 
         if(event.isOwner())
             return true;
@@ -132,16 +91,6 @@ public class Categories
     public static final Category UTILS = new Category("Utilities", event ->
     {
         User user = event.getAuthor();
-		
-		try
-		{
-			config.checkOwner();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return false;
-		}
 
         if(event.isOwner())
             return true;
@@ -161,16 +110,6 @@ public class Categories
     public static final Category FUN = new Category("Fun", event ->
     {
         User user = event.getAuthor();
-		
-		try
-		{
-			config.checkOwner();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return false;
-		}
 
         if(event.isOwner())
             return true;
@@ -190,16 +129,6 @@ public class Categories
     public static final Category OTHERS = new Category("Others", event ->
     {
         User user = event.getAuthor();
-		
-		try
-		{
-			config.checkOwner();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return false;
-		}
 
         if(event.isOwner())
             return true;

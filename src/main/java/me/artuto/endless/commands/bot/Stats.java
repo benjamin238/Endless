@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.bot;
 
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import java.awt.Color;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;

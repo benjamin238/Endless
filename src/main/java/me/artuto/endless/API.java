@@ -30,13 +30,13 @@ import spark.Spark;
 
 public class API
 {
-    public static void main(String authToken, Config config, Bot bot)
+    /*public static void main(String authToken, Config config, Bot bot)
     {
-        Spark.port(config.getAPIPort());
+        park.port(config.getAPIPort());
 
         Spark.get("/api/users/:id/guilds", (req, res) -> {
             /*if(!(isAuthorizated(req, authToken)))
-                return notAuthorizated(res);*/
+                return notAuthorizated(res);
 
             Long id;
             JSONArray array = new JSONArray();
@@ -66,7 +66,7 @@ public class API
 
         Spark.get("/api/guilds/:id", (req, res) -> {
             /*if(!(isAuthorizated(req, authToken)))
-                return notAuthorizated(res);*/
+                return notAuthorizated(res);
 
             Long id;
 
@@ -125,5 +125,5 @@ public class API
         res.status(404);
         res.body(new JSONObject().put("message", message).toString());
         return res.body();
-    }
+    }*/
 }

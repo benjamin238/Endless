@@ -1,7 +1,7 @@
 package me.artuto.endless.commands.moderation;
 
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.logging.ModLogging;
@@ -169,13 +169,13 @@ public class Clear extends Command
                 }
 
                 if (all || ids.contains(msg.getAuthor().getId()) || (bots && msg.getAuthor().isBot()) || (embed && !(msg.getEmbeds().isEmpty()))
-                        || (link && LINK.matcher(msg.getRawContent()).find()) || (image && hasImage(msg)))
+                        || (link && LINK.matcher(msg.getContentRaw()).find()) || (image && hasImage(msg)))
                 {
                     deletion.add(msg);
                     continue;
                 }
 
-                String lowerCaseContent = msg.getContent().toLowerCase();
+                String lowerCaseContent = msg.getContentDisplay().toLowerCase();
 
                 if (text.stream().anyMatch(t -> lowerCaseContent.contains(t)))
                 {
@@ -185,7 +185,7 @@ public class Clear extends Command
 
                 try
                 {
-                    if (!(p == null) && msg.getRawContent().matches(p))
+                    if (!(p == null) && msg.getContentRaw().matches(p))
                         deletion.add(msg);
                 } catch (Exception ignored) {}
             }

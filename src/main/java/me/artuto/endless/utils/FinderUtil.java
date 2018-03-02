@@ -17,13 +17,8 @@
 
 package me.artuto.endless.utils;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
 
 /**
  *
@@ -43,12 +38,12 @@ public class FinderUtil
         return guild.getTextChannelById(guild.getId());
     }
     
-    public static List<User> findBannedUsers(String query, Guild guild)
+    /*public static List<Guild.Ban> findBannedUsers(String query, Guild guild)
     {
-        List<User> bans;
+        List<Guild.Ban> bans;
         try
         {
-            bans = guild.getBans().complete();
+            bans = guild.getBanList().complete();
         }
         catch(Exception e)
         {
@@ -61,15 +56,15 @@ public class FinderUtil
         {
             id = query.replaceAll(USER_MENTION, "$1");
             User u = guild.getJDA().getUserById(id);
-            if(bans.contains(u))
+            if(bans.contains(ba))
             {
                 return Collections.singletonList(u);
             }
-            for(User user : bans)
+            for(Guild.Ban ban : bans)
             {
-                if(user.getId().equals(id))
+                if(ban.getUser().getId().equals(id))
                 {
-                    return Collections.singletonList(user);
+                    return Collections.singletonList(ban);
                 }
             }
         }
@@ -117,5 +112,5 @@ public class FinderUtil
             return startswith;
         }
         return contains;
-    }
+    }*/
 }

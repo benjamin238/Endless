@@ -19,8 +19,8 @@ package me.artuto.endless;
 
 
 import ch.qos.logback.classic.*;
-import com.jagrosh.jdautilities.commandclient.*;
-import com.jagrosh.jdautilities.waiter.EventWaiter;
+import com.jagrosh.jdautilities.command.*;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.bot.*;
 import me.artuto.endless.commands.botadm.*;
@@ -54,7 +54,6 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class Endless extends ListenerAdapter
 {
-    private static JDA jda;
     private static Config config;
     private static ScheduledExecutorService threads = Executors.newSingleThreadScheduledExecutor();
     private static EventWaiter waiter = new EventWaiter();
@@ -63,15 +62,15 @@ public class Endless extends ListenerAdapter
     private static DatabaseManager db;
     private static DonatorsDataManager ddm;
     private static GuildSettingsDataManager gsdm;
-    private static TagDataManager tdm;
     private static ProfileDataManager pdm;
+   // private static StarboardDataManager sdm;
+    private static TagDataManager tdm;
     private static Logger LOGGER = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
     private static ModLogging modlog;
 
 
     public static void main(String[] args) throws Exception
-
     {
         LOGGER.setLevel(Level.INFO);
 
@@ -89,8 +88,6 @@ public class Endless extends ListenerAdapter
             e.printStackTrace();
             return;
         }
-		
-		config.checkOwner();
 
         LOG.info("Starting Database and Managers...");
         initializeData();
@@ -106,17 +103,18 @@ public class Endless extends ListenerAdapter
         bdm = new BlacklistDataManager(db);
         ddm = new DonatorsDataManager(db);
         gsdm = new GuildSettingsDataManager(db);
-        tdm = new TagDataManager(db);
         pdm = new ProfileDataManager(db);
+        //sdm = new StarboardDataManager(db);
+        tdm = new TagDataManager(db);
         modlog = new ModLogging(gsdm);
         new GuildUtils(config, db);
         new Categories(bdm);
     }
 
-    private static void startAPI()
+    /*private static void startAPI()
     {
         API.main(config.getAPIToken(), config, bot);
-    }
+    }*/
 
     private static CommandClient createClient()
     {
@@ -170,6 +168,7 @@ public class Endless extends ListenerAdapter
 
                 new Leave(gsdm),
                 new ServerSettings(gsdm),
+                //new Starboard(gsdm, waiter),
                 new Welcome(gsdm),
 
                 //Tools
@@ -203,7 +202,7 @@ public class Endless extends ListenerAdapter
 
     private static void startJda() throws LoginException, RateLimitedException, InterruptedException
     {
-        jda = new JDABuilder(AccountType.BOT)
+        JDA jda = new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
                 .setGame(Game.playing(config.getGame()))
                 .setStatus(config.getStatus())
@@ -212,7 +211,7 @@ public class Endless extends ListenerAdapter
                 .setEnableShutdownHook(true)
                 .addEventListener(waiter, createClient(),
                         new Endless(), new Logging(config), new ServerLogging(gsdm),
-                        new GuildEvents(config, tdm, gsdm), new UserEvents(config))
+                        new GuildEvents(config, tdm, gsdm), /*new StarboardEvents(gsdm, sdm),*/ new UserEvents(config))
                 .buildBlocking();
     }
 
@@ -222,9 +221,12 @@ public class Endless extends ListenerAdapter
     public void onReady(ReadyEvent event)
     {
         bot = new Bot(config, event.getJDA());
-        LOG.info("Starting the API...");
-        startAPI();
-        LOG.info("Successfully started the API!");
+        if(config.api())
+        {
+            LOG.info("Starting the API...");
+            //startAPI();
+            LOG.info("Successfully started the API!");
+        }
 
         LOG.info("Leaving Pointless Guilds...");
         GuildUtils.leaveBadGuilds(event.getJDA());

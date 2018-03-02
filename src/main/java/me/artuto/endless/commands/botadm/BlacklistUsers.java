@@ -1,7 +1,7 @@
 package me.artuto.endless.commands.botadm;
 
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.BlacklistDataManager;
 import net.dv8tion.jda.core.EmbedBuilder;

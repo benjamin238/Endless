@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.botadm;
 
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -72,8 +72,8 @@ public class Eval extends Command
         try
         {
             imports = Arrays.asList("com.jagrosh.jdautilities",
-                    "com.jagrosh.jdautilities.commandclient",
-                    "com.jagrosh.jdautilities.commandclient.impl",
+                    "com.jagrosh.jdautilities.command",
+                    "com.jagrosh.jdautilities.command.impl",
                     "com.jagrosh.jdautilities.entities",
                     "com.jagrosh.jdautilities.menu",
                     "com.jagrosh.jdautilities.utils",

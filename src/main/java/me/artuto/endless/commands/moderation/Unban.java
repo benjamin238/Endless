@@ -17,13 +17,14 @@
 
 package me.artuto.endless.commands.moderation;
 
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import java.util.List;
+
+import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.loader.Config;
-import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.Permission;

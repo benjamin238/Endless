@@ -327,4 +327,106 @@ public class GuildSettingsDataManager
             LOG.warn(e.toString());
         }
     }
+
+    public TextChannel getStarboardChannel(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.closeOnCompletion();
+            TextChannel tc;
+            try (ResultSet results = statement.executeQuery(String.format("SELECT starboard_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            {
+                if(results.next())
+                    tc = guild.getTextChannelById(Long.toString(results.getLong("starboard_id")));
+                else tc=null;
+            }
+            return tc;
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return null;
+        }
+    }
+
+    public void setStarboardChannel(Guild guild, TextChannel tc)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, starboard_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    results.updateLong("starboard_id", tc==null ? null : tc.getIdLong());
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateLong("starboard_id", tc==null ? null : tc.getIdLong());
+                    results.insertRow();
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+        }
+    }
+
+    public Integer getStarboardCount(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.closeOnCompletion();
+            Integer count;
+            try (ResultSet results = statement.executeQuery(String.format("SELECT starboard_count FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            {
+                if(results.next())
+                    count = results.getInt("starboard_count");
+                else count=null;
+            }
+            return count;
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return null;
+        }
+    }
+
+    public void setStarboardCount(Guild guild, Integer count)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, starboard_count FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    results.updateInt("starboard_count", count);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateInt("starboard_count", count);
+                    results.insertRow();
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+        }
+    }
 }

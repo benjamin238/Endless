@@ -2,8 +2,8 @@ package me.artuto.endless.commands.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.managers.GoogleSearcher;

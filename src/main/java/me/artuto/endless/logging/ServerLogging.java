@@ -23,7 +23,9 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.core.events.user.UserAvatarUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ServerLogging extends ListenerAdapter
@@ -136,50 +138,39 @@ public class ServerLogging extends ListenerAdapter
         Message newmsg = event.getMessage();
         String title;
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+        StringBuilder oldContent = new StringBuilder();
+        StringBuilder newContent = new StringBuilder();
 
-        if(!(message.getContent().equals("No cached message")) && !(tc==null) && !(event.getAuthor().isBot()))
+        if(!(event.getAuthor().isBot()) && !(message.getContentRaw().equals("No cached message")) && !(tc==null))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                         null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
-                title = "`[Message Edited]:` :pencil2: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was edited in "+message.getTextChannel().getAsMention()+":";
+                oldContent.append(message.getContentRaw()+"\n");
+                newContent.append(newmsg.getContentRaw()+"\n");
+                for(Message.Attachment att : message.getAttachments())
+                    oldContent.append(att.getUrl()+"\n");
+                for(Message.Attachment att : newmsg.getAttachments())
+                    newContent.append(att.getUrl()+"\n");
 
-                builder.setAuthor(message.getAuthor().getName(), null, message.getAuthor().getEffectiveAvatarUrl());
-                builder.addField("Old Content:", "```"+message.getContent()+"```", false);
-                builder.addField("New Content:", "```"+newmsg.getContent()+"```", false);
+                title = "`["+hour+":"+min+":"+sec+"] [Message Edited]:` :pencil2: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was edited in "+message.getTextChannel().getAsMention()+":";
+
+                builder.addField("From:", oldContent.toString(), false);
+                builder.addField("To:", newContent.toString(), false);
                 builder.setFooter("Message ID: "+message.getId(), null);
-                builder.setColor(event.getGuild().getSelfMember().getColor());
-                builder.setTimestamp(message.getCreationTime());
+                builder.setColor(Color.YELLOW);
 
                 tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> {
                     MessagesLogging.removeMessage(newmsg.getIdLong());
                     MessagesLogging.addMessage(newmsg.getIdLong(), newmsg);
-                });
-            }
-        }
-        else
-        {
-            if(!(tc==null) && !(event.getAuthor().isBot()))
-            {
-                if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                    guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                            null, (e) -> tc.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-                else
-                {
-                    title = "`[Message Edited]:` :pencil2: A message was edited:";
-
-                    builder.addField("Old Content:", "```No cached message.```", false);
-                    builder.addField("New Content:", "```"+newmsg.getContent()+"```", false);
-                    builder.setFooter("Message ID: " + event.getMessageId(), null);
-                    builder.setColor(event.getGuild().getSelfMember().getColor());
-
-                    tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> {
-                        MessagesLogging.removeMessage(newmsg.getIdLong());
-                        MessagesLogging.addMessage(newmsg.getIdLong(), newmsg);
-                    });
-                }
+                }, null);
             }
         }
     }
@@ -193,42 +184,31 @@ public class ServerLogging extends ListenerAdapter
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         String title;
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+        StringBuilder sb = new StringBuilder();
 
-        if(!(message.getContent().equals("No cached message")) && !(tc==null) && !(message.getAuthor().isBot()))
+        if(!(message.getContentRaw().equals("No cached message")) && !(tc==null) && !(message.getAuthor().isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
                         null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
-                title = "`[Message Deleted]:` :wastebasket: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was deleted in "+message.getTextChannel().getAsMention()+":";
+                sb.append(message.getContentRaw()+"\n");
+                for(Message.Attachment att : message.getAttachments())
+                    sb.append(att.getUrl()+"\n");
 
-                builder.setAuthor(message.getAuthor().getName(), null, message.getAuthor().getEffectiveAvatarUrl());
-                builder.setDescription("```\n"+message.getContent()+"```");
+                title = "`["+hour+":"+min+":"+sec+"] [Message Deleted]:` :wastebasket: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was deleted in "+message.getTextChannel().getAsMention()+":";
+
+                builder.setDescription(sb.toString());
                 builder.setFooter("Message ID: "+message.getId(), null);
-                builder.setColor(event.getGuild().getSelfMember().getColor());
-                builder.setTimestamp(message.getCreationTime());
+                builder.setColor(Color.RED);
 
-                tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> MessagesLogging.removeMessage(message.getIdLong()));
-            }
-        }
-        else
-        {
-            if(!(tc==null) && !(message.getAuthor()==null))
-            {
-                if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                    guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                            null, (e) -> tc.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-                else
-                {
-                    title = "`[Message Deleted]:` :wastebasket: A message was deleted:";
-
-                    builder.setDescription("```No cached message.```");
-                    builder.setFooter("Message ID: " + event.getMessageId(), null);
-                    builder.setColor(event.getGuild().getSelfMember().getColor());
-
-                    tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> MessagesLogging.removeMessage(message.getIdLong()));
-                }
+                tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> MessagesLogging.removeMessage(message.getIdLong()), null);
             }
         }
     }

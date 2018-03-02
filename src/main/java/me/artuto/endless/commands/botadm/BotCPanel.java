@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.botadm;
 
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.OnlineStatus;
@@ -91,7 +91,7 @@ public class BotCPanel extends Command
             
             if(event.getArgs().equals("help"))
             {
-                event.replyInDM("Help for subcommand `bot status`\n"
+                event.replyInDm("Help for subcommand `bot status`\n"
                         + "Valid options: `ONLINE`, `DO_NOT_DISTURB`, `INVISIBLE`, `AWAY`");
                 event.reactSuccess();
                 return;

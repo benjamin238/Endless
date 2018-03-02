@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import java.time.format.DateTimeFormatter;
 
 import me.artuto.endless.cmddata.Categories;

@@ -53,11 +53,14 @@ rootGuildId: 312776731704426496
 # A TextChannel ID where the bot sends logs (Replace this with your TextChannel ID).
 botlogChannelId: 341041806508818432
 
+# Enable the API
+api: false
+
 # Port for the API
-apiPort: 80
+#apiPort: 80
 
 # Authorization Token for the API
-apiToken: ''
+#apiToken: ''
   
 # OnlineStatus of the bot. Valid OnlineStatus: ONLINE, IDLE, DO_NOT_DISTURB, INVISIBLE and OFFLINE.
 status: ONLINE

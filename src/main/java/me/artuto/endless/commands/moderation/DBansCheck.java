@@ -17,12 +17,12 @@
 
 package me.artuto.endless.commands.moderation;
 
-import com.jagrosh.jdautilities.commandclient.Command;
-import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import java.io.IOException;
 import java.util.List;
 
-import com.jagrosh.jdautilities.utils.FinderUtil;
+import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import java.awt.Color;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.loader.Config;
