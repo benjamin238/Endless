@@ -322,7 +322,7 @@ public class Tag extends Command
             this.arguments = "<name>";
             this.category = Categories.FUN;
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
             this.guildOnly = false;
         }
@@ -354,7 +354,7 @@ public class Tag extends Command
             this.arguments = "<name>";
             this.category = Categories.FUN;
             this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
             this.guildOnly = false;
         }
