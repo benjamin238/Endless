@@ -211,7 +211,7 @@ public class Endless extends ListenerAdapter
                 .setEnableShutdownHook(true)
                 .addEventListener(waiter, createClient(),
                         new Endless(), new Logging(config), new ServerLogging(gsdm),
-                        new GuildEvents(config, tdm, gsdm), /*new StarboardEvents(gsdm, sdm),*/ new UserEvents(config))
+                        new GuildEvents(config, tdm, gsdm, bdm), /*new StarboardEvents(gsdm, sdm),*/ new UserEvents(config))
                 .buildBlocking();
     }
 
