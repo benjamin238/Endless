@@ -24,7 +24,7 @@ package me.artuto.endless;
 
 public class Const
 {
-    public static String VERSION = "3.0.1";
+    public static String VERSION = "3.0.2";
     public static String INVITE = "https://discord.gg/CXKfYW3";
     public static String DEV = "`@Artuto#0424 | 264499432538505217`";
     public static String LINE_START = ":white_medium_small_square:";
