@@ -4,8 +4,7 @@ import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import com.jagrosh.jagtag.libraries.*;
 import me.artuto.endless.Const;
-import me.artuto.endless.data.GuildSettingsDataManager;
-import me.artuto.endless.data.TagDataManager;
+import me.artuto.endless.data.*;
 import me.artuto.endless.entities.ImportedTag;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.tempdata.AfkManager;
@@ -33,14 +32,16 @@ public class GuildEvents extends ListenerAdapter
 {
     private final Config config;
     private final TagDataManager tdm;
+    private final BlacklistDataManager bdm;
     private final GuildSettingsDataManager ldm;
     private final Parser parser;
 
-    public GuildEvents(Config config, TagDataManager tdm, GuildSettingsDataManager ldm)
+    public GuildEvents(Config config, TagDataManager tdm, GuildSettingsDataManager ldm, BlacklistDataManager bdm)
     {
         this.config = config;
         this.tdm = tdm;
         this.ldm = ldm;
+        this.bdm = bdm;
         this.parser = new ParserBuilder()
                 .addMethods(Variables.getMethods())
                 .addMethods(Arguments.getMethods())
@@ -219,7 +220,8 @@ public class GuildEvents extends ListenerAdapter
                         builder.setTimestamp(msg.getCreationTime());
                         builder.setColor(event.getMember().getColor());
 
-                        user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, null));
+                        if(!(bdm.isUserBlacklisted(author)))
+user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, null));
                     }
 
                     if(AfkManager.getMessage(user.getIdLong())==null)
