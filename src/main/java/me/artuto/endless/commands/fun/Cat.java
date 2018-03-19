@@ -49,7 +49,7 @@ public class Cat extends Command
 
             EmbedBuilder builder = new EmbedBuilder();
             OkHttpClient client = new OkHttpClient();
-            Request req = new Request.Builder().url("https://random.cat/meow").get().build();
+            Request req = new Request.Builder().url("https://aws.random.cat/meow").get().build();
             Response res = client.newCall(req).execute();
             if(!res.isSuccessful())
                 throw new RuntimeException("Error while fetching remote resource");
