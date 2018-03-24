@@ -6,7 +6,7 @@
 
     <groupId>me.artuto.endless</groupId>
     <artifactId>Endless</artifactId>
-    <version>3.0.3</version>
+    <version>3.0.4</version>
 
     <repositories>
         <repository>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.5.1_342</version>
+            <version>3.5.1_352</version>
         </dependency>
         <dependency>
             <groupId>com.jagrosh</groupId>
@@ -145,6 +145,8 @@
                     <archive>
                         <manifest>
                             <mainClass>me.artuto.endless.Endless</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -154,4 +156,9 @@
             </plugin>
         </plugins>
     </build>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
 </project>
