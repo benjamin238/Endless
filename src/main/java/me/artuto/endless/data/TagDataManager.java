@@ -51,9 +51,8 @@ public class TagDataManager
             statement.closeOnCompletion();
             try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content FROM TAGS WHERE tag_name = \"%s\"", name)))
             {
-                results.moveToInsertRow();
                 results.updateString("tag_content", content);
-                results.insertRow();
+                results.updateRow();
             }
         }
         catch(SQLException e)
