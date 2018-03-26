@@ -48,7 +48,7 @@ public class StarboardDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            e.toString();
             return false;
         }
     }
@@ -84,14 +84,15 @@ public class StarboardDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT msg_id, star_amount FROM STARBOARD WHERE msg_id = %s", msg)))
             {
+                results.moveToInsertRow();
                 results.updateInt("star_amount", amount);
-                results.updateRow();
+                results.insertRow();
                 return true;
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            e.toString();
             return false;
         }
     }

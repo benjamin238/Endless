@@ -65,11 +65,11 @@ public class StarboardEvents extends ListenerAdapter
                 eb.setAuthor(msg.getAuthor().getName(), null, msg.getAuthor().getEffectiveAvatarUrl());
                 if(!(attachments.isEmpty()))
                     for(Message.Attachment att : attachments)
-                        sb.append("\n"+att.getUrl());
+                        sb.append("\n").append(att.getUrl());
                 if(!(images.isEmpty()))
                     if(images.size()>1)
                         for(Message.Attachment img : images)
-                            sb.append("\n"+img.getUrl());
+                            sb.append("\n").append(img.getUrl());
                     else
                         eb.setImage(images.get(0).getUrl());
                 eb.setDescription(sb.toString());
@@ -82,9 +82,11 @@ public class StarboardEvents extends ListenerAdapter
                     if(!(sdm.addMessage(msg, getStarCount(msg))))
                         LOG.warn("Error when adding message to starboard. Message ID: "+msg.getId()+" TC ID: "+msg.getTextChannel().getId());
                 else
-                    if(!(sdm.updateCount(msg.getIdLong(), getStarCount(msg))))
-                        LOG.warn("Error when updating star count. Message ID: "+msg.getId()+" TC ID: "+msg.getTextChannel().getId());
-                    else updateCount(msg, sdm.getStarboardMessage(msg.getIdLong()).getStarboardMessageIdLong(), getStarCount(msg));
+                    {
+                        if(!(sdm.updateCount(msg.getIdLong(), getStarCount(msg))))
+                            LOG.warn("Error when updating star count. Message ID: "+msg.getId()+" TC ID: "+msg.getTextChannel().getId());
+                        else updateCount(msg, sdm.getStarboardMessage(msg.getIdLong()).getStarboardMessageIdLong(), getStarCount(msg));
+                    }
 
                 tc.sendMessage(msgB.build()).queue(s -> sdm.setStarboardMessageId(msg, s.getIdLong()));
 
@@ -135,7 +137,8 @@ public class StarboardEvents extends ListenerAdapter
 
     private boolean existsOnStarboard(Message msg)
     {
-        return !(sdm.getStarboardMessage(msg.getIdLong())==null);
+        if(!(sdm.getStarboardMessage(msg.getIdLong())==null)) return true;
+        else return false;
     }
 
     private void updateCount(Message msg, Long starboardMsg, Integer amount)

@@ -63,7 +63,7 @@ public class Endless extends ListenerAdapter
     private static DonatorsDataManager ddm;
     private static GuildSettingsDataManager gsdm;
     private static ProfileDataManager pdm;
-   // private static StarboardDataManager sdm;
+    private static StarboardDataManager sdm;
     private static TagDataManager tdm;
     private static Logger LOGGER = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
@@ -104,7 +104,7 @@ public class Endless extends ListenerAdapter
         ddm = new DonatorsDataManager(db);
         gsdm = new GuildSettingsDataManager(db);
         pdm = new ProfileDataManager(db);
-        //sdm = new StarboardDataManager(db);
+        sdm = new StarboardDataManager(db);
         tdm = new TagDataManager(db);
         modlog = new ModLogging(gsdm);
         new GuildUtils(config, db);
@@ -211,7 +211,7 @@ public class Endless extends ListenerAdapter
                 .setEnableShutdownHook(true)
                 .addEventListener(waiter, createClient(),
                         new Endless(), new Logging(config), new ServerLogging(gsdm),
-                        new GuildEvents(config, tdm, gsdm), /*new StarboardEvents(gsdm, sdm),*/ new UserEvents(config))
+                        new GuildEvents(config, tdm, gsdm), new StarboardEvents(gsdm, sdm), new UserEvents(config))
                 .buildBlocking();
     }
 
