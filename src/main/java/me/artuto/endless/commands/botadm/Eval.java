@@ -47,15 +47,17 @@ public class Eval extends Command
     private final GuildSettingsDataManager gsdm;
     private final BlacklistDataManager bdm;
     private final DonatorsDataManager ddm;
+    private final StarboardDataManager sdm;
     private final TagDataManager tdm;
     private final ModLogging modlog;
     
-    public Eval(Config config, DatabaseManager db, DonatorsDataManager ddm, GuildSettingsDataManager gsdm, BlacklistDataManager bdm, TagDataManager tdm, ModLogging modlog)
+    public Eval(Config config, DatabaseManager db, DonatorsDataManager ddm, GuildSettingsDataManager gsdm, BlacklistDataManager bdm, StarboardDataManager sdm, TagDataManager tdm, ModLogging modlog)
     {
         this.gsdm = gsdm;
         this.db = db;
         this.ddm = ddm;
         this.bdm = bdm;
+        this.sdm = sdm;
         this.tdm = tdm;
         this.config = config;
         this.modlog = modlog;
@@ -125,6 +127,7 @@ public class Eval extends Command
             engine.put("ddm", ddm);
             engine.put("bdm", bdm);
             engine.put("gsdm", gsdm);
+            engine.put("sdm", sdm);
             engine.put("tdm", tdm);
             engine.put("db", db);
             engine.put("config", config);
