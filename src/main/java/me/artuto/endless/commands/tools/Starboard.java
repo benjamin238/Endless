@@ -70,7 +70,7 @@ public class Starboard extends Command
         ew.waitForEvent(GuildMessageReceivedEvent.class,
                 e -> event.getAuthor().equals(e.getAuthor()) && event.getTextChannel().equals(e.getChannel()),
                 e -> {
-                    switch(e.getMessage().getContentRaw().toLowerCase())
+                    switch(e.getMessage().getContentRaw().split(" ", 2)[0].toLowerCase())
                     {
                         case "cancel":
                             event.replyWarning("Alright, setup cancelled.");
