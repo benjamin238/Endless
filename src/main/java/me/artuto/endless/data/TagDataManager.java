@@ -54,7 +54,7 @@ public class TagDataManager
                 if(results.next())
                 {
                      results.updateString("tag_content", content);
-                results.updateRow();
+                     results.updateRow();
                 }
             }
         }

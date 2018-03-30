@@ -35,7 +35,7 @@ public class StarboardDataManager
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT msg_id, tc_id, guild_id, star_amount FROM STARBOARD WHERE msg_id = %s", msg.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM STARBOARD WHERE msg_id = %s", msg.getId())))
             {
                 results.moveToInsertRow();
                 results.updateLong("msg_id", msg.getIdLong());
@@ -62,10 +62,13 @@ public class StarboardDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT msg_id, starboard_msg_id FROM STARBOARD WHERE msg_id = %s", msg.getId())))
             {
-                results.moveToInsertRow();
-                results.updateLong("starboard_msg_id", starboardMsg);
-                results.insertRow();
-                return true;
+                if(results.next())
+                {
+                    results.updateLong("starboard_msg_id", starboardMsg);
+                    results.updateRow();
+                    return true;
+                }
+                else return false;
             }
         }
         catch(SQLException e)
@@ -82,11 +85,15 @@ public class StarboardDataManager
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT msg_id, star_amount FROM STARBOARD WHERE msg_id = %s", msg)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM STARBOARD WHERE msg_id = %s", msg)))
             {
-                results.updateInt("star_amount", amount);
-                results.updateRow();
-                return true;
+                if(results.next())
+                {
+                    results.updateInt("star_amount", amount);
+                    results.updateRow();
+                    return true;
+                }
+                else return false;
             }
         }
         catch(SQLException e)
@@ -114,6 +121,28 @@ public class StarboardDataManager
         {
             LOG.warn(e.toString());
             return null;
+        }
+    }
+
+    public void deleteMessage(Long msg, Long starboardMsg)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM STARBOARD WHERE msg_id = \"%s\"", msg)))
+            {
+                if(results.next())
+                {
+                    results.updateLong("msg_id", 0);
+                    results.updateRow();
+                }
+            }
+            statement.executeUpdate(String.format("DELETE FROM STARBOARD WHERE starboard_msg_id = \"%s\"", starboardMsg));
+            statement.closeOnCompletion();
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
         }
     }
 }
