@@ -211,8 +211,13 @@ public class Endless extends ListenerAdapter
                 .setEnableShutdownHook(true)
                 .addEventListener(waiter, createClient(),
                         new Endless(), new Logging(config), new ServerLogging(gsdm),
+<<<<<<< HEAD
                         new GuildEvents(config, tdm, gsdm, bdm), new StarboardEvents(gsdm, sdm), new UserEvents(config))
                 .buildAsync();
+=======
+                        new GuildEvents(config, tdm, gsdm), new StarboardEvents(gsdm, sdm), new UserEvents(config))
+                .buildBlocking();
+>>>>>>> a199b017a9eba77977231052365c89091864b3ab
     }
 
     //When ready print the bot info

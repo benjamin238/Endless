@@ -60,6 +60,7 @@ public class StarboardEvents extends ListenerAdapter
             return;
         }
 
+<<<<<<< HEAD
         if(existsOnStarboard(starredMsg.getIdLong()))
         {
             if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
@@ -81,6 +82,41 @@ public class StarboardEvents extends ListenerAdapter
                     eb.setImage(images.get(0).getUrl());
             eb.setDescription(sb.toString());
             eb.setColor(Color.YELLOW);
+=======
+            if(!(tc.canTalk()))
+                FinderUtil.getDefaultChannel(guild).sendMessage("I can't talk on the starboard!").queue(null,
+                        e -> guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage("I can't talk on the starboard!").queue(null, null)));
+            else
+            {
+                LOG.info("pasa check 4");
+
+                sb.append(msg.getContentRaw());
+                eb.setAuthor(msg.getAuthor().getName(), null, msg.getAuthor().getEffectiveAvatarUrl());
+                if(!(attachments.isEmpty()))
+                    for(Message.Attachment att : attachments)
+                        sb.append("\n").append(att.getUrl());
+                if(!(images.isEmpty()))
+                    if(images.size()>1)
+                        for(Message.Attachment img : images)
+                            sb.append("\n").append(img.getUrl());
+                    else
+                        eb.setImage(images.get(0).getUrl());
+                eb.setDescription(sb.toString());
+                eb.setColor(Color.YELLOW);
+
+                msgB.setContent(":star: **"+getStarCount(msg)+"** "+msg.getTextChannel().getAsMention()+" ID: "+msg.getId());
+                msgB.setEmbed(eb.build());
+
+                if(!(existsOnStarboard(msg)))
+                    if(!(sdm.addMessage(msg, getStarCount(msg))))
+                        LOG.warn("Error when adding message to starboard. Message ID: "+msg.getId()+" TC ID: "+msg.getTextChannel().getId());
+                else
+                    {
+                        if(!(sdm.updateCount(msg.getIdLong(), getStarCount(msg))))
+                            LOG.warn("Error when updating star count. Message ID: "+msg.getId()+" TC ID: "+msg.getTextChannel().getId());
+                        else updateCount(msg, sdm.getStarboardMessage(msg.getIdLong()).getStarboardMessageIdLong(), getStarCount(msg));
+                    }
+>>>>>>> a199b017a9eba77977231052365c89091864b3ab
 
             msgB.setContent(getEmote(getStarCount(starredMsg))+" **"+getStarCount(starredMsg)+"** "+starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
             msgB.setEmbed(eb.build());
@@ -169,8 +205,13 @@ public class StarboardEvents extends ListenerAdapter
 
     private boolean existsOnStarboard(Long id)
     {
+<<<<<<< HEAD
         if(sdm.getStarboardMessage(id)==null) return false;
         else return true;
+=======
+        if(!(sdm.getStarboardMessage(msg.getIdLong())==null)) return true;
+        else return false;
+>>>>>>> a199b017a9eba77977231052365c89091864b3ab
     }
 
     private void updateCount(Message msg, Long starboardMsg, Integer amount)

@@ -48,7 +48,7 @@ public class StarboardDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            e.toString();
             return false;
         }
     }
@@ -87,6 +87,7 @@ public class StarboardDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM STARBOARD WHERE msg_id = %s", msg)))
             {
+<<<<<<< HEAD
                 if(results.next())
                 {
                     results.updateInt("star_amount", amount);
@@ -94,11 +95,17 @@ public class StarboardDataManager
                     return true;
                 }
                 else return false;
+=======
+                results.moveToInsertRow();
+                results.updateInt("star_amount", amount);
+                results.insertRow();
+                return true;
+>>>>>>> a199b017a9eba77977231052365c89091864b3ab
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            e.toString();
             return false;
         }
     }
