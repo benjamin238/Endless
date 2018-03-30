@@ -160,7 +160,10 @@ public class StarboardEvents extends ListenerAdapter
     private Integer getStarCount(Message msg)
     {
         List<MessageReaction> reactions = msg.getReactions().stream().filter(r -> r.getReactionEmote().getName().equals("\u2B50")).collect(Collectors.toList());
-        List<User> users = reactions.get(0).getUsers().complete();
+        if(reactions.isEmpty())
+            return 0;
+
+        List<User> users =    reactions.get(0).getUsers().complete();
 
         if(users.contains(msg.getAuthor()))
             return users.size()-1;
