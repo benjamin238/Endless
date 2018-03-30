@@ -80,6 +80,7 @@ public class Starboard extends Command
                             {
                                 event.replyError("An error happened when creating the channel and setting the permissions! Check I have the proper permissions.");
                                 waitForChannel(event);
+                                return;
                             }
 
                             event.replySuccess("Ok, this will create a channel named **\"starboard\"**, you can change the name later.",
