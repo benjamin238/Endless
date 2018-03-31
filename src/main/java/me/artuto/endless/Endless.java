@@ -37,7 +37,6 @@ import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +128,10 @@ public class Endless extends ListenerAdapter
         client.setServerInvite(Const.INVITE);
         client.setEmojis(config.getDoneEmote(), config.getWarnEmote(), config.getErrorEmote());
         client.setPrefix(config.getPrefix());
+        client.setAlternativePrefix("<@310578566695878658>");
+        client.setGuildSettingsManager(new ClientGSDM(db, gsdm));
+        client.setStatus(OnlineStatus.DO_NOT_DISTURB);
+        client.setGame(Game.playing("Loading..."));
 
         if(!(Arrays.toString(owners).isEmpty()))
             client.setCoOwnerIds(owners);
@@ -167,6 +170,7 @@ public class Endless extends ListenerAdapter
                 //Settings
 
                 new Leave(gsdm),
+                new Prefix(db, gsdm),
                 new ServerSettings(gsdm),
                 new Starboard(gsdm, waiter),
                 new Welcome(gsdm),
@@ -202,10 +206,8 @@ public class Endless extends ListenerAdapter
 
     private static void startJda() throws LoginException
     {
-        JDA jda = new JDABuilder(AccountType.BOT)
+        new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
-                .setGame(Game.playing(config.getGame()))
-                .setStatus(config.getStatus())
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
                 .setEnableShutdownHook(true)
@@ -245,6 +247,7 @@ public class Endless extends ListenerAdapter
         LOG.info("Owner: "+ownername+" ("+ownerid+")");
 
         event.getJDA().getPresence().setGame(Game.playing("Type "+config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+        event.getJDA().getPresence().setStatus(config.getStatus());
 
         if(event.getJDA().getGuilds().isEmpty())
         {
