@@ -38,7 +38,7 @@ public class Prefix extends Command
 
         Collection<String> prefixes = db.getSettings(guild).getPrefixes();
 
-        if(prefixes.isEmpty())
+        if(prefixes==null)
             event.reply("The prefix for this guild is `"+defP+"`");
         else
         {
