@@ -45,6 +45,8 @@ public class StarboardEvents extends ListenerAdapter
 
         if(!(isConfigured(guild))) return;
 
+        if(event.getChannel().getTopic().contains("{ignore:starboard}")) return;
+
         if(isSameAuthor(starredMsg.getAuthor(), event.getUser()) && event.getReactionEmote().getName().equals("\u2B50"))
         {
             //event.getChannel().sendMessage("Boooooo, "+event.getUser().getAsMention()+" selfstarred! SHAME!").queue();
