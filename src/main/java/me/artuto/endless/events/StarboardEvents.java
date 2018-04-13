@@ -163,7 +163,7 @@ public class StarboardEvents extends ListenerAdapter
         if(reactions.isEmpty())
             return 0;
 
-        List<User> users =    reactions.get(0).getUsers().complete();
+        List<User> users = reactions.get(0).getUsers().complete();
 
         if(users.contains(msg.getAuthor()))
             return users.size()-1;
