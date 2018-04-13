@@ -1,19 +1,24 @@
 package me.artuto.endless.data;
 
+import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.util.Collection;
 
 public class GuildSettingsDataManager
 {
+    private final DatabaseManager db;
     private final Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public GuildSettingsDataManager(DatabaseManager db)
     {
+        this.db = db;
         connection = db.getConnection();
     }
 
@@ -427,6 +432,130 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             LOG.warn(e.toString());
+        }
+    }
+
+    public boolean addPrefix(Guild guild, String prefix)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            String prefixes;
+            JSONArray array;
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, prefixes FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    prefixes = results.getString("prefixes");
+
+                    if(prefixes==null)
+                        array = new JSONArray().put(prefix);
+                    else
+                        array = new JSONArray(prefixes).put(prefix);
+
+                    results.updateString("prefixes", array.toString());
+                    results.updateRow();
+                    return true;
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateString("prefixes", new JSONArray().put(prefix).toString());
+                    results.insertRow();
+                    return true;
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return false;
+        }
+    }
+
+    public boolean prefixExists(Guild guild, String prefix)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            String prefixes;
+            JSONArray array;
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, prefixes FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    prefixes = results.getString("prefixes");
+
+                    if(prefixes==null)
+                        return false;
+                    else
+                    {
+                        array = new JSONArray(prefixes);
+
+                        for(Object p : array)
+                        {
+                            if(p.toString().equals(prefix))
+                                return true;
+                            else
+                                return false;
+                        }
+                    }
+                }
+                else
+                    return false;
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return false;
+        }
+        return false;
+    }
+
+    public boolean removePrefix(Guild guild, String prefix)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            String prefixes;
+            JSONArray array;
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, prefixes FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    prefixes = results.getString("prefixes");
+
+                    if(!(prefixes==null))
+                    {
+                        array = new JSONArray(prefixes);
+
+                        for(int i = 0; i < array.length(); i++)
+                        {
+                            if(array.get(i).toString().equals(prefix))
+                            {
+                                array.remove(i);
+                                results.updateString("prefixes", array.length()<0?null:array.toString());
+                                results.updateRow();
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return false;
         }
     }
 }

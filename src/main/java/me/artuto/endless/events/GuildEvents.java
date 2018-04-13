@@ -88,16 +88,6 @@ public class GuildEvents extends ListenerAdapter
             tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n" +
                     "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n" +
                     "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
-
-            if(!(defaultTc==null) && defaultTc.canTalk())
-                defaultTc.sendMessage("Hey! Thanks for adding Endless to your guild! First of all, you need to know if you activate the ModLogging/ServerLogging " +
-                        "you allow me to log all your messages, users, ids, avatars, channels, roles and other guild settings.\n" +
-                        "If you don't agree to this you **must** remove Endless from your guild.\n" +
-                        "\n" +
-                        "To know what Endless can do check out `"+config.getPrefix()+"help` which shows all of my available commands.\n" +
-                        "\n" +
-                        "If you want to recieve a notification when a new update is released, report a bug or ask for an improvement please join my server: " +
-                        "**<"+Const.INVITE+">** and post it on the correspondient channel.").queue();
         }
     }
 

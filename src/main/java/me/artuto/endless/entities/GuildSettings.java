@@ -1,51 +1,24 @@
 package me.artuto.endless.entities;
 
-public class GuildSettings
+import java.util.Collection;
+
+public interface GuildSettings
 {
-    private final Long modlogId;
-    private final Long serverlogId;
-    private final Long welcomeId;
-    private final String welcomeMsg;
-    private final Long leaveId;
-    private final String leaveMsg;
+    Long getModlog();
 
-    public GuildSettings(Long modlogId, Long serverlogId, Long welcomeId, String welcomeMsg, Long leaveId, String leaveMsg)
-    {
-        this.modlogId = modlogId;
-        this.serverlogId = serverlogId;
-        this.welcomeId = welcomeId;
-        this.welcomeMsg = welcomeMsg;
-        this.leaveMsg = leaveMsg;
-        this.leaveId = leaveId;
-    }
+    Long getServerlog();
 
-    public Long getModlog()
-    {
-        return modlogId;
-    }
+    Long getWelcomeChannel();
 
-    public Long getServerlog()
-    {
-        return serverlogId;
-    }
+    String getWelcomeMsg();
 
-    public Long getWelcomeChannel()
-    {
-        return welcomeId;
-    }
+    Long getLeaveChannel();
 
-    public String getWelcomeMsg()
-    {
-        return welcomeMsg;
-    }
+    String getLeaveMsg();
 
-    public Long getLeaveChannel()
-    {
-        return leaveId;
-    }
+    Long getStarboard();
 
-    public String getLeaveMsg()
-    {
-        return leaveMsg;
-    }
+    int getStarboardCount();
+
+    Collection<String> getPrefixes();
 }
