@@ -38,8 +38,11 @@ import java.awt.*;
 
 public class About extends Command
 {
-    public About()
+    private final Config config;
+
+    public About(Config config)
     {
+        this.config = config;
         this.name = "about";
         this.help = "Info about the bot";
         this.category = Categories.BOT;
@@ -53,19 +56,9 @@ public class About extends Command
     protected void execute(CommandEvent event)
     {
         Color color;
-        Config config = null;
 
         if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
         else color = event.getGuild().getSelfMember().getColor();
-
-        try
-        {
-            config = new Config();
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
 
         String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
         EmbedBuilder builder = new EmbedBuilder();
@@ -73,16 +66,15 @@ public class About extends Command
         String ownername = owner.getName()+"#"+owner.getDiscriminator();
         String ownerid = owner.getId();
 
-
         builder.setDescription("Hi, I'm Endless! A multipurpose bot designed to be smart.\n"+"If you found a bug please contact my dad\n"+"("+Const.DEV+")!\n");
         builder.addField(":bust_in_silhouette: Owner:", "**"+ownername+"** (**"+ownerid+"**)", false);
         builder.addField("<:jda:325395909347115008>  Library:", "Java Discord API (JDA) "+JDAInfo.VERSION+" and JDA Utilities "+JDAUtilitiesInfo.VERSION, false);
-        builder.addField("<:github:326118305062584321> GitHub:", "Did you found a bug? Want improve something?\n"+"Please open an Issue or create a PR on GitHub\n"+"**https://github.com/ArtutoGamer/Endless**\n", false);
+        builder.addField("<:github:326118305062584321> GitHub:", "Did you found a bug? Want improve something?\n"+"Please open an Issue or create a PR on [**GitHub**](https://github.com/ArtutoGamer/Endless)", false);
         builder.addField(":link: Support Guild:", "**[Support]("+Const.INVITE+")**\n", false);
         builder.setFooter("Version: "+Const.VERSION+" | Latest Start", null);
         builder.setColor(color);
         builder.setTimestamp(event.getClient().getStartTime());
         builder.setThumbnail(event.getSelfUser().getAvatarUrl());
-        event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+        event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
     }
 }
