@@ -156,7 +156,7 @@ public class Endless extends ListenerAdapter
 
         client.addCommands(
                 //Bot
-                new About(), new Donate(ddm), new Invite(), new Ping(), new Stats(),
+                new About(config), new Donate(ddm), new Invite(), new Ping(), new Stats(),
 
                 //Bot Administration
                 new Bash(), new BlacklistUsers(bdm), new BotCPanel(), new Eval(config, db, ddm, gsdm, bdm, sdm, tdm, modlog), new Shutdown(db),
