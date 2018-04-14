@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,14 @@ package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.cmddata.Categories;
+import net.dv8tion.jda.core.Permission;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import me.artuto.endless.cmddata.Categories;
-import net.dv8tion.jda.core.Permission;
-
 /**
- *
  * @author Artu
  */
 
@@ -43,9 +42,9 @@ public class Bash extends Command
         this.ownerCommand = true;
         this.guildOnly = false;
     }
-    
+
     @Override
-    protected void execute(CommandEvent event) 
+    protected void execute(CommandEvent event)
     {
         if(event.getArgs().isEmpty())
         {
@@ -55,45 +54,46 @@ public class Bash extends Command
 
         StringBuilder output = new StringBuilder();
         String finalOutput = null;
-        try 
+        try
         {
             ProcessBuilder builder = new ProcessBuilder(event.getArgs().split(" "));
-	    Process p = builder.start();
+            Process p = builder.start();
 
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
             String runningLineOutput;
-            while ((runningLineOutput = reader.readLine())!= null) {
+            while((runningLineOutput = reader.readLine()) != null)
+            {
                 output.append(runningLineOutput).append("\n");
             }
             System.out.println(output.toString());
 
-            if (output.toString().isEmpty()) {
+            if(output.toString().isEmpty())
+            {
                 event.replySuccess("Done, with no output!");
                 return;
             }
 
             // Remove linebreak
-            finalOutput = output.substring(0, output.length() - 1);
-	    reader.close();
-        } 
-        catch(IOException e) 
+            finalOutput = output.substring(0, output.length()-1);
+            reader.close();
+        }
+        catch(IOException e)
         {
-            event.replyError("I wasn't able to find the command `" + event.getArgs() + "`!");
+            event.replyError("I wasn't able to find the command `"+event.getArgs()+"`!");
             return;
-        } 
-        catch(IllegalArgumentException e) 
+        }
+        catch(IllegalArgumentException e)
         {
             event.replyError("Command output too long!");
         }
-        catch(Exception e) 
+        catch(Exception e)
         {
             e.printStackTrace();
             event.replyError("An unknown error occurred! Check the bot console.");
             return;
         }
-                
+
         event.reply("Output: \n```\n"+finalOutput+" ```");
     }
 }

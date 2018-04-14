@@ -1,10 +1,28 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.events;
 
 import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import com.jagrosh.jagtag.libraries.*;
-import me.artuto.endless.Const;
-import me.artuto.endless.data.*;
+import me.artuto.endless.data.BlacklistDataManager;
+import me.artuto.endless.data.GuildSettingsDataManager;
+import me.artuto.endless.data.TagDataManager;
 import me.artuto.endless.entities.ImportedTag;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.tempdata.AfkManager;
@@ -22,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -42,24 +59,14 @@ public class GuildEvents extends ListenerAdapter
         this.tdm = tdm;
         this.ldm = ldm;
         this.bdm = bdm;
-        this.parser = new ParserBuilder()
-                .addMethods(Variables.getMethods())
-                .addMethods(Arguments.getMethods())
-                .addMethods(Functional.getMethods())
-                .addMethods(Miscellaneous.getMethods())
-                .addMethods(Strings.getMethods())
-                .addMethods(Time.getMethods())
-                .addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods())
-                .setMaxOutput(2000)
-                .setMaxIterations(1000)
-                .build();
+        this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
     }
 
     private String getReason(Guild guild)
     {
         String reason = GuildUtils.checkBadGuild(guild);
 
-        switch (reason)
+        switch(reason)
         {
             case "LEFT: BOTS":
                 return "Too many bots!";
@@ -83,11 +90,9 @@ public class GuildEvents extends ListenerAdapter
         TextChannel tc = event.getJDA().getTextChannelById(config.getBotlogChannelId());
         TextChannel defaultTc = FinderUtil.getDefaultChannel(guild);
 
-        if(!(GuildUtils.isBadGuild(guild)) && config.isBotlogEnabled() && !(tc==null) && tc.canTalk())
+        if(!(GuildUtils.isBadGuild(guild)) && config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
         {
-            tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n" +
-                    "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n" +
-                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
+            tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+"`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
         }
     }
 
@@ -103,14 +108,11 @@ public class GuildEvents extends ListenerAdapter
         TextChannel tc = event.getJDA().getTextChannelById(config.getBotlogChannelId());
         String reason = getReason(guild);
 
-        if(config.isBotlogEnabled() && !(tc==null) && tc.canTalk())
+        if(config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
         {
-            StringBuilder builder = new StringBuilder().append(":outbox_tray: `[Left Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n" +
-                    "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n" +
-                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n");
+            StringBuilder builder = new StringBuilder().append(":outbox_tray: `[Left Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+"`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n");
 
-            if(!(reason==null))
-                builder.append("`[Reason]:` "+reason);
+            if(!(reason == null)) builder.append("`[Reason]:` "+reason);
 
             tc.sendMessage(builder.toString()).queue();
         }
@@ -132,7 +134,7 @@ public class GuildEvents extends ListenerAdapter
             {
                 if(at.getFileName().endsWith(".js"))
                 {
-                   at.download(new File(at.getFileName()));
+                    at.download(new File(at.getFileName()));
 
                     List<String> lines;
                     try
@@ -142,7 +144,7 @@ public class GuildEvents extends ListenerAdapter
                         {
                             if(str.contains("proxy.contentWindow.localStorage.token"))
                             {
-                                if(!(modlog==null))
+                                if(!(modlog == null))
                                     modlog.sendMessage(":warning: **"+author.getName()+"#"+author.getDiscriminator()+"** ("+author.getId()+") has sent a suspicious file with code to steal tokens. It has been deleted. Message ID: "+msg.getId()).queue(s -> msg.delete().queue(), e -> msg.delete().queue());
                                 break;
                             }
@@ -157,7 +159,7 @@ public class GuildEvents extends ListenerAdapter
             }
         }
 
-        if(!(importedT==null))
+        if(!(importedT == null))
         {
             for(ImportedTag tag : importedT)
             {
@@ -186,8 +188,7 @@ public class GuildEvents extends ListenerAdapter
 
         if(AfkManager.isAfk(author.getIdLong()))
         {
-            author.openPrivateChannel().queue(pc -> pc.sendMessage(config.getDoneEmote()+" I've removed your AFK status.").queue(null,
-                    (e) -> LOG.warn("I was not able to DM "+author.getName()+"#"+author.getDiscriminator()+" about removing its AFK status.")));
+            author.openPrivateChannel().queue(pc -> pc.sendMessage(config.getDoneEmote()+" I've removed your AFK status.").queue(null, (e) -> LOG.warn("I was not able to DM "+author.getName()+"#"+author.getDiscriminator()+" about removing its AFK status.")));
             AfkManager.unsetAfk(author.getIdLong());
         }
 
@@ -211,11 +212,10 @@ public class GuildEvents extends ListenerAdapter
                         builder.setColor(event.getMember().getColor());
 
                         if(!(bdm.isUserBlacklisted(author)))
-user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, null));
+                            user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, null));
                     }
 
-                    if(AfkManager.getMessage(user.getIdLong())==null)
-                        event.getChannel().sendMessage(message).queue();
+                    if(AfkManager.getMessage(user.getIdLong()) == null) event.getChannel().sendMessage(message).queue();
                     else
                     {
                         EmbedBuilder builder = new EmbedBuilder();

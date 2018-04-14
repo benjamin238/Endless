@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,16 @@
 
 package me.artuto.endless.loader;
 
+import net.dv8tion.jda.core.entities.ChannelType;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
-
 /**
- *
  * @author Artu
  */
 
@@ -39,7 +38,7 @@ public class Logging extends ListenerAdapter
     {
         this.config = config;
     }
-    
+
     //Command logger
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
@@ -52,10 +51,7 @@ public class Logging extends ListenerAdapter
                 {
                     Writer output;
                     output = new BufferedWriter(new FileWriter("logs/commands.log", true));
-                    output.append("Command executed on a Direct Message:\n"
-                            + "User: "+event.getMessage().getAuthor().getName()+"#"+event.getMessage().getAuthor().getDiscriminator()
-                                + " ("+event.getMessage().getAuthor().getId()+")\n"
-                            + "Command: '"+event.getMessage().getContentDisplay()+"' ("+event.getMessage().getId()+")\n");
+                    output.append("Command executed on a Direct Message:\n"+"User: "+event.getMessage().getAuthor().getName()+"#"+event.getMessage().getAuthor().getDiscriminator()+" ("+event.getMessage().getAuthor().getId()+")\n"+"Command: '"+event.getMessage().getContentDisplay()+"' ("+event.getMessage().getId()+")\n");
                     output.close();
                 }
                 catch(IOException e)
@@ -66,20 +62,16 @@ public class Logging extends ListenerAdapter
             else
             {
                 try
-                {                  
+                {
                     Writer output;
                     output = new BufferedWriter(new FileWriter("logs/commands.log", true));
-                    output.append("Guild: "+event.getGuild().getName()+" ("+event.getGuild().getId()+")\n"
-                            + "Channel: "+event.getChannel().getName()+" ("+event.getChannel().getId()+")\n"
-                            + "User: "+event.getMessage().getAuthor().getName()+"#"+event.getMessage().getAuthor().getDiscriminator()
-                                + " ("+event.getMessage().getAuthor().getId()+")\n"
-                            + "Command: '"+event.getMessage().getContentDisplay()+"' ("+event.getMessage().getId()+")\n");
+                    output.append("Guild: "+event.getGuild().getName()+" ("+event.getGuild().getId()+")\n"+"Channel: "+event.getChannel().getName()+" ("+event.getChannel().getId()+")\n"+"User: "+event.getMessage().getAuthor().getName()+"#"+event.getMessage().getAuthor().getDiscriminator()+" ("+event.getMessage().getAuthor().getId()+")\n"+"Command: '"+event.getMessage().getContentDisplay()+"' ("+event.getMessage().getId()+")\n");
                     output.close();
                 }
                 catch(IOException e)
                 {
                     System.out.println("Error when creating the commands log!\n "+e);
-                }    
+                }
             }
         }
     }

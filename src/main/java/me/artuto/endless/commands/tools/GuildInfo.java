@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.time.format.DateTimeFormatter;
-
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FinderUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -28,10 +26,10 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
+
+import java.time.format.DateTimeFormatter;
 
 /**
- *
  * @author Artu
  */
 
@@ -48,18 +46,18 @@ public class GuildInfo extends Command
         this.ownerCommand = false;
         this.guildOnly = true;
     }
-    
+
     @Override
     protected void execute(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         EmbedBuilder builder2 = new EmbedBuilder();
-        String roles ;
+        String roles;
         String voicech;
         Guild guild = event.getGuild();
         Member owner;
         owner = guild.getOwner();
-        String title =":information_source: Information about the guild **"+guild.getName()+"**";
+        String title = ":information_source: Information about the guild **"+guild.getName()+"**";
 
         long botCount = guild.getMembers().stream().filter(u -> u.getUser().isBot()).count();
 
@@ -95,18 +93,18 @@ public class GuildInfo extends Command
 
         try
         {
-            builder.addField(":1234: ID: ", "**" + guild.getId() + "**", true);
-            builder.addField(":bust_in_silhouette: Owner: ", "**" + owner.getUser().getName() + "**#**" + owner.getUser().getDiscriminator() + "**", true);
-            builder.addField(":map: Region: ", "**" + guild.getRegion() + "**", true);
-            builder.addField(":one: User count: ", "**" + guild.getMembers().size() + "** (**" + botCount + "** bots)", true);
+            builder.addField(":1234: ID: ", "**"+guild.getId()+"**", true);
+            builder.addField(":bust_in_silhouette: Owner: ", "**"+owner.getUser().getName()+"**#**"+owner.getUser().getDiscriminator()+"**", true);
+            builder.addField(":map: Region: ", "**"+guild.getRegion()+"**", true);
+            builder.addField(":one: User count: ", "**"+guild.getMembers().size()+"** (**"+botCount+"** bots)", true);
             builder.addField(":hammer: Roles: ", roles, false);
             builder.addField(":speech_left: Text Channels: ", textchbldr.toString(), false);
             builder.addField(":speaker: Voice Channels: ", voicech, false);
             builder.addField(":speech_balloon: Default Channel: ", FinderUtil.getDefaultChannel(guild).getAsMention(), true);
-            builder.addField(":date: Creation Date: ", "**" + guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME) + "**", true);
-            builder.addField(":vertical_traffic_light: Verification level: ", "**" + guild.getVerificationLevel() + "**", true);
-            builder.addField(":envelope: Default Notification level: ", "**" + guild.getDefaultNotificationLevel() + "**", true);
-            builder.addField(":wrench: Explicit Content Filter level: ", "**" + guild.getExplicitContentLevel() + "**", true);
+            builder.addField(":date: Creation Date: ", "**"+guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
+            builder.addField(":vertical_traffic_light: Verification level: ", "**"+guild.getVerificationLevel()+"**", true);
+            builder.addField(":envelope: Default Notification level: ", "**"+guild.getDefaultNotificationLevel()+"**", true);
+            builder.addField(":wrench: Explicit Content Filter level: ", "**"+guild.getExplicitContentLevel()+"**", true);
             builder.setThumbnail(guild.getIconUrl());
             builder.setColor(guild.getSelfMember().getColor());
             event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();

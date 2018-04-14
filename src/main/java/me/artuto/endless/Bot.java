@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,17 +21,14 @@ import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.ThreadFactory;
 
 /**
- *
  * @author Artu
  */
 
@@ -50,8 +47,7 @@ public class Bot extends ListenerAdapter
     {
         User user = jda.getUserById(id);
 
-        if(!(user==null))
-            return user.getMutualGuilds();
+        if(!(user == null)) return user.getMutualGuilds();
         else return null;
     }
 
@@ -60,7 +56,7 @@ public class Bot extends ListenerAdapter
         List<Guild> guilds = new LinkedList<>();
         User user = jda.getUserById(id);
 
-        if(!(user==null))
+        if(!(user == null))
             user.getMutualGuilds().stream().filter(g -> g.getMember(user).hasPermission(Permission.MANAGE_SERVER)).forEach(g -> guilds.add(g));
 
         return guilds;
@@ -71,22 +67,41 @@ public class Bot extends ListenerAdapter
         return jda.getGuildById(id);
     }
 
-    /**@Override
-    public void onGuildJoin(GuildJoinEvent event)
+    /**
+     * @Override public void onGuildJoin(GuildJoinEvent event)
+     * {
+     * Guild guild = event.getGuild();
+     * User owner = event.getJDA().getUserById(config.getOwnerId());
+     * String leavemsg = "Hi! Sorry, but you can't have a copy of Endless on Discord Bots, this is for my own security.\n"
+     * + "Please remove this Account from the Discord Bots list or I'll take further actions.\n"
+     * + "If you think this is an error, please contact the Developer. ~Artuto";
+     * String warnmsg = "<@264499432538505217>, **"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless here!";
+     * Long ownerId = config.getOwnerId();
+     * <p>
+     * if(event.getGuild().getId().equals("110373943822540800") || event.getGuild().getId().equals("264445053596991498") && !(ownerId==264499432538505217L))
+     * {
+     * event.getJDA().getTextChannelById("119222314964353025").sendMessage(warnmsg).complete();
+     * owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> SimpleLog.getLog("DISCORD BOTS").fatal(leavemsg)));
+     * guild.leave().complete();
+     * }
+     * }
+     */
+
+    public static class EndlessThreadFactory implements ThreadFactory
     {
-        Guild guild = event.getGuild();
-        User owner = event.getJDA().getUserById(config.getOwnerId());
-        String leavemsg = "Hi! Sorry, but you can't have a copy of Endless on Discord Bots, this is for my own security.\n"
-                    + "Please remove this Account from the Discord Bots list or I'll take further actions.\n"
-                    + "If you think this is an error, please contact the Developer. ~Artuto";
-        String warnmsg = "<@264499432538505217>, **"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless here!";
-        Long ownerId = config.getOwnerId();
-        
-        if(event.getGuild().getId().equals("110373943822540800") || event.getGuild().getId().equals("264445053596991498") && !(ownerId==264499432538505217L))
+        private final String name;
+
+        public EndlessThreadFactory(String name)
         {
-            event.getJDA().getTextChannelById("119222314964353025").sendMessage(warnmsg).complete();
-            owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> SimpleLog.getLog("DISCORD BOTS").fatal(leavemsg)));
-            guild.leave().complete();
+            this.name = name;
         }
-    }*/
+
+        @Override
+        public Thread newThread(Runnable r)
+        {
+            final Thread thread = new Thread(r, "Endless-Thread "+name);
+            thread.setDaemon(true);
+            return thread;
+        }
+    }
 }

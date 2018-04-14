@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,14 @@
 package me.artuto.endless;
 
 /**
- *
  * @author Artu
- *
- *
- * Since sometimes we need to use the same messages a lot of times, 
+ * <p>
+ * <p>
+ * Since sometimes we need to use the same messages a lot of times,
  * is better having everything equals.
  */
 
-public class Messages 
+public class Messages
 {
     // Moderation Messages
     public static String BAN_SUCCESS = "Successfully banned user ";
@@ -41,7 +40,7 @@ public class Messages
     public static String HACKBAN_ERROR = "An error happened when hackbanning ";
     public static String CLEAR_SUCCESS = "Successfully cleared ";
     public static String CLEAR_ERROR = "An error happened when clearing ";
-    
+
     // Warning
     public static String MODLOG_NOPERMISSIONS = "You have a modlog channel configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write`, `Send Images` and `Read History`!";
     public static String SRVLOG_NOPERMISSIONS = "You have a serverlog channel configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write`, `Send Images` and `Read History`!";

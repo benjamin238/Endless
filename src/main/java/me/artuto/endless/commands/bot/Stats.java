@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +19,17 @@ package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.awt.Color;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-import java.text.DecimalFormat;
-
 import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 
+import java.awt.*;
+import java.lang.management.ManagementFactory;
+import java.text.DecimalFormat;
+
 /**
- *
  * @author Artu
  */
 
@@ -47,7 +45,7 @@ public class Stats extends Command
         this.ownerCommand = false;
         this.guildOnly = false;
     }
-    
+
     @Override
     protected void execute(CommandEvent event)
     {
@@ -60,18 +58,16 @@ public class Stats extends Command
         int cpus = Runtime.getRuntime().availableProcessors();
         String processCpuLoad = new DecimalFormat("###.###%").format(ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getProcessCpuLoad());
         String systemCpuLoad = new DecimalFormat("###.###%").format(ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class).getSystemCpuLoad());
-        long ramUsed = ((Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()) / (1024 * 1024));
+        long ramUsed = ((Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/(1024*1024));
 
-        if(event.isFromType(ChannelType.PRIVATE))
-            color = Color.decode("#33ff00");
-        else
-            color = event.getGuild().getSelfMember().getColor();
-        
+        if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
+        else color = event.getGuild().getSelfMember().getColor();
+
         EmbedBuilder builder = new EmbedBuilder();
         builder.addField("<:windows:371075985996775425> OS: ", os, true);
         builder.addField(":computer: RAM usage: ", ramUsed+"MB", true);
         builder.addField(":gear: CPU usage: ", processCpuLoad+" / "+systemCpuLoad+" ("+cpus+" Cores)", true);
-        builder.addField(":map: Guilds: ", ""+event.getJDA().getGuilds().size() , true);
+        builder.addField(":map: Guilds: ", ""+event.getJDA().getGuilds().size(), true);
         builder.addField(":speech_balloon: Text Channels: ", ""+event.getJDA().getTextChannels().size(), true);
         builder.addField(":speaker: Voice Channels: ", ""+event.getJDA().getVoiceChannels().size(), true);
         builder.addField(":bust_in_silhouette: Users: ", ""+event.getJDA().getUsers().size(), true);

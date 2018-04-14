@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +27,11 @@ import java.io.File;
 import java.lang.reflect.Field;
 
 /**
- *
  * @author Artu
  * Thanks Spotlight for the code.
  */
 
-public class Config 
+public class Config
 {
     private final Logger LOG = LoggerFactory.getLogger("Config");
     private static ConfigFormat format;
@@ -47,7 +46,7 @@ public class Config
             if(field.get(format) == null)
             {
                 LOG.error("Error when reading the config!");
-                throw new Exception(field.getName() + " in your config was null!");
+                throw new Exception(field.getName()+" in your config was null!");
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game;
 
 /**
- *
  * @author Artu
  */
 
@@ -43,30 +42,22 @@ public class BotCPanel extends Command
         this.ownerCommand = true;
         this.guildOnly = false;
     }
-    
+
     @Override
-    protected void execute(CommandEvent event) 
+    protected void execute(CommandEvent event)
     {
         String prefix = event.getClient().getPrefix();
 
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Please choose a subcommand:\n" +
-                    "- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n" +
-                    "- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n" +
-                    "- `"+prefix+"bot updategame`: Updates the default game.\n" +
-                    "- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
+            event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n"+"- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n"+"- `"+prefix+"bot updategame`: Updates the default game.\n"+"- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
         }
         else if(!(event.getArgs().contains("status")) || !(event.getArgs().contains("game") || !(event.getArgs().contains("updategame"))) || !(event.getArgs().contains("optimize")))
         {
-            event.replyWarning("Please choose a subcommand:\n" +
-                    "- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n" +
-                    "- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n" +
-                    "- `"+prefix+"bot updategame`: Updates the default game.\n" +
-                    "- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
+            event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n"+"- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n"+"- `"+prefix+"bot updategame`: Updates the default game.\n"+"- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
         }
     }
-    
+
     private class Status extends Command
     {
         Status()
@@ -78,39 +69,38 @@ public class BotCPanel extends Command
             this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
             this.guildOnly = false;
-       }
-        
-       @Override
-       protected void execute(CommandEvent event)
-       {
+        }
+
+        @Override
+        protected void execute(CommandEvent event)
+        {
             if(event.getArgs().isEmpty())
             {
                 event.replyError("Please provide me a valid OnlineStatus!");
                 return;
             }
-            
+
             if(event.getArgs().equals("help"))
             {
-                event.replyInDm("Help for subcommand `bot status`\n"
-                        + "Valid options: `ONLINE`, `DO_NOT_DISTURB`, `INVISIBLE`, `AWAY`");
+                event.replyInDm("Help for subcommand `bot status`\n"+"Valid options: `ONLINE`, `DO_NOT_DISTURB`, `INVISIBLE`, `AWAY`");
                 event.reactSuccess();
                 return;
             }
-            
+
             try
             {
-               String status = event.getArgs();
-               event.getJDA().getPresence().setStatus(OnlineStatus.valueOf(status));
-               event.replySuccess("Changed status to "+event.getJDA().getPresence().getStatus()+" without error!");
+                String status = event.getArgs();
+                event.getJDA().getPresence().setStatus(OnlineStatus.valueOf(status));
+                event.replySuccess("Changed status to "+event.getJDA().getPresence().getStatus()+" without error!");
             }
             catch(Exception e)
             {
                 event.replyError("Error when changing the status! Check the Bot console for more information.");
                 e.printStackTrace();
             }
-       }
+        }
     }
-    
+
     private class Playing extends Command
     {
         Playing()
@@ -122,11 +112,11 @@ public class BotCPanel extends Command
             this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
             this.guildOnly = false;
-       }
-        
-       @Override
-       protected void execute(CommandEvent event)
-       {
+        }
+
+        @Override
+        protected void execute(CommandEvent event)
+        {
             if(event.getArgs().isEmpty())
             {
                 try
@@ -153,7 +143,7 @@ public class BotCPanel extends Command
                     e.printStackTrace();
                 }
             }
-       }
+        }
     }
 
     private class DefaultGameUpdate extends Command
@@ -174,7 +164,7 @@ public class BotCPanel extends Command
         {
             try
             {
-                event.getJDA().getPresence().setGame(Game.playing("Type "+event.getClient().getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+                event.getJDA().getPresence().setGame(Game.playing("Type "+event.getClient().getPrefix()+"help | Version "+Const.VERSION+" | On "+event.getJDA().getGuilds().size()+" Guilds | "+event.getJDA().getUsers().size()+" Users | "+event.getJDA().getTextChannels().size()+" Channels"));
                 event.replySuccess("Game updated.");
             }
             catch(Exception e)

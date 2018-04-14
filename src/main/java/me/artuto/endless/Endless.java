@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,24 +18,36 @@
 package me.artuto.endless;
 
 
-import ch.qos.logback.classic.*;
-import com.jagrosh.jdautilities.command.*;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import com.jagrosh.jdautilities.command.CommandClient;
+import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.bot.*;
 import me.artuto.endless.commands.botadm.*;
+import me.artuto.endless.commands.botadm.Shutdown;
 import me.artuto.endless.commands.fun.*;
 import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.tools.*;
-import me.artuto.endless.commands.utils.*;
+import me.artuto.endless.commands.utils.GoogleSearch;
+import me.artuto.endless.commands.utils.TimeFor;
+import me.artuto.endless.commands.utils.Translate;
 import me.artuto.endless.data.*;
-import me.artuto.endless.events.*;
-import me.artuto.endless.loader.*;
-import me.artuto.endless.logging.*;
+import me.artuto.endless.events.GuildEvents;
+import me.artuto.endless.events.StarboardEvents;
+import me.artuto.endless.events.UserEvents;
+import me.artuto.endless.loader.Config;
+import me.artuto.endless.loader.Logging;
+import me.artuto.endless.logging.ModLogging;
+import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.utils.GuildUtils;
-import net.dv8tion.jda.core.*;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.OnlineStatus;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.slf4j.LoggerFactory;
@@ -45,9 +57,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
- *
  * @author Artu
  */
 
@@ -64,10 +76,12 @@ public class Endless extends ListenerAdapter
     private static ProfileDataManager pdm;
     private static StarboardDataManager sdm;
     private static TagDataManager tdm;
-    private static Logger LOGGER = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-    private static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
+    private static Logger LOGGER = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    private static Logger LOG = (Logger) LoggerFactory.getLogger("Endless");
     private static ModLogging modlog;
 
+    // Threads
+    private static ScheduledExecutorService cmdThread = new ScheduledThreadPoolExecutor(2, new Bot.EndlessThreadFactory("Command"));
 
     public static void main(String[] args) throws Exception
     {
@@ -121,7 +135,7 @@ public class Endless extends ListenerAdapter
         Long[] coOwners = config.getCoOwnerIds();
         String[] owners = new String[coOwners.length];
 
-        for(int i = 0; i < owners.length; i++)
+        for(int i = 0; i<owners.length; i++)
             owners[i] = String.valueOf(coOwners[i]);
 
         client.setOwnerId(String.valueOf(config.getOwnerId()));
@@ -130,75 +144,37 @@ public class Endless extends ListenerAdapter
         client.setPrefix(config.getPrefix());
         client.setAlternativePrefix("<@310578566695878658>");
         client.setGuildSettingsManager(new ClientGSDM(db, gsdm));
-        client.setStatus(OnlineStatus.DO_NOT_DISTURB);
-        client.setGame(Game.playing("Loading..."));
+        client.setStatus(OnlineStatus.ONLINE);
+        client.setGame(Game.playing("Type e!help"));
+        client.setScheduleExecutor(cmdThread);
 
-        if(!(Arrays.toString(owners).isEmpty()))
-            client.setCoOwnerIds(owners);
-        if(!(config.getDBotsToken().isEmpty() || config.getDBotsToken()==null))
+        if(!(Arrays.toString(owners).isEmpty())) client.setCoOwnerIds(owners);
+        if(!(config.getDBotsToken().isEmpty() || config.getDBotsToken() == null))
             client.setDiscordBotsKey(config.getDBotsToken());
-        if(!(config.getDBotsListToken().isEmpty() || config.getDBotsListToken()==null))
+        if(!(config.getDBotsListToken().isEmpty() || config.getDBotsListToken() == null))
             client.setDiscordBotListKey(config.getDBotsListToken());
 
         client.addCommands(
                 //Bot
-
-                new About(),
-                new Donate(ddm),
-                new Invite(),
-                new Ping(),
-                new Stats(),
+                new About(), new Donate(ddm), new Invite(), new Ping(), new Stats(),
 
                 //Bot Administration
-
-                new Bash(),
-                new BlacklistUsers(bdm),
-                new BotCPanel(),
-                new Eval(config, db, ddm, gsdm, bdm, sdm, tdm, modlog),
-                new Shutdown(db),
+                new Bash(), new BlacklistUsers(bdm), new BotCPanel(), new Eval(config, db, ddm, gsdm, bdm, sdm, tdm, modlog), new Shutdown(db),
 
                 //Moderation
-
-                new Ban(modlog, config),
-                new Clear(modlog, threads),
-                new DBansCheck(config),
-                new Kick(modlog, config),
-                new Hackban(modlog, config),
-                new SoftBan(modlog, config),
-                new Unban(modlog, config),
+                new Ban(modlog, config), new Clear(modlog, threads), new DBansCheck(config), new Kick(modlog, config), new Hackban(modlog, config), new SoftBan(modlog, config), new Unban(modlog, config),
 
                 //Settings
-
-                new Leave(gsdm),
-                new Prefix(db, gsdm),
-                new ServerSettings(gsdm),
-                new Starboard(gsdm, waiter),
-                new Welcome(gsdm),
+                new Leave(gsdm), new Prefix(db, gsdm), new ServerSettings(gsdm), new Starboard(gsdm, waiter), new Welcome(gsdm),
 
                 //Tools
-
-                new Afk(),
-                new Avatar(),
-                new GuildInfo(),
-                new Lookup(),
-                new RoleCmd(),
-                new UserInfo(),
+                new Afk(), new Avatar(), new GuildInfo(), new Lookup(), new RoleCmd(), new UserInfo(),
 
                 //Fun
-
-                new Cat(config),
-                new Choose(),
-                new Dog(config),
-                new GiphyGif(config),
-                new Profile(pdm),
-                new Say(),
-                new Tag(tdm),
+                new Cat(config), new Choose(), new Dog(config), new GiphyGif(config), new Profile(pdm), new Say(), new Tag(tdm),
 
                 //Utils
-
-                new GoogleSearch(),
-                new TimeFor(pdm),
-                new Translate(config));
+                new GoogleSearch(), new TimeFor(pdm), new Translate(config));
 
         return client.build();
 
@@ -208,17 +184,19 @@ public class Endless extends ListenerAdapter
     {
         new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
+                .setStatus(OnlineStatus.DO_NOT_DISTURB)
+                .setGame(Game.playing("Loading..."))
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
                 .setEnableShutdownHook(true)
-                .addEventListener(waiter, createClient(),
-                        new Endless(), new Logging(config), new ServerLogging(gsdm),
-                        new GuildEvents(config, tdm, gsdm, bdm), new StarboardEvents(gsdm, sdm), new UserEvents(config))
+                .addEventListener(waiter, createClient(), new Endless(),
+                        new Logging(config), new ServerLogging(gsdm), new GuildEvents(config, tdm, gsdm, bdm),
+                        new StarboardEvents(gsdm, sdm), new UserEvents(config))
                 .buildAsync();
     }
 
     //When ready print the bot info
-    
+
     @Override
     public void onReady(ReadyEvent event)
     {
@@ -246,14 +224,14 @@ public class Endless extends ListenerAdapter
         LOG.info("Using prefix: "+config.getPrefix());
         LOG.info("Owner: "+ownername+" ("+ownerid+")");
 
-        event.getJDA().getPresence().setGame(Game.playing("Type "+config.getPrefix()+"help | Version " + Const.VERSION + " | On " + event.getJDA().getGuilds().size() + " Guilds | " + event.getJDA().getUsers().size() + " Users | " + event.getJDA().getTextChannels().size() + " Channels"));
+        event.getJDA().getPresence().setGame(Game.playing("Type "+config.getPrefix()+"help | Version "+Const.VERSION+" | On "+event.getJDA().getGuilds().size()+" Guilds | "+event.getJDA().getUsers().size()+" Users | "+event.getJDA().getTextChannels().size()+" Channels"));
         event.getJDA().getPresence().setStatus(config.getStatus());
 
         if(event.getJDA().getGuilds().isEmpty())
         {
-            Logger LOG = (Logger)LoggerFactory.getLogger("Startup Checker");
+            Logger LOG = (Logger) LoggerFactory.getLogger("Startup Checker");
 
-            LOG.warn("Looks like your bot isn't on any guild! Add your bot using the following link:");
+            LOG.warn("Looks like I'm on any guild! Add me using the following link:");
             LOG.warn(event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR));
         }
     }

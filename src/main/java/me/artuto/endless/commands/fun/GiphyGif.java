@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -45,7 +62,7 @@ public class GiphyGif extends Command
     {
         String args = event.getArgs();
 
-        if (config.getGihpyKey().isEmpty())
+        if(config.getGihpyKey().isEmpty())
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
             LOG.warn("Someone triggered the Giphy command, but there isn't a key in the config file. In order to stop this message add a key to the config file.");
@@ -61,18 +78,15 @@ public class GiphyGif extends Command
 
             Color color;
 
-            if(event.isFromType(ChannelType.PRIVATE))
-                color = Color.decode("#33ff00");
-            else
-                color = event.getMember().getColor();
+            if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
+            else color = event.getMember().getColor();
 
             if(args.isEmpty())
             {
                 title = "<:giphy:373675520099090436> Trending GIF:";
                 r = SimpleGiphy.getInstance().trending("50", "pg-13");
                 List<Giphy> list = r.getData();
-                if (list.isEmpty())
-                    event.replyWarning("No results found!");
+                if(list.isEmpty()) event.replyWarning("No results found!");
                 else
                 {
                     Integer rand = new Random().nextInt(list.size());
@@ -87,11 +101,10 @@ public class GiphyGif extends Command
             }
             else
             {
-                title = "<:giphy:373675520099090436> Results for `" + args + "`:";
+                title = "<:giphy:373675520099090436> Results for `"+args+"`:";
                 r = SimpleGiphy.getInstance().search(args, "50", "0", "pg-13");
                 List<Giphy> list = r.getData();
-                if (list.isEmpty())
-                    event.replyWarning("No results found!");
+                if(list.isEmpty()) event.replyWarning("No results found!");
                 else
                 {
                     Integer rand = new Random().nextInt(list.size());
@@ -110,8 +123,7 @@ public class GiphyGif extends Command
             event.replyError("An error was thrown when getting a gif! Ask the Owner to check the Console.");
             LOG.error(e.getMessage());
 
-            if (config.isDebugEnabled())
-                e.printStackTrace();
+            if(config.isDebugEnabled()) e.printStackTrace();
         }
     }
 
@@ -148,10 +160,8 @@ public class GiphyGif extends Command
 
             Color color;
 
-            if(event.isFromType(ChannelType.PRIVATE))
-                color = Color.decode("#33ff00");
-            else
-                color = event.getMember().getColor();
+            if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
+            else color = event.getMember().getColor();
 
             SimpleGiphy.setApiKey(config.getGihpyKey());
             RandomGiphyResponse r;

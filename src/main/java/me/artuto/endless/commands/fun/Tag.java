@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jagtag.Parser;
@@ -19,21 +36,12 @@ public class Tag extends Command
     public Tag(TagDataManager db)
     {
         this.db = db;
-        this.parser = new ParserBuilder()
-                .addMethods(Variables.getMethods())
-                .addMethods(Arguments.getMethods())
-                .addMethods(Functional.getMethods())
-                .addMethods(Miscellaneous.getMethods())
-                .addMethods(Strings.getMethods())
-                .addMethods(Time.getMethods())
-                .addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods())
-                .setMaxOutput(2000)
-                .setMaxIterations(1000)
-                .build();
+        this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
         this.name = "tag";
         this.aliases = new String[]{"t"};
         this.help = "Retrieves a tag with the specified name";
-        this.helpBiConsumer = (event, command) -> {
+        this.helpBiConsumer = (event, command) ->
+        {
             StringBuilder sb = new StringBuilder();
             sb.append("Help for **"+command.getName()+"**:\n");
 
@@ -79,7 +87,7 @@ public class Tag extends Command
 
         String tag = db.getTagContent(tagname);
 
-        if(tag==null)
+        if(tag == null)
         {
             event.replyError("No tag found with that name!");
             return;
@@ -131,13 +139,12 @@ public class Tag extends Command
 
             String tag = db.getTagContent(name);
 
-            if(tag==null)
+            if(tag == null)
             {
                 db.addTag(name, content, event.getAuthor().getIdLong());
                 event.replySuccess("Tag `"+name+"` was created successfully!");
             }
-            else
-                event.replyError("A tag already exists with that name!");
+            else event.replyError("A tag already exists with that name!");
         }
     }
 
@@ -168,8 +175,7 @@ public class Tag extends Command
             String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
             Long owner = db.getTagOwner(event.getArgs().trim().toLowerCase());
 
-            if(tag==null)
-                event.replyError("No tag found with that name!");
+            if(tag == null) event.replyError("No tag found with that name!");
             else
             {
                 if(owner.equals(event.getAuthor().getIdLong()) || event.isOwner())
@@ -177,8 +183,7 @@ public class Tag extends Command
                     db.removeTag(event.getArgs().trim().toLowerCase());
                     event.replySuccess("Tag successfully deleted");
                 }
-                else
-                    event.replyError("You aren't the owner of the tag!");
+                else event.replyError("You aren't the owner of the tag!");
             }
         }
     }
@@ -225,8 +230,7 @@ public class Tag extends Command
             String tag = db.getTagContent(name);
             Long owner = db.getTagOwner(name);
 
-            if(tag==null)
-                event.replyError("No tag found with that name!");
+            if(tag == null) event.replyError("No tag found with that name!");
             else
             {
                 if(owner.equals(event.getAuthor().getIdLong()) || event.isOwner())
@@ -234,8 +238,7 @@ public class Tag extends Command
                     db.editTag(name, content);
                     event.replySuccess("Tag successfully edited!");
                 }
-                else
-                    event.replyError("You aren't the owner of the tag!");
+                else event.replyError("You aren't the owner of the tag!");
             }
         }
     }
@@ -266,8 +269,7 @@ public class Tag extends Command
             String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
             User owner = event.getJDA().retrieveUserById(db.getTagOwner(event.getArgs())).complete();
 
-            if(tag==null)
-                event.replyError("No tag found with that name!");
+            if(tag == null) event.replyError("No tag found with that name!");
             else
                 event.reply("The owner of the tag `"+event.getArgs().trim().toLowerCase()+"` is **"+owner.getName()+"#"+owner.getDiscriminator()+"** (ID: **"+owner.getId()+"**)");
         }
@@ -298,8 +300,7 @@ public class Tag extends Command
 
             String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
 
-            if(tag==null)
-                event.replyError("No tag found with that name!");
+            if(tag == null) event.replyError("No tag found with that name!");
             else
             {
                 if(db.isTagImported(event.getArgs().trim().toLowerCase(), event.getGuild().getIdLong()))
@@ -338,10 +339,8 @@ public class Tag extends Command
 
             String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
 
-            if(tag==null)
-                event.replyError("No tag found with that name!");
-            else
-                event.reply(tag);
+            if(tag == null) event.replyError("No tag found with that name!");
+            else event.reply(tag);
         }
     }
 
@@ -370,10 +369,8 @@ public class Tag extends Command
 
             String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
 
-            if(tag==null)
-                event.replyError("No tag found with that name!");
-            else
-                event.reply("```"+tag+"```");
+            if(tag == null) event.replyError("No tag found with that name!");
+            else event.reply("```"+tag+"```");
         }
     }
 
@@ -402,8 +399,7 @@ public class Tag extends Command
 
             String tag = db.getTagContent(event.getArgs().trim().toLowerCase());
 
-            if(tag==null)
-                event.replyError("No tag found with that name!");
+            if(tag == null) event.replyError("No tag found with that name!");
             else
             {
                 if(!(db.isTagImported(event.getArgs().trim().toLowerCase(), event.getGuild().getIdLong())))

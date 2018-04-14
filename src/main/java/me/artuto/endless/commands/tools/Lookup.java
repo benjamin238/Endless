@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,6 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.awt.Color;
-import java.time.format.DateTimeFormatter;
-
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.tools.InfoTools;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -29,30 +26,30 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.entities.Invite;
 import net.dv8tion.jda.core.exceptions.ErrorResponseException;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.utils.WidgetUtil;
 
+import java.awt.*;
+import java.time.format.DateTimeFormatter;
+
 /**
- *
  * @author Artu
  */
 
 public class Lookup extends Command
 {
     public Lookup()
-        {
-            this.name = "lookup";
-            this.help = "Retrieves info about an invite, a guild or an user using their ID from Discord's servers.";
-            this.arguments = "<User ID | Invite code | Invite URL | Guild ID>";
-            this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildOnly = false;
-       }
-    
+    {
+        this.name = "lookup";
+        this.help = "Retrieves info about an invite, a guild or an user using their ID from Discord's servers.";
+        this.arguments = "<User ID | Invite code | Invite URL | Guild ID>";
+        this.category = Categories.TOOLS;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.ownerCommand = false;
+        this.guildOnly = false;
+    }
+
     @Override
     protected void execute(CommandEvent event)
     {
@@ -78,10 +75,8 @@ public class Lookup extends Command
             return;
         }
 
-        if(event.isFromType(ChannelType.PRIVATE))
-            color = Color.decode("#33ff00");
-        else
-            color = event.getGuild().getSelfMember().getColor();
+        if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
+        else color = event.getGuild().getSelfMember().getColor();
 
         try
         {
@@ -90,12 +85,10 @@ public class Lookup extends Command
             finished = true;
             String ranks;
 
-            if(InfoTools.nitroCheck(user))
-                ranks = "<:nitro:334859814566101004>";
-            else
-                ranks = "";
+            if(InfoTools.nitroCheck(user)) ranks = "<:nitro:334859814566101004>";
+            else ranks = "";
 
-            title = (user.isBot()?":information_source: Information about the bot **"+user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** <:bot:334859813915983872>":":information_source: Information about the user **"+user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** "+ranks);
+            title = (user.isBot() ? ":information_source: Information about the bot **"+user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** <:bot:334859813915983872>" : ":information_source: Information about the user **"+user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** "+ranks);
             builder.addField(":1234: ID:", "**"+user.getId()+"**", false);
             builder.addField(":calendar_spiral: Account Creation Time:", "**"+user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", false);
             if(user.getName().contains("Kyle2000"))
@@ -106,7 +99,9 @@ public class Lookup extends Command
             event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build(), s -> builder.clearFields());
             return;
         }
-        catch(Exception ignored) {}
+        catch(Exception ignored)
+        {
+        }
 
         TextChannel tc;
         VoiceChannel vc;
@@ -127,7 +122,7 @@ public class Lookup extends Command
                 guild = null;
             }
 
-            if(!(guild==null))
+            if(!(guild == null))
             {
                 guildb = true;
                 finished = true;
@@ -142,7 +137,7 @@ public class Lookup extends Command
 
                 event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build(), s -> builder.clearFields());
             }
-            else if(!(vc==null))
+            else if(!(vc == null))
             {
                 vcb = true;
                 finished = true;
@@ -156,7 +151,7 @@ public class Lookup extends Command
 
                 event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build(), s -> builder.clearFields());
             }
-            else if(!(tc==null))
+            else if(!(tc == null))
             {
                 tcb = true;
                 finished = true;
@@ -185,7 +180,7 @@ public class Lookup extends Command
                 title = ":information_source: Information about the invite `"+args+"`";
 
                 builder.addField(":bust_in_silhouette: Inviter:", "**"+user.getName()+"#"+user.getDiscriminator()+"**", false);
-                builder.addField(":speech_balloon: Channel:","**#"+invtc.getName()+" (ID: "+invtc.getId()+")**", false);
+                builder.addField(":speech_balloon: Channel:", "**#"+invtc.getName()+" (ID: "+invtc.getId()+")**", false);
                 builder.addField(":map: Guild:", "**"+invguild.getName()+" (ID: "+invguild.getId()+")**", false);
                 builder.setFooter("Information provided by the Discord API", "https://endless.artuto.me/assets/discord.png");
                 builder.setThumbnail(invguild.getIconUrl());
@@ -193,7 +188,9 @@ public class Lookup extends Command
 
                 event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build(), s -> builder.clearFields());
             }
-            catch(ErrorResponseException ignored) { }
+            catch(ErrorResponseException ignored)
+            {
+            }
         }
 
         if(!(finished))
@@ -203,7 +200,7 @@ public class Lookup extends Command
                 widget = WidgetUtil.getWidget(args);
                 title = ":information_source: Information about the guild **"+widget.getName()+"**";
 
-                if(!(widget==null))
+                if(!(widget == null))
                 {
                     widgetb = true;
 
@@ -218,7 +215,9 @@ public class Lookup extends Command
                     event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build(), s -> builder.clearFields());
                 }
             }
-            catch(Exception ignored) {}
+            catch(Exception ignored)
+            {
+            }
         }
 
         if(!(userb) && !(tcb) && !(vcb) && !(guildb) && !(inviteb) && !(widgetb))

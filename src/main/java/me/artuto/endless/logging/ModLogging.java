@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,19 +24,21 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
- *
  * @author Artu
  * Class used for ModLog actions.
  */
 
-public class ModLogging 
+public class ModLogging
 {
     private static GuildSettingsDataManager db;
 
@@ -50,21 +52,19 @@ public class ModLogging
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null))
+        if(!(tc == null))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
             {
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Ban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
-                        + "`[Reason]:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Ban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
             }
         }
     }
@@ -74,21 +74,19 @@ public class ModLogging
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null))
+        if(!(tc == null))
         {
             if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
             {
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Hackban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") hackbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
-                        + "`[Reason]:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Hackban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") hackbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"+"`[Reason]:` "+reason).queue();
             }
         }
     }
@@ -98,21 +96,19 @@ public class ModLogging
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null))
+        if(!(tc == null))
         {
             if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
             {
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Kick]:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
-                        + "`[Reason]:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Kick]:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
             }
         }
     }
@@ -122,21 +118,19 @@ public class ModLogging
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null))
+        if(!(tc == null))
         {
             if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
             {
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Softban]:` :banana: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") softbanned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"
-                        + "`[Reason]:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Softban]:` :banana: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") softbanned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
             }
         }
     }
@@ -146,21 +140,19 @@ public class ModLogging
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null))
+        if(!(tc == null))
         {
             if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
             {
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             }
             else
             {
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Unban]:` :wrench: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"
-                        + "`[Reason]:` "+reason).queue();
+                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Unban]:` :wrench: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"+"`[Reason]:` "+reason).queue();
             }
         }
     }
@@ -170,17 +162,16 @@ public class ModLogging
         TextChannel tc = db.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
         File file = new File("cleared.txt");
 
-        if(!(tc==null))
+        if(!(tc == null))
         {
             if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
             {
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             }
             else
             {
@@ -188,29 +179,27 @@ public class ModLogging
                 {
                     Writer output = new BufferedWriter(new FileWriter(file, true));
 
-                        for(Message msg : deleted)
+                    for(Message msg : deleted)
+                    {
+                        User a = msg.getAuthor();
+
+                        if(!(msg.getContentDisplay().isEmpty()))
                         {
-                            User a = msg.getAuthor();
-
-                            if(!(msg.getContentDisplay().isEmpty()))
-                            {
-                                String toWrite = a.getName() + "#" + a.getDiscriminator() + ": " + msg.getContentDisplay() + "\n";
-                                output.append(toWrite);
-                            }
+                            String toWrite = a.getName()+"#"+a.getDiscriminator()+": "+msg.getContentDisplay()+"\n";
+                            output.append(toWrite);
                         }
+                    }
 
-                        output.close();
+                    output.close();
                 }
                 catch(Exception e)
                 {
                     LoggerFactory.getLogger("Clear Modlog").error("Error when creating the text file with the deleted messages: "+e);
                 }
 
-                String message = "`["+hour+":"+min+":"+sec+"] [Clear]:` :wastebasket: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages in "+channel.getAsMention()+" ("+args+").\n"
-                        + "`[Reason]:` "+reason;
+                String message = "`["+hour+":"+min+":"+sec+"] [Clear]:` :wastebasket: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages in "+channel.getAsMention()+" ("+args+").\n"+"`[Reason]:` "+reason;
 
-                if(!(file.exists()))
-                    tc.sendMessage(message).queue();
+                if(!(file.exists())) tc.sendMessage(message).queue();
                 else
                     tc.sendFile(file, "cleared.txt", new MessageBuilder().append(message).build()).queue((s) -> file.delete());
             }

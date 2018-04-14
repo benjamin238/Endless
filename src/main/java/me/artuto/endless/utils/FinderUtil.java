@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 /**
- *
  * @author Artu
  */
 
@@ -32,7 +31,7 @@ public class FinderUtil
     public static TextChannel getDefaultChannel(Guild guild)
     {
 
-        if(guild.getTextChannelById(guild.getId())==null)
+        if(guild.getTextChannelById(guild.getId()) == null)
             return guild.getTextChannels().stream().filter(TextChannel::canTalk).findFirst().orElse(null);
 
         return guild.getTextChannelById(guild.getId());

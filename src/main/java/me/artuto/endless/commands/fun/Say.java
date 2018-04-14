@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,10 @@ import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 
 /**
- *
  * @author Artu
  */
 
-public class Say extends Command 
+public class Say extends Command
 {
     public Say()
     {
@@ -40,7 +39,7 @@ public class Say extends Command
         this.ownerCommand = false;
         this.guildOnly = true;
     }
-    
+
     @Override
     protected void execute(CommandEvent event)
     {

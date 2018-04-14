@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,6 @@ package me.artuto.endless.commands.tools;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
-import java.util.List;
-import java.util.function.BiConsumer;
-
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -30,8 +27,9 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 
+import java.util.List;
+
 /**
- *
  * @author Artu
  */
 
@@ -48,13 +46,13 @@ public class Avatar extends Command
         this.ownerCommand = false;
         this.guildOnly = true;
     }
-    
+
     @Override
     protected void execute(CommandEvent event)
     {
         Member target;
         EmbedBuilder builder = new EmbedBuilder();
-        
+
         if(event.getArgs().isEmpty())
         {
             target = event.getMessage().getMember();
@@ -62,7 +60,7 @@ public class Avatar extends Command
         else
         {
             List<Member> list = FinderUtil.findMembers(event.getArgs(), event.getGuild());
-            
+
             if(list.isEmpty())
             {
                 event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
@@ -73,23 +71,23 @@ public class Avatar extends Command
                 event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
                 return;
             }
-    	    else
+            else
             {
                 target = list.get(0);
             }
-        }   
-            
+        }
+
         String title = ":frame_photo: Avatar of **"+target.getUser().getName()+"**"+"#"+"**"+target.getUser().getDiscriminator()+"**";
-            
+
         try
         {
-                builder.setImage(target.getUser().getEffectiveAvatarUrl());
-                builder.setColor(target.getColor());
-                event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(); 
+            builder.setImage(target.getUser().getEffectiveAvatarUrl());
+            builder.setColor(target.getColor());
+            event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
         }
         catch(Exception e)
         {
-                event.replyError("An error happened when getting the avatar!");
+            event.replyError("An error happened when getting the avatar!");
         }
     }
 }

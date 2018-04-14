@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 
 /**
- *
  * @author Artu
  */
 
@@ -41,7 +40,7 @@ public class Choose extends Command
         this.ownerCommand = false;
         this.guildOnly = false;
     }
-    
+
     @Override
     protected void execute(CommandEvent event)
     {
@@ -52,14 +51,14 @@ public class Choose extends Command
         else
         {
             String[] options = event.getArgs().split("\\s+");
-            
-            if(options.length==1)
+
+            if(options.length == 1)
             {
                 event.replyWarning("You only gave me one option: `"+options[0]+"`");
             }
             else
             {
-                event.reply("I choose `"+options[(int)(Math.random()*options.length)]+"`");
+                event.reply("I choose `"+options[(int) (Math.random()*options.length)]+"`");
             }
         }
     }

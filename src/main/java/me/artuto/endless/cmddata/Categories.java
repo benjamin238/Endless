@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.cmddata;
 
 import com.jagrosh.jdautilities.command.Command.Category;
@@ -10,21 +27,20 @@ import org.slf4j.LoggerFactory;
 public class Categories
 {
     private static BlacklistDataManager db;
-	private static Config config;
+    private static Config config;
     private static final Logger LOG = LoggerFactory.getLogger("Blacklisted Users");
 
     public Categories(BlacklistDataManager db)
     {
         this.db = db;
-		this.config = config;
+        this.config = config;
     }
 
     public static final Category BOT = new Category("Bot", event ->
     {
         User user = event.getAuthor();
 
-        if(event.isOwner())
-            return true;
+        if(event.isOwner()) return true;
         else
         {
             if(db.isUserBlacklisted(user))
@@ -33,8 +49,7 @@ public class Categories
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else
-                return true;
+            else return true;
         }
     });
 
@@ -43,7 +58,7 @@ public class Categories
         if(event.isOwner())
 
             return true;
-        else 
+        else
         {
             event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
             return false;
@@ -54,8 +69,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner())
-            return true;
+        if(event.isOwner()) return true;
         else
         {
             if(db.isUserBlacklisted(user))
@@ -64,8 +78,7 @@ public class Categories
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else
-                return true;
+            else return true;
         }
     });
 
@@ -73,8 +86,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner())
-            return true;
+        if(event.isOwner()) return true;
         else
         {
             if(db.isUserBlacklisted(user))
@@ -83,8 +95,7 @@ public class Categories
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else
-                return true;
+            else return true;
         }
     });
 
@@ -92,8 +103,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner())
-            return true;
+        if(event.isOwner()) return true;
         else
         {
             if(db.isUserBlacklisted(user))
@@ -102,8 +112,7 @@ public class Categories
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else
-                return true;
+            else return true;
         }
     });
 
@@ -111,8 +120,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner())
-            return true;
+        if(event.isOwner()) return true;
         else
         {
             if(db.isUserBlacklisted(user))
@@ -121,8 +129,7 @@ public class Categories
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else
-                return true;
+            else return true;
         }
     });
 
@@ -130,8 +137,7 @@ public class Categories
     {
         User user = event.getAuthor();
 
-        if(event.isOwner())
-            return true;
+        if(event.isOwner()) return true;
         else
         {
             if(db.isUserBlacklisted(user))
@@ -140,8 +146,7 @@ public class Categories
                 event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
                 return false;
             }
-            else
-                return true;
+            else return true;
         }
     });
 }

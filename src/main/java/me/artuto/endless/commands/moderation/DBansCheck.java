@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artuto
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,7 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.io.IOException;
-import java.util.List;
-
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
-import java.awt.Color;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.utils.FormatUtil;
@@ -31,17 +27,16 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.io.IOException;
+import java.util.List;
+
 /**
- *
  * @author Artuto
  */
 
@@ -49,7 +44,7 @@ public class DBansCheck extends Command
 {
     private final Logger LOG = LoggerFactory.getLogger("DiscordBans Command");
     private final Config config;
-    
+
     public DBansCheck(Config config)
     {
         this.config = config;
@@ -64,7 +59,7 @@ public class DBansCheck extends Command
         this.guildOnly = false;
         this.cooldown = 10;
     }
-    
+
     @Override
     protected void execute(CommandEvent event)
     {
@@ -105,24 +100,16 @@ public class DBansCheck extends Command
             event.replyWarning(FormatUtil.listOfUsers(list, event.getArgs()));
             return;
         }
-        else
-            user = list.get(0);
+        else user = list.get(0);
 
-       try
-       {
+        try
+        {
             OkHttpClient client = new OkHttpClient();
-           
-            RequestBody formBody = new FormBody.Builder()
-                .add("token", config.getDBansToken())
-                .add("userid", user.getId())
-                .add("version", "3")
-                .build();
-            
-            Request request = new Request.Builder()
-                .url("https://bans.discordlist.net/api")
-                .post(formBody)
-                .build();
-    
+
+            RequestBody formBody = new FormBody.Builder().add("token", config.getDBansToken()).add("userid", user.getId()).add("version", "3").build();
+
+            Request request = new Request.Builder().url("https://bans.discordlist.net/api").post(formBody).build();
+
             Response response = client.newCall(request).execute();
 
             info = response.body().string();
@@ -152,14 +139,13 @@ public class DBansCheck extends Command
             }
 
             event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
-       }
-       catch(IOException e)
-       {
+        }
+        catch(IOException e)
+        {
             event.replyError("An error was thrown when doing the check! Ask the Owner to check the Console.");
             LOG.error(e.toString());
 
-            if(config.isDebugEnabled())
-                e.printStackTrace();
-       }
+            if(config.isDebugEnabled()) e.printStackTrace();
+        }
     }
 }

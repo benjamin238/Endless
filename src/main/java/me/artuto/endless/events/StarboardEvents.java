@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.events;
 
 import me.artuto.endless.data.GuildSettingsDataManager;
@@ -36,16 +53,17 @@ public class StarboardEvents extends ListenerAdapter
     {
         Message starredMsg = event.getChannel().getMessageById(event.getMessageId()).complete();
         Guild guild = event.getGuild();
-        TextChannel starboard = gsdm.getStarboardChannel(guild);
         EmbedBuilder eb = new EmbedBuilder();
         MessageBuilder msgB = new MessageBuilder();
         StringBuilder sb = new StringBuilder();
         List<Message.Attachment> attachments = starredMsg.getAttachments().stream().filter(a -> !(a.isImage())).collect(Collectors.toList());
         List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
 
-        if(!(isConfigured(guild))) return;
+        if(!(event.getChannel().getTopic() == null) && event.getChannel().getTopic().toLowerCase().contains("{ignore:starboard}"))
+            return;
 
-        if(event.getChannel().getTopic().toLowerCase().contains("{ignore:starboard}")) return;
+        if(!(isConfigured(guild))) return;
+        TextChannel starboard = gsdm.getStarboardChannel(guild);
 
         if(isSameAuthor(starredMsg.getAuthor(), event.getUser()) && event.getReactionEmote().getName().equals("\u2B50"))
         {
@@ -57,8 +75,7 @@ public class StarboardEvents extends ListenerAdapter
 
         if(!(starboard.canTalk()))
         {
-            FinderUtil.getDefaultChannel(guild).sendMessage("I can't talk on the starboard!").queue(null,
-                    e -> guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage("I can't talk on the starboard!").queue(null, null)));
+            FinderUtil.getDefaultChannel(guild).sendMessage("I can't talk on the starboard!").queue(null, e -> guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage("I can't talk on the starboard!").queue(null, null)));
             return;
         }
 
@@ -66,21 +83,18 @@ public class StarboardEvents extends ListenerAdapter
         {
             if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
                 LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
-            else updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+            else
+                updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
         }
         else
         {
             sb.append(starredMsg.getContentRaw());
             eb.setAuthor(starredMsg.getAuthor().getName(), null, starredMsg.getAuthor().getEffectiveAvatarUrl());
-            if(!(attachments.isEmpty()))
-                for(Message.Attachment att : attachments)
-                    sb.append("\n").append(att.getUrl());
-            if(!(images.isEmpty()))
-                if(images.size()>1)
-                    for(Message.Attachment img : images)
-                        sb.append("\n").append(img.getUrl());
-                else
-                    eb.setImage(images.get(0).getUrl());
+            if(!(attachments.isEmpty())) for(Message.Attachment att : attachments)
+                sb.append("\n").append(att.getUrl());
+            if(!(images.isEmpty())) if(images.size()>1) for(Message.Attachment img : images)
+                sb.append("\n").append(img.getUrl());
+            else eb.setImage(images.get(0).getUrl());
             eb.setDescription(sb.toString());
             eb.setColor(Color.YELLOW);
 
@@ -112,7 +126,8 @@ public class StarboardEvents extends ListenerAdapter
 
             if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
                 LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
-            else updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+            else
+                updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
         }
     }
 
@@ -151,30 +166,28 @@ public class StarboardEvents extends ListenerAdapter
 
     private boolean isConfigured(Guild guild)
     {
-        return !(gsdm.getStarboardChannel(guild)==null) && !(gsdm.getStarboardCount(guild)==null);
+        return !(gsdm.getStarboardChannel(guild) == null) && !(gsdm.getStarboardCount(guild) == null);
     }
 
     private boolean amountPassed(Message msg)
     {
-        return getStarCount(msg)>=gsdm.getStarboardCount(msg.getGuild());
+        return getStarCount(msg) >= gsdm.getStarboardCount(msg.getGuild());
     }
 
     private Integer getStarCount(Message msg)
     {
         List<MessageReaction> reactions = msg.getReactions().stream().filter(r -> r.getReactionEmote().getName().equals("\u2B50")).collect(Collectors.toList());
-        if(reactions.isEmpty())
-            return 0;
+        if(reactions.isEmpty()) return 0;
 
         List<User> users = reactions.get(0).getUsers().complete();
 
-        if(users.contains(msg.getAuthor()))
-            return users.size()-1;
+        if(users.contains(msg.getAuthor())) return users.size()-1;
         else return users.size();
     }
 
     private boolean existsOnStarboard(Long id)
     {
-        if(sdm.getStarboardMessage(id)==null) return false;
+        if(sdm.getStarboardMessage(id) == null) return false;
         else return true;
     }
 
@@ -186,12 +199,9 @@ public class StarboardEvents extends ListenerAdapter
 
     private String getEmote(Integer count)
     {
-        if(count<5)
-            return ":star:";
-        else if(count>5 || count<=10)
-            return ":star2:";
-        else if(count>15)
-            return ":dizzy:";
+        if(count<5) return ":star:";
+        else if(count>5 || count<=10) return ":star2:";
+        else if(count>15) return ":dizzy:";
         else return ":star:";
     }
 

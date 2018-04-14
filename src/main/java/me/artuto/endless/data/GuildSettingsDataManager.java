@@ -1,14 +1,32 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.data;
 
-import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.Collection;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class GuildSettingsDataManager
 {
@@ -34,11 +52,10 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             TextChannel tc;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT modlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT modlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next())
-                    tc = guild.getTextChannelById(Long.toString(results.getLong("modlog_id")));
-                else tc=null;
+                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("modlog_id")));
+                else tc = null;
             }
             return tc;
         }
@@ -56,11 +73,10 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             TextChannel tc;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT serverlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT serverlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next())
-                    tc = guild.getTextChannelById(Long.toString(results.getLong("serverlog_id")));
-                else tc=null;
+                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("serverlog_id")));
+                else tc = null;
             }
             return tc;
         }
@@ -82,14 +98,14 @@ public class GuildSettingsDataManager
             {
                 if(results.next())
                 {
-                    results.updateLong("modlog_id", tc==null ? null : tc.getIdLong());
+                    results.updateLong("modlog_id", tc == null ? null : tc.getIdLong());
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("modlog_id", tc==null ? null : tc.getIdLong());
+                    results.updateLong("modlog_id", tc == null ? null : tc.getIdLong());
                     results.insertRow();
                 }
             }
@@ -111,14 +127,14 @@ public class GuildSettingsDataManager
             {
                 if(results.next())
                 {
-                    results.updateLong("serverlog_id", tc==null ? 0l : tc.getIdLong());
+                    results.updateLong("serverlog_id", tc == null ? 0l : tc.getIdLong());
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("serverlog_id", tc==null ? 0l : tc.getIdLong());
+                    results.updateLong("serverlog_id", tc == null ? 0l : tc.getIdLong());
                     results.insertRow();
                 }
             }
@@ -136,11 +152,10 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             TextChannel tc;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT welcome_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT welcome_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next())
-                    tc = guild.getTextChannelById(Long.toString(results.getLong("welcome_id")));
-                else tc=null;
+                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("welcome_id")));
+                else tc = null;
             }
             return tc;
         }
@@ -162,14 +177,14 @@ public class GuildSettingsDataManager
             {
                 if(results.next())
                 {
-                    results.updateLong("welcome_id", tc==null ? null : tc.getIdLong());
+                    results.updateLong("welcome_id", tc == null ? null : tc.getIdLong());
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("welcome_id", tc==null ? null : tc.getIdLong());
+                    results.updateLong("welcome_id", tc == null ? null : tc.getIdLong());
                     results.insertRow();
                 }
             }
@@ -187,11 +202,10 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             TextChannel tc;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT leave_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT leave_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next())
-                    tc = guild.getTextChannelById(Long.toString(results.getLong("leave_id")));
-                else tc=null;
+                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("leave_id")));
+                else tc = null;
             }
             return tc;
         }
@@ -213,14 +227,14 @@ public class GuildSettingsDataManager
             {
                 if(results.next())
                 {
-                    results.updateLong("leave_id", tc==null ? null : tc.getIdLong());
+                    results.updateLong("leave_id", tc == null ? null : tc.getIdLong());
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("leave_id", tc==null ? null : tc.getIdLong());
+                    results.updateLong("leave_id", tc == null ? null : tc.getIdLong());
                     results.insertRow();
                 }
             }
@@ -238,11 +252,10 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             String message;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT welcome_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT welcome_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next())
-                    message = results.getString("welcome_msg");
-                else message="";
+                if(results.next()) message = results.getString("welcome_msg");
+                else message = "";
             }
             return message;
         }
@@ -289,11 +302,10 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             String message;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT leave_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT leave_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next())
-                    message = results.getString("leave_msg");
-                else message="";
+                if(results.next()) message = results.getString("leave_msg");
+                else message = "";
             }
             return message;
         }
@@ -340,11 +352,10 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             TextChannel tc;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT starboard_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT starboard_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next())
-                    tc = guild.getTextChannelById(Long.toString(results.getLong("starboard_id")));
-                else tc=null;
+                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("starboard_id")));
+                else tc = null;
             }
             return tc;
         }
@@ -366,14 +377,14 @@ public class GuildSettingsDataManager
             {
                 if(results.next())
                 {
-                    results.updateLong("starboard_id", tc==null ? null : tc.getIdLong());
+                    results.updateLong("starboard_id", tc == null ? null : tc.getIdLong());
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("starboard_id", tc==null ? null : tc.getIdLong());
+                    results.updateLong("starboard_id", tc == null ? null : tc.getIdLong());
                     results.insertRow();
                 }
             }
@@ -391,11 +402,10 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             Integer count;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT starboard_count FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT starboard_count FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next())
-                    count = results.getInt("starboard_count");
-                else count=null;
+                if(results.next()) count = results.getInt("starboard_count");
+                else count = null;
             }
             return count;
         }
@@ -450,10 +460,8 @@ public class GuildSettingsDataManager
                 {
                     prefixes = results.getString("prefixes");
 
-                    if(prefixes==null)
-                        array = new JSONArray().put(prefix);
-                    else
-                        array = new JSONArray(prefixes).put(prefix);
+                    if(prefixes == null) array = new JSONArray().put(prefix);
+                    else array = new JSONArray(prefixes).put(prefix);
 
                     results.updateString("prefixes", array.toString());
                     results.updateRow();
@@ -491,23 +499,19 @@ public class GuildSettingsDataManager
                 {
                     prefixes = results.getString("prefixes");
 
-                    if(prefixes==null)
-                        return false;
+                    if(prefixes == null) return false;
                     else
                     {
                         array = new JSONArray(prefixes);
 
                         for(Object p : array)
                         {
-                            if(p.toString().equals(prefix))
-                                return true;
-                            else
-                                return false;
+                            if(p.toString().equals(prefix)) return true;
+                            else return false;
                         }
                     }
                 }
-                else
-                    return false;
+                else return false;
             }
         }
         catch(SQLException e)
@@ -533,16 +537,16 @@ public class GuildSettingsDataManager
                 {
                     prefixes = results.getString("prefixes");
 
-                    if(!(prefixes==null))
+                    if(!(prefixes == null))
                     {
                         array = new JSONArray(prefixes);
 
-                        for(int i = 0; i < array.length(); i++)
+                        for(int i = 0; i<array.length(); i++)
                         {
                             if(array.get(i).toString().equals(prefix))
                             {
                                 array.remove(i);
-                                results.updateString("prefixes", array.length()<0?null:array.toString());
+                                results.updateString("prefixes", array.length()<0 ? null : array.toString());
                                 results.updateRow();
                                 return true;
                             }

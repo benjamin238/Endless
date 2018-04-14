@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.data;
 
 import net.dv8tion.jda.core.entities.User;
@@ -13,8 +30,7 @@ public class ProfileDataManager
 {
     private final Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
-    private final Profile DEFAULT = new Profile("", 0,"", "", "", "", "", "", "", "",
-            "", "", "", "", "", "", "", "", "", "", "");
+    private final Profile DEFAULT = new Profile("", 0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
 
     public ProfileDataManager(DatabaseManager db)
     {
@@ -33,30 +49,9 @@ public class ProfileDataManager
             {
                 if(results.next())
                 {
-                    p = new Profile(results.getString("timezone"),
-                            results.getInt("donated_amount"),
-                            results.getString("twitter"),
-                            results.getString("steam"),
-                            results.getString("wii"),
-                            results.getString("nnid"),
-                            results.getString("xboxlive"),
-                            results.getString("psn"),
-                            results.getString("3ds"),
-                            results.getString("skype"),
-                            results.getString("youtube"),
-                            results.getString("about"),
-                            results.getString("twitch"),
-                            results.getString("minecraft"),
-                            results.getString("email"),
-                            results.getString("lol"),
-                            results.getString("wow"),
-                            results.getString("battle"),
-                            results.getString("splatoon"),
-                            results.getString("mkwii"),
-                            results.getString("reddit"));
+                    p = new Profile(results.getString("timezone"), results.getInt("donated_amount"), results.getString("twitter"), results.getString("steam"), results.getString("wii"), results.getString("nnid"), results.getString("xboxlive"), results.getString("psn"), results.getString("3ds"), results.getString("skype"), results.getString("youtube"), results.getString("about"), results.getString("twitch"), results.getString("minecraft"), results.getString("email"), results.getString("lol"), results.getString("wow"), results.getString("battle"), results.getString("splatoon"), results.getString("mkwii"), results.getString("reddit"));
                 }
-                else
-                    p = DEFAULT;
+                else p = DEFAULT;
             }
             return p;
         }
@@ -139,8 +134,7 @@ public class ProfileDataManager
         final String mkwii;
         final String reddit;
 
-        private Profile(String timezone, int donatedAmount, String twitter, String steam, String wii, String nnid, String xboxLive, String psn, String threeds, String skype,
-                        String youtube, String about, String twitch, String minecraft, String email, String lol, String wow, String battle, String splatoon, String mkwii, String reddit)
+        private Profile(String timezone, int donatedAmount, String twitter, String steam, String wii, String nnid, String xboxLive, String psn, String threeds, String skype, String youtube, String about, String twitch, String minecraft, String email, String lol, String wow, String battle, String splatoon, String mkwii, String reddit)
         {
             this.timezone = timezone;
             this.donatedAmount = donatedAmount;

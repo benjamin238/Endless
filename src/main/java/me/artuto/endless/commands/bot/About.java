@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,9 @@
 
 package me.artuto.endless.commands.bot;
 
-import com.jagrosh.jdautilities.commons.JDAUtilitiesInfo;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.awt.Color;
+import com.jagrosh.jdautilities.commons.JDAUtilitiesInfo;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.loader.Config;
@@ -31,8 +30,9 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.User;
 
+import java.awt.*;
+
 /**
- *
  * @author Artu
  */
 
@@ -48,17 +48,15 @@ public class About extends Command
         this.ownerCommand = false;
         this.guildOnly = false;
     }
-    
+
     @Override
     protected void execute(CommandEvent event)
     {
         Color color;
         Config config = null;
-        
-        if(event.isFromType(ChannelType.PRIVATE))
-            color = Color.decode("#33ff00");
-        else
-            color = event.getGuild().getSelfMember().getColor();
+
+        if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
+        else color = event.getGuild().getSelfMember().getColor();
 
         try
         {
@@ -68,27 +66,23 @@ public class About extends Command
         {
             e.printStackTrace();
         }
-        
-       String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
-       EmbedBuilder builder = new EmbedBuilder();
-       User owner = event.getJDA().getUserById(config.getOwnerId());
-       String ownername = owner.getName()+"#"+owner.getDiscriminator();
-       String ownerid = owner.getId();
+
+        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
+        EmbedBuilder builder = new EmbedBuilder();
+        User owner = event.getJDA().getUserById(config.getOwnerId());
+        String ownername = owner.getName()+"#"+owner.getDiscriminator();
+        String ownerid = owner.getId();
 
 
-              builder.setDescription("Hi, I'm Endless! A multipurpose bot designed to be smart.\n"
-              		+ "If you found a bug please contact my dad\n"
-              		+ "("+Const.DEV+")!\n");
-              builder.addField(":bust_in_silhouette: Owner:", "**"+ownername+"** (**"+ownerid+"**)", false);
-              builder.addField("<:jda:325395909347115008>  Library:", "Java Discord API (JDA) "+JDAInfo.VERSION+" and JDA Utilities "+JDAUtilitiesInfo.VERSION, false);
-              builder.addField("<:github:326118305062584321> GitHub:", "Did you found a bug? Want improve something?\n"
-              		+ "Please open an Issue or create a PR on GitHub\n"
-              		+ "**https://github.com/ArtutoGamer/Endless**\n", false);
-              builder.addField(":link: Support Guild:", "**[Support]("+Const.INVITE+")**\n", false);
-              builder.setFooter("Version: "+Const.VERSION+" | Latest Start", null);
-              builder.setColor(color);
-              builder.setTimestamp(event.getClient().getStartTime());
-              builder.setThumbnail(event.getSelfUser().getAvatarUrl());
-              event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+        builder.setDescription("Hi, I'm Endless! A multipurpose bot designed to be smart.\n"+"If you found a bug please contact my dad\n"+"("+Const.DEV+")!\n");
+        builder.addField(":bust_in_silhouette: Owner:", "**"+ownername+"** (**"+ownerid+"**)", false);
+        builder.addField("<:jda:325395909347115008>  Library:", "Java Discord API (JDA) "+JDAInfo.VERSION+" and JDA Utilities "+JDAUtilitiesInfo.VERSION, false);
+        builder.addField("<:github:326118305062584321> GitHub:", "Did you found a bug? Want improve something?\n"+"Please open an Issue or create a PR on GitHub\n"+"**https://github.com/ArtutoGamer/Endless**\n", false);
+        builder.addField(":link: Support Guild:", "**[Support]("+Const.INVITE+")**\n", false);
+        builder.setFooter("Version: "+Const.VERSION+" | Latest Start", null);
+        builder.setColor(color);
+        builder.setTimestamp(event.getClient().getStartTime());
+        builder.setThumbnail(event.getSelfUser().getAvatarUrl());
+        event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 
 /**
- *
  * @author Artu
  */
 
@@ -39,11 +38,10 @@ public class Invite extends Command
         this.ownerCommand = false;
         this.guildOnly = false;
     }
-    
+
     @Override
-    protected void execute(CommandEvent event) 
+    protected void execute(CommandEvent event)
     {
-    	event.reply("So you want invite Endless to your server? Here you have it:\n"
-    			+ ":link: **<https://discordapp.com/api/oauth2/authorize?client_id="+event.getSelfUser().getId()+"&scope=bot&permissions=8>**");
+        event.reply("So you want invite Endless to your server? Here you have it:\n"+":link: **<https://discordapp.com/api/oauth2/authorize?client_id="+event.getSelfUser().getId()+"&scope=bot&permissions=8>**");
     }
 }

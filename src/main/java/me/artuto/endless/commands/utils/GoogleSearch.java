@@ -1,20 +1,30 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.commands.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.managers.GoogleSearcher;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
-import okhttp3.*;
 
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class GoogleSearch extends Command
 {
@@ -61,7 +71,7 @@ public class GoogleSearch extends Command
 
         ArrayList<String> results = searcher.getGoogleData(query);
 
-        if(results==null)
+        if(results == null)
         {
             event.replyWarning("An error ocurred when using Google Search. Ask the bot owner to see the console.");
         }
@@ -77,7 +87,7 @@ public class GoogleSearch extends Command
             {
                 output.append("\n See also:");
 
-                for(int i=1; i<num && i<results.size(); i++)
+                for(int i = 1; i<num && i<results.size(); i++)
                 {
                     output.append("\n<").append(results.get(i)).append(">");
                 }

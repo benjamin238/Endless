@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -60,25 +77,19 @@ public class RoleCmd extends Command
             event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
             return;
         }
-        else
-            rol = list.get(0);
+        else rol = list.get(0);
 
         color = rol.getColor();
         members = event.getGuild().getMembersWithRoles(rol);
 
-        if(members.size()>20)
-            membersInRole = String.valueOf(members.size());
-        else if(members.isEmpty())
-            membersInRole = "Nobody";
-        else
-            membersInRole = members.stream().map(m -> m.getAsMention()).collect(Collectors.joining(", "));
+        if(members.size()>20) membersInRole = String.valueOf(members.size());
+        else if(members.isEmpty()) membersInRole = "Nobody";
+        else membersInRole = members.stream().map(m -> m.getAsMention()).collect(Collectors.joining(", "));
 
         perm = rol.getPermissions();
 
-        if(perm.isEmpty())
-            permissions = "None";
-        else
-            permissions = perm.stream().map(p -> "`"+p.getName()+"`").collect(Collectors.joining(", "));
+        if(perm.isEmpty()) permissions = "None";
+        else permissions = perm.stream().map(p -> "`"+p.getName()+"`").collect(Collectors.joining(", "));
 
         String title = ":performing_arts: Information about the role **"+rol.getName()+"**";
 
@@ -86,12 +97,12 @@ public class RoleCmd extends Command
         {
             builder.addField(":1234: ID: ", "**"+rol.getId()+"**", false);
             builder.addField(":calendar: Creation Date: ", "**"+rol.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", false);
-            builder.addField(":paintbrush: Color: ", color==null?"**#000000**":"**#"+Integer.toHexString(color.getRGB()).substring(2).toUpperCase()+"**",true);
+            builder.addField(":paintbrush: Color: ", color == null ? "**#000000**" : "**#"+Integer.toHexString(color.getRGB()).substring(2).toUpperCase()+"**", true);
             builder.addField(":small_red_triangle: Position: ", String.valueOf("**"+rol.getPosition()+"**"), true);
-            builder.addField(":bell: Mentionable: ", (rol.isMentionable()?"**Yes**":"**No**"), true);
-            builder.addField(":wrench: Managed: ", (rol.isManaged()?"**Yes**":"**No**"), true);
-            builder.addField(":link: Hoisted: ", (rol.isHoisted()?"**Yes**":"**No**"), true);
-            builder.addField(":passport_control: Public Role: ", (rol.isPublicRole()?"**Yes**":"**No**"), true);
+            builder.addField(":bell: Mentionable: ", (rol.isMentionable() ? "**Yes**" : "**No**"), true);
+            builder.addField(":wrench: Managed: ", (rol.isManaged() ? "**Yes**" : "**No**"), true);
+            builder.addField(":link: Hoisted: ", (rol.isHoisted() ? "**Yes**" : "**No**"), true);
+            builder.addField(":passport_control: Public Role: ", (rol.isPublicRole() ? "**Yes**" : "**No**"), true);
             builder.addField(":key: Permissions: ", permissions, false);
             builder.addField(":busts_in_silhouette: Members: ", membersInRole, false);
             builder.setColor(color);
@@ -157,14 +168,13 @@ public class RoleCmd extends Command
                 event.replyWarning(FormatUtil.listOfRoles(rlist, event.getArgs()));
                 return;
             }
-            else
-                rol = rlist.get(0);
+            else rol = rlist.get(0);
 
             List<Member> mlist = FinderUtil.findMembers(member, event.getGuild());
 
             if(mlist.isEmpty())
             {
-                event.replyWarning("I was not able to found a user with the provided arguments: '" + event.getArgs() + "'");
+                event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
                 return;
             }
             else if(mlist.size()>1)
@@ -172,8 +182,7 @@ public class RoleCmd extends Command
                 event.replyWarning(FormatUtil.listOfMembers(mlist, event.getArgs()));
                 return;
             }
-            else
-                m = mlist.get(0);
+            else m = mlist.get(0);
 
             if(!(author.canInteract(rol)))
             {
@@ -186,9 +195,7 @@ public class RoleCmd extends Command
                 return;
             }
 
-            event.getGuild().getController().addSingleRoleToMember(m, rol).reason("["+author.getUser().getName()+"#"+author.getUser().getDiscriminator()+"]").queue(s ->
-                            event.replySuccess("Successfully given the role **"+rol.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"), e ->
-                    event.replyError("An error happened when giving the role **"+rol.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"));
+            event.getGuild().getController().addSingleRoleToMember(m, rol).reason("["+author.getUser().getName()+"#"+author.getUser().getDiscriminator()+"]").queue(s -> event.replySuccess("Successfully given the role **"+rol.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"), e -> event.replyError("An error happened when giving the role **"+rol.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"));
         }
     }
 
@@ -246,14 +253,13 @@ public class RoleCmd extends Command
                 event.replyWarning(FormatUtil.listOfRoles(rlist, event.getArgs()));
                 return;
             }
-            else
-                rol = rlist.get(0);
+            else rol = rlist.get(0);
 
             List<Member> mlist = FinderUtil.findMembers(member, event.getGuild());
 
             if(mlist.isEmpty())
             {
-                event.replyWarning("I was not able to found a user with the provided arguments: '" + event.getArgs() + "'");
+                event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
                 return;
             }
             else if(mlist.size()>1)
@@ -261,8 +267,7 @@ public class RoleCmd extends Command
                 event.replyWarning(FormatUtil.listOfMembers(mlist, event.getArgs()));
                 return;
             }
-            else
-                m = mlist.get(0);
+            else m = mlist.get(0);
 
             if(!(author.canInteract(rol)))
             {
@@ -275,9 +280,7 @@ public class RoleCmd extends Command
                 return;
             }
 
-            event.getGuild().getController().removeSingleRoleFromMember(m, rol).reason("["+author.getUser().getName()+"#"+author.getUser().getDiscriminator()+"]").queue(s ->
-                    event.replySuccess("Successfully removed the role **"+rol.getName()+"** from **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"), e ->
-                    event.replyError("An error happened when removing the role **"+rol.getName()+"** from **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"));
+            event.getGuild().getController().removeSingleRoleFromMember(m, rol).reason("["+author.getUser().getName()+"#"+author.getUser().getDiscriminator()+"]").queue(s -> event.replySuccess("Successfully removed the role **"+rol.getName()+"** from **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"), e -> event.replyError("An error happened when removing the role **"+rol.getName()+"** from **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"));
         }
     }
 }

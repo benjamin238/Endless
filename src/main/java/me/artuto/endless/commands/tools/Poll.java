@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
 
 package me.artuto.endless.commands.tools;
 
-public class Poll {
+public class Poll
+{
 /**
  *
  * @author Artu

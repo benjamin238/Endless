@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,20 +19,19 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.util.List;
-
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.loader.Config;
-import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.logging.ModLogging;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
- *
  * @author Artu
  */
 
@@ -54,7 +53,7 @@ public class Unban extends Command
         this.ownerCommand = false;
         this.guildOnly = true;
     }
-    
+
     @Override
     protected void execute(CommandEvent event)
     {
@@ -63,7 +62,7 @@ public class Unban extends Command
         author = event.getAuthor();
         String target;
         String reason;
-        
+
         if(event.getArgs().isEmpty())
         {
             event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban <@user|ID|username> for [reason]");
@@ -81,9 +80,9 @@ public class Unban extends Command
             target = event.getArgs();
             reason = "[no reason specified]";
         }
-              
+
         List<User> list = FinderUtil.findBannedUsers(target, event.getGuild());
-            
+
         if(list.isEmpty())
         {
             event.replyWarning("I was not able to found a user with the provided arguments: '"+target+"'");
@@ -94,11 +93,10 @@ public class Unban extends Command
             event.replyWarning(FormatUtil.listOfUsers(list, target));
             return;
         }
-    	else
-            user = list.get(0);
-        
+        else user = list.get(0);
+
         String username = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
-        
+
         try
         {
             event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
@@ -109,9 +107,8 @@ public class Unban extends Command
         {
             event.replyError(Messages.UNBAN_ERROR+username);
             LoggerFactory.getLogger("Unban Command").error(e.toString());
-            if(config.isDebugEnabled())
-                e.printStackTrace();
+            if(config.isDebugEnabled()) e.printStackTrace();
         }
     }
-    
+
 }

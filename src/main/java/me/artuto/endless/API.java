@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,6 @@
  */
 
 package me.artuto.endless;
-
-import me.artuto.endless.Bot;
-import me.artuto.endless.loader.Config;
-
-import net.dv8tion.jda.core.entities.Guild;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import spark.Request;
-import spark.Response;
-import spark.Spark;
-
 
 public class API
 {

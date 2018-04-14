@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.logging;
 
 import com.jagrosh.jagtag.Parser;
@@ -24,7 +41,9 @@ import net.dv8tion.jda.core.events.user.UserAvatarUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -36,17 +55,7 @@ public class ServerLogging extends ListenerAdapter
     public ServerLogging(GuildSettingsDataManager db)
     {
         ServerLogging.db = db;
-        this.parser = new ParserBuilder()
-                .addMethods(Variables.getMethods())
-                .addMethods(Arguments.getMethods())
-                .addMethods(Functional.getMethods())
-                .addMethods(Miscellaneous.getMethods())
-                .addMethods(Strings.getMethods())
-                .addMethods(Time.getMethods())
-                .addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods())
-                .setMaxOutput(2000)
-                .setMaxIterations(1000)
-                .build();
+        this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
     }
 
     @Override
@@ -59,28 +68,25 @@ public class ServerLogging extends ListenerAdapter
         User newmember = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
         String msg = db.getWelcomeMessage(guild);
         parser.clear().put("user", newmember).put("guild", guild).put("channel", welcome);
 
-        if(!(serverlog==null))
+        if(!(serverlog == null))
         {
             if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                    null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Join]:` :inbox_tray: :bust_in_silhouette: **"+newmember.getName()+"**#**"+newmember.getDiscriminator()+"** ("+newmember.getId()+") joined the guild! User count: **"+guild.getMembers().size()+"** members").queue();
         }
 
-        if(!(welcome==null) && !(msg==null))
+        if(!(welcome == null) && !(msg == null))
         {
             if(!(welcome.getGuild().getSelfMember().hasPermission(welcome, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue()));
-            else
-                welcome.sendMessage(parser.parse(msg).trim()).queueAfter(2, TimeUnit.SECONDS);
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue()));
+            else welcome.sendMessage(parser.parse(msg).trim()).queueAfter(2, TimeUnit.SECONDS);
         }
     }
 
@@ -94,28 +100,25 @@ public class ServerLogging extends ListenerAdapter
         User odMember = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
         String msg = db.getLeaveMessage(guild);
         parser.clear().put("user", odMember).put("guild", guild).put("channel", leave);
 
-        if(!(serverlog==null))
+        if(!(serverlog == null))
         {
             if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                    null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+odMember.getName()+"**#**"+odMember.getDiscriminator()+"** ("+odMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
         }
 
-        if(!(leave==null) && !(msg==null))
+        if(!(leave == null) && !(msg == null))
         {
             if(!(leave.getGuild().getSelfMember().hasPermission(leave, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue()));
-            else
-                leave.sendMessage(parser.parse(msg).trim()).queue();
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue()));
+            else leave.sendMessage(parser.parse(msg).trim()).queue();
         }
     }
 
@@ -124,7 +127,7 @@ public class ServerLogging extends ListenerAdapter
     {
         TextChannel tc = db.getServerlogChannel(event.getGuild());
 
-        if(!(tc==null) && !(event.getAuthor().isBot()))
+        if(!(tc == null) && !(event.getAuthor().isBot()))
             MessagesLogging.addMessage(event.getMessage().getIdLong(), event.getMessage());
     }
 
@@ -140,17 +143,16 @@ public class ServerLogging extends ListenerAdapter
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
         StringBuilder oldContent = new StringBuilder();
         StringBuilder newContent = new StringBuilder();
 
-        if(!(event.getAuthor().isBot()) && !(message.getContentRaw().equals("No cached message")) && !(tc==null))
+        if(!(event.getAuthor().isBot()) && !(message.getContentRaw().equals("No cached message")) && !(tc == null))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
                 oldContent.append(message.getContentRaw()+"\n");
@@ -167,7 +169,8 @@ public class ServerLogging extends ListenerAdapter
                 builder.setFooter("Message ID: "+message.getId(), null);
                 builder.setColor(Color.YELLOW);
 
-                tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) -> {
+                tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue((m) ->
+                {
                     MessagesLogging.removeMessage(newmsg.getIdLong());
                     MessagesLogging.addMessage(newmsg.getIdLong(), newmsg);
                 }, null);
@@ -186,16 +189,15 @@ public class ServerLogging extends ListenerAdapter
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
         StringBuilder sb = new StringBuilder();
 
-        if(!(message.getContentRaw().equals("No cached message")) && !(tc==null) && !(message.getAuthor().isBot()))
+        if(!(message.getContentRaw().equals("No cached message")) && !(tc == null) && !(message.getAuthor().isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
                 sb.append(message.getContentRaw()+"\n");
@@ -228,11 +230,10 @@ public class ServerLogging extends ListenerAdapter
                 TextChannel tc = db.getServerlogChannel(guild);
                 TextChannel channel = FinderUtil.getDefaultChannel(guild);
 
-                if(!(tc==null))
+                if(!(tc == null))
                 {
                     if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                        guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                                null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                        guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
                     else
                     {
                         builder.setAuthor(user.getName(), null, user.getEffectiveAvatarUrl());
@@ -257,15 +258,14 @@ public class ServerLogging extends ListenerAdapter
         User user = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null) && !(user.isBot()))
+        if(!(tc == null) && !(user.isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Join]:`  **"+user.getName()+"#"+user.getDiscriminator()+"** has joined a Voice Channel: **"+vc.getName()+"** (ID: "+vc.getId()+")").queue();
         }
@@ -282,15 +282,14 @@ public class ServerLogging extends ListenerAdapter
         User user = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null) && !(user.isBot()))
+        if(!(tc == null) && !(user.isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Move]:` **"+user.getName()+"#"+user.getDiscriminator()+"** switched between Voice Channels: From: **"+vcold.getName()+"** To: **"+vcnew.getName()+"**").queue();
         }
@@ -306,15 +305,14 @@ public class ServerLogging extends ListenerAdapter
         User user = event.getMember().getUser();
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String hour = String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
-        if(!(tc==null) && !(user.isBot()))
+        if(!(tc == null) && !(user.isBot()))
         {
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(
-                        null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Left]:` **"+user.getName()+"#"+user.getDiscriminator()+"** left a Voice Channel: **"+vc.getName()+"**").queue();
         }

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.data;
 
 import me.artuto.endless.entities.ImportedTag;
@@ -53,8 +70,8 @@ public class TagDataManager
             {
                 if(results.next())
                 {
-                     results.updateString("tag_content", content);
-                     results.updateRow();
+                    results.updateString("tag_content", content);
+                    results.updateRow();
                 }
             }
         }
@@ -71,11 +88,10 @@ public class TagDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             String content;
-            try (ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content FROM TAGS WHERE TAG_NAME = \"%s\"", name)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content FROM TAGS WHERE TAG_NAME = \"%s\"", name)))
             {
-                if(results.next())
-                    content = results.getString("tag_content");
-                else content=null;
+                if(results.next()) content = results.getString("tag_content");
+                else content = null;
             }
             return content;
         }
@@ -116,10 +132,8 @@ public class TagDataManager
             statement.closeOnCompletion();
             try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_owner FROM TAGS WHERE tag_name = \"%s\"", name)))
             {
-                if(results.next())
-                    return results.getLong("tag_owner");
-                else
-                    return null;
+                if(results.next()) return results.getLong("tag_owner");
+                else return null;
             }
         }
         catch(SQLException e)
@@ -204,13 +218,9 @@ public class TagDataManager
             try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name LIKE \'imported-%\'"))
             {
                 while(results.next())
-                    tags.add(new ImportedTagImpl(results.getLong("tag_id"),
-                            results.getString("tag_name"),
-                            results.getString("tag_content"),
-                            results.getLong("tag_owner"),
-                            Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
+                    tags.add(new ImportedTagImpl(results.getLong("tag_id"), results.getString("tag_name"), results.getString("tag_content"), results.getLong("tag_owner"), Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
 
-                return tags.isEmpty()?null:tags;
+                return tags.isEmpty() ? null : tags;
             }
         }
         catch(SQLException e)
@@ -231,13 +241,9 @@ public class TagDataManager
             try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name LIKE \'imported-"+guild+":%\'"))
             {
                 while(results.next())
-                    tags.add(new ImportedTagImpl(results.getLong("tag_id"),
-                            results.getString("tag_name"),
-                            results.getString("tag_content"),
-                            results.getLong("tag_owner"),
-                            Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
+                    tags.add(new ImportedTagImpl(results.getLong("tag_id"), results.getString("tag_name"), results.getString("tag_content"), results.getLong("tag_owner"), Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
 
-                return tags.isEmpty()?null:tags;
+                return tags.isEmpty() ? null : tags;
             }
         }
         catch(SQLException e)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,10 @@ package me.artuto.endless.commands.bot;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
-import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.MessageChannel;
 
 /**
- *
  * @author Artu
  */
 
@@ -40,13 +39,12 @@ public class Ping extends Command
         this.ownerCommand = false;
         this.guildOnly = false;
     }
-    
+
     @Override
     protected void execute(CommandEvent event)
     {
         MessageChannel channel = event.getChannel();
         long time = System.currentTimeMillis();
-        channel.sendMessage("Ping!").queue( (message) ->
-         message.editMessageFormat("Pong! - "+"Discord API Ping: "+event.getJDA().getPing()+"ms - Ping: %dms", System.currentTimeMillis() - time).queue());
+        channel.sendMessage("Ping!").queue((message) -> message.editMessageFormat("Pong! - "+"Discord API Ping: "+event.getJDA().getPing()+"ms - Ping: %dms", System.currentTimeMillis()-time).queue());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,13 +18,12 @@
 package me.artuto.endless;
 
 /**
- *
  * @author Artu
  */
 
 public class Const
 {
-    public static String VERSION = Const.class.getPackage().getImplementationVersion();
+    public static String VERSION = Const.class.getPackage().getImplementationVersion()==null?"DEV":Const.class.getPackage().getImplementationVersion();
     public static String INVITE = "https://discord.gg/CXKfYW3";
     public static String DEV = "`@Artuto#0424 | 264499432538505217`";
     public static String LINE_START = ":white_medium_small_square:";

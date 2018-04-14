@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.artuto.endless.managers;
 
 import org.jsoup.Jsoup;
@@ -40,7 +57,8 @@ public class GoogleSearcher
 
             Elements links = docs.select("a[href]");
             result = new ArrayList<>();
-            links.stream().map((link) -> link.attr("href")).filter((temp) -> (temp.startsWith("/url?q="))).forEach((temp) -> {
+            links.stream().map((link) -> link.attr("href")).filter((temp) -> (temp.startsWith("/url?q="))).forEach((temp) ->
+            {
                 try
                 {
                     String results = URLDecoder.decode(temp.substring(7, temp.indexOf("&sa=")), "UTF-8");
@@ -48,7 +66,8 @@ public class GoogleSearcher
                         result.add(results);
                 }
                 catch(UnsupportedEncodingException e)
-                { }
+                {
+                }
             });
         }
         catch(IOException e)

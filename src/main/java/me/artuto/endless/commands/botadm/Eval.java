@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Artu
+ * Copyright (C) 2017-2018 Artuto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,6 @@ package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.*;
 import me.artuto.endless.loader.Config;
@@ -30,11 +26,13 @@ import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author Artu
  */
 
@@ -50,7 +48,7 @@ public class Eval extends Command
     private final StarboardDataManager sdm;
     private final TagDataManager tdm;
     private final ModLogging modlog;
-    
+
     public Eval(Config config, DatabaseManager db, DonatorsDataManager ddm, GuildSettingsDataManager gsdm, BlacklistDataManager bdm, StarboardDataManager sdm, TagDataManager tdm, ModLogging modlog)
     {
         this.gsdm = gsdm;
@@ -68,53 +66,24 @@ public class Eval extends Command
         this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
         this.guildOnly = false;
-        
+
         engine = new ScriptEngineManager().getEngineByName("Groovy");
 
         try
         {
-            imports = Arrays.asList("com.jagrosh.jdautilities",
-                    "com.jagrosh.jdautilities.command",
-                    "com.jagrosh.jdautilities.command.impl",
-                    "com.jagrosh.jdautilities.entities",
-                    "com.jagrosh.jdautilities.menu",
-                    "com.jagrosh.jdautilities.utils",
-                    "com.jagrosh.jdautilities.waiter",
-                    "java.awt",
-                    "java.io",
-                    "java.lang",
-                    "java.util",
-                    "java.util.stream",
-                    "me.artuto.endless",
-                    "me.artuto.endless.cmddata",
-                    "me.artuto.endless.commands",
-                    "me.artuto.endless.data",
-                    "me.artuto.endless.events",
-                    "me.artuto.endless.loader",
-                    "me.artuto.endless.logging",
-                    "me.artuto.endless.managers",
-                    "me.artuto.endless.tools",
-                    "me.artuto.endless.utils",
-                    "net.dv8tion.jda.bot",
-                    "net.dv8tion.jda.bot.entities",
-                    "net.dv8tion.jda.bot.entities.impl",
-                    "net.dv8tion.jda.core",
-                    "net.dv8tion.jda.core.entities",
-                    "net.dv8tion.jda.core.entities.impl",
-                    "net.dv8tion.jda.core.managers",
-                    "net.dv8tion.jda.core.managers.impl",
-                    "net.dv8tion.jda.core.utils",
-                    "net.dv8tion.jda.webhook");
+            imports = Arrays.asList("com.jagrosh.jdautilities", "com.jagrosh.jdautilities.command", "com.jagrosh.jdautilities.command.impl", "com.jagrosh.jdautilities.entities", "com.jagrosh.jdautilities.menu", "com.jagrosh.jdautilities.utils", "com.jagrosh.jdautilities.waiter", "java.awt", "java.io", "java.lang", "java.util", "java.util.stream", "me.artuto.endless", "me.artuto.endless.cmddata", "me.artuto.endless.commands", "me.artuto.endless.data", "me.artuto.endless.events", "me.artuto.endless.loader", "me.artuto.endless.logging", "me.artuto.endless.managers", "me.artuto.endless.tools", "me.artuto.endless.utils", "net.dv8tion.jda.bot", "net.dv8tion.jda.bot.entities", "net.dv8tion.jda.bot.entities.impl", "net.dv8tion.jda.core", "net.dv8tion.jda.core.entities", "net.dv8tion.jda.core.entities.impl", "net.dv8tion.jda.core.managers", "net.dv8tion.jda.core.managers.impl", "net.dv8tion.jda.core.utils", "net.dv8tion.jda.webhook");
         }
-        catch(Exception ignored) {}
+        catch(Exception ignored)
+        {
+        }
     }
-	
+
     @Override
-    protected void execute(CommandEvent event) 
+    protected void execute(CommandEvent event)
     {
         String importString = "";
         String eval;
-        
+
         try
         {
             engine.put("event", event);
@@ -141,16 +110,15 @@ public class Eval extends Command
             }
 
             for(final String s : imports)
-                importString += "import "+ s + ".*;";
+                importString += "import "+s+".*;";
 
             eval = event.getArgs().replaceAll("getToken", "getSelfUser");
-            Object out = engine.eval(importString + eval);
+            Object out = engine.eval(importString+eval);
 
-            if(out==null || String.valueOf(out).isEmpty())
-                event.reactSuccess();
+            if(out == null || String.valueOf(out).isEmpty()) event.reactSuccess();
             else
                 event.replySuccess("Done! Output:\n```"+out.toString().replaceAll(event.getJDA().getToken(), "Nice try.")+"```");
-        } 
+        }
         catch(ScriptException e2)
         {
             event.replyError("Error! Output:\n```"+e2+" ```");
