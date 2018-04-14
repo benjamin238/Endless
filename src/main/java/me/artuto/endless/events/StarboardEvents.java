@@ -51,19 +51,19 @@ public class StarboardEvents extends ListenerAdapter
     @Override
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event)
     {
-        Message starredMsg = event.getChannel().getMessageById(event.getMessageId()).complete();
         Guild guild = event.getGuild();
         EmbedBuilder eb = new EmbedBuilder();
         MessageBuilder msgB = new MessageBuilder();
         StringBuilder sb = new StringBuilder();
-        List<Message.Attachment> attachments = starredMsg.getAttachments().stream().filter(a -> !(a.isImage())).collect(Collectors.toList());
-        List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
 
         if(!(event.getChannel().getTopic() == null) && event.getChannel().getTopic().toLowerCase().contains("{ignore:starboard}"))
             return;
 
         if(!(isConfigured(guild))) return;
         TextChannel starboard = gsdm.getStarboardChannel(guild);
+        Message starredMsg = event.getChannel().getMessageById(event.getMessageId()).complete();
+        List<Message.Attachment> attachments = starredMsg.getAttachments().stream().filter(a -> !(a.isImage())).collect(Collectors.toList());
+        List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
 
         if(isSameAuthor(starredMsg.getAuthor(), event.getUser()) && event.getReactionEmote().getName().equals("\u2B50"))
         {
@@ -187,8 +187,7 @@ public class StarboardEvents extends ListenerAdapter
 
     private boolean existsOnStarboard(Long id)
     {
-        if(sdm.getStarboardMessage(id) == null) return false;
-        else return true;
+        return !(sdm.getStarboardMessage(id)==null);
     }
 
     private void updateCount(Message msg, Long starboardMsg, Integer amount)

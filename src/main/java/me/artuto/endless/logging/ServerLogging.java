@@ -28,7 +28,10 @@ import me.artuto.endless.utils.FinderUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.audit.ActionType;
+import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.events.guild.GuildBanEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
@@ -37,7 +40,7 @@ import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
-import net.dv8tion.jda.core.events.user.UserAvatarUpdateEvent;
+import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
@@ -46,15 +49,16 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ServerLogging extends ListenerAdapter
 {
-    private static GuildSettingsDataManager db;
+    private final GuildSettingsDataManager db;
     private final Parser parser;
 
     public ServerLogging(GuildSettingsDataManager db)
     {
-        ServerLogging.db = db;
+        this.db = db;
         this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
     }
 
@@ -108,6 +112,9 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(serverlog == null))
         {
+            if(guild.getSelfMember().hasPermission(Permission.BAN_MEMBERS))
+                if(wasBanned(event.getMember())) return;
+
             if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
@@ -155,12 +162,12 @@ public class ServerLogging extends ListenerAdapter
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
-                oldContent.append(message.getContentRaw()+"\n");
-                newContent.append(newmsg.getContentRaw()+"\n");
+                oldContent.append(message.getContentRaw()).append("\n");
+                newContent.append(newmsg.getContentRaw()).append("\n");
                 for(Message.Attachment att : message.getAttachments())
-                    oldContent.append(att.getUrl()+"\n");
+                    oldContent.append(att.getUrl()).append("\n");
                 for(Message.Attachment att : newmsg.getAttachments())
-                    newContent.append(att.getUrl()+"\n");
+                    newContent.append(att.getUrl()).append("\n");
 
                 title = "`["+hour+":"+min+":"+sec+"] [Message Edited]:` :pencil2: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was edited in "+message.getTextChannel().getAsMention()+":";
 
@@ -200,9 +207,9 @@ public class ServerLogging extends ListenerAdapter
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
-                sb.append(message.getContentRaw()+"\n");
+                sb.append(message.getContentRaw()).append("\n");
                 for(Message.Attachment att : message.getAttachments())
-                    sb.append(att.getUrl()+"\n");
+                    sb.append(att.getUrl()).append("\n");
 
                 title = "`["+hour+":"+min+":"+sec+"] [Message Deleted]:` :wastebasket: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was deleted in "+message.getTextChannel().getAsMention()+":";
 
@@ -216,7 +223,7 @@ public class ServerLogging extends ListenerAdapter
     }
 
     @Override
-    public void onUserAvatarUpdate(UserAvatarUpdateEvent event)
+    public void onUserUpdateAvatar(UserUpdateAvatarEvent event)
     {
         List<Guild> guilds = event.getUser().getMutualGuilds();
         EmbedBuilder builder = new EmbedBuilder();
@@ -237,7 +244,7 @@ public class ServerLogging extends ListenerAdapter
                     else
                     {
                         builder.setAuthor(user.getName(), null, user.getEffectiveAvatarUrl());
-                        builder.setThumbnail(event.getPreviousAvatarUrl());
+                        builder.setThumbnail(event.getOldAvatarUrl());
                         builder.setImage(user.getEffectiveAvatarUrl());
                         builder.setColor(guild.getSelfMember().getColor());
 
@@ -316,5 +323,55 @@ public class ServerLogging extends ListenerAdapter
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Left]:` **"+user.getName()+"#"+user.getDiscriminator()+"** left a Voice Channel: **"+vc.getName()+"**").queue();
         }
+    }
+
+    @Override
+    public void onGuildBan(GuildBanEvent event)
+    {
+        Guild guild = event.getGuild();
+        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
+        User user = event.getUser();
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+
+        if(!(tc == null))
+        {
+            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+            else
+            {
+                if(guild.getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS))
+
+                tc.sendMessage(":hammer: `["+hour+":"+min+":"+sec+"] [User Banned]:` **"+user.getName()+"#"+user.getDiscriminator()+"** has been banned!\n" +
+                        "`[Reason]:` "+getBanReason(user, guild)).queue();
+
+            }
+        }
+    }
+
+    private boolean wasBanned(Member member)
+    {
+        for(Guild.Ban ban : member.getGuild().getBanList().complete())
+            return ban.getUser().equals(member.getUser());
+        return false;
+    }
+
+    private String getBanReason(User user, Guild guild)
+    {
+        String reason;
+        reason = guild.getBanList().complete().stream().filter(ban -> ban.getUser().equals(user)).map(Guild.Ban::getReason).collect(Collectors.joining("\n"));
+
+        if(reason==null || reason.isEmpty() || reason.equals("null"))
+        {
+            if(guild.getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS))
+                reason = guild.getAuditLogs().type(ActionType.BAN).complete().stream().filter(entry -> entry.getTargetIdLong()==user.getIdLong()).limit(1).map(AuditLogEntry::getReason).collect(Collectors.joining("\n"));
+            else reason = "[no reason specified]";
+        }
+
+        return reason;
     }
 }
