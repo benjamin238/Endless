@@ -31,6 +31,7 @@ import me.artuto.endless.handlers.BlacklistHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.loader.Logging;
+import me.artuto.endless.logging.CommandLogging;
 import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.logging.ServerLogging;
 import net.dv8tion.jda.core.AccountType;
@@ -87,6 +88,7 @@ public class Bot extends ListenerAdapter
         client.setAlternativePrefix("<@310578566695878658>");
         client.setGuildSettingsManager(new ClientGSDM(db, gsdm));
         client.setScheduleExecutor(loader.cmdThread);
+        client.setListener(new CommandLogging());
 
         if(maintenance)
         {
