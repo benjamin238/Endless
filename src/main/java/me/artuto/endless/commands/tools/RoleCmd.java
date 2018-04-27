@@ -232,8 +232,8 @@ public class RoleCmd extends Command
             {
                 String[] args = event.getArgs().split(" from ", 2);
 
-                role = args[0];
-                member = args[1];
+                role = args[0].trim();
+                member = args[1].trim();
             }
             catch(IndexOutOfBoundsException e)
             {
