@@ -22,7 +22,7 @@ import net.dv8tion.jda.core.entities.*;
 import java.util.List;
 
 /**
- * @author Artu
+ * @author Artuto
  * <p>
  * The following code is property of jagrosh (https://github.com/jagrosh/Spectra) with some changes made by me.
  * Contact me if any issue.

@@ -15,34 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.fun;
-
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.cmddata.Categories;
-import net.dv8tion.jda.core.Permission;
+package me.artuto.endless.exceptions;
 
 /**
  * @author Artuto
  */
 
-public class Say extends Command
+public class GuildException extends RuntimeException
 {
-    public Say()
+    public GuildException()
     {
-        this.name = "say";
-        this.help = "Say something!";
-        this.arguments = "<text>";
-        this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildOnly = true;
+        throw new GuildException("Invalid Guilds!");
     }
 
-    @Override
-    protected void execute(CommandEvent event)
+    public GuildException(String message)
     {
-        event.reply(event.getArgs());
+        super(message);
     }
 }

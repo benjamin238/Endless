@@ -229,4 +229,24 @@ public class GuildEvents extends ListenerAdapter
             }
         }
     }
+
+    /**
+     * @Override public void onGuildJoin(GuildJoinEvent event)
+     * {
+     * Guild guild = event.getGuild();
+     * User owner = event.getJDA().getUserById(config.getOwnerId());
+     * String leavemsg = "Hi! Sorry, but you can't have a copy of Endless on Discord Bots, this is for my own security.\n"
+     * + "Please remove this Account from the Discord Bots list or I'll take further actions.\n"
+     * + "If you think this is an error, please contact the Developer. ~Artuto";
+     * String warnmsg = "<@264499432538505217>, **"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless here!";
+     * Long ownerId = config.getOwnerId();
+     * <p>
+     * if(event.getGuild().getId().equals("110373943822540800") || event.getGuild().getId().equals("264445053596991498") && !(ownerId==264499432538505217L))
+     * {
+     * event.getJDA().getTextChannelById("119222314964353025").sendMessage(warnmsg).complete();
+     * owner.openPrivateChannel().queue(s -> s.sendMessage(leavemsg).queue(null, (e) -> SimpleLog.getLog("DISCORD BOTS").fatal(leavemsg)));
+     * guild.leave().complete();
+     * }
+     * }
+     */
 }

@@ -15,34 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.fun;
+package me.artuto.endless.tools;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.cmddata.Categories;
-import net.dv8tion.jda.core.Permission;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * @author Artuto
  */
 
-public class Say extends Command
+public class EndlessThreadFactory implements ThreadFactory
 {
-    public Say()
+    private final String name;
+
+    public EndlessThreadFactory(String name)
     {
-        this.name = "say";
-        this.help = "Say something!";
-        this.arguments = "<text>";
-        this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildOnly = true;
+        this.name = name;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    public Thread newThread(Runnable r)
     {
-        event.reply(event.getArgs());
+        final Thread thread = new Thread(r, "Endless-Thread "+name);
+        thread.setDaemon(true);
+        return thread;
     }
 }

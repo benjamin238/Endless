@@ -20,20 +20,16 @@ package me.artuto.endless.commands.botadm;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.DatabaseManager;
 import net.dv8tion.jda.core.Permission;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Shutdown extends Command
 {
-    private final DatabaseManager db;
-
-    public Shutdown(DatabaseManager db)
+    public Shutdown()
     {
-        this.db = db;
         this.name = "shutdown";
         this.aliases = new String[]{"quit", "exit", "close", "terminate"};
         this.help = "Turns Off the bot";
@@ -48,7 +44,6 @@ public class Shutdown extends Command
     protected void execute(CommandEvent event)
     {
         event.reactSuccess();
-        db.shutdown();
         event.getJDA().shutdown();
     }
 }

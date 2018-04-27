@@ -15,12 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.tools;
+package me.artuto.endless.bootloader;
 
-public class Poll
-{
+import ch.qos.logback.classic.Logger;
+import me.artuto.endless.tools.EndlessThreadFactory;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 /**
- *
  * @author Artuto
  */
+
+public class ThreadLoader
+{
+    private final Logger LOG = (Logger) LoggerFactory.getLogger("Thread Loader");
+
+    public ScheduledExecutorService createThread(String name)
+    {
+        try
+        {
+            return new ScheduledThreadPoolExecutor(2, new EndlessThreadFactory(name));
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException("Error when creating the "+name+" thread!");
+        }
+    }
 }

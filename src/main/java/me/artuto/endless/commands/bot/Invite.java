@@ -23,7 +23,7 @@ import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Invite extends Command

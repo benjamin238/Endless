@@ -35,7 +35,7 @@ import java.awt.*;
 import java.util.List;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Donate extends Command

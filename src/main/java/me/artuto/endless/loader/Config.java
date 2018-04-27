@@ -27,7 +27,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 
 /**
- * @author Artu
+ * @author Artuto
  * Thanks Spotlight for the code.
  */
 
@@ -141,6 +141,11 @@ public class Config
         return format.botlogChannelId;
     }
 
+    public String getBotlogWebhook()
+    {
+        return format.botlogWebhook;
+    }
+
     public Boolean api()
     {
         return format.api;
@@ -174,5 +179,15 @@ public class Config
     public Boolean isDeepDebugEnabled()
     {
         return format.deepDebug;
+    }
+
+    public boolean isSentryEnabled()
+    {
+        return format.sentryEnabled;
+    }
+
+    public String getSentryDSN()
+    {
+        return format.sentryDSN;
     }
 }

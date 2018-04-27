@@ -40,6 +40,7 @@ public class ConfigFormat
     public Long[] coOwnerIds;
     public Long rootGuildId;
     public Long botlogChannelId;
+    public String botlogWebhook;
     public Boolean api;
     /*public int apiPort;
     public String apiToken;*/
@@ -47,4 +48,6 @@ public class ConfigFormat
     public Boolean botlog;
     public Boolean debug;
     public Boolean deepDebug;
+    public boolean sentryEnabled;
+    public String sentryDSN;
 }

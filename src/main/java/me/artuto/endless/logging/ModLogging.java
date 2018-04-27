@@ -34,7 +34,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
- * @author Artu
+ * @author Artuto
  * Class used for ModLog actions.
  */
 

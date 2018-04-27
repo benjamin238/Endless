@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class UserInfo extends Command

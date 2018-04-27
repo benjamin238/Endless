@@ -53,6 +53,8 @@ rootGuildId: 312776731704426496
 # A TextChannel ID where the bot sends logs (Replace this with your TextChannel ID).
 botlogChannelId: 341041806508818432
 
+botlogWebhook: ''
+
 # Enable the API
 api: false
 

@@ -30,7 +30,7 @@ import net.dv8tion.jda.core.entities.Member;
 import java.time.format.DateTimeFormatter;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class GuildInfo extends Command

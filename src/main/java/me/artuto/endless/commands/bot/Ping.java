@@ -24,7 +24,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.MessageChannel;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Ping extends Command

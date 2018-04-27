@@ -26,7 +26,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class BotCPanel extends Command

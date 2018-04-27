@@ -33,7 +33,7 @@ import net.dv8tion.jda.core.entities.User;
 import java.awt.*;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class About extends Command

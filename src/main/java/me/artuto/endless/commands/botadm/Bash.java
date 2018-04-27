@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Bash extends Command

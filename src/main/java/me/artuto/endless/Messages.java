@@ -18,7 +18,7 @@
 package me.artuto.endless;
 
 /**
- * @author Artu
+ * @author Artuto
  * <p>
  * <p>
  * Since sometimes we need to use the same messages a lot of times,

@@ -37,7 +37,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Kick extends Command

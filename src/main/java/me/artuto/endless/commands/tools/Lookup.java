@@ -33,7 +33,7 @@ import java.awt.*;
 import java.time.format.DateTimeFormatter;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Lookup extends Command

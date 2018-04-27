@@ -15,12 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.tools;
+package me.artuto.endless.bootloader;
 
-public class Poll
-{
+import ch.qos.logback.classic.Logger;
+import me.artuto.endless.exceptions.ConfigException;
+import me.artuto.endless.loader.Config;
+import org.slf4j.LoggerFactory;
+
 /**
- *
  * @author Artuto
  */
+
+public class ConfigLoader
+{
+    private final Logger LOG = (Logger) LoggerFactory.getLogger("Config Loader");
+
+    public Config loadConfig()
+    {
+        LOG.info("Loading config file...");
+
+        try
+        {
+            Config config = new Config();
+            LOG.info("Successfully loaded config file!");
+            return config;
+        }
+        catch(Exception e)
+        {
+            throw new ConfigException();
+        }
+    }
 }

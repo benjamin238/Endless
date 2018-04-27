@@ -24,6 +24,7 @@ import com.kdotj.simplegiphy.data.Giphy;
 import com.kdotj.simplegiphy.data.GiphyListResponse;
 import com.kdotj.simplegiphy.data.RandomGiphy;
 import com.kdotj.simplegiphy.data.RandomGiphyResponse;
+import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.EmbedBuilder;

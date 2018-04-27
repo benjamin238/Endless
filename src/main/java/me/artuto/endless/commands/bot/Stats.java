@@ -30,7 +30,7 @@ import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Stats extends Command

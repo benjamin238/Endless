@@ -15,12 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.tools;
+package me.artuto.endless.bootloader;
 
-public class Poll
-{
+import ch.qos.logback.classic.Logger;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import org.slf4j.LoggerFactory;
+
 /**
- *
  * @author Artuto
  */
+
+public class WaiterLoader
+{
+    private final Logger LOG = (Logger) LoggerFactory.getLogger("Waiter Loader");
+
+    public EventWaiter createWaiter()
+    {
+        LOG.info("Loading Waiters...");
+
+        try
+        {
+            return new EventWaiter();
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException("Error when creating a Waiter!");
+        }
+    }
 }

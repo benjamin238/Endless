@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Eval extends Command

@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Logging extends ListenerAdapter

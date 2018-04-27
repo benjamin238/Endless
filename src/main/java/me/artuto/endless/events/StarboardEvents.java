@@ -34,129 +34,121 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 public class StarboardEvents extends ListenerAdapter
 {
-    private static GuildSettingsDataManager gsdm;
-    private static StarboardDataManager sdm;
+    private final GuildSettingsDataManager gsdm;
+    private final StarboardDataManager sdm;
     private final Logger LOG = LoggerFactory.getLogger("Starboard");
+    private final ScheduledExecutorService thread;
 
-    public StarboardEvents(GuildSettingsDataManager gsdm, StarboardDataManager sdm)
+    public StarboardEvents(GuildSettingsDataManager gsdm, StarboardDataManager sdm, ScheduledExecutorService thread)
     {
-        StarboardEvents.gsdm = gsdm;
-        StarboardEvents.sdm = sdm;
+        this.gsdm = gsdm;
+        this.sdm = sdm;
+        this.thread = thread;
     }
 
     @Override
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event)
     {
-        Guild guild = event.getGuild();
-        EmbedBuilder eb = new EmbedBuilder();
-        MessageBuilder msgB = new MessageBuilder();
-        StringBuilder sb = new StringBuilder();
+        thread.submit(() -> {
+            Guild guild = event.getGuild();
+            EmbedBuilder eb = new EmbedBuilder();
+            MessageBuilder msgB = new MessageBuilder();
+            StringBuilder sb = new StringBuilder();
 
-        if(!(event.getChannel().getTopic() == null) && event.getChannel().getTopic().toLowerCase().contains("{ignore:starboard}"))
-            return;
+            if(!(event.getChannel().getTopic() == null) && event.getChannel().getTopic().toLowerCase().contains("{ignore:starboard}"))
+                return;
 
-        if(!(isConfigured(guild))) return;
-        TextChannel starboard = gsdm.getStarboardChannel(guild);
-        Message starredMsg = event.getChannel().getMessageById(event.getMessageId()).complete();
-        List<Message.Attachment> attachments = starredMsg.getAttachments().stream().filter(a -> !(a.isImage())).collect(Collectors.toList());
-        List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
+            if(!(isConfigured(guild))) return;
 
-        if(isSameAuthor(starredMsg.getAuthor(), event.getUser()) && event.getReactionEmote().getName().equals("\u2B50"))
-        {
-            //event.getChannel().sendMessage("Boooooo, "+event.getUser().getAsMention()+" selfstarred! SHAME!").queue();
-            return;
-        }
+            TextChannel starboard = gsdm.getStarboardChannel(guild);
+            Message starredMsg = event.getChannel().getMessageById(event.getMessageId()).complete();
+            List<Message.Attachment> attachments = starredMsg.getAttachments().stream().filter(a -> !(a.isImage())).collect(Collectors.toList());
+            List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
 
-        if(!(amountPassed(starredMsg))) return;
+            if(isSameAuthor(starredMsg.getAuthor(), event.getUser()) && event.getReactionEmote().getName().equals("\u2B50"))
+            {
+                //event.getChannel().sendMessage("Boooooo, "+event.getUser().getAsMention()+" selfstarred! SHAME!").queue();
+                return;
+            }
 
-        if(!(starboard.canTalk()))
-        {
-            FinderUtil.getDefaultChannel(guild).sendMessage("I can't talk on the starboard!").queue(null, e -> guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage("I can't talk on the starboard!").queue(null, null)));
-            return;
-        }
+            if(!(amountPassed(starredMsg))) return;
 
-        if(existsOnStarboard(starredMsg.getIdLong()))
-        {
-            if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
-                LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
+            if(!(starboard.canTalk()))
+            {
+                FinderUtil.getDefaultChannel(guild).sendMessage("I can't talk on the starboard!").queue(null, e -> guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage("I can't talk on the starboard!").queue(null, null)));
+                return;
+            }
+
+            if(existsOnStarboard(starredMsg.getIdLong()))
+            {
+                if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
+                    LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
+                else
+                    updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+            }
             else
-                updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
-        }
-        else
-        {
-            sb.append(starredMsg.getContentRaw());
-            eb.setAuthor(starredMsg.getAuthor().getName(), null, starredMsg.getAuthor().getEffectiveAvatarUrl());
-            if(!(attachments.isEmpty())) for(Message.Attachment att : attachments)
-                sb.append("\n").append(att.getUrl());
-            if(!(images.isEmpty())) if(images.size()>1) for(Message.Attachment img : images)
-                sb.append("\n").append(img.getUrl());
-            else eb.setImage(images.get(0).getUrl());
-            eb.setDescription(sb.toString());
-            eb.setColor(Color.YELLOW);
+            {
+                sb.append(starredMsg.getContentRaw());
+                eb.setAuthor(starredMsg.getAuthor().getName(), null, starredMsg.getAuthor().getEffectiveAvatarUrl());
+                if(!(attachments.isEmpty())) for(Message.Attachment att : attachments)
+                    sb.append("\n").append(att.getUrl());
+                if(!(images.isEmpty())) if(images.size()>1) for(Message.Attachment img : images)
+                    sb.append("\n").append(img.getUrl());
+                else eb.setImage(images.get(0).getUrl());
+                eb.setDescription(sb.toString());
+                eb.setColor(Color.YELLOW);
 
-            msgB.setContent(getEmote(getStarCount(starredMsg))+" **"+getStarCount(starredMsg)+"** "+starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
-            msgB.setEmbed(eb.build());
+                msgB.setContent(getEmote(getStarCount(starredMsg))+" **"+getStarCount(starredMsg)+"** "+starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
+                msgB.setEmbed(eb.build());
 
-            if(!(sdm.addMessage(starredMsg, getStarCount(starredMsg))))
-                LOG.warn("Error when adding message to starboard. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
-            starboard.sendMessage(msgB.build()).queue(s -> sdm.setStarboardMessageId(starredMsg, s.getIdLong()));
-        }
+                if(!(sdm.addMessage(starredMsg, getStarCount(starredMsg))))
+                    LOG.warn("Error when adding message to starboard. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
+                starboard.sendMessage(msgB.build()).queue(s -> sdm.setStarboardMessageId(starredMsg, s.getIdLong()));
+            }
+        });
     }
 
     @Override
     public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event)
     {
-        if(!(isConfigured(event.getGuild()))) return;
+        thread.submit(() -> {
+            if(!(isConfigured(event.getGuild()))) return;
 
-        Message starredMsg = event.getChannel().getMessageById(event.getMessageId()).complete();
-        StarboardMessage starboardMsg = sdm.getStarboardMessage(starredMsg.getIdLong());
-        TextChannel starboard = gsdm.getStarboardChannel(event.getGuild());
+            Message starredMsg = event.getChannel().getMessageById(event.getMessageId()).complete();
+            StarboardMessage starboardMsg = sdm.getStarboardMessage(starredMsg.getIdLong());
+            TextChannel starboard = gsdm.getStarboardChannel(event.getGuild());
 
-        if(existsOnStarboard(starredMsg.getIdLong()))
-        {
-            if(!(amountPassed(starredMsg)))
+            if(existsOnStarboard(starredMsg.getIdLong()))
             {
-                starboard.getMessageById(starboardMsg.getStarboardMessageId()).queue(s -> s.delete().queue());
-                return;
-            }
+                if(!(amountPassed(starredMsg)))
+                {
+                    delete(starboard, starboardMsg);
+                    return;
+                }
 
-            if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
-                LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
-            else
-                updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
-        }
+                if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
+                    LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
+                else
+                    updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+            }
+        });
     }
 
     @Override
     public void onGuildMessageReactionRemoveAll(GuildMessageReactionRemoveAllEvent event)
     {
-        Long msg = event.getMessageIdLong();
-        TextChannel starboard = gsdm.getStarboardChannel(event.getGuild());
-        StarboardMessage starboardMsg = sdm.getStarboardMessage(msg);
-
-        if(existsOnStarboard(msg))
-        {
-            starboard.getMessageById(starboardMsg.getStarboardMessageId()).queue(s -> s.delete().queue(), null);
-            sdm.deleteMessage(msg, starboardMsg.getStarboardMessageIdLong());
-        }
+        thread.submit(() -> check(event.getGuild(), event.getMessageIdLong()));
     }
 
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent event)
     {
-        Long msg = event.getMessageIdLong();
-        TextChannel starboard = gsdm.getStarboardChannel(event.getGuild());
-        StarboardMessage starboardMsg = sdm.getStarboardMessage(msg);
-
-        if(existsOnStarboard(msg))
-        {
-            starboard.getMessageById(starboardMsg.getStarboardMessageId()).queue(s -> s.delete().queue(), null);
-            sdm.deleteMessage(msg, starboardMsg.getStarboardMessageIdLong());
-        }
+        thread.submit(() -> check(event.getGuild(), event.getMessageIdLong()));
     }
 
     private boolean isSameAuthor(User msgAuthor, User user)
@@ -208,4 +200,19 @@ public class StarboardEvents extends ListenerAdapter
     {
 
     }*/
+
+    private void delete(TextChannel starboard, StarboardMessage starboardMsg)
+    {
+        starboard.getMessageById(starboardMsg.getStarboardMessageId()).queue(s -> s.delete().queue());
+        sdm.deleteMessage(starboardMsg.getMessageIdLong(), starboardMsg.getStarboardMessageIdLong());
+    }
+
+    private void check(Guild guild, long msg)
+    {
+        TextChannel starboard = gsdm.getStarboardChannel(guild);
+        StarboardMessage starboardMsg = sdm.getStarboardMessage(msg);
+
+        if(existsOnStarboard(msg))
+            delete(starboard, starboardMsg);
+    }
 }

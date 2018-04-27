@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * @author Artu
+ * @author Artuto
  */
 
 public class Unban extends Command
