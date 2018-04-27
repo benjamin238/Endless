@@ -106,14 +106,14 @@ public class BotEvents extends ListenerAdapter
     public void onResume(ResumedEvent event)
     {
         if(config.isBotlogEnabled())
-            webhook.send("**Endless** is now <@&436352909685424134>!");
+            webhook.send("**Endless** is has <@&436352909685424134>!");
     }
 
     @Override
     public void onReconnect(ReconnectedEvent event)
     {
         if(config.isBotlogEnabled())
-            webhook.send("**Endless** is now <@&436352708304175106>!");
+            webhook.send("**Endless** is has <@&436352708304175106>!");
     }
 
     @Override
