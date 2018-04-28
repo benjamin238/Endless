@@ -31,7 +31,7 @@ public class TimeUtils
     {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String day = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
+        String day = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)+1);
         String month = String.format("%02d", calendar.get(Calendar.MONTH));
         String year = String.format("%02d", calendar.get(Calendar.YEAR));
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
