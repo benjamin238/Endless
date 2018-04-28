@@ -40,6 +40,8 @@ public class CommandLogging implements CommandListener
         User author = event.getAuthor();
         Guild guild = event.getGuild();
 
+        if(event.isOwner()) return;
+
         commandLog.sendMessage("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
                 "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped()+"`) in **"+guild.getName()+"** (ID: "+guild.getId()+")").queue();
     }
