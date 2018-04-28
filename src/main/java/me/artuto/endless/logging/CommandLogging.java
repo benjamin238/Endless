@@ -39,6 +39,9 @@ public class CommandLogging implements CommandListener
         TextChannel commandLog = event.getJDA().getTextChannelById(439269675109580810L);
         User author = event.getAuthor();
         Guild guild = event.getGuild();
+        
+        // If is the help command is null
+        if(command==null) return;
 
         if(event.isOwner()) return;
 
