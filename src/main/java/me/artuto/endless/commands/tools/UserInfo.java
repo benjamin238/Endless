@@ -93,7 +93,7 @@ public class UserInfo extends Command
 
         for(int i = index+1; i<index+7; i++)
         {
-            if(i>joins.size()) break;
+            if(i>=joins.size()) break;
 
             Member m = joins.get(i);
             String name = m.getUser().getName();
