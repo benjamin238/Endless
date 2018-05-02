@@ -17,10 +17,10 @@
 
 package me.artuto.endless.commands.moderation;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
@@ -34,7 +34,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Clear extends Command
+public class Clear extends EndlessCommand
 {
     private final ModLogging modlog;
     private final ScheduledExecutorService threads;
@@ -56,14 +56,14 @@ public class Clear extends Command
         this.aliases = new String[]{"clean", "prune"};
         this.help = "Clears the specified range of message using the specified parameters";
         this.category = Categories.MODERATION;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
+        this.botPerms = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
+        this.userPerms = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String params = event.getArgs();
         String r;

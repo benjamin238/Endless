@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.DatabaseManager;
@@ -27,7 +28,7 @@ import net.dv8tion.jda.core.entities.Guild;
 
 import java.util.Collection;
 
-public class Prefix extends Command
+public class Prefix extends EndlessCommand
 {
     private final DatabaseManager db;
     private final GuildSettingsDataManager gsdm;
@@ -40,14 +41,14 @@ public class Prefix extends Command
         this.children = new Command[]{new Add(), new Remove()};
         this.help = "Displays or adds a prefix";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         StringBuilder sb = new StringBuilder();
         Guild guild = event.getGuild();
@@ -65,21 +66,21 @@ public class Prefix extends Command
         }
     }
 
-    private class Add extends Command
+    private class Add extends EndlessCommand
     {
         Add()
         {
             this.name = "add";
             this.help = "Adds a custom prefix";
             this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String args = event.getArgs();
             Guild guild = event.getGuild();
@@ -93,21 +94,21 @@ public class Prefix extends Command
         }
     }
 
-    private class Remove extends Command
+    private class Remove extends EndlessCommand
     {
         Remove()
         {
             this.name = "remove";
             this.help = "Removes a custom prefix";
             this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String args = event.getArgs();
             Guild guild = event.getGuild();

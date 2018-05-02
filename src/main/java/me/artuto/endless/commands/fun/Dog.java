@@ -17,9 +17,9 @@
 
 package me.artuto.endless.commands.fun;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.io.IOException;
 
-public class Dog extends Command
+public class Dog extends EndlessCommand
 {
     private final Logger LOG = LoggerFactory.getLogger("Dog Image Command");
     private Config config;
@@ -46,15 +46,15 @@ public class Dog extends Command
         this.name = "dog";
         this.help = "Displays a cute pupper.";
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
         this.cooldown = 10;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         try
         {

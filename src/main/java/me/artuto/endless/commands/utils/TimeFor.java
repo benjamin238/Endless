@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.utils;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
@@ -35,7 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.zone.ZoneRulesException;
 import java.util.List;
 
-public class TimeFor extends Command
+public class TimeFor extends EndlessCommand
 {
     private final ProfileDataManager db;
 
@@ -48,14 +49,14 @@ public class TimeFor extends Command
         this.help = "Shows the timezone for the specified user";
         this.arguments = "<user>";
         this.category = Categories.UTILS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         ProfileDataManager.Profile p;
         ZonedDateTime t;
@@ -132,7 +133,7 @@ public class TimeFor extends Command
         }
     }
 
-    private class Change extends Command
+    private class Change extends EndlessCommand
     {
         public Change()
         {
@@ -141,14 +142,14 @@ public class TimeFor extends Command
             this.help = "Changes your timezone";
             this.arguments = "<timezone>";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String args = event.getArgs();
 
@@ -173,7 +174,7 @@ public class TimeFor extends Command
         }
     }
 
-    private class TList extends Command
+    private class TList extends EndlessCommand
     {
         public TList()
         {
@@ -181,14 +182,14 @@ public class TimeFor extends Command
             this.aliases = new String[]{"timezones"};
             this.help = "Shows the list with valid timezones";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             event.replySuccess("Here is the list: ");
             try

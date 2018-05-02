@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -31,7 +32,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class Starboard extends Command
+public class Starboard extends EndlessCommand
 {
     private final GuildSettingsDataManager db;
     private final EventWaiter ew;
@@ -45,14 +46,14 @@ public class Starboard extends Command
         this.aliases = new String[]{"sb"};
         this.help = "If no valid arguments are given the setup to install the starboard is launched.";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         event.replySuccess("Hi! Welcome to the Endless' Starboard Setup. This will automagically install an starboard on your server, I only need some "+"information to continue.");
 
@@ -166,7 +167,7 @@ public class Starboard extends Command
         event.replySuccess("The starboard has been installed successfully! Thanks for using Endless' starboard!");
     }
 
-    private class SetChannel extends Command
+    private class SetChannel extends EndlessCommand
     {
         SetChannel()
         {
@@ -174,14 +175,14 @@ public class Starboard extends Command
             this.aliases = new String[]{"channel"};
             this.help = "Changes the channel of the starboard.";
             this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
@@ -203,7 +204,7 @@ public class Starboard extends Command
         }
     }
 
-    private class SetCount extends Command
+    private class SetCount extends EndlessCommand
     {
         SetCount()
         {
@@ -211,14 +212,14 @@ public class Starboard extends Command
             this.aliases = new String[]{"count", "amount", "setamount"};
             this.help = "Changes the amount of stars required to be in the starboard.";
             this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             Integer args;
 

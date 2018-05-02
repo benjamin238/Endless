@@ -17,11 +17,11 @@
 
 package me.artuto.endless.commands.moderation;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.utils.FormatUtil;
@@ -35,7 +35,7 @@ import java.util.List;
  * @author Artuto
  */
 
-public class Unban extends Command
+public class Unban extends EndlessCommand
 {
     private final ModLogging modlog;
     private final Config config;
@@ -48,14 +48,14 @@ public class Unban extends Command
         this.help = "Unbans the specified user";
         this.arguments = "<@user|ID|username> for [reason]";
         this.category = Categories.MODERATION;
-        this.botPermissions = new Permission[]{Permission.KICK_MEMBERS};
-        this.userPermissions = new Permission[]{Permission.KICK_MEMBERS};
+        this.botPerms = new Permission[]{Permission.KICK_MEMBERS};
+        this.userPerms = new Permission[]{Permission.KICK_MEMBERS};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         User author;
         User user;

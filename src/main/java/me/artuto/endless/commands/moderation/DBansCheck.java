@@ -17,10 +17,10 @@
 
 package me.artuto.endless.commands.moderation;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -40,7 +40,7 @@ import java.util.List;
  * @author Artuto
  */
 
-public class DBansCheck extends Command
+public class DBansCheck extends EndlessCommand
 {
     private final Logger LOG = LoggerFactory.getLogger("DiscordBans Command");
     private final Config config;
@@ -53,15 +53,15 @@ public class DBansCheck extends Command
         this.arguments = "<@user|ID|nickname|username>";
         this.category = Categories.MODERATION;
         this.aliases = new String[]{"checkbans", "dbans"};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
         this.cooldown = 10;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         User user;

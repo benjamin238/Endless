@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.bot;
 
-import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -33,21 +33,21 @@ import java.text.DecimalFormat;
  * @author Artuto
  */
 
-public class Stats extends Command
+public class Stats extends EndlessCommand
 {
     public Stats()
     {
         this.name = "stats";
         this.help = "Shows the stats of the bot";
         this.category = Categories.BOT;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String title = ":information_source: Stats of **"+event.getSelfUser().getName()+"**:";
         Color color;

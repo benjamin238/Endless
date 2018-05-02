@@ -31,13 +31,35 @@ public class TimeUtils
     {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
-        String day = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)+1);
-        String month = String.format("%02d", calendar.get(Calendar.MONTH));
+        String day = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
+        String month = String.format("%02d", calendar.get(Calendar.MONTH)+1);
         String year = String.format("%02d", calendar.get(Calendar.YEAR));
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         return "["+day+"/"+month+"/"+year+"] ["+hour+":"+min+":"+sec+"]";
+    }
+
+    public static String getTime()
+    {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+
+        return "["+hour+":"+min+":"+sec+"]";
+    }
+
+    public static String getDate()
+    {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String day = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
+        String month = String.format("%02d", calendar.get(Calendar.MONTH)+1);
+        String year = String.format("%02d", calendar.get(Calendar.YEAR));
+
+        return "["+day+"/"+month+"/"+year+"]";
     }
 }

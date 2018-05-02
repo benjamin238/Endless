@@ -17,11 +17,11 @@
 
 package me.artuto.endless.commands.bot;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.JDAUtilitiesInfo;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDAInfo;
@@ -36,7 +36,7 @@ import java.awt.*;
  * @author Artuto
  */
 
-public class About extends Command
+public class About extends EndlessCommand
 {
     private final Config config;
 
@@ -46,14 +46,14 @@ public class About extends Command
         this.name = "about";
         this.help = "Info about the bot";
         this.category = Categories.BOT;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Color color;
 

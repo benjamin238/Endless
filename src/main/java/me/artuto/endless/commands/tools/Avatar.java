@@ -17,10 +17,10 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -33,7 +33,7 @@ import java.util.List;
  * @author Artuto
  */
 
-public class Avatar extends Command
+public class Avatar extends EndlessCommand
 {
     public Avatar()
     {
@@ -41,14 +41,14 @@ public class Avatar extends Command
         this.help = "Displays the avatar of the specified user.";
         this.arguments = "<user>";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Member target;
         EmbedBuilder builder = new EmbedBuilder();

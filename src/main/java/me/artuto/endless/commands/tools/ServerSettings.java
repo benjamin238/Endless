@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
@@ -31,7 +32,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.List;
 
-public class ServerSettings extends Command
+public class ServerSettings extends EndlessCommand
 {
     private final GuildSettingsDataManager db;
 
@@ -43,14 +44,14 @@ public class ServerSettings extends Command
         this.aliases = new String[]{"settings"};
         this.help = "Displays the settings of the server";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Guild guild = event.getGuild();
         TextChannel modlog = db.getModlogChannel(guild);
@@ -77,7 +78,7 @@ public class ServerSettings extends Command
 
     }
 
-    private class ModLog extends Command
+    private class ModLog extends EndlessCommand
     {
         public ModLog()
         {
@@ -86,14 +87,14 @@ public class ServerSettings extends Command
             this.help = "Sets the modlog channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = new Command.Category("Settings");
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
@@ -115,7 +116,7 @@ public class ServerSettings extends Command
         }
     }
 
-    private class ServerLog extends Command
+    private class ServerLog extends EndlessCommand
     {
         public ServerLog()
         {
@@ -123,14 +124,14 @@ public class ServerSettings extends Command
             this.help = "Sets the serverlog channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = new Command.Category("Settings");
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
@@ -152,7 +153,7 @@ public class ServerSettings extends Command
         }
     }
 
-    private class Welcome extends Command
+    private class Welcome extends EndlessCommand
     {
         public Welcome()
         {
@@ -161,14 +162,14 @@ public class ServerSettings extends Command
             this.help = "Sets the welcome channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = new Command.Category("Settings");
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
@@ -190,7 +191,7 @@ public class ServerSettings extends Command
         }
     }
 
-    private class Leave extends Command
+    private class Leave extends EndlessCommand
     {
         public Leave()
         {
@@ -199,14 +200,14 @@ public class ServerSettings extends Command
             this.help = "Sets the leave channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = new Command.Category("Settings");
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))

@@ -17,9 +17,9 @@
 
 package me.artuto.endless.commands.bot;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.MessageChannel;
 
@@ -27,21 +27,21 @@ import net.dv8tion.jda.core.entities.MessageChannel;
  * @author Artuto
  */
 
-public class Ping extends Command
+public class Ping extends EndlessCommand
 {
     public Ping()
     {
         this.name = "ping";
         this.help = "Pong!";
         this.category = Categories.BOT;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         MessageChannel channel = event.getChannel();
         long time = System.currentTimeMillis();

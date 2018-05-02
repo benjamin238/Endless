@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
@@ -29,7 +30,7 @@ import net.dv8tion.jda.core.entities.Game;
  * @author Artuto
  */
 
-public class BotCPanel extends Command
+public class BotCPanel extends EndlessCommand
 {
     public BotCPanel()
     {
@@ -37,14 +38,14 @@ public class BotCPanel extends Command
         this.help = "Controls the status, game, optimized the bot and other useful things.";
         this.category = Categories.BOTADM;
         this.children = new Command[]{new Status(), new Playing(), new DefaultGameUpdate(), new Optimize()};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String prefix = event.getClient().getPrefix();
 
@@ -58,21 +59,21 @@ public class BotCPanel extends Command
         }
     }
 
-    private class Status extends Command
+    private class Status extends EndlessCommand
     {
         Status()
         {
             this.name = "status";
             this.help = "Sets the Online Status (OnlineStatus) of the bot.";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {
@@ -101,21 +102,21 @@ public class BotCPanel extends Command
         }
     }
 
-    private class Playing extends Command
+    private class Playing extends EndlessCommand
     {
         Playing()
         {
             this.name = "game";
             this.help = "Sets the Game (Game.of) of the bot.";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {
@@ -146,21 +147,21 @@ public class BotCPanel extends Command
         }
     }
 
-    private class DefaultGameUpdate extends Command
+    private class DefaultGameUpdate extends EndlessCommand
     {
         DefaultGameUpdate()
         {
             this.name = "updategame";
             this.help = "Updates the default game.";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             try
             {
@@ -175,21 +176,21 @@ public class BotCPanel extends Command
         }
     }
 
-    private class Optimize extends Command
+    private class Optimize extends EndlessCommand
     {
         Optimize()
         {
             this.name = "optimize";
             this.help = "Optimizes the Bot's RAM usage. Use with caution.";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             try
             {

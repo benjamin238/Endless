@@ -20,10 +20,9 @@ package me.artuto.endless.logging;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.CommandListener;
-import me.artuto.endless.utils.StringUtils;
+import me.artuto.endless.Bot;
 import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
@@ -36,7 +35,7 @@ public class CommandLogging implements CommandListener
     @Override
     public void onCommand(CommandEvent event, Command command)
     {
-        TextChannel commandLog = event.getJDA().getTextChannelById(439269675109580810L);
+        TextChannel commandLog = event.getJDA().getTextChannelById(Bot.config.getCommandslogChannelId());
         User author = event.getAuthor();
         Guild guild = event.getGuild();
         
@@ -47,5 +46,11 @@ public class CommandLogging implements CommandListener
 
         commandLog.sendMessage("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
                 "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped()+"`) in **"+guild.getName()+"** (ID: "+guild.getId()+")").queue();
+    }
+
+    @Override
+    public void onCommandException(CommandEvent event, Command command, Throwable throwable)
+    {
+
     }
 }

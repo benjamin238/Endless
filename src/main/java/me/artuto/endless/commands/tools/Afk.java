@@ -17,14 +17,14 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.tempdata.AfkManager;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
-public class Afk extends Command
+public class Afk extends EndlessCommand
 {
     public Afk()
     {
@@ -32,13 +32,13 @@ public class Afk extends Command
         this.help = "Mark yourself ask afk with a message";
         this.arguments = "[message]";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         User user = event.getAuthor();
 

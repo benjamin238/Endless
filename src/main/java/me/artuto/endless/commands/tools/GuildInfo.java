@@ -17,9 +17,9 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.FinderUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter;
  * @author Artuto
  */
 
-public class GuildInfo extends Command
+public class GuildInfo extends EndlessCommand
 {
     public GuildInfo()
     {
@@ -41,14 +41,14 @@ public class GuildInfo extends Command
         this.aliases = new String[]{"server", "serverinfo", "guildinfo", "ginfo", "sinfo"};
         this.help = "Shows info about the current guild";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         EmbedBuilder builder2 = new EmbedBuilder();

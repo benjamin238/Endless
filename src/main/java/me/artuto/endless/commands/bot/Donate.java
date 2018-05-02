@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Const;
@@ -38,7 +39,7 @@ import java.util.List;
  * @author Artuto
  */
 
-public class Donate extends Command
+public class Donate extends EndlessCommand
 {
     private final DonatorsDataManager db;
 
@@ -49,14 +50,14 @@ public class Donate extends Command
         this.children = new Command[]{new Add(), new Remove()};
         this.help = "Info about donations";
         this.category = Categories.BOT;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Color color;
         EmbedBuilder builder = new EmbedBuilder();
@@ -78,21 +79,21 @@ public class Donate extends Command
         event.reply(new MessageBuilder().append(":information_source: List of donators:").setEmbed(builder.build()).build());
     }
 
-    private class Add extends Command
+    private class Add extends EndlessCommand
     {
-        public Add()
+        Add()
         {
             this.name = "add";
             this.help = "Adds a donator to the list";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(!(event.getClient().getOwnerId().equals(Const.ARTUTO_ID)))
             {
@@ -143,21 +144,21 @@ public class Donate extends Command
         }
     }
 
-    private class Remove extends Command
+    private class Remove extends EndlessCommand
     {
-        public Remove()
+        Remove()
         {
             this.name = "remove";
             this.help = "Removes a donator from the list";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(!(event.getClient().getOwnerId().equals(Const.ARTUTO_ID)))
             {

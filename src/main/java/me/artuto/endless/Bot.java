@@ -30,7 +30,6 @@ import me.artuto.endless.events.*;
 import me.artuto.endless.handlers.BlacklistHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
 import me.artuto.endless.loader.Config;
-import me.artuto.endless.loader.Logging;
 import me.artuto.endless.logging.CommandLogging;
 import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.logging.ServerLogging;
@@ -50,6 +49,7 @@ import java.util.Arrays;
 public class Bot extends ListenerAdapter
 {
     private final EndlessLoader loader = new EndlessLoader();
+    public static Config config;
 
     public void boot(boolean maintenance) throws LoginException
     {
@@ -57,7 +57,7 @@ public class Bot extends ListenerAdapter
         if(maintenance)
             Endless.LOG.warn("WARNING - Starting on Maintenance Mode - WARNING");
         loader.preLoad();
-        Config config = loader.config;
+        config = loader.config;
 
         loader.databaseLoad(maintenance);
         BlacklistDataManager bdm = loader.dbLoader.getBlacklistDataManager();
@@ -143,8 +143,8 @@ public class Bot extends ListenerAdapter
             builder.addEventListener(client.build(), new Bot());
         else
             builder.addEventListener(loader.waiter, client.build(), new BotEvents(config, loader.botlogThread, false, db),
-            new Logging(config), new ServerLogging(gsdm), new GuildEvents(config, tdm, gsdm, bdm),
-            new StarboardEvents(gsdm, sdm, loader.starboardThread), new UserEvents(config));
+                    new ServerLogging(gsdm), new GuildEvents(config, tdm, gsdm, bdm),
+                    new StarboardEvents(gsdm, sdm, loader.starboardThread), new UserEvents(config));
 
         builder.buildAsync();
     }

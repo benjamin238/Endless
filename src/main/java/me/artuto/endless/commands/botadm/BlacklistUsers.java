@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.BlacklistDataManager;
@@ -30,7 +31,7 @@ import java.awt.*;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class BlacklistUsers extends Command
+public class BlacklistUsers extends EndlessCommand
 {
     private final BlacklistDataManager db;
 
@@ -41,14 +42,14 @@ public class BlacklistUsers extends Command
         this.help = "Adds, removes or displays the list with blacklisted users.";
         this.category = Categories.BOTADM;
         this.children = new Command[]{new Add(), new Remove(), new Check(), new BlacklistList()};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String prefix = event.getClient().getPrefix();
 
@@ -62,7 +63,7 @@ public class BlacklistUsers extends Command
         }
     }
 
-    private class Add extends Command
+    private class Add extends EndlessCommand
     {
         Add()
         {
@@ -70,14 +71,14 @@ public class BlacklistUsers extends Command
             this.help = "Adds a user ID to the blacklisted users list.";
             this.arguments = "<user ID>";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             User user;
 
@@ -115,7 +116,7 @@ public class BlacklistUsers extends Command
         }
     }
 
-    private class Remove extends Command
+    private class Remove extends EndlessCommand
     {
         Remove()
         {
@@ -123,14 +124,14 @@ public class BlacklistUsers extends Command
             this.help = "Removes a user ID to the blacklisted users list.";
             this.arguments = "<user ID>";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             User user;
 
@@ -176,21 +177,21 @@ public class BlacklistUsers extends Command
         }
     }
 
-    private class BlacklistList extends Command
+    private class BlacklistList extends EndlessCommand
     {
         BlacklistList()
         {
             this.name = "list";
             this.help = "Displays blacklisted users.";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             Set<User> list;
             EmbedBuilder builder = new EmbedBuilder();
@@ -228,21 +229,21 @@ public class BlacklistUsers extends Command
         }
     }
 
-    private class Check extends Command
+    private class Check extends EndlessCommand
     {
         Check()
         {
             this.name = "check";
             this.help = "Checks if a user ID is blacklisted.";
             this.category = Categories.BOTADM;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             User user;
 

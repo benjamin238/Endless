@@ -17,16 +17,16 @@
 
 package me.artuto.endless.commands.fun;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.Permission;
 
 /**
  * @author Artuto
  */
 
-public class Say extends Command
+public class Say extends EndlessCommand
 {
     public Say()
     {
@@ -34,14 +34,14 @@ public class Say extends Command
         this.help = "Say something!";
         this.arguments = "<text>";
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         event.reply(event.getArgs());
     }

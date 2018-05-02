@@ -17,13 +17,13 @@
 
 package me.artuto.endless.commands.fun;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.data.ProfileDataManager;
 import net.dv8tion.jda.core.Permission;
 
-public class Profile extends Command
+public class Profile extends EndlessCommand
 {
     private final ProfileDataManager db;
 
@@ -35,14 +35,14 @@ public class Profile extends Command
         this.help = "Displays or edits the profile of the specified user";
         this.arguments = "<user>";
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
 
     }

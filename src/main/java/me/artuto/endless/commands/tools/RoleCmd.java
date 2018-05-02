@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
@@ -33,7 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RoleCmd extends Command
+public class RoleCmd extends EndlessCommand
 {
     public RoleCmd()
     {
@@ -42,14 +43,14 @@ public class RoleCmd extends Command
         this.arguments = "<role>";
         this.children = new Command[]{new GiveRole(), new TakeRole()};
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Role rol;
         Color color;
@@ -114,7 +115,7 @@ public class RoleCmd extends Command
         }
     }
 
-    private class GiveRole extends Command
+    private class GiveRole extends EndlessCommand
     {
         public GiveRole()
         {
@@ -122,14 +123,14 @@ public class RoleCmd extends Command
             this.help = "Gives the specified role to the specified member";
             this.arguments = "<role> to <user>";
             this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
+            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {
@@ -199,7 +200,7 @@ public class RoleCmd extends Command
         }
     }
 
-    private class TakeRole extends Command
+    private class TakeRole extends EndlessCommand
     {
         public TakeRole()
         {
@@ -207,14 +208,14 @@ public class RoleCmd extends Command
             this.help = "Takes the specified role from the specified member";
             this.arguments = "<role> from <user>";
             this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
+            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {

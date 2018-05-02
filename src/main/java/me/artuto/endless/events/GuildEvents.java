@@ -82,7 +82,7 @@ public class GuildEvents extends ListenerAdapter
     {
         Guild guild = event.getGuild();
         User owner = guild.getOwner().getUser();
-        LoggerFactory.getLogger("Logging").info("[GUILD JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
+        LoggerFactory.getLogger("ogging").info("[GUILD JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
         long botCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
         long userCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> !(u.isBot())).count();
         long totalCount = guild.getMembers().size();

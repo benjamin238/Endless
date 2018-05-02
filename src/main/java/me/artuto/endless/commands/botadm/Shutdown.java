@@ -17,16 +17,16 @@
 
 package me.artuto.endless.commands.botadm;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.Permission;
 
 /**
  * @author Artuto
  */
 
-public class Shutdown extends Command
+public class Shutdown extends EndlessCommand
 {
     public Shutdown()
     {
@@ -34,14 +34,14 @@ public class Shutdown extends Command
         this.aliases = new String[]{"quit", "exit", "close", "terminate"};
         this.help = "Turns Off the bot";
         this.category = Categories.BOTADM;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         event.reactSuccess();
         event.getJDA().shutdown();

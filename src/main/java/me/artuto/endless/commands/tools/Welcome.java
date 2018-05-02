@@ -18,13 +18,14 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.GuildSettingsDataManager;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
-public class Welcome extends Command
+public class Welcome extends EndlessCommand
 {
     private final GuildSettingsDataManager db;
 
@@ -36,14 +37,14 @@ public class Welcome extends Command
         this.aliases = new String[]{"welcomemessage", "welcomemsg"};
         this.help = "Changes or shows the welcome message";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Guild guild = event.getGuild();
         String msg = db.getWelcomeMessage(guild);
@@ -52,21 +53,21 @@ public class Welcome extends Command
         else event.replyError("No message configured!");
     }
 
-    private class Change extends Command
+    private class Change extends EndlessCommand
     {
         public Change()
         {
             this.name = "change";
             this.help = "Changes the welcome message";
             this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {

@@ -17,10 +17,10 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -34,7 +34,7 @@ import java.util.List;
  * @author Artuto
  */
 
-public class Quote extends Command
+public class Quote extends EndlessCommand
 {
     public Quote()
     {
@@ -42,13 +42,13 @@ public class Quote extends Command
         this.help = "Quotes a message";
         this.arguments = "<message id> [channel]";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         if(event.getArgs().isEmpty())
         {

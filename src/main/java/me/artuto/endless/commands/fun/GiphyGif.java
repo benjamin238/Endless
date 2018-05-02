@@ -18,13 +18,13 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.kdotj.simplegiphy.SimpleGiphy;
 import com.kdotj.simplegiphy.data.Giphy;
 import com.kdotj.simplegiphy.data.GiphyListResponse;
 import com.kdotj.simplegiphy.data.RandomGiphy;
 import com.kdotj.simplegiphy.data.RandomGiphyResponse;
-import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -38,7 +38,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
-public class GiphyGif extends Command
+public class GiphyGif extends EndlessCommand
 {
     private final Logger LOG = LoggerFactory.getLogger("Giphy Command");
     private Config config;
@@ -52,14 +52,14 @@ public class GiphyGif extends Command
         this.help = "Searches a gif on Giphy using the specified serarch terms.";
         this.arguments = "[keyword]";
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
+        this.userPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String args = event.getArgs();
 
@@ -128,7 +128,7 @@ public class GiphyGif extends Command
         }
     }
 
-    private class RandomGif extends Command
+    private class RandomGif extends EndlessCommand
     {
         private RandomGif()
         {
@@ -136,13 +136,13 @@ public class GiphyGif extends Command
             this.help = "Retrieves a random GIF from Giphy.";
             this.category = Categories.FUN;
             this.arguments = "[keyword]";
-            this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+            this.userPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String args = event.getArgs();
 

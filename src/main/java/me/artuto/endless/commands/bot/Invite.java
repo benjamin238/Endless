@@ -17,30 +17,30 @@
 
 package me.artuto.endless.commands.bot;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.Permission;
 
 /**
  * @author Artuto
  */
 
-public class Invite extends Command
+public class Invite extends EndlessCommand
 {
     public Invite()
     {
         this.name = "invite";
         this.help = "Shows the bot invite";
         this.category = Categories.BOT;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         event.reply("So you want invite Endless to your server? Here you have it:\n"+":link: **<https://discordapp.com/api/oauth2/authorize?client_id="+event.getSelfUser().getId()+"&scope=bot&permissions=8>**");
     }

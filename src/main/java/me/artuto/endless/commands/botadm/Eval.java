@@ -17,9 +17,9 @@
 
 package me.artuto.endless.commands.botadm;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.data.*;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.ModLogging;
@@ -36,7 +36,7 @@ import java.util.List;
  * @author Artuto
  */
 
-public class Eval extends Command
+public class Eval extends EndlessCommand
 {
     private ScriptEngine engine;
     private List<String> imports;
@@ -62,10 +62,10 @@ public class Eval extends Command
         this.name = "eval";
         this.help = "Executes Groovy code";
         this.category = Categories.BOTADM;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
-        this.guildOnly = false;
+        this.guild = false;
 
         engine = new ScriptEngineManager().getEngineByName("Groovy");
 
@@ -79,7 +79,7 @@ public class Eval extends Command
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String importString = "";
         String eval;

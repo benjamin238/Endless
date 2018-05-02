@@ -17,16 +17,16 @@
 
 package me.artuto.endless.commands.utils;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.managers.GoogleSearcher;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 
 import java.util.ArrayList;
 
-public class GoogleSearch extends Command
+public class GoogleSearch extends EndlessCommand
 {
     private final GoogleSearcher searcher;
 
@@ -38,15 +38,15 @@ public class GoogleSearch extends Command
         this.help = "Search something on Google!";
         this.arguments = "[num] <query to search>";
         this.category = Categories.UTILS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
         this.cooldown = 10;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         String[] inputs = event.getArgs().split("\\s+", 2);

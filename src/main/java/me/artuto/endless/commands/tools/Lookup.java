@@ -17,9 +17,9 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.tools.InfoTools;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
@@ -36,7 +36,7 @@ import java.time.format.DateTimeFormatter;
  * @author Artuto
  */
 
-public class Lookup extends Command
+public class Lookup extends EndlessCommand
 {
     public Lookup()
     {
@@ -44,14 +44,14 @@ public class Lookup extends Command
         this.help = "Retrieves info about an invite, a guild or an user using their ID from Discord's servers.";
         this.arguments = "<User ID | Invite code | Invite URL | Guild ID>";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         boolean userb = false;
         boolean tcb = false;

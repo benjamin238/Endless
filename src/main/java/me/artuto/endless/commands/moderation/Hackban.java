@@ -17,17 +17,17 @@
 
 package me.artuto.endless.commands.moderation;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 import org.slf4j.LoggerFactory;
 
-public class Hackban extends Command
+public class Hackban extends EndlessCommand
 {
     private final ModLogging modlog;
     private final Config config;
@@ -40,14 +40,14 @@ public class Hackban extends Command
         this.help = "Hackbans the specified user";
         this.arguments = "<ID> for [reason]";
         this.category = Categories.MODERATION;
-        this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
-        this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
+        this.botPerms = new Permission[]{Permission.BAN_MEMBERS};
+        this.userPerms = new Permission[]{Permission.BAN_MEMBERS};
         this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guild = true;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         User author = event.getAuthor();
         User user;

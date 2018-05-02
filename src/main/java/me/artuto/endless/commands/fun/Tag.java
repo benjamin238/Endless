@@ -21,6 +21,7 @@ import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import com.jagrosh.jagtag.libraries.*;
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.TagDataManager;
@@ -28,7 +29,7 @@ import me.artuto.endless.tools.Variables;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
-public class Tag extends Command
+public class Tag extends EndlessCommand
 {
     private final TagDataManager db;
     private final Parser parser;
@@ -54,14 +55,14 @@ public class Tag extends Command
         this.arguments = "<name>";
         this.children = new Command[]{new Add(), new Delete(), new Edit(), new Import(), new Owner(), new Raw(), new Raw2(), new UnImport()};
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         if(event.getArgs().isEmpty())
         {
@@ -97,7 +98,7 @@ public class Tag extends Command
         event.reply(parser.parse(tag));
     }
 
-    private class Add extends Command
+    private class Add extends EndlessCommand
     {
         public Add()
         {
@@ -106,14 +107,14 @@ public class Tag extends Command
             this.help = "Creates a new tag";
             this.arguments = "<name> <content>";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String[] args;
             String name;
@@ -148,7 +149,7 @@ public class Tag extends Command
         }
     }
 
-    private class Delete extends Command
+    private class Delete extends EndlessCommand
     {
         public Delete()
         {
@@ -157,14 +158,14 @@ public class Tag extends Command
             this.help = "Removes a existant tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {
@@ -188,7 +189,7 @@ public class Tag extends Command
         }
     }
 
-    private class Edit extends Command
+    private class Edit extends EndlessCommand
     {
         public Edit()
         {
@@ -196,14 +197,14 @@ public class Tag extends Command
             this.help = "Edits an existant tag";
             this.arguments = "<name> <new content>";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String[] args;
             String name;
@@ -243,7 +244,7 @@ public class Tag extends Command
         }
     }
 
-    private class Owner extends Command
+    private class Owner extends EndlessCommand
     {
         public Owner()
         {
@@ -251,14 +252,14 @@ public class Tag extends Command
             this.help = "Gets the owner of a existant tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {
@@ -275,7 +276,7 @@ public class Tag extends Command
         }
     }
 
-    private class Import extends Command
+    private class Import extends EndlessCommand
     {
         public Import()
         {
@@ -283,14 +284,14 @@ public class Tag extends Command
             this.help = "Imports a tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {
@@ -314,7 +315,7 @@ public class Tag extends Command
         }
     }
 
-    private class Raw extends Command
+    private class Raw extends EndlessCommand
     {
         public Raw()
         {
@@ -322,14 +323,14 @@ public class Tag extends Command
             this.help = "Shows the content of a tag without parsing the args";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {
@@ -344,7 +345,7 @@ public class Tag extends Command
         }
     }
 
-    private class Raw2 extends Command
+    private class Raw2 extends EndlessCommand
     {
         public Raw2()
         {
@@ -352,14 +353,14 @@ public class Tag extends Command
             this.help = "Shows the content of a tag without parsing the args on a codeblock";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = false;
-            this.guildOnly = false;
+            this.guild = false;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {
@@ -374,7 +375,7 @@ public class Tag extends Command
         }
     }
 
-    private class UnImport extends Command
+    private class UnImport extends EndlessCommand
     {
         public UnImport()
         {
@@ -382,14 +383,14 @@ public class Tag extends Command
             this.help = "Unimports a tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guildOnly = true;
+            this.guild = true;
         }
 
         @Override
-        protected void execute(CommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {

@@ -190,4 +190,9 @@ public class Config
     {
         return format.sentryDSN;
     }
+
+    public Long getCommandslogChannelId()
+    {
+        return format.commandslogChannelId;
+    }
 }

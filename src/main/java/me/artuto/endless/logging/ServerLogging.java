@@ -25,6 +25,7 @@ import me.artuto.endless.data.GuildSettingsDataManager;
 import me.artuto.endless.tempdata.MessagesLogging;
 import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.FinderUtil;
+import me.artuto.endless.utils.IgnoreUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -135,7 +136,12 @@ public class ServerLogging extends ListenerAdapter
         TextChannel tc = db.getServerlogChannel(event.getGuild());
 
         if(!(tc == null) && !(event.getAuthor().isBot()))
+        {
+            if(IgnoreUtils.isIgnored(event.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getId(), tc.getTopic()))
+                return;
+
             MessagesLogging.addMessage(event.getMessage().getIdLong(), event.getMessage());
+        }
     }
 
     @Override
@@ -158,6 +164,9 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(event.getAuthor().isBot()) && !(message.getContentRaw().equals("No cached message")) && !(tc == null))
         {
+            if(IgnoreUtils.isIgnored(event.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
+                return;
+
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
@@ -203,6 +212,9 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(message.getContentRaw().equals("No cached message")) && !(tc == null) && !(message.getAuthor().isBot()))
         {
+            if(IgnoreUtils.isIgnored(message.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
+                return;
+
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
@@ -239,6 +251,9 @@ public class ServerLogging extends ListenerAdapter
 
                 if(!(tc == null))
                 {
+                    if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()))
+                        return;
+
                     if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                         guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
                     else
@@ -271,6 +286,9 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(tc == null) && !(user.isBot()))
         {
+            if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vc.getId(), tc.getTopic()))
+                return;
+
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
@@ -295,6 +313,9 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(tc == null) && !(user.isBot()))
         {
+            if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vcnew.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vcold.getId(), tc.getTopic()))
+                return;
+
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
@@ -318,6 +339,9 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(tc == null) && !(user.isBot()))
         {
+            if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vc.getId(), tc.getTopic()))
+                return;
+
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else

@@ -17,16 +17,16 @@
 
 package me.artuto.endless.commands.fun;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.Permission;
 
 /**
  * @author Artuto
  */
 
-public class Choose extends Command
+public class Choose extends EndlessCommand
 {
     public Choose()
     {
@@ -35,14 +35,14 @@ public class Choose extends Command
         this.help = "Chooses between the given options.";
         this.arguments = "<option 1> <option 2> ...";
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guildOnly = false;
+        this.guild = false;
     }
 
     @Override
-    protected void execute(CommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         if(event.getArgs().isEmpty())
         {
