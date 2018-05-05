@@ -18,6 +18,7 @@
 package me.artuto.endless.data;
 
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.json.JSONArray;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GuildSettingsDataManager
 {
@@ -377,14 +380,14 @@ public class GuildSettingsDataManager
             {
                 if(results.next())
                 {
-                    results.updateLong("starboard_id", tc == null ? null : tc.getIdLong());
+                    results.updateLong("starboard_id", tc==null?null:tc.getIdLong());
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("starboard_id", tc == null ? null : tc.getIdLong());
+                    results.updateLong("starboard_id", tc==null?null:tc.getIdLong());
                     results.insertRow();
                 }
             }
@@ -505,10 +508,7 @@ public class GuildSettingsDataManager
                         array = new JSONArray(prefixes);
 
                         for(Object p : array)
-                        {
-                            if(p.toString().equals(prefix)) return true;
-                            else return false;
-                        }
+                            return p.toString().equals(prefix);
                     }
                 }
                 else return false;
@@ -547,6 +547,130 @@ public class GuildSettingsDataManager
                             {
                                 array.remove(i);
                                 results.updateString("prefixes", array.length()<0 ? null : array.toString());
+                                results.updateRow();
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return false;
+        }
+    }
+
+    public List<Role> getRolemeRoles(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            String rolemeRoles;
+            JSONArray array;
+            List<Role> roles = new LinkedList<>();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, roleme_roles FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    rolemeRoles = results.getString("roleme_roles");
+
+                    if(rolemeRoles == null) return roles;
+                    else
+                    {
+                        array = new JSONArray(rolemeRoles);
+                        Role role;
+
+                        for(Object r : array)
+                        {
+                            role = guild.getRoleById(r.toString());
+
+                            if(!(role==null))
+                                roles.add(role);
+                        }
+
+                        return roles;
+                    }
+
+                }
+                else return roles;
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return null;
+        }
+    }
+
+    public boolean addRolemeRole(Guild guild, Role role)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            String roles;
+            JSONArray array;
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, roleme_roles FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    roles = results.getString("roleme_roles");
+
+                    if(roles==null) array = new JSONArray().put(role.getId());
+                    else array = new JSONArray(roles).put(role.getId());
+
+                    results.updateString("roleme_roles", array.toString());
+                    results.updateRow();
+                    return true;
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateString("roleme_roles", new JSONArray().put(role.getId()).toString());
+                    results.insertRow();
+                    return true;
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return false;
+        }
+    }
+
+    public boolean removeRolemeRole(Guild guild, Role role)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            String roles;
+            JSONArray array;
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, roleme_roles FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    roles = results.getString("roleme_roles");
+
+                    if(!(roles == null))
+                    {
+                        array = new JSONArray(roles);
+
+                        for(int i = 0; i<array.length(); i++)
+                        {
+                            if(array.get(i).toString().equals(role.getId()))
+                            {
+                                array.remove(i);
+                                results.updateString("roleme_roles", array.length()<0 ? null : array.toString());
                                 results.updateRow();
                                 return true;
                             }

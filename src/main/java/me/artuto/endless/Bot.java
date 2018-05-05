@@ -129,7 +129,7 @@ public class Bot extends ListenerAdapter
                 new Cat(config), new Choose(), new Dog(config), new GiphyGif(config), new Profile(pdm), new Say(), new Tag(tdm),
 
                 //Utils
-                new GoogleSearch(), new TimeFor(pdm), new Translate(config));
+                new GoogleSearch(), new Roleme(gsdm), new TimeFor(pdm), new Translate(config));
 
         Endless.LOG.info("Starting JDA...");
 
