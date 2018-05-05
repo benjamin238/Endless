@@ -19,6 +19,7 @@ package me.artuto.endless.handlers;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.data.BlacklistDataManager;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,8 @@ import org.slf4j.LoggerFactory;
 
 public class BlacklistHandler
 {
-    private static final Logger LOG = LoggerFactory.getLogger("Blacklisted Users");
-    private static BlacklistDataManager db;
+    private final Logger LOG = LoggerFactory.getLogger("Blacklisted Users");
+    private BlacklistDataManager db;
 
     public BlacklistHandler(BlacklistDataManager db)
     {
@@ -39,18 +40,24 @@ public class BlacklistHandler
 
     public boolean handleBlacklist(CommandEvent event)
     {
+        Guild guild = event.getGuild();
         User user = event.getAuthor();
 
         if(event.isOwner()) return true;
-        else
+        else if(db.isBlacklisted(user.getIdLong()))
         {
-            if(db.isUserBlacklisted(user))
-            {
-                LOG.info("A Blacklisted user executed a command: "+user.getName()+"#"+user.getDiscriminator()+" (ID: "+user.getId()+")");
-                event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
-                return false;
-            }
-            else return true;
+            LOG.info("A Blacklisted user executed a command: "+user.getName()+"#"+user.getDiscriminator()+" (ID: "+user.getId()+")");
+            event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
+            return false;
         }
+        else if(db.isBlacklisted(guild.getIdLong()))
+        {
+            LOG.info("Command executed in blacklisted guild: "+guild.getName()+" (ID: "+guild.getId()+")");
+            event.replyError("I'm sorry, but the owner of this bot has blocked this guild from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
+            guild.leave().queue();
+            return false;
+        }
+
+        return true;
     }
 }

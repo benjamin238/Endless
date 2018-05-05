@@ -89,6 +89,7 @@ public class Bot extends ListenerAdapter
         client.setGuildSettingsManager(new ClientGSDM(db, gsdm));
         client.setScheduleExecutor(loader.cmdThread);
         client.setListener(new CommandLogging());
+        client.setLinkedCacheSize(6);
 
         if(maintenance)
         {

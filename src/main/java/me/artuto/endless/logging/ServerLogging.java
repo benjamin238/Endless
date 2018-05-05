@@ -26,6 +26,7 @@ import me.artuto.endless.tempdata.MessagesLogging;
 import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.IgnoreUtils;
+import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -70,21 +71,16 @@ public class ServerLogging extends ListenerAdapter
         TextChannel serverlog = db.getServerlogChannel(guild);
         TextChannel welcome = db.getWelcomeChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-        User newmember = event.getMember().getUser();
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+        User newMember = event.getMember().getUser();
         String msg = db.getWelcomeMessage(guild);
-        parser.clear().put("user", newmember).put("guild", guild).put("channel", welcome);
+        parser.clear().put("user", newMember).put("guild", guild).put("channel", welcome);
 
         if(!(serverlog == null))
         {
             if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
-                serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Join]:` :inbox_tray: :bust_in_silhouette: **"+newmember.getName()+"**#**"+newmember.getDiscriminator()+"** ("+newmember.getId()+") joined the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+                serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Join]:` :inbox_tray: :bust_in_silhouette: **"+newMember.getName()+"**#**"+newMember.getDiscriminator()+"** ("+newMember.getId()+") joined the guild! User count: **"+guild.getMembers().size()+"** members").queue();
         }
 
         if(!(welcome == null) && !(msg == null))
@@ -102,14 +98,9 @@ public class ServerLogging extends ListenerAdapter
         TextChannel serverlog = db.getServerlogChannel(guild);
         TextChannel leave = db.getLeaveChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-        User odMember = event.getMember().getUser();
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+        User oldMember = event.getMember().getUser();
         String msg = db.getLeaveMessage(guild);
-        parser.clear().put("user", odMember).put("guild", guild).put("channel", leave);
+        parser.clear().put("user", oldMember).put("guild", guild).put("channel", leave);
 
         if(!(serverlog == null))
         {
@@ -119,7 +110,7 @@ public class ServerLogging extends ListenerAdapter
             if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
-                serverlog.sendMessage("`["+hour+":"+min+":"+sec+"] [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+odMember.getName()+"**#**"+odMember.getDiscriminator()+"** ("+odMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+                serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldMember.getName()+"**#**"+oldMember.getDiscriminator()+"** ("+oldMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
         }
 
         if(!(leave == null) && !(msg == null))
@@ -152,13 +143,7 @@ public class ServerLogging extends ListenerAdapter
         TextChannel tc = db.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         Message newmsg = event.getMessage();
-        String title;
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
         StringBuilder oldContent = new StringBuilder();
         StringBuilder newContent = new StringBuilder();
 
@@ -178,7 +163,7 @@ public class ServerLogging extends ListenerAdapter
                 for(Message.Attachment att : newmsg.getAttachments())
                     newContent.append(att.getUrl()).append("\n");
 
-                title = "`["+hour+":"+min+":"+sec+"] [Message Edited]:` :pencil2: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was edited in "+message.getTextChannel().getAsMention()+":";
+                String title = "`"+TimeUtils.getTimeAndDate()+" [Message Edited]:` :pencil2: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was edited in "+message.getTextChannel().getAsMention()+":";
 
                 builder.addField("From:", oldContent.toString(), false);
                 builder.addField("To:", newContent.toString(), false);
@@ -201,13 +186,7 @@ public class ServerLogging extends ListenerAdapter
         Guild guild = event.getGuild();
         TextChannel tc = db.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
-        String title;
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
         StringBuilder sb = new StringBuilder();
 
         if(!(message.getContentRaw().equals("No cached message")) && !(tc == null) && !(message.getAuthor().isBot()))
@@ -223,7 +202,7 @@ public class ServerLogging extends ListenerAdapter
                 for(Message.Attachment att : message.getAttachments())
                     sb.append(att.getUrl()).append("\n");
 
-                title = "`["+hour+":"+min+":"+sec+"] [Message Deleted]:` :wastebasket: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was deleted in "+message.getTextChannel().getAsMention()+":";
+                String title = "`"+TimeUtils.getTimeAndDate()+" [Message Deleted]:` :wastebasket: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was deleted in "+message.getTextChannel().getAsMention()+":";
 
                 builder.setDescription(sb.toString());
                 builder.setFooter("Message ID: "+message.getId(), null);
@@ -240,7 +219,7 @@ public class ServerLogging extends ListenerAdapter
         List<Guild> guilds = event.getUser().getMutualGuilds();
         EmbedBuilder builder = new EmbedBuilder();
         User user = event.getUser();
-        String title = "`[Avatar Update]:` :frame_photo: **"+user.getName()+"#"+user.getDiscriminator()+"** changed their avatar: ";
+        String title = "`"+TimeUtils.getTimeAndDate()+" [Avatar Update]:` :frame_photo: **"+user.getName()+"#"+user.getDiscriminator()+"** changed their avatar: ";
 
         if(!(guilds.isEmpty()) && !(user.isBot()))
         {
@@ -278,11 +257,6 @@ public class ServerLogging extends ListenerAdapter
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelJoined();
         User user = event.getMember().getUser();
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         if(!(tc == null) && !(user.isBot()))
         {
@@ -292,7 +266,7 @@ public class ServerLogging extends ListenerAdapter
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Join]:`  **"+user.getName()+"#"+user.getDiscriminator()+"** has joined a Voice Channel: **"+vc.getName()+"** (ID: "+vc.getId()+")").queue();
+                tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Join]:`  **"+user.getName()+"#"+user.getDiscriminator()+"** has joined a Voice Channel: **"+vc.getName()+"** (ID: "+vc.getId()+")").queue();
         }
     }
 
@@ -305,11 +279,6 @@ public class ServerLogging extends ListenerAdapter
         VoiceChannel vcold = event.getChannelLeft();
         VoiceChannel vcnew = event.getChannelJoined();
         User user = event.getMember().getUser();
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         if(!(tc == null) && !(user.isBot()))
         {
@@ -319,7 +288,7 @@ public class ServerLogging extends ListenerAdapter
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Move]:` **"+user.getName()+"#"+user.getDiscriminator()+"** switched between Voice Channels: From: **"+vcold.getName()+"** To: **"+vcnew.getName()+"**").queue();
+                tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Move]:` **"+user.getName()+"#"+user.getDiscriminator()+"** switched between Voice Channels: From: **"+vcold.getName()+"** To: **"+vcnew.getName()+"**").queue();
         }
     }
 
@@ -331,11 +300,6 @@ public class ServerLogging extends ListenerAdapter
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelLeft();
         User user = event.getMember().getUser();
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         if(!(tc == null) && !(user.isBot()))
         {
@@ -345,7 +309,7 @@ public class ServerLogging extends ListenerAdapter
             if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Voice Left]:` **"+user.getName()+"#"+user.getDiscriminator()+"** left a Voice Channel: **"+vc.getName()+"**").queue();
+                tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Left]:` **"+user.getName()+"#"+user.getDiscriminator()+"** left a Voice Channel: **"+vc.getName()+"**").queue();
         }
     }
 
@@ -356,11 +320,6 @@ public class ServerLogging extends ListenerAdapter
         TextChannel tc = db.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User user = event.getUser();
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
 
         if(!(tc == null))
         {
@@ -369,8 +328,7 @@ public class ServerLogging extends ListenerAdapter
             else
             {
                 if(guild.getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS))
-
-                tc.sendMessage(":hammer: `["+hour+":"+min+":"+sec+"] [User Banned]:` **"+user.getName()+"#"+user.getDiscriminator()+"** has been banned!\n" +
+                    tc.sendMessage(":hammer: `"+TimeUtils.getTimeAndDate()+" [User Banned]:` **"+user.getName()+"#"+user.getDiscriminator()+"** has been banned!\n" +
                         "`[Reason]:` "+getBanReason(user, guild)).queue();
 
             }

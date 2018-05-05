@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
@@ -28,7 +29,7 @@ import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class BlacklistUsers extends EndlessCommand
@@ -54,13 +55,9 @@ public class BlacklistUsers extends EndlessCommand
         String prefix = event.getClient().getPrefix();
 
         if(event.getArgs().isEmpty())
-        {
             event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"blacklistuser add`: Adds a user ID to the blacklisted users list.\n"+"- `"+prefix+"blacklistuser remove`: Removes a user ID from the blacklisted users list.\n"+"- `"+prefix+"blacklistuser list`: Displays blacklisted users.\n"+"- `"+prefix+"blacklistuser check`: Checks if a user ID is blacklisted.");
-        }
         else if(!(event.getArgs().contains("add")) || !(event.getArgs().contains("remove")) || !(event.getArgs().contains("list") || !(event.getArgs().contains("check"))))
-        {
             event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"blacklistuser add`: Adds a user ID to the blacklisted users list.\n"+"- `"+prefix+"blacklistuser remove`: Removes a user ID from the blacklisted users list.\n"+"- `"+prefix+"blacklistuser list`: Displays blacklisted users.\n"+"- `"+prefix+"blacklistuser check`: Checks if a user ID is blacklisted.");
-        }
     }
 
     private class Add extends EndlessCommand
@@ -98,7 +95,7 @@ public class BlacklistUsers extends EndlessCommand
                 return;
             }
 
-            if(db.isUserBlacklisted(user))
+            if(db.isBlacklisted(user.getIdLong()))
             {
                 event.replyError("That user is already on the blacklist!");
                 return;
@@ -106,7 +103,7 @@ public class BlacklistUsers extends EndlessCommand
 
             try
             {
-                db.addBlacklistUser(user);
+                db.addBlacklist(user.getIdLong(), null, Const.BlacklistType.USER);
                 event.replySuccess("Added **"+user.getName()+"#"+user.getDiscriminator()+"** to the blacklist.");
             }
             catch(Exception e)
@@ -153,7 +150,7 @@ public class BlacklistUsers extends EndlessCommand
 
             try
             {
-                if(!(db.isUserBlacklisted(user)))
+                if(!(db.isBlacklisted(user.getIdLong())))
                 {
                     event.replyError("That ID isn't in the blacklist!");
                     return;
@@ -167,7 +164,7 @@ public class BlacklistUsers extends EndlessCommand
 
             try
             {
-                db.removeBlacklistedUser(user);
+                db.removeBlacklist(user.getIdLong());
                 event.replySuccess("Removed **"+user.getName()+"#"+user.getDiscriminator()+"** from the blacklist.");
             }
             catch(Exception e)
@@ -193,27 +190,21 @@ public class BlacklistUsers extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            Set<User> list;
+            List<User> list;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
 
             if(event.isFromType(ChannelType.PRIVATE))
-            {
                 color = Color.decode("#33ff00");
-            }
             else
-            {
                 color = event.getGuild().getSelfMember().getColor();
-            }
 
             try
             {
-                list = db.getBlacklistedUsersList(event.getJDA());
+                list = db.getBlacklistedUsers(event.getJDA());
 
                 if(list.isEmpty())
-                {
                     event.reply("The list is empty!");
-                }
                 else
                 {
                     builder.setDescription(list.stream().map(u -> u.getName()+"#"+u.getDiscriminator()+" (ID: "+u.getId()+")").collect(Collectors.joining("\n")));
@@ -265,14 +256,10 @@ public class BlacklistUsers extends EndlessCommand
 
             try
             {
-                if(!(db.isUserBlacklisted(user)))
-                {
+                if(!(db.isBlacklisted(user.getIdLong())))
                     event.replySuccess("**"+user.getName()+"#"+user.getDiscriminator()+"** isn't blacklisted!");
-                }
                 else
-                {
                     event.replySuccess("**"+user.getName()+"#"+user.getDiscriminator()+"** is blacklisted!");
-                }
             }
             catch(Exception e)
             {

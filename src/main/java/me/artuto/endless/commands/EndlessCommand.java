@@ -53,7 +53,6 @@ public abstract class EndlessCommand extends Command
                 event.replyError(String.format("I need the %s permission in this Guild to execute this command!", p.getName()));
                 return;
             }
-
             break;
         }
 
@@ -70,7 +69,6 @@ public abstract class EndlessCommand extends Command
                 event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
                 return;
             }
-
             break;
         }
 

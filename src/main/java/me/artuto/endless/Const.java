@@ -31,4 +31,11 @@ public class Const
     public static String ARTUTO_ALT_ID = "302534881370439681";
     public static String MAIN_GUILD = "312776731704426496";
     public static String GUILD_TESTING = "323954859713888256";
+
+    // Enums
+    public enum BlacklistType
+    {
+        GUILD,
+        USER;
+    }
 }

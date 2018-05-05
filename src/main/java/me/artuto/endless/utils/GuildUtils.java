@@ -21,6 +21,7 @@ import me.artuto.endless.data.DatabaseManager;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
@@ -72,7 +73,7 @@ public class GuildUtils
 
     public static boolean isBadGuild(Guild guild)
     {
-        long botCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
+        long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
 
         if(db.hasSettings(guild)) return false;
         else if(botCount>20 && ((double) botCount/guild.getMembers().size())>.65) return true;

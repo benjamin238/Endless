@@ -82,17 +82,25 @@ public class GuildEvents extends ListenerAdapter
     {
         Guild guild = event.getGuild();
         User owner = guild.getOwner().getUser();
-        LoggerFactory.getLogger("ogging").info("[GUILD JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
-        long botCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
-        long userCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> !(u.isBot())).count();
+        long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
+        long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
         long totalCount = guild.getMembers().size();
         GuildUtils.checkBadGuild(guild);
         TextChannel tc = event.getJDA().getTextChannelById(config.getBotlogChannelId());
-        TextChannel defaultTc = FinderUtil.getDefaultChannel(guild);
+
+        if(bdm.isBlacklisted(guild.getIdLong()) || bdm.isBlacklisted(owner.getIdLong()))
+        {
+            LoggerFactory.getLogger("Logging").info("[BLACKLISTED GUILD/OWNER JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n" +
+                    "Owner: "+owner.getName()+"#"+owner.getDiscriminator()+" (ID: "+owner.getId()+")");
+            guild.leave().queue();
+            return;
+        }
 
         if(!(GuildUtils.isBadGuild(guild)) && config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
         {
-            tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+"`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
+            tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+
+                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
+            LoggerFactory.getLogger("Logging").info("[GUILD JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
         }
     }
 
@@ -102,8 +110,8 @@ public class GuildEvents extends ListenerAdapter
         Guild guild = event.getGuild();
         User owner = guild.getOwner().getUser();
         LoggerFactory.getLogger("Logging").info("[GUILD LEFT]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
-        long botCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
-        long userCount = guild.getMembers().stream().map(m -> m.getUser()).filter(u -> !(u.isBot())).count();
+        long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
+        long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
         long totalCount = guild.getMembers().size();
         TextChannel tc = event.getJDA().getTextChannelById(config.getBotlogChannelId());
         String reason = getReason(guild);
@@ -112,7 +120,7 @@ public class GuildEvents extends ListenerAdapter
         {
             StringBuilder builder = new StringBuilder().append(":outbox_tray: `[Left Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+"`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n");
 
-            if(!(reason == null)) builder.append("`[Reason]:` "+reason);
+            if(!(reason == null)) builder.append("`[Reason]:` ").append(reason);
 
             tc.sendMessage(builder.toString()).queue();
         }
@@ -201,7 +209,7 @@ public class GuildEvents extends ListenerAdapter
             {
                 if(msg.getMentionedUsers().contains(user))
                 {
-                    if(!(user.isBot()))
+                    if(!(user.isBot()) || !(bdm.isBlacklisted(author.getIdLong())))
                     {
                         EmbedBuilder builder = new EmbedBuilder();
 
@@ -211,8 +219,8 @@ public class GuildEvents extends ListenerAdapter
                         builder.setTimestamp(msg.getCreationTime());
                         builder.setColor(event.getMember().getColor());
 
-                        if(!(bdm.isUserBlacklisted(author)))
-                            user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, null));
+
+                        user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue(null, null));
                     }
 
                     if(AfkManager.getMessage(user.getIdLong()) == null) event.getChannel().sendMessage(message).queue();
@@ -230,8 +238,8 @@ public class GuildEvents extends ListenerAdapter
         }
     }
 
-    /**
-     * @Override public void onGuildJoin(GuildJoinEvent event)
+     /** @Override
+     * public void onGuildJoin(GuildJoinEvent event)
      * {
      * Guild guild = event.getGuild();
      * User owner = event.getJDA().getUserById(config.getOwnerId());
