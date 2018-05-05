@@ -162,7 +162,9 @@ public class Roleme extends EndlessCommand
                     return;
                 }
 
-                if(db.addRolemeRole(guild, role))
+                if(!(event.getSelfMember().canInteract(role)))
+                    event.replyError("I can't interact with that role!");
+                else if(db.addRolemeRole(guild, role))
                     event.replySuccess("Successfully added the role *"+role.getName()+"* to the RoleMe roles list.");
                 else
                     event.replyError("Something has gone wrong while adding the role to the RoleMe roles list, please contact the bot owner.");
