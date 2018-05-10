@@ -17,33 +17,29 @@
 
 package me.artuto.endless.utils;
 
+import me.artuto.endless.Bot;
 import me.artuto.endless.data.DatabaseManager;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.*;
 
 public class GuildUtils
 {
-    private static Config config;
-    private static DatabaseManager db;
+    private static Bot bot;
 
-    public GuildUtils(Config config, DatabaseManager db)
+    public GuildUtils(Bot bot)
     {
-        this.db = db;
-        this.config = config;
+        GuildUtils.bot = bot;
     }
 
     public static void leaveBadGuilds(JDA jda)
     {
-        User owner = jda.getUserById(config.getOwnerId());
+        User owner = jda.getUserById(bot.config.getOwnerId());
         jda.getGuilds().stream().filter(g ->
         {
-            if(db.hasSettings(g)) return false;
+            if(bot.db.hasSettings(g)) return false;
 
-            long botCount = g.getMembers().stream().map(m -> m.getUser()).filter(u -> u.isBot()).count();
+            long botCount = g.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
             if(botCount>20 && ((double) botCount/g.getMembers().size())>.50) return true;
 
             /**if(isABotListGuild(g))
@@ -75,9 +71,14 @@ public class GuildUtils
     {
         long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
 
-        if(db.hasSettings(guild)) return false;
+        if(bot.db.hasSettings(guild)) return false;
         else if(botCount>20 && ((double) botCount/guild.getMembers().size())>.65) return true;
         else return false;
+    }
+
+    public static Role getMutedRole(Guild guild)
+    {
+        return guild.getRolesByName("Muted", true).stream().findFirst().orElse(bot.gsdm.getMutedRole(guild));
     }
 
     /**public static boolean isABotListGuild(Guild guild)

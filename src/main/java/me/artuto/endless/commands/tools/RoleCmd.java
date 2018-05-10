@@ -46,7 +46,7 @@ public class RoleCmd extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guild = true;
+        this.guildCommand = true;
     }
 
     @Override
@@ -126,7 +126,7 @@ public class RoleCmd extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.ownerCommand = false;
-            this.guild = true;
+            this.guildCommand = true;
         }
 
         @Override
@@ -211,7 +211,7 @@ public class RoleCmd extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.ownerCommand = false;
-            this.guild = true;
+            this.guildCommand = true;
         }
 
         @Override

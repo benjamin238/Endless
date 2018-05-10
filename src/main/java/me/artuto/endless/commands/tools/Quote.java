@@ -45,7 +45,7 @@ public class Quote extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY};
         this.userPerms = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY};
         this.ownerCommand = false;
-        this.guild = true;
+        this.guildCommand = true;
     }
 
     protected void executeCommand(CommandEvent event)

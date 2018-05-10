@@ -50,7 +50,7 @@ public class UserInfo extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guild = true;
+        this.guildCommand = true;
     }
 
     @Override

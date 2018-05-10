@@ -38,4 +38,11 @@ public class Const
         GUILD,
         USER;
     }
+    public enum PunishmentType
+    {
+        BAN,
+        MUTE,
+        TEMPBAN,
+        TEMPMUTE;
+    }
 }

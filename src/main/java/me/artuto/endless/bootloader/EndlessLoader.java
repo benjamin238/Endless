@@ -19,6 +19,7 @@ package me.artuto.endless.bootloader;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import io.sentry.Sentry;
+import me.artuto.endless.Bot;
 import me.artuto.endless.loader.Config;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -28,6 +29,9 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class EndlessLoader
 {
+    // Bot
+    private Bot bot;
+
     // Data Sources
     public Config config;
     public DatabaseLoader dbLoader;
@@ -48,6 +52,11 @@ public class EndlessLoader
     // Waiters
     public EventWaiter waiter;
 
+    public EndlessLoader(Bot bot)
+    {
+        this.bot = bot;
+    }
+
     public void preLoad()
     {
         config = new StartupChecker().checkConfig();
@@ -58,7 +67,7 @@ public class EndlessLoader
 
     public void databaseLoad(boolean maintenance)
     {
-        dbLoader = new DatabaseLoader(config).initialize(maintenance);
+        dbLoader = new DatabaseLoader(config).initialize(maintenance, bot);
     }
 
     public void threadLoad()

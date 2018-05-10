@@ -55,7 +55,7 @@ public class GiphyGif extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
         this.userPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.ownerCommand = false;
-        this.guild = false;
+        this.guildCommand = false;
     }
 
     @Override
@@ -139,7 +139,7 @@ public class GiphyGif extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.userPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.ownerCommand = false;
-            this.guild = false;
+            this.guildCommand = false;
         }
 
         protected void executeCommand(CommandEvent event)

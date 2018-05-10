@@ -43,7 +43,7 @@ public class Hackban extends EndlessCommand
         this.botPerms = new Permission[]{Permission.BAN_MEMBERS};
         this.userPerms = new Permission[]{Permission.BAN_MEMBERS};
         this.ownerCommand = false;
-        this.guild = true;
+        this.guildCommand = true;
     }
 
     @Override

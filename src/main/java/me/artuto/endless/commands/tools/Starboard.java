@@ -49,7 +49,7 @@ public class Starboard extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.ownerCommand = false;
-        this.guild = true;
+        this.guildCommand = true;
     }
 
     @Override
@@ -178,7 +178,7 @@ public class Starboard extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guild = true;
+            this.guildCommand = true;
         }
 
         @Override
@@ -215,7 +215,7 @@ public class Starboard extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
-            this.guild = true;
+            this.guildCommand = true;
         }
 
         @Override

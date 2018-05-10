@@ -30,7 +30,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 public abstract class EndlessCommand extends Command
 {
-    protected boolean guild;
+    protected boolean guildCommand;
     protected Permission[] botPerms;
     protected Permission[] userPerms;
 
@@ -40,7 +40,7 @@ public abstract class EndlessCommand extends Command
         Member selfMember = event.getSelfMember();
         TextChannel tc = event.getTextChannel();
 
-        if(guild && !(event.isFromType(ChannelType.TEXT)))
+        if(guildCommand && !(event.isFromType(ChannelType.TEXT)))
         {
             event.replyError("This command cannot be used in Direct messages!");
             return;

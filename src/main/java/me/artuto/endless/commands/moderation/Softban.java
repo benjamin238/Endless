@@ -40,12 +40,12 @@ import java.util.List;
  * @author Artuto
  */
 
-public class SoftBan extends EndlessCommand
+public class Softban extends EndlessCommand
 {
     private final ModLogging modlog;
     private final Config config;
 
-    public SoftBan(ModLogging modlog, Config config)
+    public Softban(ModLogging modlog, Config config)
     {
         this.modlog = modlog;
         this.config = config;
@@ -56,7 +56,7 @@ public class SoftBan extends EndlessCommand
         this.botPerms = new Permission[]{Permission.BAN_MEMBERS};
         this.userPerms = new Permission[]{Permission.BAN_MEMBERS};
         this.ownerCommand = false;
-        this.guild = true;
+        this.guildCommand = true;
     }
 
     @Override

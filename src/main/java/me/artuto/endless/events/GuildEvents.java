@@ -20,20 +20,26 @@ package me.artuto.endless.events;
 import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import com.jagrosh.jagtag.libraries.*;
-import me.artuto.endless.data.BlacklistDataManager;
-import me.artuto.endless.data.GuildSettingsDataManager;
-import me.artuto.endless.data.TagDataManager;
+import me.artuto.endless.Bot;
+import me.artuto.endless.Const;
 import me.artuto.endless.entities.ImportedTag;
-import me.artuto.endless.loader.Config;
 import me.artuto.endless.tempdata.AfkManager;
 import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.audit.ActionType;
+import net.dv8tion.jda.core.audit.AuditLogEntry;
+import net.dv8tion.jda.core.audit.AuditLogKey;
+import net.dv8tion.jda.core.audit.AuditLogOption;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -47,18 +53,12 @@ import java.util.List;
 
 public class GuildEvents extends ListenerAdapter
 {
-    private final Config config;
-    private final TagDataManager tdm;
-    private final BlacklistDataManager bdm;
-    private final GuildSettingsDataManager ldm;
+    private final Bot bot;
     private final Parser parser;
 
-    public GuildEvents(Config config, TagDataManager tdm, GuildSettingsDataManager ldm, BlacklistDataManager bdm)
+    public GuildEvents(Bot bot)
     {
-        this.config = config;
-        this.tdm = tdm;
-        this.ldm = ldm;
-        this.bdm = bdm;
+        this.bot = bot;
         this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
     }
 
@@ -86,9 +86,9 @@ public class GuildEvents extends ListenerAdapter
         long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
         long totalCount = guild.getMembers().size();
         GuildUtils.checkBadGuild(guild);
-        TextChannel tc = event.getJDA().getTextChannelById(config.getBotlogChannelId());
+        TextChannel tc = event.getJDA().getTextChannelById(bot.config.getBotlogChannelId());
 
-        if(bdm.isBlacklisted(guild.getIdLong()) || bdm.isBlacklisted(owner.getIdLong()))
+        if(bot.bdm.isBlacklisted(guild.getIdLong()) || bot.bdm.isBlacklisted(owner.getIdLong()))
         {
             LoggerFactory.getLogger("Logging").info("[BLACKLISTED GUILD/OWNER JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n" +
                     "Owner: "+owner.getName()+"#"+owner.getDiscriminator()+" (ID: "+owner.getId()+")");
@@ -96,7 +96,7 @@ public class GuildEvents extends ListenerAdapter
             return;
         }
 
-        if(!(GuildUtils.isBadGuild(guild)) && config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
+        if(!(GuildUtils.isBadGuild(guild)) && bot.config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
         {
             tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+
                     "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
@@ -113,10 +113,10 @@ public class GuildEvents extends ListenerAdapter
         long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
         long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
         long totalCount = guild.getMembers().size();
-        TextChannel tc = event.getJDA().getTextChannelById(config.getBotlogChannelId());
+        TextChannel tc = event.getJDA().getTextChannelById(bot.config.getBotlogChannelId());
         String reason = getReason(guild);
 
-        if(config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
+        if(bot.config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
         {
             StringBuilder builder = new StringBuilder().append(":outbox_tray: `[Left Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+"`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n");
 
@@ -133,8 +133,8 @@ public class GuildEvents extends ListenerAdapter
         User author = event.getAuthor();
         Message msg = event.getMessage();
         String message;
-        List<ImportedTag> importedT = tdm.getImportedTagsForGuild(event.getGuild().getIdLong());
-        TextChannel modlog = ldm.getModlogChannel(event.getGuild());
+        List<ImportedTag> importedT = bot.tdm.getImportedTagsForGuild(event.getGuild().getIdLong());
+        TextChannel modlog = bot.gsdm.getModlogChannel(event.getGuild());
 
         if(!(msg.getAttachments().isEmpty()))
         {
@@ -172,7 +172,7 @@ public class GuildEvents extends ListenerAdapter
             for(ImportedTag tag : importedT)
             {
                 String name = tag.getName();
-                String command = config.getPrefix().toLowerCase()+name;
+                String command = bot.config.getPrefix().toLowerCase()+name;
                 String tagargs;
                 String[] args;
 
@@ -196,7 +196,7 @@ public class GuildEvents extends ListenerAdapter
 
         if(AfkManager.isAfk(author.getIdLong()))
         {
-            author.openPrivateChannel().queue(pc -> pc.sendMessage(config.getDoneEmote()+" I've removed your AFK status.").queue(null, (e) -> LOG.warn("I was not able to DM "+author.getName()+"#"+author.getDiscriminator()+" about removing its AFK status.")));
+            author.openPrivateChannel().queue(pc -> pc.sendMessage(bot.config.getDoneEmote()+" I've removed your AFK status.").queue(null, (e) -> LOG.warn("I was not able to DM "+author.getName()+"#"+author.getDiscriminator()+" about removing its AFK status.")));
             AfkManager.unsetAfk(author.getIdLong());
         }
 
@@ -209,7 +209,7 @@ public class GuildEvents extends ListenerAdapter
             {
                 if(msg.getMentionedUsers().contains(user))
                 {
-                    if(!(user.isBot()) || !(bdm.isBlacklisted(author.getIdLong())))
+                    if(!(user.isBot()) || !(bot.bdm.isBlacklisted(author.getIdLong())))
                     {
                         EmbedBuilder builder = new EmbedBuilder();
 
@@ -235,6 +235,51 @@ public class GuildEvents extends ListenerAdapter
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event)
+    {
+        Guild guild = event.getGuild();
+
+        if(event.getRoles().contains(GuildUtils.getMutedRole(guild)))
+        {
+            if(bot.pdm.addPunishment(event.getUser().getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE))
+                bot.modlog.logMute(null, event.getMember(), "[no reason specified]",
+                        guild, FinderUtil.getDefaultChannel(guild));
+        }
+    }
+
+    @Override
+    public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event)
+    {
+        Guild guild = event.getGuild();
+
+        if(event.getRoles().contains(GuildUtils.getMutedRole(guild)))
+        {
+            if(bot.pdm.removePunishment(event.getUser().getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE))
+                bot.modlog.logUnmute(null, event.getMember(), "[no reason specified]",
+                        guild, FinderUtil.getDefaultChannel(guild));
+        }
+    }
+
+    @Override
+    public void onGuildMemberJoin(GuildMemberJoinEvent event)
+    {
+        if(!(bot.pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE)==null))
+        {
+            Role mutedRole = GuildUtils.getMutedRole(event.getGuild());
+
+            if(!(mutedRole==null) && event.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)
+                    && event.getGuild().getSelfMember().canInteract(mutedRole))
+            {
+                
+            }
+        }
+        else if(!(bot.pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE)==null))
+        {
+
         }
     }
 

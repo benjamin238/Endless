@@ -19,6 +19,8 @@ package me.artuto.endless.logging;
 
 import me.artuto.endless.Messages;
 import me.artuto.endless.data.GuildSettingsDataManager;
+import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
@@ -202,6 +204,61 @@ public class ModLogging
                 if(!(file.exists())) tc.sendMessage(message).queue();
                 else
                     tc.sendFile(file, "cleared.txt", new MessageBuilder().append(message).build()).queue((s) -> file.delete());
+            }
+        }
+    }
+
+    public void logMute(User author, Member target, String reason, Guild guild, TextChannel channel)
+    {
+        TextChannel tc = db.getModlogChannel(guild);
+
+        if(!(tc == null))
+        {
+            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+            else
+            {
+                if(author==null)
+                    tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Mute]:` :mute: **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** " +
+                            "("+target.getUser().getId()+") has been muted.\n"+"`[Reason]:` "+reason).queue();
+                else
+                    tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Mute]:` :mute: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") " +
+                            "muted **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
+            }
+        }
+    }
+
+    public void logTempMute(User author, Member target, String reason, Guild guild, TextChannel channel, int time)
+    {
+        TextChannel tc = db.getModlogChannel(guild);
+        String formattedTime = FormatUtil.formatTimeFromSeconds(time);
+
+        if(!(tc == null))
+        {
+            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+            else
+                tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Mute]:` :mute: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") " +
+                        "muted **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+") for "+formattedTime+"\n"+"`[Reason]:` "+reason).queue();
+        }
+    }
+
+    public void logUnmute(User author, Member target, String reason, Guild guild, TextChannel channel)
+    {
+        TextChannel tc = db.getModlogChannel(guild);
+
+        if(!(tc == null))
+        {
+            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+            else
+            {
+                if(author==null)
+                    tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Unmute]:` :speaker: **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** " +
+                            "("+target.getUser().getId()+") has been unmuted.\n"+"`[Reason]:` "+reason).queue();
+                else
+                    tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Unmute]:` :speaker: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unmuted " +
+                            "**"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
             }
         }
     }

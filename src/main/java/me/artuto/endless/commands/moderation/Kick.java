@@ -56,7 +56,7 @@ public class Kick extends EndlessCommand
         this.botPerms = new Permission[]{Permission.KICK_MEMBERS};
         this.userPerms = new Permission[]{Permission.KICK_MEMBERS};
         this.ownerCommand = false;
-        this.guild = true;
+        this.guildCommand = true;
     }
 
     @Override

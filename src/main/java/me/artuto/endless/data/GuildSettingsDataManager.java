@@ -686,4 +686,57 @@ public class GuildSettingsDataManager
             return false;
         }
     }
+
+    public Role getMutedRole(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.closeOnCompletion();
+            Role role;
+            try(ResultSet results = statement.executeQuery(String.format("SELECT muted_role FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            {
+                if(results.next()) role = guild.getRoleById(results.getLong("muted_role"));
+                else role = null;
+            }
+            return role;
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return null;
+        }
+    }
+
+    public boolean setMutedRole(Guild guild, Role role)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, muted_role FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    results.updateLong("muted_role", role==null?null:role.getIdLong());
+                    results.updateRow();
+                    return true;
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateLong("muted_role", role==null?null:role.getIdLong());
+                    results.insertRow();
+                    return true;
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return false;
+        }
+    }
 }

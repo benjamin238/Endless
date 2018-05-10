@@ -40,6 +40,8 @@ public class Messages
     public static String HACKBAN_ERROR = "An error happened when hackbanning ";
     public static String CLEAR_SUCCESS = "Successfully cleared ";
     public static String CLEAR_ERROR = "An error happened when clearing ";
+    public static String MUTE_SUCCESS = "Successfully muted ";
+    public static String MUTE_ERROR = "An error happened when muting ";
 
     // Warning
     public static String MODLOG_NOPERMISSIONS = "You have a modlog channel configured, but I don't have the required permissions, make sure I have: `Message Read`, `Message Write`, `Send Images` and `Read History`!";

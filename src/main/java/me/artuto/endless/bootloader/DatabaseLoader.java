@@ -18,6 +18,7 @@
 package me.artuto.endless.bootloader;
 
 import ch.qos.logback.classic.Logger;
+import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.data.*;
 import me.artuto.endless.exceptions.DatabaseException;
@@ -41,7 +42,8 @@ public class DatabaseLoader
     private DatabaseManager db;
     private DonatorsDataManager ddm;
     private GuildSettingsDataManager gsdm;
-    private ProfileDataManager pdm;
+    private PunishmentsDataManager pdm;
+    private ProfileDataManager prdm;
     private StarboardDataManager sdm;
     private TagDataManager tdm;
     private ModLogging modlog;
@@ -55,7 +57,7 @@ public class DatabaseLoader
         this.config = config;
     }
 
-    public DatabaseLoader initialize(boolean maintenance)
+    public DatabaseLoader initialize(boolean maintenance, Bot bot)
     {
         LOG.info("Loading Database Managers...");
 
@@ -65,14 +67,15 @@ public class DatabaseLoader
             bdm = new BlacklistDataManager(db);
             ddm = new DonatorsDataManager(db);
             gsdm = new GuildSettingsDataManager(db);
-            pdm = new ProfileDataManager(db);
+            pdm = new PunishmentsDataManager(db);
+            prdm = new ProfileDataManager(db);
             sdm = new StarboardDataManager(db);
             tdm = new TagDataManager(db);
             modlog = new ModLogging(gsdm);
             bHandler = new BlacklistHandler(bdm);
             sHandler = new SpecialCaseHandler();
             categories = new Categories(bHandler, sHandler, maintenance);
-            new GuildUtils(config, db);
+            new GuildUtils(bot);
             return this;
         }
         catch(SQLException e)
@@ -103,7 +106,7 @@ public class DatabaseLoader
 
     public ProfileDataManager getProfileDataManager()
     {
-        return pdm;
+        return prdm;
     }
 
     public StarboardDataManager getStarbordDataManager()
@@ -114,6 +117,11 @@ public class DatabaseLoader
     public TagDataManager getTagDataManager()
     {
         return tdm;
+    }
+
+    public PunishmentsDataManager getPunishmentsDataManager()
+    {
+        return pdm;
     }
 
     public BlacklistHandler getBlacklistHandler()

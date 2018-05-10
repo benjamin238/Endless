@@ -53,7 +53,7 @@ public class Donate extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
-        this.guild = false;
+        this.guildCommand = false;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class Donate extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guild = false;
+            this.guildCommand = false;
         }
 
         @Override
@@ -154,7 +154,7 @@ public class Donate extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guild = false;
+            this.guildCommand = false;
         }
 
         @Override

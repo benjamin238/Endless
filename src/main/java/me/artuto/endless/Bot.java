@@ -27,8 +27,6 @@ import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
 import me.artuto.endless.data.*;
 import me.artuto.endless.events.*;
-import me.artuto.endless.handlers.BlacklistHandler;
-import me.artuto.endless.handlers.SpecialCaseHandler;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.CommandLogging;
 import me.artuto.endless.logging.ModLogging;
@@ -48,8 +46,23 @@ import java.util.Arrays;
 
 public class Bot extends ListenerAdapter
 {
-    private final EndlessLoader loader = new EndlessLoader();
-    public static Config config;
+    private final EndlessLoader loader = new EndlessLoader(this);
+
+    // Config
+    public Config config;
+
+    // Data Managers
+    public BlacklistDataManager bdm;
+    public DatabaseManager db;
+    public DonatorsDataManager ddm;
+    public GuildSettingsDataManager gsdm;
+    public PunishmentsDataManager pdm;
+    public ProfileDataManager prdm;
+    public StarboardDataManager sdm;
+    public TagDataManager tdm;
+
+    // Logging
+    public ModLogging modlog;
 
     public void boot(boolean maintenance) throws LoginException
     {
@@ -60,16 +73,15 @@ public class Bot extends ListenerAdapter
         config = loader.config;
 
         loader.databaseLoad(maintenance);
-        BlacklistDataManager bdm = loader.dbLoader.getBlacklistDataManager();
-        DatabaseManager db = loader.dbLoader.getDatabaseManager();
-        DonatorsDataManager ddm = loader.dbLoader.getDonatorsDataManager();
-        GuildSettingsDataManager gsdm = loader.dbLoader.getGuildSettingsDataManager();
-        ProfileDataManager pdm = loader.dbLoader.getProfileDataManager();
-        StarboardDataManager sdm = loader.dbLoader.getStarbordDataManager();
-        TagDataManager tdm = loader.dbLoader.getTagDataManager();
-        BlacklistHandler bHandler = loader.dbLoader.getBlacklistHandler();
-        SpecialCaseHandler sHandler = loader.dbLoader.getSpecialCaseHandler();
-        ModLogging modlog = loader.dbLoader.getModlog();
+        bdm = loader.dbLoader.getBlacklistDataManager();
+        db = loader.dbLoader.getDatabaseManager();
+        ddm = loader.dbLoader.getDonatorsDataManager();
+        gsdm = loader.dbLoader.getGuildSettingsDataManager();
+        pdm = loader.dbLoader.getPunishmentsDataManager();
+        prdm = loader.dbLoader.getProfileDataManager();
+        sdm = loader.dbLoader.getStarbordDataManager();
+        tdm = loader.dbLoader.getTagDataManager();
+        modlog = loader.dbLoader.getModlog();
 
         loader.threadLoad();
         loader.waiterLoad();
@@ -88,7 +100,7 @@ public class Bot extends ListenerAdapter
         client.setAlternativePrefix("<@310578566695878658>");
         client.setGuildSettingsManager(new ClientGSDM(db, gsdm));
         client.setScheduleExecutor(loader.cmdThread);
-        client.setListener(new CommandLogging());
+        client.setListener(new CommandLogging(this));
         client.setLinkedCacheSize(6);
 
         if(maintenance)
@@ -117,7 +129,7 @@ public class Bot extends ListenerAdapter
                 new Bash(), new BlacklistUsers(bdm), new BotCPanel(), new Eval(config, db, ddm, gsdm, bdm, sdm, tdm, modlog), new Shutdown(),
 
                 //Moderation
-                new Ban(modlog, config), new Clear(modlog, loader.cleanThread), new DBansCheck(config), new Kick(modlog, config), new Hackban(modlog, config), new SoftBan(modlog, config), new Unban(modlog, config),
+                new Ban(modlog, config), new Clear(modlog, loader.cleanThread), new DBansCheck(config), new Kick(modlog, config), new Hackban(modlog, config), new Mute(config, gsdm, modlog, pdm), new Softban(modlog, config), new Unban(modlog, config),
 
                 //Settings
                 new Leave(gsdm), new Prefix(db, gsdm), new ServerSettings(gsdm), new Starboard(gsdm, loader.waiter), new Welcome(gsdm),
@@ -126,10 +138,10 @@ public class Bot extends ListenerAdapter
                 new Afk(), new Avatar(), new GuildInfo(), new Lookup(), new Quote(), new RoleCmd(), new UserInfo(),
 
                 //Fun
-                new Cat(config), new Choose(), new Dog(config), new GiphyGif(config), new Profile(pdm), new Say(), new Tag(tdm),
+                new Cat(config), new Choose(), new Dog(config), new GiphyGif(config), new Profile(prdm), new Say(), new Tag(tdm),
 
                 //Utils
-                new GoogleSearch(), new Roleme(gsdm), new TimeFor(pdm), new Translate(config));
+                new GoogleSearch(), new Roleme(gsdm), new TimeFor(prdm), new Translate(config));
 
         Endless.LOG.info("Starting JDA...");
 
@@ -144,7 +156,7 @@ public class Bot extends ListenerAdapter
             builder.addEventListener(client.build(), new Bot());
         else
             builder.addEventListener(loader.waiter, client.build(), new BotEvents(config, loader.botlogThread, false, db),
-                    new ServerLogging(gsdm), new GuildEvents(config, tdm, gsdm, bdm),
+                    new ServerLogging(gsdm), new GuildEvents(this),
                     new StarboardEvents(gsdm, sdm, loader.starboardThread), new UserEvents(config));
 
         builder.buildAsync();
