@@ -138,7 +138,7 @@ public class Bot extends ListenerAdapter
                 new Ban(modlog, config), new Clear(modlog, loader.cleanThread), new DBansCheck(config), new Kick(modlog, config), new Hackban(modlog, config), new Mute(config, gsdm, modlog, pdm), new Softban(modlog, config), new Unban(modlog, config),
 
                 //Server Settings
-                new Leave(gsdm), new Prefix(db, gsdm), new ServerSettings(gsdm), new Setup(this), new Starboard(gsdm, loader.waiter), new Welcome(gsdm),
+                new Leave(gsdm), new Prefix(db, gsdm), new ServerSettings(this), new Setup(this), new Starboard(gsdm, loader.waiter), new Welcome(gsdm),
 
                 //Tools
                 new Afk(), new Avatar(), new GuildInfo(), new Lookup(), new Quote(), new RoleCmd(), new UserInfo(),

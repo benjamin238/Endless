@@ -18,11 +18,12 @@
 package me.artuto.endless.commands.severconfig;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.GuildSettingsDataManager;
+import me.artuto.endless.entities.GuildSettings;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -34,11 +35,11 @@ import java.util.List;
 
 public class ServerSettings extends EndlessCommand
 {
-    private final GuildSettingsDataManager db;
+    private final Bot bot;
 
-    public ServerSettings(GuildSettingsDataManager db)
+    public ServerSettings(Bot bot)
     {
-        this.db = db;
+        this.bot = bot;
         this.name = "config";
         this.children = new Command[]{new ModLog(), new ServerLog(), new Welcome(), new Leave()};
         this.aliases = new String[]{"settings"};
@@ -54,10 +55,12 @@ public class ServerSettings extends EndlessCommand
     protected void executeCommand(CommandEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel modlog = db.getModlogChannel(guild);
-        TextChannel serverlog = db.getServerlogChannel(guild);
-        TextChannel welcome = db.getWelcomeChannel(guild);
-        TextChannel leave = db.getLeaveChannel(guild);
+        GuildSettings settings = bot.db.getSettings(guild);
+        TextChannel modlog = guild.getTextChannelById(settings.getModlog());
+        TextChannel serverlog = guild.getTextChannelById(settings.getServerlog());
+        TextChannel welcome = guild.getTextChannelById(settings.getWelcomeChannel());
+        TextChannel leave = guild.getTextChannelById(settings.getLeaveChannel());
+        String welcomeMsg = settings.getWelcomeMsg();
         EmbedBuilder builder = new EmbedBuilder();
         String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
 
@@ -80,7 +83,7 @@ public class ServerSettings extends EndlessCommand
 
     private class ModLog extends EndlessCommand
     {
-        public ModLog()
+        ModLog()
         {
             this.name = "modlog";
             this.aliases = new String[]{"banlog", "kicklog", "banslog", "kickslog"};
@@ -99,7 +102,7 @@ public class ServerSettings extends EndlessCommand
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                db.setModlogChannel(event.getGuild(), null);
+                bot.gsdm.setModlogChannel(event.getGuild(), null);
                 event.replySuccess("Modlogging disabled");
             }
             else
@@ -109,7 +112,7 @@ public class ServerSettings extends EndlessCommand
                 else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    db.setModlogChannel(event.getGuild(), list.get(0));
+                    bot.gsdm.setModlogChannel(event.getGuild(), list.get(0));
                     event.replySuccess("Modlogging actions will be logged in "+list.get(0).getAsMention());
                 }
             }
@@ -118,7 +121,7 @@ public class ServerSettings extends EndlessCommand
 
     private class ServerLog extends EndlessCommand
     {
-        public ServerLog()
+        ServerLog()
         {
             this.name = "serverlog";
             this.help = "Sets the serverlog channel";
@@ -136,7 +139,7 @@ public class ServerSettings extends EndlessCommand
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                db.setServerlogChannel(event.getGuild(), null);
+                bot.gsdm.setServerlogChannel(event.getGuild(), null);
                 event.replySuccess("Serverlogging disabled");
             }
             else
@@ -146,7 +149,7 @@ public class ServerSettings extends EndlessCommand
                 else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    db.setServerlogChannel(event.getGuild(), list.get(0));
+                    bot.gsdm.setServerlogChannel(event.getGuild(), list.get(0));
                     event.replySuccess("Serverlogging actions will be logged in "+list.get(0).getAsMention());
                 }
             }
@@ -155,7 +158,7 @@ public class ServerSettings extends EndlessCommand
 
     private class Welcome extends EndlessCommand
     {
-        public Welcome()
+        Welcome()
         {
             this.name = "welcome";
             this.aliases = new String[]{"joinschannel", "joinslog", "joins"};
@@ -174,7 +177,7 @@ public class ServerSettings extends EndlessCommand
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                db.setWelcomeChannel(event.getGuild(), null);
+                bot.gsdm.setWelcomeChannel(event.getGuild(), null);
                 event.replySuccess("Welcome channel disabled");
             }
             else
@@ -184,7 +187,7 @@ public class ServerSettings extends EndlessCommand
                 else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    db.setWelcomeChannel(event.getGuild(), list.get(0));
+                    bot.gsdm.setWelcomeChannel(event.getGuild(), list.get(0));
                     event.replySuccess("The message configured will be sent in "+list.get(0).getAsMention());
                 }
             }
@@ -193,7 +196,7 @@ public class ServerSettings extends EndlessCommand
 
     private class Leave extends EndlessCommand
     {
-        public Leave()
+        Leave()
         {
             this.name = "leave";
             this.aliases = new String[]{"leaveschannel", "leaveslog", "leaves"};
@@ -212,7 +215,7 @@ public class ServerSettings extends EndlessCommand
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                db.setLeaveChannel(event.getGuild(), null);
+                bot.gsdm.setLeaveChannel(event.getGuild(), null);
                 event.replySuccess("Leave channel disabled");
             }
             else
@@ -222,7 +225,7 @@ public class ServerSettings extends EndlessCommand
                 else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    db.setLeaveChannel(event.getGuild(), list.get(0));
+                    bot.gsdm.setLeaveChannel(event.getGuild(), list.get(0));
                     event.replySuccess("The message configured will be sent in "+list.get(0).getAsMention());
                 }
             }
