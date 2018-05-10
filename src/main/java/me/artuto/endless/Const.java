@@ -26,23 +26,27 @@ public class Const
     public static String VERSION = Const.class.getPackage().getImplementationVersion()==null?"DEV":Const.class.getPackage().getImplementationVersion();
     public static String INVITE = "https://discord.gg/CXKfYW3";
     public static String DEV = "`@Artuto#0424 | 264499432538505217`";
-    public static String LINE_START = ":white_medium_small_square:";
     public static String ARTUTO_ID = "264499432538505217";
     public static String ARTUTO_ALT_ID = "302534881370439681";
     public static String MAIN_GUILD = "312776731704426496";
     public static String GUILD_TESTING = "323954859713888256";
 
+    // Emotes
+    public static String INFO = "<:endlessInfo:444203939303522305>";
+    public static String LINE_START = ":white_medium_small_square:";
+    public static String LOADING = "<a:endlessLoading:444198122965434399>";
+
     // Enums
     public enum BlacklistType
     {
         GUILD,
-        USER;
+        USER
     }
     public enum PunishmentType
     {
         BAN,
         MUTE,
         TEMPBAN,
-        TEMPMUTE;
+        TEMPMUTE
     }
 }

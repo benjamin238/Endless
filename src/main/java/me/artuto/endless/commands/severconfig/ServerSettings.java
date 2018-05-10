@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.tools;
+package me.artuto.endless.commands.severconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import me.artuto.endless.commands.EndlessCommand;
@@ -43,7 +43,7 @@ public class ServerSettings extends EndlessCommand
         this.children = new Command[]{new ModLog(), new ServerLog(), new Welcome(), new Leave()};
         this.aliases = new String[]{"settings"};
         this.help = "Displays the settings of the server";
-        this.category = Categories.TOOLS;
+        this.category = Categories.SERVER_CONFIG;
         this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.ownerCommand = false;
@@ -86,7 +86,7 @@ public class ServerSettings extends EndlessCommand
             this.aliases = new String[]{"banlog", "kicklog", "banslog", "kickslog"};
             this.help = "Sets the modlog channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
-            this.category = new Command.Category("Settings");
+            this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
@@ -123,7 +123,7 @@ public class ServerSettings extends EndlessCommand
             this.name = "serverlog";
             this.help = "Sets the serverlog channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
-            this.category = new Command.Category("Settings");
+            this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
@@ -161,7 +161,7 @@ public class ServerSettings extends EndlessCommand
             this.aliases = new String[]{"joinschannel", "joinslog", "joins"};
             this.help = "Sets the welcome channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
-            this.category = new Command.Category("Settings");
+            this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
@@ -199,7 +199,7 @@ public class ServerSettings extends EndlessCommand
             this.aliases = new String[]{"leaveschannel", "leaveslog", "leaves"};
             this.help = "Sets the leave channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
-            this.category = new Command.Category("Settings");
+            this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;

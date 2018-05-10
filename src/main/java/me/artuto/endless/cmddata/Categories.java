@@ -67,6 +67,17 @@ public class Categories
         return bHandler.handleBlacklist(event);
     });
 
+    public static final Category SERVER_CONFIG = new Category("Guild Settings", event ->
+    {
+        if(event.isOwner())
+            return true;
+
+        if(maintenance)
+            return sHandler.handleCommandInMaintenance(event);
+
+        return bHandler.handleBlacklist(event);
+    });
+
     public static final Category TOOLS = new Category("Tools", event ->
     {
         if(event.isOwner())

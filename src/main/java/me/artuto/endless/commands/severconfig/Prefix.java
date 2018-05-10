@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.tools;
+package me.artuto.endless.commands.severconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import me.artuto.endless.commands.EndlessCommand;
@@ -40,7 +40,7 @@ public class Prefix extends EndlessCommand
         this.name = "prefix";
         this.children = new Command[]{new Add(), new Remove()};
         this.help = "Displays or adds a prefix";
-        this.category = Categories.TOOLS;
+        this.category = Categories.SERVER_CONFIG;
         this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.ownerCommand = false;
@@ -72,7 +72,7 @@ public class Prefix extends EndlessCommand
         {
             this.name = "add";
             this.help = "Adds a custom prefix";
-            this.category = Categories.TOOLS;
+            this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
@@ -100,7 +100,7 @@ public class Prefix extends EndlessCommand
         {
             this.name = "remove";
             this.help = "Removes a custom prefix";
-            this.category = Categories.TOOLS;
+            this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;

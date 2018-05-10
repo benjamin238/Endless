@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.tools;
+package me.artuto.endless.commands.severconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import me.artuto.endless.commands.EndlessCommand;
@@ -36,7 +36,7 @@ public class Leave extends EndlessCommand
         this.children = new Command[]{new Change()};
         this.aliases = new String[]{"leavemessage", "leavemsg"};
         this.help = "Changes or shows the welcome message";
-        this.category = Categories.TOOLS;
+        this.category = Categories.SERVER_CONFIG;
         this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = false;
@@ -59,7 +59,7 @@ public class Leave extends EndlessCommand
         {
             this.name = "change";
             this.help = "Changes the welcome message";
-            this.category = Categories.TOOLS;
+            this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;

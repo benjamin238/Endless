@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.tools;
+package me.artuto.endless.commands.severconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import me.artuto.endless.commands.EndlessCommand;
@@ -45,7 +45,7 @@ public class Starboard extends EndlessCommand
         this.children = new Command[]{new SetChannel(), new SetCount()};
         this.aliases = new String[]{"sb"};
         this.help = "If no valid arguments are given the setup to install the starboard is launched.";
-        this.category = Categories.TOOLS;
+        this.category = Categories.SERVER_CONFIG;
         this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.ownerCommand = false;
@@ -174,7 +174,7 @@ public class Starboard extends EndlessCommand
             this.name = "setchannel";
             this.aliases = new String[]{"channel"};
             this.help = "Changes the channel of the starboard.";
-            this.category = Categories.TOOLS;
+            this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;
@@ -211,7 +211,7 @@ public class Starboard extends EndlessCommand
             this.name = "setcount";
             this.aliases = new String[]{"count", "amount", "setamount"};
             this.help = "Changes the amount of stars required to be in the starboard.";
-            this.category = Categories.TOOLS;
+            this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.ownerCommand = false;

@@ -18,11 +18,13 @@
 package me.artuto.endless;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import me.artuto.endless.bootloader.EndlessLoader;
 import me.artuto.endless.commands.bot.*;
 import me.artuto.endless.commands.botadm.*;
 import me.artuto.endless.commands.fun.*;
 import me.artuto.endless.commands.moderation.*;
+import me.artuto.endless.commands.severconfig.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
 import me.artuto.endless.data.*;
@@ -64,6 +66,9 @@ public class Bot extends ListenerAdapter
     // Logging
     public ModLogging modlog;
 
+    // EventWaiter
+    public EventWaiter waiter;
+
     public void boot(boolean maintenance) throws LoginException
     {
         Endless.LOG.info("Starting Endless "+Const.VERSION+"...");
@@ -85,6 +90,7 @@ public class Bot extends ListenerAdapter
 
         loader.threadLoad();
         loader.waiterLoad();
+        waiter = loader.waiter;
 
         CommandClientBuilder client = new CommandClientBuilder();
         Long[] coOwners = config.getCoOwnerIds();
@@ -131,8 +137,8 @@ public class Bot extends ListenerAdapter
                 //Moderation
                 new Ban(modlog, config), new Clear(modlog, loader.cleanThread), new DBansCheck(config), new Kick(modlog, config), new Hackban(modlog, config), new Mute(config, gsdm, modlog, pdm), new Softban(modlog, config), new Unban(modlog, config),
 
-                //Settings
-                new Leave(gsdm), new Prefix(db, gsdm), new ServerSettings(gsdm), new Starboard(gsdm, loader.waiter), new Welcome(gsdm),
+                //Server Settings
+                new Leave(gsdm), new Prefix(db, gsdm), new ServerSettings(gsdm), new Setup(this), new Starboard(gsdm, loader.waiter), new Welcome(gsdm),
 
                 //Tools
                 new Afk(), new Avatar(), new GuildInfo(), new Lookup(), new Quote(), new RoleCmd(), new UserInfo(),

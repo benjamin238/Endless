@@ -243,7 +243,9 @@ public class GuildEvents extends ListenerAdapter
     {
         Guild guild = event.getGuild();
 
-        if(event.getRoles().contains(GuildUtils.getMutedRole(guild)))
+        if(event.getRoles().contains(GuildUtils.getMutedRole(guild))
+                && bot.pdm.getPunishment(event.getUser().getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE)==null
+                || bot.pdm.getPunishment(event.getUser().getIdLong(), guild.getIdLong(), Const.PunishmentType.TEMPMUTE)==null)
         {
             if(bot.pdm.addPunishment(event.getUser().getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE))
                 bot.modlog.logMute(null, event.getMember(), "[no reason specified]",
@@ -273,13 +275,15 @@ public class GuildEvents extends ListenerAdapter
 
             if(!(mutedRole==null) && event.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)
                     && event.getGuild().getSelfMember().canInteract(mutedRole))
-            {
-                
-            }
+                event.getGuild().getController().addSingleRoleToMember(event.getMember(), mutedRole).reason("[Mute restore]").queue(s -> {}, e-> {});
         }
         else if(!(bot.pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE)==null))
         {
+            Role mutedRole = GuildUtils.getMutedRole(event.getGuild());
 
+            if(!(mutedRole==null) && event.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)
+                    && event.getGuild().getSelfMember().canInteract(mutedRole))
+                event.getGuild().getController().addSingleRoleToMember(event.getMember(), mutedRole).reason("[Mute restore]").queue(s -> {}, e-> {});
         }
     }
 
