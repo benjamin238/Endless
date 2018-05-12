@@ -23,17 +23,13 @@ import java.util.Collection;
 
 public class GuildSettingsImpl implements GuildSettings
 {
-    private final Long modlogId;
-    private final Long serverlogId;
-    private final Long welcomeId;
-    private final String welcomeMsg;
-    private final Long leaveId;
-    private final String leaveMsg;
-    private final Long starboardId;
-    private final int starboardCount;
     private final Collection<String> prefixes;
+    private final int starboardCount;
+    private final long modlogId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
+    private final String welcomeMsg, leaveMsg;
 
-    public GuildSettingsImpl(Long modlogId, Long serverlogId, Long welcomeId, String welcomeMsg, Long leaveId, String leaveMsg, Long starboardId, int starboardCount, Collection<String> prefixes)
+    public GuildSettingsImpl(long modlogId, long serverlogId, long welcomeId, String welcomeMsg,
+                             long leaveId, String leaveMsg, long starboardId, int starboardCount, Collection<String> prefixes, long mutedRoleId)
     {
         this.modlogId = modlogId;
         this.serverlogId = serverlogId;
@@ -44,22 +40,23 @@ public class GuildSettingsImpl implements GuildSettings
         this.starboardId = starboardId;
         this.starboardCount = starboardCount;
         this.prefixes = prefixes;
+        this.mutedRoleId = mutedRoleId;
     }
 
     @Override
-    public Long getModlog()
+    public long getModlog()
     {
         return modlogId;
     }
 
     @Override
-    public Long getServerlog()
+    public long getServerlog()
     {
         return serverlogId;
     }
 
     @Override
-    public Long getWelcomeChannel()
+    public long getWelcomeChannel()
     {
         return welcomeId;
     }
@@ -71,7 +68,7 @@ public class GuildSettingsImpl implements GuildSettings
     }
 
     @Override
-    public Long getLeaveChannel()
+    public long getLeaveChannel()
     {
         return leaveId;
     }
@@ -83,7 +80,7 @@ public class GuildSettingsImpl implements GuildSettings
     }
 
     @Override
-    public Long getStarboard()
+    public long getStarboard()
     {
         return starboardId;
     }
@@ -98,5 +95,11 @@ public class GuildSettingsImpl implements GuildSettings
     public Collection<String> getPrefixes()
     {
         return prefixes;
+    }
+
+    @Override
+    public long getMutedRole()
+    {
+        return mutedRoleId;
     }
 }

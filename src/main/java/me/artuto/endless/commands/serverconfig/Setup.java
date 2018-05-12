@@ -1,4 +1,4 @@
-package me.artuto.endless.commands.severconfig;
+package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

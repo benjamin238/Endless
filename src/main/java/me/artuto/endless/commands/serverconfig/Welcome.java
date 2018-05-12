@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.severconfig;
+package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import me.artuto.endless.commands.EndlessCommand;

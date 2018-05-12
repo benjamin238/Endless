@@ -24,7 +24,7 @@ import me.artuto.endless.commands.bot.*;
 import me.artuto.endless.commands.botadm.*;
 import me.artuto.endless.commands.fun.*;
 import me.artuto.endless.commands.moderation.*;
-import me.artuto.endless.commands.severconfig.*;
+import me.artuto.endless.commands.serverconfig.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
 import me.artuto.endless.data.*;

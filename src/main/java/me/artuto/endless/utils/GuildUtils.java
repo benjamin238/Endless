@@ -78,7 +78,7 @@ public class GuildUtils
 
     public static Role getMutedRole(Guild guild)
     {
-        return guild.getRolesByName("Muted", true).stream().findFirst().orElse(bot.gsdm.getMutedRole(guild));
+        return guild.getRolesByName("Muted", true).stream().findFirst().orElse(guild.getRoleById(bot.db.getSettings(guild).getMutedRole()));
     }
 
     /**public static boolean isABotListGuild(Guild guild)

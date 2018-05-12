@@ -21,21 +21,23 @@ import java.util.Collection;
 
 public interface GuildSettings
 {
-    Long getModlog();
+    long getModlog();
 
-    Long getServerlog();
+    long getServerlog();
 
-    Long getWelcomeChannel();
+    long getWelcomeChannel();
 
     String getWelcomeMsg();
 
-    Long getLeaveChannel();
+    long getLeaveChannel();
 
     String getLeaveMsg();
 
-    Long getStarboard();
+    long getStarboard();
 
     int getStarboardCount();
 
     Collection<String> getPrefixes();
+
+    long getMutedRole();
 }

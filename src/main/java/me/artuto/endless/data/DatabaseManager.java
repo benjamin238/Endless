@@ -32,7 +32,7 @@ public class DatabaseManager
 {
     private final Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
-    private final GuildSettings DEFAULT = new GuildSettingsImpl(0L, 0L, 0L, "", 0L, "", 0L, 0, null);
+    private final GuildSettings DEFAULT = new GuildSettingsImpl(0L, 0L, 0L, "", 0L, "", 0L, 0, null, 0L);
 
     public DatabaseManager(String host, String user, String pass) throws SQLException
     {
@@ -55,7 +55,7 @@ public class DatabaseManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             GuildSettings gs;
-            Set<String> prefixes = new HashSet<String>();
+            Set<String> prefixes = new HashSet<>();
             String array;
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getIdLong())))
@@ -64,10 +64,17 @@ public class DatabaseManager
                 {
                     array = results.getString("prefixes");
 
-                    if(!(array == null)) for(Object prefix : new JSONArray(results.getString("prefixes")))
-                        prefixes.add(prefix.toString());
+                    if(!(array == null))
+                    {
+                        for(Object prefix : new JSONArray(results.getString("prefixes")))
+                            prefixes.add(prefix.toString());
+                    }
 
-                    gs = new GuildSettingsImpl(results.getLong("modlog_id"), results.getLong("serverlog_id"), results.getLong("welcome_id"), results.getString("welcome_msg"), results.getLong("leave_id"), results.getString("leave_msg"), results.getLong("starboard_id"), results.getInt("starboard_count"), prefixes);
+                    gs = new GuildSettingsImpl(results.getLong("modlog_id"), results.getLong("serverlog_id"),
+                            results.getLong("welcome_id"), results.getString("welcome_msg"),
+                            results.getLong("leave_id"), results.getString("leave_msg"),
+                            results.getLong("starboard_id"), results.getInt("starboard_count"),
+                            prefixes, results.getLong("muted_role_id"));
                 }
                 else gs = DEFAULT;
             }
@@ -80,14 +87,14 @@ public class DatabaseManager
         }
     }
 
-    public GuildSettings getSettings(Long guild)
+    public GuildSettings getSettings(long guild)
     {
         try
         {
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             GuildSettings gs;
-            Set<String> prefixes = new HashSet<String>();
+            Set<String> prefixes = new HashSet<>();
             String array;
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild)))
@@ -99,7 +106,11 @@ public class DatabaseManager
                     if(!(array == null)) for(Object prefix : new JSONArray(results.getString("prefixes")))
                         prefixes.add(prefix.toString());
 
-                    gs = new GuildSettingsImpl(results.getLong("modlog_id"), results.getLong("serverlog_id"), results.getLong("welcome_id"), results.getString("welcome_msg"), results.getLong("leave_id"), results.getString("leave_msg"), results.getLong("starboard_id"), results.getInt("starboard_count"), prefixes);
+                    gs = new GuildSettingsImpl(results.getLong("modlog_id"), results.getLong("serverlog_id"),
+                            results.getLong("welcome_id"), results.getString("welcome_msg"),
+                            results.getLong("leave_id"), results.getString("leave_msg"),
+                            results.getLong("starboard_id"), results.getInt("starboard_count"),
+                            prefixes, results.getLong("muted_role_id"));
                 }
                 else gs = DEFAULT;
             }
@@ -131,7 +142,7 @@ public class DatabaseManager
         }
     }
 
-    public boolean hasSettings(Long guild)
+    public boolean hasSettings(long guild)
     {
         try
         {

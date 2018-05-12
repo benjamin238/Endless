@@ -715,11 +715,11 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, muted_role FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, muted_role_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
                 if(results.next())
                 {
-                    results.updateLong("muted_role", role==null?null:role.getIdLong());
+                    results.updateLong("muted_role_id", role==null?null:role.getIdLong());
                     results.updateRow();
                     return true;
                 }
@@ -727,7 +727,7 @@ public class GuildSettingsDataManager
                 {
                     results.moveToInsertRow();
                     results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("muted_role", role==null?null:role.getIdLong());
+                    results.updateLong("muted_role_id", role==null?null:role.getIdLong());
                     results.insertRow();
                     return true;
                 }

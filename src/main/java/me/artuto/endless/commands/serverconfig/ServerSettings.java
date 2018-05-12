@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.severconfig;
+package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import me.artuto.endless.Bot;
@@ -25,10 +25,12 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.entities.GuildSettings;
 import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.List;
@@ -41,7 +43,7 @@ public class ServerSettings extends EndlessCommand
     {
         this.bot = bot;
         this.name = "config";
-        this.children = new Command[]{new ModLog(), new ServerLog(), new Welcome(), new Leave()};
+        this.children = new Command[]{new Modlog(), new Serverlog(), new Welcome(), new Leave(), new MutedRole()};
         this.aliases = new String[]{"settings"};
         this.help = "Displays the settings of the server";
         this.category = Categories.SERVER_CONFIG;
@@ -54,39 +56,43 @@ public class ServerSettings extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
         GuildSettings settings = bot.db.getSettings(guild);
+        int starboardCount = settings.getStarboardCount();
+        Role mutedRole = GuildUtils.getMutedRole(guild);
+        String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
+        String welcomeMsg = settings.getWelcomeMsg();
+        String leaveMsg = settings.getLeaveMsg();
         TextChannel modlog = guild.getTextChannelById(settings.getModlog());
         TextChannel serverlog = guild.getTextChannelById(settings.getServerlog());
         TextChannel welcome = guild.getTextChannelById(settings.getWelcomeChannel());
         TextChannel leave = guild.getTextChannelById(settings.getLeaveChannel());
-        String welcomeMsg = settings.getWelcomeMsg();
-        EmbedBuilder builder = new EmbedBuilder();
-        String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
+        TextChannel starboard = guild.getTextChannelById(settings.getStarboard());
 
-        try
-        {
-            builder.addField("Modlog Channel: ", (modlog == null ? "None" : modlog.getAsMention()), true);
-            builder.addField("Serverlog Channel: ", (serverlog == null ? "None" : serverlog.getAsMention()), true);
-            builder.addField("Welcome Channel: ", (welcome == null ? "None" : welcome.getAsMention()), true);
-            builder.addField("Leave Channel: ", (leave == null ? "None" : leave.getAsMention()), true);
-            builder.setColor(event.getSelfMember().getColor());
+        builder.addField("Modlog Channel:", (modlog==null?"None":modlog.getAsMention()), true);
+        builder.addField("Serverlog Channel:", (serverlog==null?"None":serverlog.getAsMention()), true);
+        builder.addBlankField(true);
+        builder.addField("Welcome Channel:", (welcome==null?"None":welcome.getAsMention()), true);
+        builder.addField("Welcome Message:", (welcomeMsg==null?"None":"`` "+welcomeMsg+"```"), true);
+        builder.addBlankField(true);
+        builder.addField("Leave Channel:", (leave==null?"None":leave.getAsMention()), true);
+        builder.addField("Leave Message:", (leaveMsg==null?"None":"```"+leaveMsg+"```"), true);
+        builder.addBlankField(true);
+        builder.addField("Starboard Channel:", (starboard==null?"None":starboard.getAsMention()), true);
+        builder.addField("Starboard Count:", (starboardCount==0?"Disabled":String.valueOf(starboardCount)), true);
+        builder.addBlankField(true);
+        builder.addField("Muted Role:", (mutedRole==null?"None":mutedRole.getAsMention()), true);
+        builder.setColor(event.getSelfMember().getColor());
 
-            event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
-        }
-        catch(Exception e)
-        {
-            event.replyError("Something went wrong when getting the settings: \n```"+e+"```");
-        }
-
+        event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
     }
 
-    private class ModLog extends EndlessCommand
+    private class Modlog extends EndlessCommand
     {
-        ModLog()
+        Modlog()
         {
             this.name = "modlog";
-            this.aliases = new String[]{"banlog", "kicklog", "banslog", "kickslog"};
             this.help = "Sets the modlog channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = Categories.SERVER_CONFIG;
@@ -119,9 +125,9 @@ public class ServerSettings extends EndlessCommand
         }
     }
 
-    private class ServerLog extends EndlessCommand
+    private class Serverlog extends EndlessCommand
     {
-        ServerLog()
+        Serverlog()
         {
             this.name = "serverlog";
             this.help = "Sets the serverlog channel";
@@ -227,6 +233,51 @@ public class ServerSettings extends EndlessCommand
                 {
                     bot.gsdm.setLeaveChannel(event.getGuild(), list.get(0));
                     event.replySuccess("The message configured will be sent in "+list.get(0).getAsMention());
+                }
+            }
+        }
+    }
+
+    private class MutedRole extends EndlessCommand
+    {
+        MutedRole()
+        {
+            this.name = "mutedrole";
+            this.help = "Sets the muted role";
+            this.arguments = "<@Role|Role ID|Role name>";
+            this.category = Categories.SERVER_CONFIG;
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.ownerCommand = false;
+            this.guildCommand = true;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            if(event.getArgs().isEmpty()) event.replyError("Please include a role or NONE");
+            else if(event.getArgs().equalsIgnoreCase("none"))
+            {
+                bot.gsdm.setMutedRole(event.getGuild(), null);
+                event.replySuccess("Muted role disabled");
+            }
+            else
+            {
+                List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
+                if(list.isEmpty()) event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
+                else if(list.size()>1) event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
+                else
+                {
+                    if(!(GuildUtils.getMutedRole(event.getGuild())==null))
+                    {
+                        event.replyError("You already have a Muted role!");
+                        return;
+                    }
+
+                    if(bot.gsdm.setMutedRole(event.getGuild(), list.get(0)))
+                        event.replySuccess("The muted role is now "+list.get(0).getAsMention());
+                    else
+                        event.replyError("Something went wrong while setting the muted role!");
                 }
             }
         }
