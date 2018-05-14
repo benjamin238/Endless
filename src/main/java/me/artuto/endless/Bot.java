@@ -41,6 +41,8 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
 import java.util.Arrays;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Artuto
@@ -63,11 +65,14 @@ public class Bot extends ListenerAdapter
     public StarboardDataManager sdm;
     public TagDataManager tdm;
 
+    // EventWaiter
+    public EventWaiter waiter;
+
     // Logging
     public ModLogging modlog;
 
-    // EventWaiter
-    public EventWaiter waiter;
+    // Schedulers
+    public ScheduledExecutorService muteScheduler;
 
     public void boot(boolean maintenance) throws LoginException
     {
@@ -91,6 +96,8 @@ public class Bot extends ListenerAdapter
         loader.threadLoad();
         loader.waiterLoad();
         waiter = loader.waiter;
+
+        muteScheduler = loader.muteScheduler;
 
         CommandClientBuilder client = new CommandClientBuilder();
         Long[] coOwners = config.getCoOwnerIds();
@@ -132,10 +139,11 @@ public class Bot extends ListenerAdapter
                 new About(config), new Donate(ddm), new Invite(), new Ping(), new Stats(),
 
                 //Bot Administration
-                new Bash(), new BlacklistUsers(bdm), new BotCPanel(), new Eval(config, db, ddm, gsdm, bdm, sdm, tdm, modlog), new Shutdown(),
+                new Bash(), new BlacklistUsers(bdm), new BotCPanel(), new Eval(this), new Shutdown(),
 
                 //Moderation
-                new Ban(modlog, config), new Clear(modlog, loader.cleanThread), new DBansCheck(config), new Kick(modlog, config), new Hackban(modlog, config), new Mute(config, gsdm, modlog, pdm), new Softban(modlog, config), new Unban(modlog, config),
+                new Ban(modlog, config), new Clear(modlog, loader.cleanThread), new DBansCheck(config), new Kick(modlog, config),
+                new Hackban(modlog, config), new Mute(this), new Softban(modlog, config), new Unban(modlog, config),
 
                 //Server Settings
                 new Leave(gsdm), new Prefix(db, gsdm), new ServerSettings(this), new Setup(this), new Starboard(gsdm, loader.waiter), new Welcome(gsdm),
@@ -161,7 +169,7 @@ public class Bot extends ListenerAdapter
         if(maintenance)
             builder.addEventListener(client.build(), new Bot());
         else
-            builder.addEventListener(loader.waiter, client.build(), new BotEvents(config, loader.botlogThread, false, db),
+            builder.addEventListener(loader.waiter, client.build(), new BotEvents(this, loader.botlogThread, false),
                     new ServerLogging(gsdm), new GuildEvents(this),
                     new StarboardEvents(gsdm, sdm, loader.starboardThread), new UserEvents(config));
 

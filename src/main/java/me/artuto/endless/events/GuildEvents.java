@@ -23,6 +23,9 @@ import com.jagrosh.jagtag.libraries.*;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.entities.ImportedTag;
+import me.artuto.endless.entities.ParsedAuditLog;
+import me.artuto.endless.entities.Punishment;
+import me.artuto.endless.entities.TempPunishment;
 import me.artuto.endless.tempdata.AfkManager;
 import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.FinderUtil;
@@ -242,47 +245,76 @@ public class GuildEvents extends ListenerAdapter
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event)
     {
         Guild guild = event.getGuild();
+        Role mutedRole = GuildUtils.getMutedRole(guild);
 
-        if(event.getRoles().contains(GuildUtils.getMutedRole(guild))
-                && bot.pdm.getPunishment(event.getUser().getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE)==null
-                || bot.pdm.getPunishment(event.getUser().getIdLong(), guild.getIdLong(), Const.PunishmentType.TEMPMUTE)==null)
-        {
-            if(bot.pdm.addPunishment(event.getUser().getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE))
-                bot.modlog.logMute(null, event.getMember(), "[no reason specified]",
-                        guild, FinderUtil.getDefaultChannel(guild));
-        }
+        if(!(event.getRoles().contains(mutedRole)))
+            return;
+
+        if(!(guild.getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)))
+            return;
+
+        guild.getAuditLogs().type(ActionType.MEMBER_ROLE_UPDATE).limit(1).queue(entries -> {
+            if(entries.isEmpty())
+                return;
+
+            ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), AuditLogKey.MEMBER_ROLES_ADD);
+            String reason = parsedAuditLog.getReason();
+            User author = parsedAuditLog.getAuthor();
+            User target = parsedAuditLog.getTarget();
+
+            if(author.equals(event.getJDA().getSelfUser()))
+                return;
+
+            bot.modlog.logMute(author, guild.getMember(target), reason, guild, FinderUtil.getDefaultChannel(guild));
+            bot.pdm.addPunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.TEMPMUTE);
+        }, e -> {});
     }
 
     @Override
     public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event)
     {
         Guild guild = event.getGuild();
+        Role mutedRole = GuildUtils.getMutedRole(guild);
 
-        if(event.getRoles().contains(GuildUtils.getMutedRole(guild)))
-        {
-            if(bot.pdm.removePunishment(event.getUser().getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE))
-                bot.modlog.logUnmute(null, event.getMember(), "[no reason specified]",
-                        guild, FinderUtil.getDefaultChannel(guild));
-        }
+        if(!(event.getRoles().contains(mutedRole)))
+            return;
+
+        if(!(guild.getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)))
+            return;
+
+        guild.getAuditLogs().type(ActionType.MEMBER_ROLE_UPDATE).limit(1).queue(entries -> {
+            if(entries.isEmpty())
+                return;
+
+            ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), AuditLogKey.MEMBER_ROLES_REMOVE);
+            String reason = parsedAuditLog.getReason();
+            User author = parsedAuditLog.getAuthor();
+            User target = parsedAuditLog.getTarget();
+
+            bot.modlog.logUnmute(author, guild.getMember(target), reason, guild, FinderUtil.getDefaultChannel(guild));
+            bot.pdm.removePunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.TEMPMUTE);
+        }, e -> {});
     }
 
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event)
     {
-        if(!(bot.pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE)==null))
+        Guild guild = event.getGuild();
+        Punishment punishment = bot.pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE);
+        TempPunishment tempPunishment = (TempPunishment)bot.pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE);
+
+        if(!(punishment==null))
         {
             Role mutedRole = GuildUtils.getMutedRole(event.getGuild());
 
-            if(!(mutedRole==null) && event.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)
-                    && event.getGuild().getSelfMember().canInteract(mutedRole))
-                event.getGuild().getController().addSingleRoleToMember(event.getMember(), mutedRole).reason("[Mute restore]").queue(s -> {}, e-> {});
+            if(!(mutedRole==null) && guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES) && guild.getSelfMember().canInteract(mutedRole))
+                guild.getController().addSingleRoleToMember(event.getMember(), mutedRole).reason("[Mute restore]").queue(s -> {}, e -> {});
         }
-        else if(!(bot.pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE)==null))
+        else if(!(tempPunishment==null))
         {
             Role mutedRole = GuildUtils.getMutedRole(event.getGuild());
 
-            if(!(mutedRole==null) && event.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)
-                    && event.getGuild().getSelfMember().canInteract(mutedRole))
+            if(!(mutedRole==null) && guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES) && guild.getSelfMember().canInteract(mutedRole))
                 event.getGuild().getController().addSingleRoleToMember(event.getMember(), mutedRole).reason("[Mute restore]").queue(s -> {}, e-> {});
         }
     }

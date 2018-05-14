@@ -71,7 +71,7 @@ public class DatabaseLoader
             prdm = new ProfileDataManager(db);
             sdm = new StarboardDataManager(db);
             tdm = new TagDataManager(db);
-            modlog = new ModLogging(gsdm);
+            modlog = new ModLogging(bot);
             bHandler = new BlacklistHandler(bdm);
             sHandler = new SpecialCaseHandler();
             categories = new Categories(bHandler, sHandler, maintenance);

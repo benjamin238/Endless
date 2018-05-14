@@ -36,11 +36,16 @@ public class EndlessLoader
     public Config config;
     public DatabaseLoader dbLoader;
 
+    // EventWaiters
+    public EventWaiter waiter;
+
+    // Schedulers
+    public ScheduledExecutorService muteScheduler;
+
     // Thread Loader
     private final ThreadLoader threadLoader = new ThreadLoader();
 
     // Threads
-
     public ScheduledExecutorService botlogThread;
     public ScheduledExecutorService cleanThread;
     public ScheduledExecutorService cmdThread;
@@ -48,9 +53,6 @@ public class EndlessLoader
 
     // Waiter Loader
     private final WaiterLoader waiterLoader = new WaiterLoader();
-
-    // Waiters
-    public EventWaiter waiter;
 
     public EndlessLoader(Bot bot)
     {
@@ -75,6 +77,7 @@ public class EndlessLoader
         botlogThread = threadLoader.createThread("Botlog");
         cleanThread = threadLoader.createThread("Clean Command");
         cmdThread = threadLoader.createThread("Commands");
+        muteScheduler = threadLoader.createThread("Mute");
         starboardThread = threadLoader.createThread("Starboard");
     }
 

@@ -19,8 +19,13 @@ package me.artuto.endless.utils;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.data.DatabaseManager;
+import me.artuto.endless.entities.ParsedAuditLog;
+import me.artuto.endless.entities.impl.ParsedAuditLogImpl;
 import me.artuto.endless.loader.Config;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.audit.AuditLogChange;
+import net.dv8tion.jda.core.audit.AuditLogEntry;
+import net.dv8tion.jda.core.audit.AuditLogKey;
 import net.dv8tion.jda.core.entities.*;
 
 public class GuildUtils
@@ -79,6 +84,16 @@ public class GuildUtils
     public static Role getMutedRole(Guild guild)
     {
         return guild.getRolesByName("Muted", true).stream().findFirst().orElse(guild.getRoleById(bot.db.getSettings(guild).getMutedRole()));
+    }
+
+    public static ParsedAuditLog getAuditLog(AuditLogEntry entry, AuditLogKey key)
+    {
+        JDA jda = entry.getJDA();
+        User author = entry.getUser();
+        User target = jda.getUserById(entry.getTargetIdLong());
+        AuditLogChange change = entry.getChangeByKey(key);
+
+        return new ParsedAuditLogImpl(key, change.getNewValue(), change.getOldValue(), entry.getReason(), author, target);
     }
 
     /**public static boolean isABotListGuild(Guild guild)

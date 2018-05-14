@@ -21,7 +21,12 @@ import me.artuto.endless.Const;
 import me.artuto.endless.entities.Punishment;
 import me.artuto.endless.entities.TempPunishment;
 import me.artuto.endless.entities.impl.PunishmentImpl;
+import me.artuto.endless.utils.GuildUtils;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +35,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -99,7 +103,7 @@ public class PunishmentsDataManager
         }
     }
 
-    public boolean addTempPunishment(User user, Guild guild, long time, Const.PunishmentType type)
+    public boolean addTempPunishment(long user, long guild, long time, Const.PunishmentType type)
     {
         try
         {
@@ -109,8 +113,8 @@ public class PunishmentsDataManager
             try(ResultSet results = statement.executeQuery("SELECT * FROM PUNISHMENTS"))
             {
                 results.moveToInsertRow();
-                results.updateLong("user_id", user.getIdLong());
-                results.updateLong("guild_id", guild.getIdLong());
+                results.updateLong("user_id", user);
+                results.updateLong("guild_id", guild);
                 results.updateLong("time", time);
                 results.updateString("type", type.name());
                 results.insertRow();
@@ -177,7 +181,7 @@ public class PunishmentsDataManager
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS type = \"%s\"", type.name())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE type = \"%s\"", type.name())))
             {
                 List<Punishment> list = new LinkedList<>();
 
@@ -200,7 +204,7 @@ public class PunishmentsDataManager
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS type = \"%s\"", type.name())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE type = \"%s\"", type.name())))
             {
                 List<TempPunishment> list = new LinkedList<>();
 
@@ -221,12 +225,23 @@ public class PunishmentsDataManager
         }
     }
 
-    public void updateTempPunishments(Const.PunishmentType type)
+    public void updateTempPunishments(Const.PunishmentType type, JDA jda)
     {
         for(TempPunishment p : getTempPunishments(type))
         {
-            if(p.getExpiryTime().isAfter(OffsetDateTime.now()))
+            if(OffsetDateTime.now().isAfter(p.getExpiryTime()))
+            {
                 removePunishment(p.getUserId(), p.getGuildId(), p.getType());
+                Guild guild = jda.getGuildById(p.getGuildId());
+
+                if(!(guild==null))
+                {
+                     Member member = guild.getMemberById(p.getUserId());
+                     Role mutedRole = GuildUtils.getMutedRole(guild);
+                     if(!(member==null) && guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES) && guild.getSelfMember().canInteract(mutedRole))
+                         guild.getController().removeSingleRoleFromMember(member, mutedRole).reason("[Tempumute finished]").queue();
+                }
+            }
         }
     }
 }

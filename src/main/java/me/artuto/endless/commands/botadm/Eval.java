@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.data.*;
@@ -40,25 +41,11 @@ public class Eval extends EndlessCommand
 {
     private ScriptEngine engine;
     private List<String> imports;
-    private final Config config;
-    private final DatabaseManager db;
-    private final GuildSettingsDataManager gsdm;
-    private final BlacklistDataManager bdm;
-    private final DonatorsDataManager ddm;
-    private final StarboardDataManager sdm;
-    private final TagDataManager tdm;
-    private final ModLogging modlog;
+    private final Bot bot;
 
-    public Eval(Config config, DatabaseManager db, DonatorsDataManager ddm, GuildSettingsDataManager gsdm, BlacklistDataManager bdm, StarboardDataManager sdm, TagDataManager tdm, ModLogging modlog)
+    public Eval(Bot bot)
     {
-        this.gsdm = gsdm;
-        this.db = db;
-        this.ddm = ddm;
-        this.bdm = bdm;
-        this.sdm = sdm;
-        this.tdm = tdm;
-        this.config = config;
-        this.modlog = modlog;
+        this.bot = bot;
         this.name = "eval";
         this.help = "Executes Groovy code";
         this.category = Categories.BOTADM;
@@ -93,14 +80,7 @@ public class Eval extends EndlessCommand
             engine.put("bot", event.getSelfUser());
             engine.put("client", event.getClient());
             engine.put("author", event.getAuthor());
-            engine.put("ddm", ddm);
-            engine.put("bdm", bdm);
-            engine.put("gsdm", gsdm);
-            engine.put("sdm", sdm);
-            engine.put("tdm", tdm);
-            engine.put("db", db);
-            engine.put("config", config);
-            engine.put("modlog", modlog);
+            engine.put("endless", bot);
             if(event.isFromType(ChannelType.TEXT))
             {
                 engine.put("member", event.getMember());

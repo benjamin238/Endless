@@ -19,14 +19,11 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.data.GuildSettingsDataManager;
-import me.artuto.endless.data.PunishmentsDataManager;
-import me.artuto.endless.loader.Config;
-import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.GuildUtils;
@@ -45,17 +42,11 @@ import java.util.List;
 
 public class Mute extends EndlessCommand
 {
-    private final Config config;
-    private final GuildSettingsDataManager gsdm;
-    private final ModLogging modlog;
-    private final PunishmentsDataManager tpdm;
+    private final Bot bot;
 
-    public Mute(Config config, GuildSettingsDataManager gsdm, ModLogging modlog, PunishmentsDataManager tpdm)
+    public Mute(Bot bot)
     {
-        this.config = config;
-        this.gsdm = gsdm;
-        this.modlog = modlog;
-        this.tpdm = tpdm;
+        this.bot = bot;
         this.name = "mute";
         this.help = "Mutes the specified user";
         this.arguments = "<@user|ID|nickname|username> for [time] for [reason]";
@@ -132,13 +123,27 @@ public class Mute extends EndlessCommand
 
         String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
         mutedRole = GuildUtils.getMutedRole(event.getGuild());
+        int minutes = time/60;
         int fTime = time;
         String fReason = reason;
-        Instant unmuteTime = Instant.now().plus(time, ChronoUnit.MINUTES);
+        Instant unmuteTime = Instant.now().plus(minutes, ChronoUnit.MINUTES);
         Const.PunishmentType type = time==0?Const.PunishmentType.MUTE:Const.PunishmentType.TEMPMUTE;
 
+        if(time<0)
+        {
+            event.replyError("The time cannot be negative!");
+            return;
+        }
+        else if(time==0)
+            minutes = 0;
+        else if(time>60)
+            minutes = (int)Math.round(time/60.0);
+        else minutes = 1;
+
+        int fMinutes = minutes;
+
         if(mutedRole==null)
-            event.replyError("No muted role set! Please set one using `e!config mutedrole <role>` or let the me create one for you using `e!setup mutedrole` ");
+            event.replyError("No muted role set! Please set one using `e!config mutedrole <role>` or let the me create one for you using `e!setup mutedrole`");
         else
         {
             if(!(event.getSelfMember().canInteract(mutedRole)))
@@ -147,24 +152,25 @@ public class Mute extends EndlessCommand
                 return;
             }
 
-            if(!(tpdm.getPunishment(member.getUser().getIdLong(), event.getGuild().getIdLong(), type)==null))
+            if(!(bot.pdm.getPunishment(member.getUser().getIdLong(), event.getGuild().getIdLong(), type)==null))
             {
                 event.replyWarning("This user is already muted!");
                 return;
             }
 
-            if(tpdm.addTempPunishment(member.getUser(), event.getGuild(), unmuteTime.getEpochSecond(), type))
-            {
-                event.getGuild().getController().addSingleRoleToMember(member, mutedRole).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
-                    event.replySuccess(Messages.MUTE_SUCCESS+username);
-                    if(fTime==0)
-                        modlog.logMute(author, member, fReason, event.getGuild(), event.getTextChannel());
-                    else
-                        modlog.logTempMute(author, member, fReason, event.getGuild(), event.getTextChannel(), fTime);
-                }, e -> event.replyError(Messages.MUTE_ERROR+username));
-            }
-            else
-                event.replyError("Something has gone wrong while muting the specified user, please contact the bot owner.");
+            event.getGuild().getController().addSingleRoleToMember(member, mutedRole).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
+                event.replySuccess(Messages.MUTE_SUCCESS+username);
+                if(fMinutes>0)
+                {
+                    bot.modlog.logTempMute(author, member, fReason, event.getGuild(), event.getTextChannel(), fTime);
+                    bot.pdm.addTempPunishment(member.getUser().getIdLong(), event.getGuild().getIdLong(), unmuteTime.toEpochMilli(), Const.PunishmentType.TEMPMUTE);
+                }
+                else
+                {
+                    bot.modlog.logMute(author, member, fReason, event.getGuild(), event.getTextChannel());
+                    bot.pdm.addPunishment(member.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE);
+                }
+            }, e -> event.replyError(Messages.MUTE_ERROR+username));
         }
     }
 }

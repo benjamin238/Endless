@@ -17,12 +17,18 @@
 
 package me.artuto.endless.logging;
 
+import me.artuto.endless.Bot;
+import me.artuto.endless.Const;
 import me.artuto.endless.Messages;
 import me.artuto.endless.data.GuildSettingsDataManager;
+import me.artuto.endless.entities.GuildSettings;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.audit.AuditLogChange;
+import net.dv8tion.jda.core.audit.AuditLogEntry;
+import net.dv8tion.jda.core.audit.AuditLogKey;
 import net.dv8tion.jda.core.entities.*;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +36,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Artuto
@@ -42,16 +45,16 @@ import java.util.List;
 
 public class ModLogging
 {
-    private static GuildSettingsDataManager db;
+    private Bot bot;
 
-    public ModLogging(GuildSettingsDataManager db)
+    public ModLogging(Bot bot)
     {
-        ModLogging.db = db;
+        this.bot = bot;
     }
 
     public void logBan(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = db.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -73,7 +76,7 @@ public class ModLogging
 
     public void logHackban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = db.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -95,7 +98,7 @@ public class ModLogging
 
     public void logKick(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = db.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -117,7 +120,7 @@ public class ModLogging
 
     public void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = db.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -139,7 +142,7 @@ public class ModLogging
 
     public void logUnban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = db.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -161,7 +164,7 @@ public class ModLogging
 
     public void logClear(User author, TextChannel channel, String reason, Guild guild, List<Message> deleted, String args)
     {
-        TextChannel tc = db.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -210,7 +213,7 @@ public class ModLogging
 
     public void logMute(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = db.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
 
         if(!(tc == null))
         {
@@ -230,7 +233,7 @@ public class ModLogging
 
     public void logTempMute(User author, Member target, String reason, Guild guild, TextChannel channel, int time)
     {
-        TextChannel tc = db.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         String formattedTime = FormatUtil.formatTimeFromSeconds(time);
 
         if(!(tc == null))
@@ -245,7 +248,7 @@ public class ModLogging
 
     public void logUnmute(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = db.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
 
         if(!(tc == null))
         {
