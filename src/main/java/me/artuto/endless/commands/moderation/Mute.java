@@ -70,7 +70,7 @@ public class Mute extends EndlessCommand
 
         if(event.getArgs().isEmpty())
         {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"mute <@user|ID|nickname|username> for [reason]");
+            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"mute <@user|ID|nickname|username> for [time] for [reason]");
             return;
         }
 
