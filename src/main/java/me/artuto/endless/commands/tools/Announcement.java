@@ -60,7 +60,7 @@ public class Announcement extends EndlessCommand
 
          boolean ping = true;
          Role role;
-         String[] splittedArgs = args.split(" | ", 3);
+         String[] splittedArgs = args.split(" \\| ", 2);
          String[] splittedArgs2;
          String message;
          String preChannel;
@@ -70,7 +70,7 @@ public class Announcement extends EndlessCommand
          try
          {
              message = splittedArgs[0].trim();
-             splittedArgs2 = splittedArgs[2].trim().trim().split(" | ", 3);
+             splittedArgs2 = splittedArgs[1].trim().trim().split(" \\| ", 2);
              try
              {
                  preChannel = splittedArgs2[0].trim();
@@ -95,7 +95,7 @@ public class Announcement extends EndlessCommand
 
              try
              {
-                 preRole = splittedArgs2[2].trim();
+                 preRole = splittedArgs2[1].trim();
 
                  List<Role> rList = FinderUtil.findRoles(preRole, event.getGuild());
                  if(rList.isEmpty())
