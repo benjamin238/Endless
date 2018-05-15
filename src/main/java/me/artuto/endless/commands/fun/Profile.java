@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.data.ProfileDataManager;
@@ -25,11 +26,11 @@ import net.dv8tion.jda.core.Permission;
 
 public class Profile extends EndlessCommand
 {
-    private final ProfileDataManager db;
+    private final Bot bot;
 
-    public Profile(ProfileDataManager db)
+    public Profile(Bot bot)
     {
-        this.db = db;
+        this.bot = bot;
         this.name = "profile";
         this.aliases = new String[]{"p"};
         this.help = "Displays or edits the profile of the specified user";
@@ -44,6 +45,6 @@ public class Profile extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-
+        event.reply("Not available yet...");
     }
 }

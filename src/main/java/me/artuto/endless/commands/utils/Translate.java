@@ -23,6 +23,7 @@ import com.github.vbauer.yta.service.YTranslateApi;
 import com.github.vbauer.yta.service.YTranslateApiImpl;
 import com.github.vbauer.yta.service.basic.exception.YTranslateException;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.loader.Config;
@@ -38,11 +39,11 @@ import java.awt.*;
 public class Translate extends EndlessCommand
 {
     private final Logger LOG = LoggerFactory.getLogger("Translate Command");
-    private final Config config;
+    private final Bot bot;
 
-    public Translate(Config config)
+    public Translate(Bot bot)
     {
-        this.config = config;
+        this.bot = bot;
         this.name = "translate";
         this.help = "Translate something!";
         this.arguments = "<target language> <text>";
@@ -60,7 +61,7 @@ public class Translate extends EndlessCommand
         String language;
         String text;
 
-        if(config.getGihpyKey().isEmpty())
+        if(bot.config.getGihpyKey().isEmpty())
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
             LOG.warn("Someone triggered the Translate command, but there isn't a key in the config file. In order to stop this message add a key to the config file.");
@@ -100,7 +101,7 @@ public class Translate extends EndlessCommand
 
             String title = "<:yandexTranslate:374422013437149186> Text Translated successfully: ";
             EmbedBuilder builder = new EmbedBuilder();
-            YTranslateApi api = new YTranslateApiImpl(config.getTranslateKey());
+            YTranslateApi api = new YTranslateApiImpl(bot.config.getTranslateKey());
             Language target = Language.of(language);
             Translation translated = api.translationApi().translate(text, target);
             Language lang = api.detectionApi().detect(text).get();
@@ -121,7 +122,7 @@ public class Translate extends EndlessCommand
         {
             event.replyError("Something went wrong when translating the text: \n```"+e+"```");
 
-            if(config.isDebugEnabled()) e.printStackTrace();
+            if(bot.config.isDebugEnabled()) e.printStackTrace();
         }
     }
 }

@@ -20,6 +20,7 @@ package me.artuto.endless.commands.utils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
@@ -38,11 +39,11 @@ import java.util.List;
 
 public class Roleme extends EndlessCommand
 {
-    private final GuildSettingsDataManager db;
+    private final Bot bot;
 
-    public Roleme(GuildSettingsDataManager db)
+    public Roleme(Bot bot)
     {
-        this.db = db;
+        this.bot = bot;
         this.name = "roleme";
         this.help = "Self-assignable roles.";
         this.arguments = "[roleme role]";
@@ -59,7 +60,7 @@ public class Roleme extends EndlessCommand
     {
         String args = event.getArgs();
         Guild guild = event.getGuild();
-        List<Role> rolemeRoles = db.getRolemeRoles(guild);
+        List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
         Member member = event.getMember();
         Role role;
 
@@ -132,7 +133,7 @@ public class Roleme extends EndlessCommand
         protected void executeCommand(CommandEvent event)
         {
             Guild guild = event.getGuild();
-            List<Role> rolemeRoles = db.getRolemeRoles(guild);
+            List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
             String args = event.getArgs();
             Role role;
 
@@ -164,7 +165,7 @@ public class Roleme extends EndlessCommand
 
                 if(!(event.getSelfMember().canInteract(role)))
                     event.replyError("I can't interact with that role!");
-                else if(db.addRolemeRole(guild, role))
+                else if(bot.gsdm.addRolemeRole(guild, role))
                     event.replySuccess("Successfully added the role *"+role.getName()+"* to the RoleMe roles list.");
                 else
                     event.replyError("Something has gone wrong while adding the role to the RoleMe roles list, please contact the bot owner.");
@@ -189,7 +190,7 @@ public class Roleme extends EndlessCommand
         protected void executeCommand(CommandEvent event)
         {
             Guild guild = event.getGuild();
-            List<Role> rolemeRoles = db.getRolemeRoles(guild);
+            List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
             String args = event.getArgs();
             Role role;
 
@@ -219,7 +220,7 @@ public class Roleme extends EndlessCommand
                     return;
                 }
 
-                if(db.removeRolemeRole(guild, role))
+                if(bot.gsdm.removeRolemeRole(guild, role))
                     event.replySuccess("Successfully removed the role *"+role.getName()+"* from the RoleMe roles list.");
                 else
                     event.replyError("Something has gone wrong while removing the role from the RoleMe roles list, please contact the bot owner.");

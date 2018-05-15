@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.utils;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
@@ -38,11 +39,11 @@ import java.util.List;
 
 public class TimeFor extends EndlessCommand
 {
-    private final ProfileDataManager db;
+    private final Bot bot;
 
-    public TimeFor(ProfileDataManager db)
+    public TimeFor(Bot bot)
     {
-        this.db = db;
+        this.bot = bot;
         this.name = "timefor";
         this.aliases = new String[]{"tf"};
         this.children = new Command[]{new Change(), new TList()};
@@ -69,10 +70,10 @@ public class TimeFor extends EndlessCommand
         if(event.getArgs().isEmpty())
         {
             user = event.getAuthor();
-            p = db.getProfile(user);
+            p = bot.prdm.getProfile(user);
             name = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
 
-            if(!(db.hasAProfile(user))) event.replyError("You don't have a timezone configured!");
+            if(!(bot.prdm.hasAProfile(user))) event.replyError("You don't have a timezone configured!");
             else
             {
                 try
@@ -108,10 +109,10 @@ public class TimeFor extends EndlessCommand
             }
             else user = list.get(0).getUser();
 
-            p = db.getProfile(user);
+            p = bot.prdm.getProfile(user);
             name = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
 
-            if(!(db.hasAProfile(user))) event.replyError(name+" doesn't has a timezone configured!");
+            if(!(bot.prdm.hasAProfile(user))) event.replyError(name+" doesn't has a timezone configured!");
             else
             {
                 try
@@ -135,7 +136,7 @@ public class TimeFor extends EndlessCommand
 
     private class Change extends EndlessCommand
     {
-        public Change()
+        Change()
         {
             this.name = "change";
             this.aliases = new String[]{"set"};
@@ -169,14 +170,14 @@ public class TimeFor extends EndlessCommand
                 return;
             }
 
-            db.setTimezone(event.getAuthor(), args);
+            bot.prdm.setTimezone(event.getAuthor(), args);
             event.replySuccess("Successfully updated timezone!");
         }
     }
 
     private class TList extends EndlessCommand
     {
-        public TList()
+        TList()
         {
             this.name = "list";
             this.aliases = new String[]{"timezones"};
@@ -194,11 +195,11 @@ public class TimeFor extends EndlessCommand
             event.replySuccess("Here is the list: ");
             try
             {
-                event.getChannel().sendFile(new URL("https://endless.artuto.me/Timezones.txt").openStream(), "Timezones.txt", null).queue();
+                event.getChannel().sendFile(new URL("https://endless.artuto.me/files/Timezones.txt").openStream(), "Timezones.txt", null).queue();
             }
             catch(IOException e)
             {
-                event.replyError("Error when uploading the list, please visit **https://endless.artuto.me/Timezones.txt** to see the list.");
+                event.replyError("Error when uploading the list, please visit **https://endless.artuto.me/files/Timezones.txt** to see the list.");
             }
         }
     }

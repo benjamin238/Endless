@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
@@ -41,11 +42,11 @@ import java.util.List;
 
 public class Donate extends EndlessCommand
 {
-    private final DonatorsDataManager db;
+    private final Bot bot;
 
-    public Donate(DonatorsDataManager db)
+    public Donate(Bot bot)
     {
-        this.db = db;
+        this.bot = bot;
         this.name = "donate";
         this.children = new Command[]{new Add(), new Remove()};
         this.help = "Info about donations";
@@ -62,14 +63,14 @@ public class Donate extends EndlessCommand
         Color color;
         EmbedBuilder builder = new EmbedBuilder();
         StringBuilder sb = new StringBuilder();
-        List<User> list = db.getUsersThatDonated(event.getJDA());
+        List<User> list = bot.ddm.getUsersThatDonated(event.getJDA());
 
         if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
         else color = event.getGuild().getSelfMember().getColor();
 
         if(list.isEmpty()) sb.append("None has donated yet ):");
         else for(User user : list)
-            sb.append(String.format("%#s - %s\n", user, db.getAmount(user)));
+            sb.append(String.format("%#s - %s\n", user, bot.ddm.getAmount(user)));
 
         builder.setColor(color);
         builder.addField(":moneybag: Donations:", "Actually, I host Endless on a very basic VPS, which can cause some lag sometimes.\n"+"I'll appreciate your donation. All the recauded money will be for get a new and better VPS.\n", false);
@@ -130,7 +131,7 @@ public class Donate extends EndlessCommand
             {
                 event.getJDA().retrieveUserById(id).queue(s ->
                 {
-                    db.setDonation(s, amount);
+                    bot.ddm.setDonation(s, amount);
                     event.replySuccess(String.format("Successfully added %#s to the donators list!", s));
                 }, e -> event.replyError("Invalid ID!"));
             }
@@ -138,7 +139,7 @@ public class Donate extends EndlessCommand
             else
             {
                 user = list.get(0).getUser();
-                db.setDonation(user, amount);
+                bot.ddm.setDonation(user, amount);
                 event.replySuccess(String.format("Successfully added %#s to the donators list!", user));
             }
         }
@@ -179,14 +180,14 @@ public class Donate extends EndlessCommand
             {
                 event.getJDA().retrieveUserById(event.getArgs()).queue(s ->
                 {
-                    if(!(db.hasDonated(s)))
+                    if(!(bot.ddm.hasDonated(s)))
                     {
-                        db.setDonation(s, null);
+                        bot.ddm.setDonation(s, null);
                         event.replyError("This user hasn't donated!");
                     }
                     else
                     {
-                        db.setDonation(s, null);
+                        bot.ddm.setDonation(s, null);
                         event.replySuccess(String.format("Successfully removed %#s from the donators list!", s));
                     }
                 }, e -> event.replyError("Invalid ID!"));
@@ -196,14 +197,14 @@ public class Donate extends EndlessCommand
             {
                 user = list.get(0).getUser();
 
-                if(!(db.hasDonated(user)))
+                if(!(bot.ddm.hasDonated(user)))
                 {
-                    db.setDonation(user, null);
+                    bot.ddm.setDonation(user, null);
                     event.replyError("This user hasn't donated!");
                 }
                 else
                 {
-                    db.setDonation(user, null);
+                    bot.ddm.setDonation(user, null);
                     event.replySuccess(String.format("Successfully removed %#s from the donators list!", user));
                 }
             }

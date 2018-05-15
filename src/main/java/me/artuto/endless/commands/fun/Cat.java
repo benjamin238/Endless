@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.loader.Config;
@@ -38,11 +39,11 @@ import java.io.IOException;
 public class Cat extends EndlessCommand
 {
     private final Logger LOG = LoggerFactory.getLogger("Cat Image Command");
-    private final Config config;
+    private final Bot bot;
 
-    public Cat(Config config)
+    public Cat(Bot bot)
     {
-        this.config = config;
+        this.bot = bot;
         this.name = "cat";
         this.help = "Displays a cute kitty.";
         this.category = Categories.FUN;
@@ -84,7 +85,7 @@ public class Cat extends EndlessCommand
             event.replyError("An error was thrown when getting the image! Ask the Owner to check the Console.");
             LOG.error(e.getMessage());
 
-            if(config.isDebugEnabled()) e.printStackTrace();
+            if(bot.config.isDebugEnabled()) e.printStackTrace();
         }
     }
 }

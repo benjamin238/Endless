@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
@@ -27,11 +28,11 @@ import net.dv8tion.jda.core.entities.Guild;
 
 public class Leave extends EndlessCommand
 {
-    private final GuildSettingsDataManager db;
+    private final Bot bot;
 
-    public Leave(GuildSettingsDataManager db)
+    public Leave(Bot bot)
     {
-        this.db = db;
+        this.bot = bot;
         this.name = "leave";
         this.children = new Command[]{new Change()};
         this.aliases = new String[]{"leavemessage", "leavemsg"};
@@ -47,7 +48,7 @@ public class Leave extends EndlessCommand
     protected void executeCommand(CommandEvent event)
     {
         Guild guild = event.getGuild();
-        String msg = db.getLeaveMessage(guild);
+        String msg = bot.gsdm.getLeaveMessage(guild);
 
         if(!(msg == null)) event.replySuccess("Leave message at **"+guild.getName()+"**: `"+msg+"`");
         else event.replyError("No message configured!");
@@ -55,10 +56,11 @@ public class Leave extends EndlessCommand
 
     private class Change extends EndlessCommand
     {
-        public Change()
+        Change()
         {
             this.name = "change";
             this.help = "Changes the welcome message";
+            this.aliases = new String[]{"set"};
             this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -75,7 +77,7 @@ public class Leave extends EndlessCommand
                 return;
             }
 
-            db.setLeaveMessage(event.getGuild(), event.getArgs());
+            bot.gsdm.setLeaveMessage(event.getGuild(), event.getArgs());
             event.replySuccess("leave message configured.");
         }
     }

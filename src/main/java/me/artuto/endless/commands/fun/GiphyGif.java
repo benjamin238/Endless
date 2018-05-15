@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.kdotj.simplegiphy.SimpleGiphy;
@@ -41,11 +42,11 @@ import java.util.Random;
 public class GiphyGif extends EndlessCommand
 {
     private final Logger LOG = LoggerFactory.getLogger("Giphy Command");
-    private Config config;
+    private Bot bot;
 
-    public GiphyGif(Config config)
+    public GiphyGif(Bot bot)
     {
-        this.config = config;
+        this.bot = bot;
         this.name = "giphy";
         this.aliases = new String[]{"gif"};
         this.children = new Command[]{new RandomGif()};
@@ -63,7 +64,7 @@ public class GiphyGif extends EndlessCommand
     {
         String args = event.getArgs();
 
-        if(config.getGihpyKey().isEmpty())
+        if(bot.config.getGihpyKey().isEmpty())
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
             LOG.warn("Someone triggered the Giphy command, but there isn't a key in the config file. In order to stop this message add a key to the config file.");
@@ -72,7 +73,7 @@ public class GiphyGif extends EndlessCommand
 
         try
         {
-            SimpleGiphy.setApiKey(config.getGihpyKey());
+            SimpleGiphy.setApiKey(bot.config.getGihpyKey());
             GiphyListResponse r;
             EmbedBuilder builder = new EmbedBuilder();
             String title;
@@ -124,13 +125,13 @@ public class GiphyGif extends EndlessCommand
             event.replyError("An error was thrown when getting a gif! Ask the Owner to check the Console.");
             LOG.error(e.getMessage());
 
-            if(config.isDebugEnabled()) e.printStackTrace();
+            if(bot.config.isDebugEnabled()) e.printStackTrace();
         }
     }
 
     private class RandomGif extends EndlessCommand
     {
-        private RandomGif()
+        RandomGif()
         {
             this.name = "random";
             this.help = "Retrieves a random GIF from Giphy.";
@@ -146,7 +147,7 @@ public class GiphyGif extends EndlessCommand
         {
             String args = event.getArgs();
 
-            if(config.getGihpyKey().isEmpty())
+            if(bot.config.getGihpyKey().isEmpty())
             {
                 event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
                 LOG.warn("Someone triggered the Giphy command, but there isn't a key in the config file. In order to stop this message add a key to the config file.");
@@ -164,7 +165,7 @@ public class GiphyGif extends EndlessCommand
             if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
             else color = event.getMember().getColor();
 
-            SimpleGiphy.setApiKey(config.getGihpyKey());
+            SimpleGiphy.setApiKey(bot.config.getGihpyKey());
             RandomGiphyResponse r;
             EmbedBuilder builder = new EmbedBuilder();
             String title = "<:giphy:373675520099090436> Random Giphy Image:";

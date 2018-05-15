@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
@@ -34,13 +35,11 @@ import java.util.concurrent.TimeUnit;
 
 public class Starboard extends EndlessCommand
 {
-    private final GuildSettingsDataManager db;
-    private final EventWaiter ew;
+    private final Bot bot;
 
-    public Starboard(GuildSettingsDataManager db, EventWaiter waiter)
+    public Starboard(Bot bot)
     {
-        this.db = db;
-        this.ew = waiter;
+        this.bot = bot;
         this.name = "starboard";
         this.children = new Command[]{new SetChannel(), new SetCount()};
         this.aliases = new String[]{"sb"};
@@ -64,7 +63,7 @@ public class Starboard extends EndlessCommand
     {
         event.replySuccess("Alright! Lets start; First, Do you want to create a new channel or use a channel already created?\n"+"Type **\"create\"** to create a new channel and automatically setup permissions.\n"+"Type **\"created <channel name>\"** to use an already created channel.\n"+"Type **\"cancel\"** to cancel the setup.");
 
-        ew.waitForEvent(GuildMessageReceivedEvent.class, e -> event.getAuthor().equals(e.getAuthor()) && event.getTextChannel().equals(e.getChannel()), e ->
+        bot.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> event.getAuthor().equals(e.getAuthor()) && event.getTextChannel().equals(e.getChannel()), e ->
         {
             switch(e.getMessage().getContentRaw().split(" ", 2)[0].toLowerCase())
             {
@@ -84,7 +83,7 @@ public class Starboard extends EndlessCommand
                         event.getGuild().getController().createTextChannel("starboard").queue(tc -> tc.createPermissionOverride(event.getGuild().getPublicRole()).setDeny(Permission.MESSAGE_WRITE).queue(self -> self.getChannel().createPermissionOverride(event.getSelfMember()).setAllow(Permission.MESSAGE_WRITE).queue(next ->
                         {
                             event.replySuccess("Channel created successfully!");
-                            db.setStarboardChannel(event.getGuild(), (TextChannel) tc);
+                            bot.gsdm.setStarboardChannel(event.getGuild(), (TextChannel) tc);
                             waitForStarCount(event);
                         })));
                     }));
@@ -109,7 +108,7 @@ public class Starboard extends EndlessCommand
                     else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, tc));
                     else
                     {
-                        db.setStarboardChannel(event.getGuild(), list.get(0));
+                        bot.gsdm.setStarboardChannel(event.getGuild(), list.get(0));
                         event.replySuccess("Alright, the starboard channel will be "+list.get(0).getAsMention());
                         waitForStarCount(event);
                     }
@@ -125,7 +124,7 @@ public class Starboard extends EndlessCommand
     {
         event.replySuccess("Now, what minimum amount of stars are needed to appear in the starboard? Minimum amount is 1 and maximum is 20.");
 
-        ew.waitForEvent(GuildMessageReceivedEvent.class, e -> event.getAuthor().equals(e.getAuthor()) && event.getTextChannel().equals(e.getChannel()), e ->
+        bot.waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> event.getAuthor().equals(e.getAuthor()) && event.getTextChannel().equals(e.getChannel()), e ->
         {
             Integer args;
 
@@ -155,7 +154,7 @@ public class Starboard extends EndlessCommand
             else
             {
                 event.replySuccess("OK! The required star amount is `"+args+"`.");
-                db.setStarboardCount(event.getGuild(), args);
+                bot.gsdm.setStarboardCount(event.getGuild(), args);
                 finished(event);
             }
 
@@ -187,7 +186,7 @@ public class Starboard extends EndlessCommand
             if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
             else if(event.getArgs().equalsIgnoreCase("none"))
             {
-                db.setStarboardChannel(event.getGuild(), null);
+                bot.gsdm.setStarboardChannel(event.getGuild(), null);
                 event.replySuccess("Starboard disabled");
             }
             else
@@ -197,7 +196,7 @@ public class Starboard extends EndlessCommand
                 else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
-                    db.setStarboardChannel(event.getGuild(), list.get(0));
+                    bot.gsdm.setStarboardChannel(event.getGuild(), list.get(0));
                     event.replySuccess("The starboard is now "+list.get(0).getAsMention());
                 }
             }
@@ -243,7 +242,7 @@ public class Starboard extends EndlessCommand
             else
             {
                 event.replySuccess("OK! The required star amount is `"+args+"`.");
-                db.setStarboardCount(event.getGuild(), args);
+                bot.gsdm.setStarboardCount(event.getGuild(), args);
             }
         }
     }

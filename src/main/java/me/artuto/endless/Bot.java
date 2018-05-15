@@ -139,7 +139,7 @@ public class Bot extends ListenerAdapter
 
         client.addCommands(
                 //Bot
-                new About(config), new Donate(ddm), new Invite(), new Ping(), new Stats(),
+                new About(this), new Donate(this), new Invite(), new Ping(), new Stats(),
 
                 //Bot Administration
                 new Bash(), new BlacklistUsers(this), new BotCPanel(), new Eval(this), new Shutdown(),
@@ -149,16 +149,18 @@ public class Bot extends ListenerAdapter
                 new Hackban(this), new Mute(this), new Softban(this), new Unban(this),
 
                 //Server Settings
-                new Leave(gsdm), new Prefix(db, gsdm), new ServerSettings(this), new Setup(this), new Starboard(gsdm, loader.waiter), new Welcome(gsdm),
+                new Leave(this), new Prefix(this), new ServerSettings(this),
+                new Setup(this), new Starboard(this), new Welcome(this),
 
                 //Tools
                 new Afk(), new Avatar(), new GuildInfo(), new Lookup(), new Quote(), new RoleCmd(), new UserInfo(),
 
                 //Fun
-                new Cat(config), new Choose(), new Dog(config), new GiphyGif(config), new Profile(prdm), new Say(), new Tag(tdm),
+                new Cat(this), new Choose(), new Dog(this),
+                new GiphyGif(this), new Profile(this), new Say(), new Tag(this),
 
                 //Utils
-                new GoogleSearch(), new Roleme(gsdm), new TimeFor(prdm), new Translate(config));
+                new GoogleSearch(), new Roleme(this), new TimeFor(this), new Translate(this));
 
         Endless.LOG.info("Starting JDA...");
 

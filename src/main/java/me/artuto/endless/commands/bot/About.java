@@ -19,6 +19,7 @@ package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.JDAUtilitiesInfo;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
@@ -38,11 +39,11 @@ import java.awt.*;
 
 public class About extends EndlessCommand
 {
-    private final Config config;
+    private final Bot bot;
 
-    public About(Config config)
+    public About(Bot bot)
     {
-        this.config = config;
+        this.bot = bot;
         this.name = "about";
         this.help = "Info about the bot";
         this.category = Categories.BOT;
@@ -62,7 +63,7 @@ public class About extends EndlessCommand
 
         String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
         EmbedBuilder builder = new EmbedBuilder();
-        User owner = event.getJDA().getUserById(config.getOwnerId());
+        User owner = event.getJDA().getUserById(bot.config.getOwnerId());
         String ownername = owner.getName()+"#"+owner.getDiscriminator();
         String ownerid = owner.getId();
 

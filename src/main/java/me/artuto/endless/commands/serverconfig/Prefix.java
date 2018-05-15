@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
+import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
@@ -30,13 +31,11 @@ import java.util.Collection;
 
 public class Prefix extends EndlessCommand
 {
-    private final DatabaseManager db;
-    private final GuildSettingsDataManager gsdm;
+    private final Bot bot;
 
-    public Prefix(DatabaseManager db, GuildSettingsDataManager gsdm)
+    public Prefix(Bot bot)
     {
-        this.db = db;
-        this.gsdm = gsdm;
+        this.bot = bot;
         this.name = "prefix";
         this.children = new Command[]{new Add(), new Remove()};
         this.help = "Displays or adds a prefix";
@@ -54,7 +53,7 @@ public class Prefix extends EndlessCommand
         Guild guild = event.getGuild();
         String defP = event.getClient().getPrefix();
 
-        Collection<String> prefixes = db.getSettings(guild).getPrefixes();
+        Collection<String> prefixes = bot.db.getSettings(guild).getPrefixes();
 
         if(prefixes == null) event.reply("The prefix for this guild is `"+defP+"`");
         else
@@ -88,7 +87,7 @@ public class Prefix extends EndlessCommand
             if(args.isEmpty()) event.replyWarning("You didn't provided me a prefix!");
             else
             {
-                if(gsdm.addPrefix(guild, args.toLowerCase().trim())) event.replySuccess("Successfully added prefix!");
+                if(bot.gsdm.addPrefix(guild, args.toLowerCase().trim())) event.replySuccess("Successfully added prefix!");
                 else event.replyError("There was an error when adding the prefix. Contact the owner.");
             }
         }
@@ -116,9 +115,9 @@ public class Prefix extends EndlessCommand
             if(args.isEmpty()) event.replyWarning("You didn't provided me a prefix!");
             else
             {
-                if(gsdm.prefixExists(guild, args.toLowerCase().trim()))
+                if(bot.gsdm.prefixExists(guild, args.toLowerCase().trim()))
                 {
-                    if(gsdm.removePrefix(guild, args.toLowerCase().trim()))
+                    if(bot.gsdm.removePrefix(guild, args.toLowerCase().trim()))
                         event.replySuccess("Successfully removed a prefix!");
                     else event.replyError("There was an error when removing the prefix. Contact the owner.");
                 }
