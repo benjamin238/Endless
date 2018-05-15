@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data;
+package me.artuto.endless.data.managers;
 
+import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class DonatorsDataManager
     private static Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
-    public DonatorsDataManager(DatabaseManager db)
+    public DonatorsDataManager(Database db)
     {
         connection = db.getConnection();
     }
