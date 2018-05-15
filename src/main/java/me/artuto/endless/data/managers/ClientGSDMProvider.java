@@ -19,6 +19,7 @@ package me.artuto.endless.data.managers;
 
 import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import me.artuto.endless.data.Database;
+import net.dv8tion.jda.core.entities.Guild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,12 +28,12 @@ import java.util.Collection;
 
 public class ClientGSDMProvider implements GuildSettingsProvider
 {
-    private final Long guild;
+    private final Guild guild;
     private final Database db;
     private final GuildSettingsDataManager gsdm;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
-    public ClientGSDMProvider(Long guild, Database db, GuildSettingsDataManager gsdm)
+    public ClientGSDMProvider(Guild guild, Database db, GuildSettingsDataManager gsdm)
     {
         this.guild = guild;
         this.db = db;

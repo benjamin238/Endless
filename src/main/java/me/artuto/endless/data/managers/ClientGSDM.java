@@ -41,6 +41,6 @@ public class ClientGSDM implements GuildSettingsManager<ClientGSDMProvider>
     @Override
     public ClientGSDMProvider getSettings(Guild guild)
     {
-        return new ClientGSDMProvider(guild.getIdLong(), db, gsdm);
+        return new ClientGSDMProvider(guild, db, gsdm);
     }
 }
