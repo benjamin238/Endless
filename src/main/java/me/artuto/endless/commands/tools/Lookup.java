@@ -71,7 +71,7 @@ public class Lookup extends EndlessCommand
 
         if(args.isEmpty())
         {
-            event.replyWarning("");
+            event.replyWarning("No arguments provided!");
             return;
         }
 
