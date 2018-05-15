@@ -107,7 +107,7 @@ public class RoleCmd extends EndlessCommand
             builder.addField(":key: Permissions: ", permissions, false);
             builder.addField(":busts_in_silhouette: Members: ", membersInRole, false);
             builder.setColor(color);
-            event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+            event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
         }
         catch(Exception e)
         {
@@ -117,7 +117,7 @@ public class RoleCmd extends EndlessCommand
 
     private class GiveRole extends EndlessCommand
     {
-        public GiveRole()
+        GiveRole()
         {
             this.name = "give";
             this.help = "Gives the specified role to the specified member";
@@ -202,7 +202,7 @@ public class RoleCmd extends EndlessCommand
 
     private class TakeRole extends EndlessCommand
     {
-        public TakeRole()
+        TakeRole()
         {
             this.name = "take";
             this.help = "Takes the specified role from the specified member";

@@ -152,7 +152,8 @@ public class Bot extends ListenerAdapter
                 new Setup(this), new Starboard(this), new Welcome(this),
 
                 //Tools
-                new Afk(), new Avatar(), new GuildInfo(), new Lookup(), new Quote(), new RoleCmd(), new UserInfo(),
+                new Afk(), new Announcement(), new Avatar(), new GuildInfo(),
+                new Lookup(), new Quote(), new RoleCmd(), new UserInfo(),
 
                 //Fun
                 new Cat(this), new Choose(), new Dog(this),
