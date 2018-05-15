@@ -264,7 +264,7 @@ public class GuildEvents extends ListenerAdapter
                 return;
 
             bot.modlog.logMute(author, guild.getMember(target), reason, guild, FinderUtil.getDefaultChannel(guild));
-            bot.pdm.addPunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.TEMPMUTE);
+            bot.pdm.addPunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE);
         }, e -> {});
     }
 
@@ -290,7 +290,7 @@ public class GuildEvents extends ListenerAdapter
             User target = parsedAuditLog.getTarget();
 
             bot.modlog.logUnmute(author, guild.getMember(target), reason, guild, FinderUtil.getDefaultChannel(guild));
-            bot.pdm.removePunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.TEMPMUTE);
+            bot.pdm.removePunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE);
         }, e -> {});
     }
 
