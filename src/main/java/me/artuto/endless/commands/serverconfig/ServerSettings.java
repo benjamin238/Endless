@@ -76,7 +76,7 @@ public class ServerSettings extends EndlessCommand
         builder.addField("Serverlog Channel:", (serverlog==null?"None":serverlog.getAsMention()), true);
         builder.addBlankField(true);
         builder.addField("Welcome Channel:", (welcome==null?"None":welcome.getAsMention()), true);
-        builder.addField("Welcome Message:", (welcomeMsg==null?"None":"`` "+welcomeMsg+"```"), true);
+        builder.addField("Welcome Message:", (welcomeMsg==null?"None":"```"+welcomeMsg+"```"), true);
         builder.addBlankField(true);
         builder.addField("Leave Channel:", (leave==null?"None":leave.getAsMention()), true);
         builder.addField("Leave Message:", (leaveMsg==null?"None":"```"+leaveMsg+"```"), true);
