@@ -20,19 +20,24 @@ package me.artuto.endless.data;
 import me.artuto.endless.entities.GuildSettings;
 import me.artuto.endless.entities.impl.GuildSettingsImpl;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Role;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class DatabaseManager
 {
     private final Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
-    private final GuildSettings DEFAULT = new GuildSettingsImpl(0L, 0L, 0L, "", 0L, "", 0L, 0, null, 0L);
+    private final GuildSettings DEFAULT = new GuildSettingsImpl(null, 0, 0,null,
+            0L, 0L, 0L,0L,
+            0L, 0L, null, null);
 
     public DatabaseManager(String host, String user, String pass) throws SQLException
     {
@@ -55,6 +60,7 @@ public class DatabaseManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             GuildSettings gs;
+            List<Role> roleMeRoles = new LinkedList<>();
             Set<String> prefixes = new HashSet<>();
             String array;
 
@@ -66,51 +72,26 @@ public class DatabaseManager
 
                     if(!(array == null))
                     {
-                        for(Object prefix : new JSONArray(results.getString("prefixes")))
+                        for(Object prefix : new JSONArray(array))
                             prefixes.add(prefix.toString());
                     }
 
-                    gs = new GuildSettingsImpl(results.getLong("modlog_id"), results.getLong("serverlog_id"),
-                            results.getLong("welcome_id"), results.getString("welcome_msg"),
-                            results.getLong("leave_id"), results.getString("leave_msg"),
-                            results.getLong("starboard_id"), results.getInt("starboard_count"),
-                            prefixes, results.getLong("muted_role_id"));
-                }
-                else gs = DEFAULT;
-            }
-            return gs;
-        }
-        catch(SQLException e)
-        {
-            LOG.warn(e.toString());
-            return DEFAULT;
-        }
-    }
+                    array = results.getString("roleme_roles");
 
-    public GuildSettings getSettings(long guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            GuildSettings gs;
-            Set<String> prefixes = new HashSet<>();
-            String array;
+                    if(!(array == null))
+                    {
+                        for(Object preRole : new JSONArray(array))
+                        {
+                            Role role = guild.getRoleById(preRole.toString());
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild)))
-            {
-                if(results.next())
-                {
-                    array = results.getString("prefixes");
+                            if(!(role==null))
+                                roleMeRoles.add(role);
+                        }
+                    }
 
-                    if(!(array == null)) for(Object prefix : new JSONArray(results.getString("prefixes")))
-                        prefixes.add(prefix.toString());
-
-                    gs = new GuildSettingsImpl(results.getLong("modlog_id"), results.getLong("serverlog_id"),
-                            results.getLong("welcome_id"), results.getString("welcome_msg"),
-                            results.getLong("leave_id"), results.getString("leave_msg"),
-                            results.getLong("starboard_id"), results.getInt("starboard_count"),
-                            prefixes, results.getLong("muted_role_id"));
+                    gs = new GuildSettingsImpl(prefixes, results.getInt("ban_delete_days"), results.getInt("starboard_count"), roleMeRoles,
+                            results.getLong("leave_id"), results.getLong("modlog_id"), results.getLong("muted_role_id"), results.getLong("serverlog_id"),
+                            results.getLong("starboard_id"), results.getLong("welcome_id"), results.getString("leave_msg"), results.getString("welcome_msg"));
                 }
                 else gs = DEFAULT;
             }

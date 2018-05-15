@@ -19,21 +19,15 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.loader.Config;
-import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.utils.FormatUtil;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
-import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -42,13 +36,11 @@ import java.util.List;
 
 public class Kick extends EndlessCommand
 {
-    private final ModLogging modlog;
-    private final Config config;
+    private final Bot bot;
 
-    public Kick(ModLogging modlog, Config config)
+    public Kick(Bot bot)
     {
-        this.modlog = modlog;
-        this.config = config;
+        this.bot = bot;
         this.name = "kick";
         this.help = "Kicks the specified user";
         this.arguments = "<@user|ID|nickname|username> for [reason]";
@@ -62,7 +54,6 @@ public class Kick extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        EmbedBuilder builder = new EmbedBuilder();
         Member member;
         User author = event.getAuthor();
         String target;
@@ -76,7 +67,7 @@ public class Kick extends EndlessCommand
 
         try
         {
-            String[] args = event.getArgs().split(" for", 2);
+            String[] args = event.getArgs().split(" for ", 2);
             target = args[0].trim();
             reason = args[1].trim();
         }
@@ -100,56 +91,24 @@ public class Kick extends EndlessCommand
         }
         else member = list.get(0);
 
-        if(!event.getSelfMember().canInteract(member))
+        if(!(event.getSelfMember().canInteract(member)))
         {
             event.replyError("I can't kick the specified user!");
             return;
         }
 
-        if(!event.getMember().canInteract(member))
+        if(!(event.getMember().canInteract(member)))
         {
             event.replyError("You can't kick the specified user!");
             return;
         }
 
         String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
-        String r = reason;
+        String fReason = reason;
 
-        try
-        {
-            if(!(member.getUser().isBot()))
-            {
-                builder.setColor(Color.YELLOW);
-                builder.setThumbnail(event.getGuild().getIconUrl());
-                builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-                builder.setTitle("Kick");
-                builder.setDescription("You were kicked on the guild **"+event.getGuild().getName()+"** by **"+event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"+"They gave the following reason: **"+reason+"**\n");
-                builder.setFooter("Time", null);
-                builder.setTimestamp(Instant.now());
-
-                member.getUser().openPrivateChannel().queue(s -> s.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue((d) ->
-                {
-                    event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
-                    event.replySuccess(Messages.KICK_SUCCESS+username);
-                }, (e) ->
-                {
-                    event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
-                    event.replySuccess(Messages.KICK_SUCCESS+username);
-                }));
-            }
-            else
-            {
-                event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
-                event.replySuccess(Messages.KICK_SUCCESS+username);
-            }
-
-            modlog.logKick(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
-        }
-        catch(Exception e)
-        {
-            event.replyError(Messages.KICK_ERROR+username);
-            LoggerFactory.getLogger("Kick Command").error(e.toString());
-            if(config.isDebugEnabled()) e.printStackTrace();
-        }
+        event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
+            event.replySuccess(Messages.KICK_SUCCESS+username);
+            bot.modlog.logKick(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
+        }, e -> event.replyError(Messages.KICK_ERROR+username));
     }
 }

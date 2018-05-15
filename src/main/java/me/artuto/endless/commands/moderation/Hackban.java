@@ -18,24 +18,20 @@
 package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.loader.Config;
-import me.artuto.endless.logging.ModLogging;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
-import org.slf4j.LoggerFactory;
 
 public class Hackban extends EndlessCommand
 {
-    private final ModLogging modlog;
-    private final Config config;
+    private final Bot bot;
 
-    public Hackban(ModLogging modlog, Config config)
+    public Hackban(Bot bot)
     {
-        this.modlog = modlog;
-        this.config = config;
+        this.bot = bot;
         this.name = "hackban";
         this.help = "Hackbans the specified user";
         this.arguments = "<ID> for [reason]";
@@ -62,7 +58,7 @@ public class Hackban extends EndlessCommand
 
         try
         {
-            String[] args = event.getArgs().split(" for", 2);
+            String[] args = event.getArgs().split(" for ", 2);
             target = args[0];
             reason = args[1];
         }
@@ -83,23 +79,16 @@ public class Hackban extends EndlessCommand
         }
 
         String username = "**"+user.getName()+"**#**"+user.getDiscriminator()+"**";
+        String fReason = reason;
 
         if(event.getGuild().getMembers().contains(event.getGuild().getMemberById(target)))
             event.replyWarning("This user is on this Guild! Please use `"+event.getClient().getPrefix()+"ban` instead.");
         else
         {
-            try
-            {
-                event.getGuild().getController().ban(user, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
+            event.getGuild().getController().ban(user, bot.gsdm.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
                 event.replySuccess(Messages.HACKBAN_SUCCESS+username);
-                modlog.logHackban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
-            }
-            catch(Exception e)
-            {
-                event.replyError(Messages.HACKBAN_ERROR+username);
-                LoggerFactory.getLogger("Hackban command").error(e.toString());
-                if(config.isDebugEnabled()) e.printStackTrace();
-            }
+                bot.modlog.logHackban(event.getAuthor(), user, fReason, event.getGuild(), event.getTextChannel());
+            }, e -> event.replyError(Messages.HACKBAN_ERROR+username));
         }
     }
 }

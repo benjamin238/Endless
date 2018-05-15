@@ -18,77 +18,34 @@
 package me.artuto.endless.entities.impl;
 
 import me.artuto.endless.entities.GuildSettings;
+import net.dv8tion.jda.core.entities.Role;
 
 import java.util.Collection;
+import java.util.List;
 
 public class GuildSettingsImpl implements GuildSettings
 {
     private final Collection<String> prefixes;
-    private final int starboardCount;
+    private final int banDeleteDays, starboardCount;
+    private final List<Role> roleMeRoles;
     private final long modlogId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
     private final String welcomeMsg, leaveMsg;
 
-    public GuildSettingsImpl(long modlogId, long serverlogId, long welcomeId, String welcomeMsg,
-                             long leaveId, String leaveMsg, long starboardId, int starboardCount, Collection<String> prefixes, long mutedRoleId)
+    public GuildSettingsImpl(Collection<String> prefixes, int banDeleteDays, int starboardCount, List<Role> roleMeRoles, long leaveId, long modlogId, long mutedRoleId,
+                             long serverlogId, long starboardId, long welcomeId, String leaveMsg, String welcomeMsg)
     {
-        this.modlogId = modlogId;
-        this.serverlogId = serverlogId;
-        this.welcomeId = welcomeId;
-        this.welcomeMsg = welcomeMsg;
-        this.leaveMsg = leaveMsg;
-        this.leaveId = leaveId;
-        this.starboardId = starboardId;
-        this.starboardCount = starboardCount;
         this.prefixes = prefixes;
+        this.banDeleteDays = banDeleteDays;
+        this.starboardCount = starboardCount;
+        this.roleMeRoles = roleMeRoles;
+        this.leaveId = leaveId;
+        this.modlogId = modlogId;
         this.mutedRoleId = mutedRoleId;
-    }
-
-    @Override
-    public long getModlog()
-    {
-        return modlogId;
-    }
-
-    @Override
-    public long getServerlog()
-    {
-        return serverlogId;
-    }
-
-    @Override
-    public long getWelcomeChannel()
-    {
-        return welcomeId;
-    }
-
-    @Override
-    public String getWelcomeMsg()
-    {
-        return welcomeMsg;
-    }
-
-    @Override
-    public long getLeaveChannel()
-    {
-        return leaveId;
-    }
-
-    @Override
-    public String getLeaveMsg()
-    {
-        return leaveMsg;
-    }
-
-    @Override
-    public long getStarboard()
-    {
-        return starboardId;
-    }
-
-    @Override
-    public int getStarboardCount()
-    {
-        return starboardCount;
+        this.serverlogId = serverlogId;
+        this.starboardId = starboardId;
+        this.welcomeId = welcomeId;
+        this.leaveMsg = leaveMsg;
+        this.welcomeMsg = welcomeMsg;
     }
 
     @Override
@@ -98,8 +55,68 @@ public class GuildSettingsImpl implements GuildSettings
     }
 
     @Override
+    public int getBanDeleteDays()
+    {
+        return banDeleteDays;
+    }
+
+    @Override
+    public int getStarboardCount()
+    {
+        return starboardCount;
+    }
+
+    @Override
+    public List<Role> getRoleMeRoles()
+    {
+        return roleMeRoles;
+    }
+
+    @Override
+    public long getLeaveChannel()
+    {
+        return leaveId;
+    }
+
+    @Override
+    public long getModlog()
+    {
+        return modlogId;
+    }
+
+    @Override
     public long getMutedRole()
     {
         return mutedRoleId;
+    }
+
+    @Override
+    public long getServerlog()
+    {
+        return serverlogId;
+    }
+
+    @Override
+    public long getStarboard()
+    {
+        return starboardId;
+    }
+
+    @Override
+    public long getWelcomeChannel()
+    {
+        return welcomeId;
+    }
+
+    @Override
+    public String getLeaveMsg()
+    {
+        return leaveMsg;
+    }
+
+    @Override
+    public String getWelcomeMsg()
+    {
+        return welcomeMsg;
     }
 }

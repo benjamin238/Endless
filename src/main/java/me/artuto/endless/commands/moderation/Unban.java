@@ -19,15 +19,13 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.loader.Config;
-import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -37,13 +35,11 @@ import java.util.List;
 
 public class Unban extends EndlessCommand
 {
-    private final ModLogging modlog;
-    private final Config config;
+    private final Bot bot;
 
-    public Unban(ModLogging modlog, Config config)
+    public Unban(Bot bot)
     {
-        this.modlog = modlog;
-        this.config = config;
+        this.bot = bot;
         this.name = "unban";
         this.help = "Unbans the specified user";
         this.arguments = "<@user|ID|username> for [reason]";
@@ -71,7 +67,7 @@ public class Unban extends EndlessCommand
 
         try
         {
-            String[] args = event.getArgs().split(" for", 2);
+            String[] args = event.getArgs().split(" for ", 2);
             target = args[0];
             reason = args[1];
         }
@@ -96,19 +92,11 @@ public class Unban extends EndlessCommand
         else user = list.get(0);
 
         String username = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
+        String fReason = reason;
 
-        try
-        {
-            event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
+        event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
             event.replySuccess(Messages.UNBAN_SUCCESS+username);
-            modlog.logUnban(event.getAuthor(), user, reason, event.getGuild(), event.getTextChannel());
-        }
-        catch(Exception e)
-        {
-            event.replyError(Messages.UNBAN_ERROR+username);
-            LoggerFactory.getLogger("Unban Command").error(e.toString());
-            if(config.isDebugEnabled()) e.printStackTrace();
-        }
+            bot.modlog.logUnban(event.getAuthor(), user, fReason, event.getGuild(), event.getTextChannel());
+        }, e -> event.replyError(Messages.UNBAN_ERROR+username));
     }
-
 }

@@ -19,21 +19,15 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.loader.Config;
-import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.utils.FormatUtil;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
-import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -42,13 +36,11 @@ import java.util.List;
 
 public class Ban extends EndlessCommand
 {
-    private final ModLogging modlog;
-    private final Config config;
+    private final Bot bot;
 
-    public Ban(ModLogging modlog, Config config)
+    public Ban(Bot bot)
     {
-        this.modlog = modlog;
-        this.config = config;
+        this.bot = bot;
         this.name = "ban";
         this.help = "Bans the specified user";
         this.arguments = "<@user|ID|nickname|username> for [reason]";
@@ -62,7 +54,6 @@ public class Ban extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        EmbedBuilder builder = new EmbedBuilder();
         Member member;
         User author = event.getAuthor();
         String target;
@@ -100,56 +91,24 @@ public class Ban extends EndlessCommand
         }
         else member = list.get(0);
 
-        if(!event.getSelfMember().canInteract(member))
+        if(!(event.getSelfMember().canInteract(member)))
         {
             event.replyError("I can't ban the specified user!");
             return;
         }
 
-        if(!event.getMember().canInteract(member))
+        if(!(event.getMember().canInteract(member)))
         {
             event.replyError("You can't ban the specified user!");
             return;
         }
 
         String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
-        String r = reason;
+        String fReason = reason;
 
-        try
-        {
-            if(!(member.getUser().isBot()))
-            {
-                builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-                builder.setTitle("Ban");
-                builder.setDescription("You were banned on the guild **"+event.getGuild().getName()+"** by **"+event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"**\n"+"They gave the following reason: **"+reason+"**\n");
-                builder.setFooter("Time", null);
-                builder.setTimestamp(Instant.now());
-                builder.setColor(Color.RED);
-                builder.setThumbnail(event.getGuild().getIconUrl());
-
-                member.getUser().openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build()).build()).queue((d) ->
-                {
-                    event.getGuild().getController().ban(member, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
-                    event.replySuccess(Messages.BAN_SUCCESS+username);
-                }, (e) ->
-                {
-                    event.getGuild().getController().ban(member, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+r).complete();
-                    event.replySuccess(Messages.BAN_SUCCESS+username);
-                }));
-            }
-            else
-            {
-                event.getGuild().getController().ban(member, 1).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).complete();
-                event.replySuccess(Messages.BAN_SUCCESS+username);
-            }
-
-            modlog.logBan(event.getAuthor(), member, reason, event.getGuild(), event.getTextChannel());
-        }
-        catch(Exception e)
-        {
-            event.replyError(Messages.BAN_ERROR+username);
-            LoggerFactory.getLogger("Ban Command").error(e.getMessage());
-            if(config.isDebugEnabled()) e.printStackTrace();
-        }
+        event.getGuild().getController().ban(member, bot.gsdm.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
+            event.replySuccess(Messages.BAN_SUCCESS+username);
+            bot.modlog.logBan(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
+        }, e -> event.replyError(Messages.BAN_ERROR+username));
     }
 }

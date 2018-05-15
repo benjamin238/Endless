@@ -17,27 +17,34 @@
 
 package me.artuto.endless.entities;
 
+import net.dv8tion.jda.core.entities.Role;
+
 import java.util.Collection;
+import java.util.List;
 
 public interface GuildSettings
 {
-    long getModlog();
+    Collection<String> getPrefixes();
 
-    long getServerlog();
-
-    long getWelcomeChannel();
-
-    String getWelcomeMsg();
-
-    long getLeaveChannel();
-
-    String getLeaveMsg();
-
-    long getStarboard();
+    int getBanDeleteDays();
 
     int getStarboardCount();
 
-    Collection<String> getPrefixes();
+    List<Role> getRoleMeRoles();
+
+    long getLeaveChannel();
+
+    long getModlog();
 
     long getMutedRole();
+
+    long getServerlog();
+
+    long getStarboard();
+
+    long getWelcomeChannel();
+
+    String getLeaveMsg();
+
+    String getWelcomeMsg();
 }

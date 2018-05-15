@@ -43,7 +43,7 @@ public class ServerSettings extends EndlessCommand
     {
         this.bot = bot;
         this.name = "config";
-        this.children = new Command[]{new Modlog(), new Serverlog(), new Welcome(), new Leave(), new MutedRole()};
+        this.children = new Command[]{new Modlog(), new Serverlog(), new Welcome(), new Leave(), new MutedRole(), new BanDeleteDays()};
         this.aliases = new String[]{"settings"};
         this.help = "Displays the settings of the server";
         this.category = Categories.SERVER_CONFIG;
@@ -58,10 +58,12 @@ public class ServerSettings extends EndlessCommand
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
+        String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
+
         GuildSettings settings = bot.db.getSettings(guild);
+        int banDeleteDays = settings.getBanDeleteDays();
         int starboardCount = settings.getStarboardCount();
         Role mutedRole = GuildUtils.getMutedRole(guild);
-        String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
         String welcomeMsg = settings.getWelcomeMsg();
         String leaveMsg = settings.getLeaveMsg();
         TextChannel modlog = guild.getTextChannelById(settings.getModlog());
@@ -83,6 +85,8 @@ public class ServerSettings extends EndlessCommand
         builder.addField("Starboard Count:", (starboardCount==0?"Disabled":String.valueOf(starboardCount)), true);
         builder.addBlankField(true);
         builder.addField("Muted Role:", (mutedRole==null?"None":mutedRole.getAsMention()), true);
+        builder.addField("Ban delete days:", String.valueOf(banDeleteDays), true);
+        builder.addBlankField(true);
         builder.setColor(event.getSelfMember().getColor());
 
         event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
@@ -280,6 +284,44 @@ public class ServerSettings extends EndlessCommand
                         event.replyError("Something went wrong while setting the muted role!");
                 }
             }
+        }
+    }
+
+    private class BanDeleteDays extends EndlessCommand
+    {
+        BanDeleteDays()
+        {
+            this.name = "bandeletedays";
+            this.help = "Sets the amount of messages to delete when banning";
+            this.arguments = "<number of day(s)>";
+            this.category = Categories.SERVER_CONFIG;
+            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.ownerCommand = false;
+            this.guildCommand = true;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            if(event.getArgs().isEmpty()) event.replyError("Please include a number or 0");
+            else if(event.getArgs().equalsIgnoreCase("0"))
+            {
+                bot.gsdm.setBanDeleteDays(event.getGuild(), 0);
+                event.replySuccess("Ban delete days set to 0 (No delete)");
+            }
+            else if(event.getArgs().equalsIgnoreCase("1"))
+            {
+                bot.gsdm.setBanDeleteDays(event.getGuild(), 1);
+                event.replySuccess("Ban delete days set to 1");
+            }
+            else if(event.getArgs().equalsIgnoreCase("7"))
+            {
+                bot.gsdm.setBanDeleteDays(event.getGuild(), 7);
+                event.replySuccess("Ban delete days set to 7");
+            }
+            else
+                event.replyError("That isn't a valid option! Valid options are `0` (Don't delete), `1` and `7`");
         }
     }
 }

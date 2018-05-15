@@ -42,7 +42,6 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import javax.security.auth.login.LoginException;
 import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Artuto
@@ -74,6 +73,9 @@ public class Bot extends ListenerAdapter
     // Schedulers
     public ScheduledExecutorService muteScheduler;
 
+    // Threads
+    public ScheduledExecutorService clearThread;
+
     public void boot(boolean maintenance) throws LoginException
     {
         Endless.LOG.info("Starting Endless "+Const.VERSION+"...");
@@ -94,6 +96,7 @@ public class Bot extends ListenerAdapter
         modlog = loader.dbLoader.getModlog();
 
         loader.threadLoad();
+        clearThread = loader.clearThread;
         loader.waiterLoad();
         waiter = loader.waiter;
 
@@ -139,11 +142,11 @@ public class Bot extends ListenerAdapter
                 new About(config), new Donate(ddm), new Invite(), new Ping(), new Stats(),
 
                 //Bot Administration
-                new Bash(), new BlacklistUsers(bdm), new BotCPanel(), new Eval(this), new Shutdown(),
+                new Bash(), new BlacklistUsers(this), new BotCPanel(), new Eval(this), new Shutdown(),
 
                 //Moderation
-                new Ban(modlog, config), new Clear(modlog, loader.cleanThread), new DBansCheck(config), new Kick(modlog, config),
-                new Hackban(modlog, config), new Mute(this), new Softban(modlog, config), new Unban(modlog, config),
+                new Ban(this), new Clear(this), new DBansCheck(this), new Kick(this),
+                new Hackban(this), new Mute(this), new Softban(this), new Unban(this),
 
                 //Server Settings
                 new Leave(gsdm), new Prefix(db, gsdm), new ServerSettings(this), new Setup(this), new Starboard(gsdm, loader.waiter), new Welcome(gsdm),

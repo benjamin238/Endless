@@ -47,7 +47,7 @@ public class EndlessLoader
 
     // Threads
     public ScheduledExecutorService botlogThread;
-    public ScheduledExecutorService cleanThread;
+    public ScheduledExecutorService clearThread;
     public ScheduledExecutorService cmdThread;
     public ScheduledExecutorService starboardThread;
 
@@ -75,7 +75,7 @@ public class EndlessLoader
     public void threadLoad()
     {
         botlogThread = threadLoader.createThread("Botlog");
-        cleanThread = threadLoader.createThread("Clean Command");
+        clearThread = threadLoader.createThread("Clear Command");
         cmdThread = threadLoader.createThread("Commands");
         muteScheduler = threadLoader.createThread("Mute");
         starboardThread = threadLoader.createThread("Starboard");

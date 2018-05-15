@@ -739,4 +739,55 @@ public class GuildSettingsDataManager
             return false;
         }
     }
+
+    public int getBanDeleteDays(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.closeOnCompletion();
+            int days;
+            try(ResultSet results = statement.executeQuery(String.format("SELECT muted_role FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            {
+                if(results.next()) days = results.getInt("ban_delete_days");
+                else days = 0;
+            }
+            return days;
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+            return 0;
+        }
+    }
+
+
+    public void setBanDeleteDays(Guild guild, int days)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, ban_delete_days FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                {
+                    results.updateInt("ban_delete_days", days);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateInt("ban_delete_days", days);
+                    results.insertRow();
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn(e.toString());
+        }
+    }
 }

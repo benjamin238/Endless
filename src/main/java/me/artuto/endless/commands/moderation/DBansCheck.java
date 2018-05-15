@@ -19,9 +19,9 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.loader.Config;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -43,11 +43,11 @@ import java.util.List;
 public class DBansCheck extends EndlessCommand
 {
     private final Logger LOG = LoggerFactory.getLogger("DiscordBans Command");
-    private final Config config;
+    private final Bot bot;
 
-    public DBansCheck(Config config)
+    public DBansCheck(Bot bot)
     {
-        this.config = config;
+        this.bot = bot;
         this.name = "discordbans";
         this.help = "Checks if the specified user ID is registered on Discord Bans";
         this.arguments = "<@user|ID|nickname|username>";
@@ -74,7 +74,7 @@ public class DBansCheck extends EndlessCommand
             return;
         }
 
-        if(config.getDBansToken().isEmpty())
+        if(bot.config.getDBansToken().isEmpty())
         {
             event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
             LOG.warn("Someone triggered the Discord Bans Check command, but there isn't a token in the config file. In order to stop this message add a token to the config file.");
@@ -105,11 +105,8 @@ public class DBansCheck extends EndlessCommand
         try
         {
             OkHttpClient client = new OkHttpClient();
-
-            RequestBody formBody = new FormBody.Builder().add("token", config.getDBansToken()).add("userid", user.getId()).add("version", "3").build();
-
+            RequestBody formBody = new FormBody.Builder().add("token", bot.config.getDBansToken()).add("userid", user.getId()).add("version", "3").build();
             Request request = new Request.Builder().url("https://bans.discordlist.net/api").post(formBody).build();
-
             Response response = client.newCall(request).execute();
 
             info = response.body().string();
@@ -145,7 +142,7 @@ public class DBansCheck extends EndlessCommand
             event.replyError("An error was thrown when doing the check! Ask the Owner to check the Console.");
             LOG.error(e.toString());
 
-            if(config.isDebugEnabled()) e.printStackTrace();
+            if(bot.config.isDebugEnabled()) e.printStackTrace();
         }
     }
 }
