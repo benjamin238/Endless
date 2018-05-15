@@ -18,16 +18,15 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.Bot;
-import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.kdotj.simplegiphy.SimpleGiphy;
 import com.kdotj.simplegiphy.data.Giphy;
 import com.kdotj.simplegiphy.data.GiphyListResponse;
 import com.kdotj.simplegiphy.data.RandomGiphy;
 import com.kdotj.simplegiphy.data.RandomGiphyResponse;
+import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.loader.Config;
+import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;

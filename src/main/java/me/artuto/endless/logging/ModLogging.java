@@ -18,17 +18,11 @@
 package me.artuto.endless.logging;
 
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.GuildSettingsDataManager;
-import me.artuto.endless.entities.GuildSettings;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.audit.AuditLogChange;
-import net.dv8tion.jda.core.audit.AuditLogEntry;
-import net.dv8tion.jda.core.audit.AuditLogKey;
 import net.dv8tion.jda.core.entities.*;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +30,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * @author Artuto

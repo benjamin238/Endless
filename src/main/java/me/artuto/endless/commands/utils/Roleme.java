@@ -24,7 +24,6 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.data.GuildSettingsDataManager;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;

@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data;
+package me.artuto.endless.data.managers;
 
 import com.jagrosh.jdautilities.command.GuildSettingsManager;
+import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.entities.Guild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,11 @@ import javax.annotation.Nullable;
 
 public class ClientGSDM implements GuildSettingsManager<ClientGSDMProvider>
 {
-    private final DatabaseManager db;
+    private final Database db;
     private final GuildSettingsDataManager gsdm;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
-    public ClientGSDM(DatabaseManager db, GuildSettingsDataManager gsdm)
+    public ClientGSDM(Database db, GuildSettingsDataManager gsdm)
     {
         this.db = db;
         this.gsdm = gsdm;

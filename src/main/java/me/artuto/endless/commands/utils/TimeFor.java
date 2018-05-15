@@ -18,12 +18,12 @@
 package me.artuto.endless.commands.utils;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.Bot;
-import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.ProfileDataManager;
+import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.data.managers.ProfileDataManager;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;

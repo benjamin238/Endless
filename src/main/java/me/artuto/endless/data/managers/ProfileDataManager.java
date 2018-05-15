@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data;
+package me.artuto.endless.data.managers;
 
+import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class ProfileDataManager
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
     private final Profile DEFAULT = new Profile("", 0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
 
-    public ProfileDataManager(DatabaseManager db)
+    public ProfileDataManager(Database db)
     {
         this.connection = db.getConnection();
     }

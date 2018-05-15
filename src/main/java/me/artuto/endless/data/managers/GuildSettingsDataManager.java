@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data;
+package me.artuto.endless.data.managers;
 
+import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -33,11 +34,11 @@ import java.util.List;
 
 public class GuildSettingsDataManager
 {
-    private final DatabaseManager db;
+    private final Database db;
     private final Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
-    public GuildSettingsDataManager(DatabaseManager db)
+    public GuildSettingsDataManager(Database db)
     {
         this.db = db;
         connection = db.getConnection();

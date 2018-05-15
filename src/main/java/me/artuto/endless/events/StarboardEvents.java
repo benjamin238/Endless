@@ -17,8 +17,8 @@
 
 package me.artuto.endless.events;
 
-import me.artuto.endless.data.GuildSettingsDataManager;
-import me.artuto.endless.data.StarboardDataManager;
+import me.artuto.endless.data.managers.GuildSettingsDataManager;
+import me.artuto.endless.data.managers.StarboardDataManager;
 import me.artuto.endless.entities.StarboardMessage;
 import me.artuto.endless.utils.FinderUtil;
 import net.dv8tion.jda.core.EmbedBuilder;

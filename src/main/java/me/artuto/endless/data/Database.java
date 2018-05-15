@@ -31,7 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class DatabaseManager
+public class Database
 {
     private final Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
@@ -39,14 +39,14 @@ public class DatabaseManager
             0L, 0L, 0L,0L,
             0L, 0L, null, null);
 
-    public DatabaseManager(String host, String user, String pass) throws SQLException
+    public Database(String host, String user, String pass) throws SQLException
     {
         connection = DriverManager.getConnection(host, user, pass);
     }
 
     //Connection getter
 
-    Connection getConnection()
+    public Connection getConnection()
     {
         return connection;
     }

@@ -18,13 +18,12 @@
 package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.Bot;
-import me.artuto.endless.commands.EndlessCommand;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.DonatorsDataManager;
+import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;

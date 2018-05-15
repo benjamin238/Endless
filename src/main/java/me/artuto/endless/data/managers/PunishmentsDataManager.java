@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data;
+package me.artuto.endless.data.managers;
 
 import me.artuto.endless.Const;
+import me.artuto.endless.data.Database;
 import me.artuto.endless.entities.Punishment;
 import me.artuto.endless.entities.TempPunishment;
 import me.artuto.endless.entities.impl.PunishmentImpl;
@@ -27,7 +28,6 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class PunishmentsDataManager
     private final Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
-    public PunishmentsDataManager(DatabaseManager db)
+    public PunishmentsDataManager(Database db)
     {
         this.connection = db.getConnection();
     }

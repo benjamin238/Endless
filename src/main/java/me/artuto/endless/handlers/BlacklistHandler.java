@@ -18,7 +18,7 @@
 package me.artuto.endless.handlers;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.data.BlacklistDataManager;
+import me.artuto.endless.data.managers.BlacklistDataManager;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;

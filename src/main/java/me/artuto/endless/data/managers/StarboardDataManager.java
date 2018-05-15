@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data;
+package me.artuto.endless.data.managers;
 
+import me.artuto.endless.data.Database;
 import me.artuto.endless.entities.StarboardMessage;
 import me.artuto.endless.entities.impl.StarboardMessageImpl;
 import net.dv8tion.jda.core.entities.Message;
@@ -33,7 +34,7 @@ public class StarboardDataManager
     private final Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
-    public StarboardDataManager(DatabaseManager db)
+    public StarboardDataManager(Database db)
     {
         connection = db.getConnection();
     }

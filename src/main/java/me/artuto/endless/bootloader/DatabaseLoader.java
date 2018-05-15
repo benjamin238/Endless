@@ -20,7 +20,8 @@ package me.artuto.endless.bootloader;
 import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.data.*;
+import me.artuto.endless.data.Database;
+import me.artuto.endless.data.managers.*;
 import me.artuto.endless.exceptions.DatabaseException;
 import me.artuto.endless.handlers.BlacklistHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
@@ -39,7 +40,7 @@ public class DatabaseLoader
 {
     private Config config;
     private BlacklistDataManager bdm;
-    private DatabaseManager db;
+    private Database db;
     private DonatorsDataManager ddm;
     private GuildSettingsDataManager gsdm;
     private PunishmentsDataManager pdm;
@@ -63,7 +64,7 @@ public class DatabaseLoader
 
         try
         {
-            db = new DatabaseManager(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
+            db = new Database(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
             bdm = new BlacklistDataManager(db);
             ddm = new DonatorsDataManager(db);
             gsdm = new GuildSettingsDataManager(db);
@@ -84,7 +85,7 @@ public class DatabaseLoader
         }
     }
 
-    public DatabaseManager getDatabaseManager()
+    public Database getDatabaseManager()
     {
         return db;
     }

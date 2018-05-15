@@ -21,7 +21,7 @@ import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import com.jagrosh.jagtag.libraries.*;
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.GuildSettingsDataManager;
+import me.artuto.endless.data.managers.GuildSettingsDataManager;
 import me.artuto.endless.tempdata.MessagesLogging;
 import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.FinderUtil;
@@ -46,9 +46,6 @@ import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;

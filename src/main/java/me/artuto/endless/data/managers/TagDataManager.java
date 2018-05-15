@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data;
+package me.artuto.endless.data.managers;
 
+import me.artuto.endless.data.Database;
 import me.artuto.endless.entities.ImportedTag;
 import me.artuto.endless.entities.impl.ImportedTagImpl;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class TagDataManager
     private final Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
-    public TagDataManager(DatabaseManager db)
+    public TagDataManager(Database db)
     {
         this.connection = db.getConnection();
     }

@@ -22,13 +22,21 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import me.artuto.endless.bootloader.EndlessLoader;
 import me.artuto.endless.commands.bot.*;
 import me.artuto.endless.commands.botadm.*;
+import me.artuto.endless.commands.botadm.Shutdown;
 import me.artuto.endless.commands.fun.*;
 import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.serverconfig.*;
 import me.artuto.endless.commands.tools.*;
-import me.artuto.endless.commands.utils.*;
-import me.artuto.endless.data.*;
-import me.artuto.endless.events.*;
+import me.artuto.endless.commands.utils.GoogleSearch;
+import me.artuto.endless.commands.utils.Roleme;
+import me.artuto.endless.commands.utils.TimeFor;
+import me.artuto.endless.commands.utils.Translate;
+import me.artuto.endless.data.Database;
+import me.artuto.endless.data.managers.*;
+import me.artuto.endless.events.BotEvents;
+import me.artuto.endless.events.GuildEvents;
+import me.artuto.endless.events.StarboardEvents;
+import me.artuto.endless.events.UserEvents;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.CommandLogging;
 import me.artuto.endless.logging.ModLogging;
@@ -56,7 +64,7 @@ public class Bot extends ListenerAdapter
 
     // Data Managers
     public BlacklistDataManager bdm;
-    public DatabaseManager db;
+    public Database db;
     public DonatorsDataManager ddm;
     public GuildSettingsDataManager gsdm;
     public PunishmentsDataManager pdm;

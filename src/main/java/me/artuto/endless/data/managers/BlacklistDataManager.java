@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data;
+package me.artuto.endless.data.managers;
 
 import me.artuto.endless.Const;
+import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
@@ -28,17 +29,15 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class BlacklistDataManager
 {
     private static Connection connection;
     private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
-    public BlacklistDataManager(DatabaseManager db)
+    public BlacklistDataManager(Database db)
     {
         connection = db.getConnection();
     }
