@@ -182,5 +182,10 @@ public class Announcement extends EndlessCommand
                  event.replyError("Error while sending the announcement!"));
              }
          }
+		 else
+		 {
+			tc.sendMessage(message).queue(s -> event.replySuccess("Successfully sent the announcement!"), e ->
+                 event.replyError("Error while sending the announcement!"));
+		 }
      }
 }
