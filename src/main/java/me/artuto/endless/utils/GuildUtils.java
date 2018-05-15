@@ -37,21 +37,13 @@ public class GuildUtils
 
     public static void leaveBadGuilds(JDA jda)
     {
-        User owner = jda.getUserById(bot.config.getOwnerId());
         jda.getGuilds().stream().filter(g ->
         {
             if(bot.db.hasSettings(g)) return false;
 
             long botCount = g.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
-            if(botCount>20 && ((double) botCount/g.getMembers().size())>.50) return true;
+            return botCount>20 && ((double) botCount/g.getMembers().size())>.50;
 
-            /**if(isABotListGuild(g))
-             {
-             jda.getUserById("264499432538505217").openPrivateChannel().queue(s -> s.sendMessage("**"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless at "+g.getName()));
-             return true;
-             }*/
-
-            return false;
         }).forEach(g -> g.leave().queue());
     }
 
@@ -67,6 +59,12 @@ public class GuildUtils
             guild.leave().queue();
             return "LEFT: BOTS";
         }
+        else if(isABotListGuild(guild))
+        {
+            User owner = guild.getJDA().getUserById(bot.config.getOwnerId());
+            guild.getJDA().getUserById("264499432538505217").openPrivateChannel().queue(s -> s.sendMessage("**"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless at "+guild.getName()).queue());
+            return "LEFT: BOTLIST";
+        }
         else return "STAY";
     }
 
@@ -75,8 +73,7 @@ public class GuildUtils
         long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
 
         if(bot.db.hasSettings(guild)) return false;
-        else if(botCount>20 && ((double) botCount/guild.getMembers().size())>.65) return true;
-        else return false;
+        else return botCount>20 && ((double) botCount/guild.getMembers().size())>.65;
     }
 
     public static Role getMutedRole(Guild guild)
@@ -91,14 +88,20 @@ public class GuildUtils
         User target = jda.getUserById(entry.getTargetIdLong());
         AuditLogChange change = entry.getChangeByKey(key);
 
+        if(change==null)
+            return null;
+
         return new ParsedAuditLogImpl(key, change.getNewValue(), change.getOldValue(), entry.getReason(), author, target);
     }
 
-    /**public static boolean isABotListGuild(Guild guild)
+     public static boolean isABotListGuild(Guild guild)
      {
-     if(guild.getId().equals("110373943822540800") || guild.getId().equals("264445053596991498") && !(config.getOwnerId()==264499432538505217L))
-     return true;
-     else
-     return false;
-     }*/
+         if(guild.getIdLong()==110373943822540800L || guild.getIdLong()==264445053596991498L || guild.getIdLong()==330777295952543744L
+                 || guild.getIdLong()==226404143999221761L || guild.getIdLong()==374071874222686211L)
+         {
+             return !(bot.config.getOwnerId() == 264499432538505217L || bot.config.getOwnerId() == 302534881370439681L);
+         }
+         else
+             return false;
+     }
 }

@@ -71,8 +71,8 @@ public class GuildEvents extends ListenerAdapter
         {
             case "LEFT: BOTS":
                 return "Too many bots!";
-            case "LEFT: BOT LIST":
-                return "Hey! You can't have this bot on a bot list!";
+            case "LEFT: BOTLIST":
+                return "Not authorized botlist";
             default:
                 return null;
         }
@@ -120,7 +120,6 @@ public class GuildEvents extends ListenerAdapter
         if(bot.config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
         {
             StringBuilder builder = new StringBuilder().append(":outbox_tray: `[Left Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+"`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n");
-
             if(!(reason == null)) builder.append("`[Reason]:` ").append(reason);
 
             tc.sendMessage(builder.toString()).queue();
@@ -256,11 +255,14 @@ public class GuildEvents extends ListenerAdapter
                 return;
 
             ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), AuditLogKey.MEMBER_ROLES_ADD);
+            if(parsedAuditLog==null)
+                return;
+
             String reason = parsedAuditLog.getReason();
             User author = parsedAuditLog.getAuthor();
             User target = parsedAuditLog.getTarget();
 
-            if(author.equals(event.getJDA().getSelfUser()))
+            if(author.isBot())
                 return;
 
             bot.modlog.logMute(author, guild.getMember(target), reason, guild, FinderUtil.getDefaultChannel(guild));
@@ -285,6 +287,9 @@ public class GuildEvents extends ListenerAdapter
                 return;
 
             ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), AuditLogKey.MEMBER_ROLES_REMOVE);
+            if(parsedAuditLog==null)
+                return;
+
             String reason = parsedAuditLog.getReason();
             User author = parsedAuditLog.getAuthor();
             User target = parsedAuditLog.getTarget();
