@@ -1,3 +1,5 @@
+[Support](https://img.shields.io/discord/312776731704426496.svg)
+
 # Endless
 
 Endless is a Discord bot written in Java using Java Discord API (JDA) and JDA-Utilities with love ❤.
