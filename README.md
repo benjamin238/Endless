@@ -1,4 +1,4 @@
-[Support](https://img.shields.io/discord/312776731704426496.svg)
+[![Support](https://img.shields.io/discord/312776731704426496.svg)]
 
 # Endless
 
