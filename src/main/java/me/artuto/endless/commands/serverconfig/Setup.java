@@ -25,10 +25,7 @@ public class Setup extends EndlessCommand
         this.children = new Command[]{new MutedRole()};
         this.help = "Server setup";
         this.category = Categories.SERVER_CONFIG;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override
@@ -46,10 +43,8 @@ public class Setup extends EndlessCommand
             this.name = "mutedrole";;
             this.help = "Setup the muted role";
             this.category = Categories.SERVER_CONFIG;
-            this.botPerms = new Permission[]{Permission.ADMINISTRATOR};
-            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.botPermissions = new Permission[]{Permission.ADMINISTRATOR};
+            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override

@@ -41,10 +41,8 @@ public class Announcement extends EndlessCommand
         this.arguments = "<message> | [channel] | [role to ping|everyone|here]";
         this.aliases = new String[]{"announce"};
         this.category = Categories.TOOLS;
-        this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
-        this.userPerms = new Permission[]{Permission.MANAGE_ROLES, Permission.MANAGE_SERVER};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
+        this.userPermissions = new Permission[]{Permission.MANAGE_ROLES, Permission.MANAGE_SERVER};
     }
 
      @Override

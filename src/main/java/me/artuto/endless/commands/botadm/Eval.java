@@ -46,10 +46,8 @@ public class Eval extends EndlessCommand
         this.name = "eval";
         this.help = "Executes Groovy code";
         this.category = Categories.BOTADM;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
-        this.guildCommand = false;
+        this.guildOnly = false;
 
         engine = new ScriptEngineManager().getEngineByName("Groovy");
 

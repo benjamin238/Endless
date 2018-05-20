@@ -35,19 +35,14 @@ public class Choose extends EndlessCommand
         this.help = "Chooses between the given options.";
         this.arguments = "<option 1> <option 2> ...";
         this.category = Categories.FUN;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = false;
+        this.guildOnly = false;
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
         if(event.getArgs().isEmpty())
-        {
             event.replyWarning("You didn't give me any choices!");
-        }
         else
         {
             String[] options = event.getArgs().split("\\s+");

@@ -43,10 +43,7 @@ public class Starboard extends EndlessCommand
         this.aliases = new String[]{"sb"};
         this.help = "If no valid arguments are given the setup to install the starboard is launched.";
         this.category = Categories.SERVER_CONFIG;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override
@@ -172,10 +169,7 @@ public class Starboard extends EndlessCommand
             this.aliases = new String[]{"channel"};
             this.help = "Changes the channel of the starboard.";
             this.category = Categories.SERVER_CONFIG;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -209,10 +203,7 @@ public class Starboard extends EndlessCommand
             this.aliases = new String[]{"count", "amount", "setamount"};
             this.help = "Changes the amount of stars required to be in the starboard.";
             this.category = Categories.SERVER_CONFIG;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override

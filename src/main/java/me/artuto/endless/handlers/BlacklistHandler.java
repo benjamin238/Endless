@@ -50,7 +50,7 @@ public class BlacklistHandler
             event.replyError("I'm sorry, but the owner of this bot has blocked you from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");
             return false;
         }
-        else if(db.isBlacklisted(guild.getIdLong()))
+        else if(!(guild==null) && db.isBlacklisted(guild.getIdLong()))
         {
             LOG.info("Command executed in blacklisted guild: "+guild.getName()+" (ID: "+guild.getId()+")");
             event.replyError("I'm sorry, but the owner of this bot has blocked this guild from using **"+event.getJDA().getSelfUser().getName()+"**'s commands, if you want to know the reason or get un-blacklisted contact the owner.");

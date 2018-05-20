@@ -45,10 +45,8 @@ public class Kick extends EndlessCommand
         this.help = "Kicks the specified user";
         this.arguments = "<@user|ID|nickname|username> for [reason]";
         this.category = Categories.MODERATION;
-        this.botPerms = new Permission[]{Permission.KICK_MEMBERS};
-        this.userPerms = new Permission[]{Permission.KICK_MEMBERS};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.botPermissions = new Permission[]{Permission.KICK_MEMBERS};
+        this.userPermissions = new Permission[]{Permission.KICK_MEMBERS};
     }
 
     @Override

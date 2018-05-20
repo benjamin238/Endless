@@ -51,10 +51,8 @@ public class Mute extends EndlessCommand
         this.help = "Mutes the specified user";
         this.arguments = "<@user|ID|nickname|username> for [time] for [reason]";
         this.category = Categories.MODERATION;
-        this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
-        this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
+        this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
     }
 
     @Override

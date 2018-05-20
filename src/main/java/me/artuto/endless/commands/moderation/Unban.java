@@ -44,10 +44,8 @@ public class Unban extends EndlessCommand
         this.help = "Unbans the specified user";
         this.arguments = "<@user|ID|username> for [reason]";
         this.category = Categories.MODERATION;
-        this.botPerms = new Permission[]{Permission.KICK_MEMBERS};
-        this.userPerms = new Permission[]{Permission.KICK_MEMBERS};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
+        this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
     }
 
     @Override

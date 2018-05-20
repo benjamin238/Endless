@@ -23,6 +23,7 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.cmddata.CommandHelper;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -47,13 +48,12 @@ public class Donate extends EndlessCommand
     {
         this.bot = bot;
         this.name = "donate";
+        this.aliases = new String[]{"donators"};
         this.children = new Command[]{new Add(), new Remove()};
         this.help = "Info about donations";
         this.category = Categories.BOT;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = false;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.guildOnly = false;
     }
 
     @Override
@@ -86,10 +86,8 @@ public class Donate extends EndlessCommand
             this.name = "add";
             this.help = "Adds a donator to the list";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -151,10 +149,8 @@ public class Donate extends EndlessCommand
             this.name = "remove";
             this.help = "Removes a donator from the list";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override

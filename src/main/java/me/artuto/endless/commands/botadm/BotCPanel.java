@@ -38,10 +38,8 @@ public class BotCPanel extends EndlessCommand
         this.help = "Controls the status, game, optimized the bot and other useful things.";
         this.category = Categories.BOTADM;
         this.children = new Command[]{new Status(), new Playing(), new DefaultGameUpdate(), new Optimize()};
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
-        this.guildCommand = false;
+        this.guildOnly = false;
     }
 
     @Override
@@ -66,10 +64,8 @@ public class BotCPanel extends EndlessCommand
             this.name = "status";
             this.help = "Sets the Online Status (OnlineStatus) of the bot.";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -109,10 +105,8 @@ public class BotCPanel extends EndlessCommand
             this.name = "game";
             this.help = "Sets the Game (Game.of) of the bot.";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -154,10 +148,8 @@ public class BotCPanel extends EndlessCommand
             this.name = "updategame";
             this.help = "Updates the default game.";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -183,10 +175,8 @@ public class BotCPanel extends EndlessCommand
             this.name = "optimize";
             this.help = "Optimizes the Bot's RAM usage. Use with caution.";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
             this.ownerCommand = true;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override

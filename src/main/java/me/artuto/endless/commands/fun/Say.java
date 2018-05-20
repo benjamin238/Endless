@@ -34,10 +34,6 @@ public class Say extends EndlessCommand
         this.help = "Say something!";
         this.arguments = "<text>";
         this.category = Categories.FUN;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = true;
     }
 
     @Override

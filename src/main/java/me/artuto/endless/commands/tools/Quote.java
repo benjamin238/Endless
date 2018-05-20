@@ -42,10 +42,8 @@ public class Quote extends EndlessCommand
         this.help = "Quotes a message";
         this.arguments = "<message id> [channel]";
         this.category = Categories.TOOLS;
-        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY};
+        this.userPermissions = new Permission[]{Permission.MESSAGE_HISTORY};
     }
 
     protected void executeCommand(CommandEvent event)

@@ -43,10 +43,7 @@ public class RoleCmd extends EndlessCommand
         this.arguments = "<role>";
         this.children = new Command[]{new GiveRole(), new TakeRole()};
         this.category = Categories.TOOLS;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
 
     @Override
@@ -123,10 +120,8 @@ public class RoleCmd extends EndlessCommand
             this.help = "Gives the specified role to the specified member";
             this.arguments = "<role> to <user>";
             this.category = Categories.TOOLS;
-            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
         }
 
         @Override
@@ -208,10 +203,8 @@ public class RoleCmd extends EndlessCommand
             this.help = "Takes the specified role from the specified member";
             this.arguments = "<role> from <user>";
             this.category = Categories.TOOLS;
-            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
         }
 
         @Override

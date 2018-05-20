@@ -50,10 +50,6 @@ public class TimeFor extends EndlessCommand
         this.help = "Shows the timezone for the specified user";
         this.arguments = "<user>";
         this.category = Categories.UTILS;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = true;
     }
 
     @Override
@@ -143,10 +139,7 @@ public class TimeFor extends EndlessCommand
             this.help = "Changes your timezone";
             this.arguments = "<timezone>";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.guildOnly = false;
         }
 
         @Override
@@ -183,10 +176,7 @@ public class TimeFor extends EndlessCommand
             this.aliases = new String[]{"timezones"};
             this.help = "Shows the list with valid timezones";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override

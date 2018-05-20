@@ -51,10 +51,8 @@ public class Clear extends EndlessCommand
         this.aliases = new String[]{"clean", "prune"};
         this.help = "Clears the specified range of message using the specified parameters";
         this.category = Categories.MODERATION;
-        this.botPerms = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
-        this.userPerms = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
+        this.userPermissions = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
     }
 
     @Override

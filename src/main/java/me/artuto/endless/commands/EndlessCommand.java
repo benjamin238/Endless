@@ -19,10 +19,13 @@ package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.cmddata.CommandHelper;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
+
+import java.util.function.BiConsumer;
 
 /**
  * @author Artuto
@@ -30,46 +33,48 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 public abstract class EndlessCommand extends Command
 {
-    protected boolean guildCommand;
-    protected Permission[] botPerms;
-    protected Permission[] userPerms;
+    private BiConsumer<CommandEvent, Command> extendedHelp = CommandHelper::getHelpBiConsumer;
+    protected boolean ownerCommand = false;
 
+    @Override
     public void execute(CommandEvent event)
     {
+        helpBiConsumer = extendedHelp;
         Member member = event.getMember();
         Member selfMember = event.getSelfMember();
         TextChannel tc = event.getTextChannel();
 
-        if(guildCommand && !(event.isFromType(ChannelType.TEXT)))
+        if(ownerCommand && !(event.isOwner()))
         {
-            event.replyError("This command cannot be used in Direct messages!");
+            event.replyError("This command is only for Bot Owners!");
             return;
         }
 
-        for(Permission p : botPerms)
+        if(event.isFromType(ChannelType.TEXT))
         {
-            if(!(selfMember.hasPermission(p) || selfMember.hasPermission(tc, p)))
+            for(Permission p : botPermissions)
             {
-                event.replyError(String.format("I need the %s permission in this Guild to execute this command!", p.getName()));
+                if(!(selfMember.hasPermission(p) || selfMember.hasPermission(tc, p)))
+                {
+                    event.replyError(String.format("I need the %s permission in this Guild to execute this command!", p.getName()));
+                    break;
+                }
+            }
+
+            if(event.isOwner())
+            {
+                executeCommand(event);
                 return;
             }
-            break;
-        }
 
-        if(event.isOwner())
-        {
-            executeCommand(event);
-            return;
-        }
-
-        for(Permission p : userPerms)
-        {
-            if(!(member.hasPermission(p) || member.hasPermission(tc, p)))
+            for(Permission p : userPermissions)
             {
-                event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
-                return;
+                if(!(member.hasPermission(p) || member.hasPermission(tc, p)))
+                {
+                    event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
+                    break;
+                }
             }
-            break;
         }
 
         executeCommand(event);

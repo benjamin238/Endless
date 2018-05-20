@@ -37,10 +37,8 @@ public class Bash extends EndlessCommand
         this.name = "bash";
         this.help = "Executes a bash command";
         this.category = Categories.BOTADM;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
-        this.guildCommand = false;
+        this.guildOnly = false;
     }
 
     @Override

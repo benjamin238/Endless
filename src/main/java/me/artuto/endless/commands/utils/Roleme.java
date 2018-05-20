@@ -48,10 +48,7 @@ public class Roleme extends EndlessCommand
         this.arguments = "[roleme role]";
         this.category = Categories.UTILS;
         this.children = new Command[]{new Add(), new Remove()};
-        this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
     }
 
     @Override
@@ -123,10 +120,8 @@ public class Roleme extends EndlessCommand
             this.help = "Adds a role to the list of available RoleMe roles.";
             this.arguments = "[role]";
             this.category = Categories.UTILS;
-            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         protected void executeCommand(CommandEvent event)
@@ -180,10 +175,8 @@ public class Roleme extends EndlessCommand
             this.help = "Removes a role from the list of available RoleMe roles.";
             this.arguments = "[role]";
             this.category = Categories.UTILS;
-            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         protected void executeCommand(CommandEvent event)

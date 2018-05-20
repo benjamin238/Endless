@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.CommandListener;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Endless;
 import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -51,13 +52,32 @@ public class CommandLogging implements CommandListener
 
         if(event.isOwner()) return;
 
-        commandLog.sendMessage("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
-                "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped()+"`) in **"+guild.getName()+"** (ID: "+guild.getId()+")").queue();
+        if(guild==null)
+        {
+            commandLog.sendMessage("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
+                    "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped()+"`) in a **Direct message**").queue();
+        }
+        else
+        {
+            commandLog.sendMessage("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
+                    "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped()+"`) in **"+guild.getName()+"** (ID: "+guild.getId()+")").queue();
+        }
     }
 
     @Override
     public void onCommandException(CommandEvent event, Command command, Throwable throwable)
     {
+        event.replyError("An error occurred while executing this command. Please ask the owner to check the log.");
 
+        if(event.getGuild()==null)
+        {
+            Endless.LOG.error(String.format("Command Error: %s | Message ID: %s | Executed in: Direct Message",
+                    command.getName(), event.getMessage().getIdLong()), throwable);
+        }
+        else
+        {
+            Endless.LOG.error(String.format("Command Error: %s | Message ID: %s | Executed in: Text Channel %s",
+                    command.getName(), event.getMessage().getIdLong(), event.getTextChannel().getIdLong()), throwable);
+        }
     }
 }

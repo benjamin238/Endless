@@ -53,10 +53,7 @@ public class DBansCheck extends EndlessCommand
         this.arguments = "<@user|ID|nickname|username>";
         this.category = Categories.MODERATION;
         this.aliases = new String[]{"checkbans", "dbans"};
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = false;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.cooldown = 10;
     }
 

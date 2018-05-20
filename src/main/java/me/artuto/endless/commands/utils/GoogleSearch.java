@@ -38,10 +38,8 @@ public class GoogleSearch extends EndlessCommand
         this.help = "Search something on Google!";
         this.arguments = "[num] <query to search>";
         this.category = Categories.UTILS;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = false;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.guildOnly = false;
         this.cooldown = 10;
     }
 

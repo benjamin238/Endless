@@ -41,10 +41,7 @@ public class Avatar extends EndlessCommand
         this.help = "Displays the avatar of the specified user.";
         this.arguments = "<user>";
         this.category = Categories.TOOLS;
-        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = true;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
 
     @Override
@@ -54,9 +51,7 @@ public class Avatar extends EndlessCommand
         EmbedBuilder builder = new EmbedBuilder();
 
         if(event.getArgs().isEmpty())
-        {
             target = event.getMessage().getMember();
-        }
         else
         {
             List<Member> list = FinderUtil.findMembers(event.getArgs(), event.getGuild());

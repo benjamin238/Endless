@@ -43,10 +43,9 @@ public class BlacklistUsers extends EndlessCommand
         this.help = "Adds, removes or displays the list with blacklisted users.";
         this.category = Categories.BOTADM;
         this.children = new Command[]{new Add(), new Remove(), new Check(), new BlacklistList()};
-        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.ownerCommand = true;
-        this.guildCommand = false;
+        this.guildOnly = false;
     }
 
     @Override
@@ -68,10 +67,8 @@ public class BlacklistUsers extends EndlessCommand
             this.help = "Adds a user ID to the blacklisted users list.";
             this.arguments = "<user ID>";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.ownerCommand = true;
+            this.guildOnly = false;
         }
 
         @Override
@@ -121,10 +118,8 @@ public class BlacklistUsers extends EndlessCommand
             this.help = "Removes a user ID to the blacklisted users list.";
             this.arguments = "<user ID>";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.ownerCommand = true;
+            this.guildOnly = false;
         }
 
         @Override
@@ -181,10 +176,8 @@ public class BlacklistUsers extends EndlessCommand
             this.name = "list";
             this.help = "Displays blacklisted users.";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.ownerCommand = true;
+            this.guildOnly = false;
         }
 
         @Override
@@ -227,10 +220,8 @@ public class BlacklistUsers extends EndlessCommand
             this.name = "check";
             this.help = "Checks if a user ID is blacklisted.";
             this.category = Categories.BOTADM;
-            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.ownerCommand = true;
+            this.guildOnly = false;
         }
 
         @Override

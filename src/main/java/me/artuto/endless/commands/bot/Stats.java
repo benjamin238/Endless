@@ -40,10 +40,8 @@ public class Stats extends EndlessCommand
         this.name = "stats";
         this.help = "Shows the stats of the bot";
         this.category = Categories.BOT;
-        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = false;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.guildOnly = false;
     }
 
     @Override

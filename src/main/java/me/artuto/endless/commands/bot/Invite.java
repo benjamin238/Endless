@@ -33,10 +33,7 @@ public class Invite extends EndlessCommand
         this.name = "invite";
         this.help = "Shows the bot invite";
         this.category = Categories.BOT;
-        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = false;
+        this.guildOnly = false;
     }
 
     @Override

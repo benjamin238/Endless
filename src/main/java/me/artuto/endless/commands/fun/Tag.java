@@ -24,6 +24,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.cmddata.CommandHelper;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.tools.Variables;
 import net.dv8tion.jda.core.Permission;
@@ -41,24 +42,10 @@ public class Tag extends EndlessCommand
         this.name = "tag";
         this.aliases = new String[]{"t"};
         this.help = "Retrieves a tag with the specified name";
-        this.helpBiConsumer = (event, command) ->
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Help for **").append(command.getName()).append("**:\n");
-
-            for(Command c : command.getChildren())
-                sb.append("`").append(event.getClient().getPrefix()).append(c.getName()).append(" ").append(c.getArguments()).append("` - ").append(c.getHelp()).append("\n");
-
-            event.replyInDm(sb.toString());
-            event.reactSuccess();
-        };
         this.arguments = "<name>";
         this.children = new Command[]{new Add(), new Delete(), new Edit(), new Import(), new Owner(), new Raw(), new Raw2(), new UnImport()};
         this.category = Categories.FUN;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = false;
+        this.guildOnly = false;
     }
 
     @Override
@@ -107,10 +94,7 @@ public class Tag extends EndlessCommand
             this.help = "Creates a new tag";
             this.arguments = "<name> <content>";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -158,10 +142,7 @@ public class Tag extends EndlessCommand
             this.help = "Removes a existant tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -197,10 +178,7 @@ public class Tag extends EndlessCommand
             this.help = "Edits an existant tag";
             this.arguments = "<name> <new content>";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -252,10 +230,7 @@ public class Tag extends EndlessCommand
             this.help = "Gets the owner of a existant tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -284,10 +259,7 @@ public class Tag extends EndlessCommand
             this.help = "Imports a tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -323,10 +295,7 @@ public class Tag extends EndlessCommand
             this.help = "Shows the content of a tag without parsing the args";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -353,10 +322,7 @@ public class Tag extends EndlessCommand
             this.help = "Shows the content of a tag without parsing the args on a codeblock";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.ownerCommand = false;
-            this.guildCommand = false;
+            this.guildOnly = false;
         }
 
         @Override
@@ -383,10 +349,7 @@ public class Tag extends EndlessCommand
             this.help = "Unimports a tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.ownerCommand = false;
-            this.guildCommand = true;
+            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override

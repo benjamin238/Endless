@@ -35,10 +35,6 @@ public class Profile extends EndlessCommand
         this.help = "Displays or edits the profile of the specified user";
         this.arguments = "<user>";
         this.category = Categories.FUN;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.ownerCommand = false;
-        this.guildCommand = true;
     }
 
     @Override

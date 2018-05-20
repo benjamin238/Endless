@@ -46,10 +46,9 @@ public class Dog extends EndlessCommand
         this.name = "dog";
         this.help = "Displays a cute pupper.";
         this.category = Categories.FUN;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.ownerCommand = false;
-        this.guildCommand = false;
+        this.guildOnly = false;
         this.cooldown = 10;
     }
 

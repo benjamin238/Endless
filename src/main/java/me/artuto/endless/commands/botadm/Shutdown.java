@@ -34,10 +34,8 @@ public class Shutdown extends EndlessCommand
         this.aliases = new String[]{"quit", "exit", "close", "terminate"};
         this.help = "Turns Off the bot";
         this.category = Categories.BOTADM;
-        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
-        this.userPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.ownerCommand = true;
-        this.guildCommand = false;
+        this.guildOnly = false;
     }
 
     @Override

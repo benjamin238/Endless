@@ -15,31 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.tools;
+package me.artuto.endless.commands.utils;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.tempdata.AfkManager;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.User;
 
-public class Afk extends EndlessCommand
+/**
+ * @author Artuto
+ */
+
+public class Emote extends EndlessCommand
 {
-    public Afk()
+    public Emote()
     {
-        this.name = "afk";
-        this.help = "Mark yourself ask afk with a message";
-        this.arguments = "[message]";
-        this.category = Categories.TOOLS;
+        this.name = "emote";
+        this.aliases = new String[]{"emoji"};
+        this.help = "Get the info of a specified emote.";
+        this.arguments = "<emote>";
+        this.category = Categories.UTILS;
         this.guildOnly = false;
     }
 
+    @Override
     protected void executeCommand(CommandEvent event)
     {
-        User user = event.getAuthor();
 
-        AfkManager.setAfk(user.getIdLong(), event.getArgs().isEmpty() ? null : event.getArgs());
-        event.replySuccess("**"+user.getName()+"** is now AFK!");
     }
 }
