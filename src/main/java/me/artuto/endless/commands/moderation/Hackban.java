@@ -36,8 +36,8 @@ public class Hackban extends EndlessCommand
         this.help = "Hackbans the specified user";
         this.arguments = "<ID> for [reason]";
         this.category = Categories.MODERATION;
-        this.botPermissions = new Permission[]{Permission.BAN_MEMBERS};
-        this.userPermissions = new Permission[]{Permission.BAN_MEMBERS};
+        this.botPerms = new Permission[]{Permission.BAN_MEMBERS};
+        this.userPerms = new Permission[]{Permission.BAN_MEMBERS};
     }
 
     @Override

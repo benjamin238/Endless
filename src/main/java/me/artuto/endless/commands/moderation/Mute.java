@@ -25,6 +25,7 @@ import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.ArgsUtils;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
@@ -51,8 +52,8 @@ public class Mute extends EndlessCommand
         this.help = "Mutes the specified user";
         this.arguments = "<@user|ID|nickname|username> for [time] for [reason]";
         this.category = Categories.MODERATION;
-        this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
-        this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
+        this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+        this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
     }
 
     @Override
@@ -107,13 +108,13 @@ public class Mute extends EndlessCommand
         }
         else member = list.get(0);
 
-        if(!event.getSelfMember().canInteract(member))
+        if(!(Checks.canMemberInteract(event.getSelfMember(), member)))
         {
             event.replyError("I can't mute the specified user!");
             return;
         }
 
-        if(!event.getMember().canInteract(member))
+        if(!(Checks.canMemberInteract(event.getMember(), member)))
         {
             event.replyError("You can't mute the specified user!");
             return;
@@ -144,7 +145,7 @@ public class Mute extends EndlessCommand
             event.replyError("No muted role set! Please set one using `e!config mutedrole <role>` or let the me create one for you using `e!setup mutedrole`");
         else
         {
-            if(!(event.getSelfMember().canInteract(mutedRole)))
+            if(!(Checks.canMemberInteract(event.getSelfMember(), mutedRole)))
             {
                 event.replyError("I can't interact with the Muted role!");
                 return;

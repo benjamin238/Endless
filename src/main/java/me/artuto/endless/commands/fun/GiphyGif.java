@@ -52,8 +52,8 @@ public class GiphyGif extends EndlessCommand
         this.help = "Searches a gif on Giphy using the specified serarch terms.";
         this.arguments = "[keyword]";
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.userPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
     }
 
@@ -135,7 +135,7 @@ public class GiphyGif extends EndlessCommand
             this.help = "Retrieves a random GIF from Giphy.";
             this.category = Categories.FUN;
             this.arguments = "[keyword]";
-            this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.guildOnly = false;
         }
 

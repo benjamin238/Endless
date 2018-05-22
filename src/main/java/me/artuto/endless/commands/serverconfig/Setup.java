@@ -7,6 +7,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
@@ -25,7 +26,7 @@ public class Setup extends EndlessCommand
         this.children = new Command[]{new MutedRole()};
         this.help = "Server setup";
         this.category = Categories.SERVER_CONFIG;
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override
@@ -43,8 +44,8 @@ public class Setup extends EndlessCommand
             this.name = "mutedrole";;
             this.help = "Setup the muted role";
             this.category = Categories.SERVER_CONFIG;
-            this.botPermissions = new Permission[]{Permission.ADMINISTRATOR};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.ADMINISTRATOR};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -56,13 +57,13 @@ public class Setup extends EndlessCommand
 
             if(!(mutedRole==null))
             {
-                if(!(guild.getSelfMember().canInteract(mutedRole)))
+                if(!(Checks.canMemberInteract(event.getSelfMember(), mutedRole)))
                 {
                     event.replyError("I can't interact with the existing *"+mutedRole.getName()+"* role!");
                     return;
                 }
 
-                if(!(event.getMember().canInteract(mutedRole)))
+                if(!(Checks.canMemberInteract(event.getMember(), mutedRole)))
                 {
                     event.replyError("You can't interact with the existing *"+mutedRole.getName()+"* role!");
                     return;

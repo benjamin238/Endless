@@ -47,7 +47,7 @@ public class UserInfo extends EndlessCommand
         this.help = "Shows info about the specified user";
         this.arguments = "<user>";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
 
     @Override

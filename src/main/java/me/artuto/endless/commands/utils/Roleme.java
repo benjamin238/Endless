@@ -24,6 +24,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
@@ -48,7 +49,7 @@ public class Roleme extends EndlessCommand
         this.arguments = "[roleme role]";
         this.category = Categories.UTILS;
         this.children = new Command[]{new Add(), new Remove()};
-        this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
+        this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
     }
 
     @Override
@@ -95,7 +96,7 @@ public class Roleme extends EndlessCommand
 
             if(rolemeRoles.contains(role))
             {
-                if(!(event.getSelfMember().canInteract(role)))
+                if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
                     event.replyError("I can't interact with that role!");
                 else
                 {
@@ -120,8 +121,8 @@ public class Roleme extends EndlessCommand
             this.help = "Adds a role to the list of available RoleMe roles.";
             this.arguments = "[role]";
             this.category = Categories.UTILS;
-            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         protected void executeCommand(CommandEvent event)
@@ -157,7 +158,7 @@ public class Roleme extends EndlessCommand
                     return;
                 }
 
-                if(!(event.getSelfMember().canInteract(role)))
+                if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
                     event.replyError("I can't interact with that role!");
                 else if(bot.gsdm.addRolemeRole(guild, role))
                     event.replySuccess("Successfully added the role *"+role.getName()+"* to the RoleMe roles list.");
@@ -175,8 +176,8 @@ public class Roleme extends EndlessCommand
             this.help = "Removes a role from the list of available RoleMe roles.";
             this.arguments = "[role]";
             this.category = Categories.UTILS;
-            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         protected void executeCommand(CommandEvent event)

@@ -43,7 +43,7 @@ public class BlacklistUsers extends EndlessCommand
         this.help = "Adds, removes or displays the list with blacklisted users.";
         this.category = Categories.BOTADM;
         this.children = new Command[]{new Add(), new Remove(), new Check(), new BlacklistList()};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.ownerCommand = true;
         this.guildOnly = false;
     }

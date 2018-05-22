@@ -33,7 +33,7 @@ public class Ping extends EndlessCommand
         this.name = "ping";
         this.help = "Pong!";
         this.category = Categories.BOT;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.guildOnly = false;
     }
 

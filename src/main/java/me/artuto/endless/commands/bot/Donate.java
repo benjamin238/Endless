@@ -52,7 +52,7 @@ public class Donate extends EndlessCommand
         this.children = new Command[]{new Add(), new Remove()};
         this.help = "Info about donations";
         this.category = Categories.BOT;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
     }
 

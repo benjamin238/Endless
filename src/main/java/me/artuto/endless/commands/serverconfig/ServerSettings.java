@@ -47,7 +47,7 @@ public class ServerSettings extends EndlessCommand
         this.aliases = new String[]{"settings"};
         this.help = "Displays the settings of the server";
         this.category = Categories.SERVER_CONFIG;
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.guildOnly = true;
     }
 
@@ -98,7 +98,7 @@ public class ServerSettings extends EndlessCommand
             this.help = "Sets the modlog channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -132,7 +132,7 @@ public class ServerSettings extends EndlessCommand
             this.help = "Sets the serverlog channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -167,7 +167,7 @@ public class ServerSettings extends EndlessCommand
             this.help = "Sets the welcome channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -202,7 +202,7 @@ public class ServerSettings extends EndlessCommand
             this.help = "Sets the leave channel";
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -236,7 +236,7 @@ public class ServerSettings extends EndlessCommand
             this.help = "Sets the muted role";
             this.arguments = "<@Role|Role ID|Role name>";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -278,7 +278,7 @@ public class ServerSettings extends EndlessCommand
             this.help = "Sets the amount of messages to delete when banning";
             this.arguments = "<number of day(s)>";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override

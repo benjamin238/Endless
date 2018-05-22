@@ -22,6 +22,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -43,7 +44,7 @@ public class RoleCmd extends EndlessCommand
         this.arguments = "<role>";
         this.children = new Command[]{new GiveRole(), new TakeRole()};
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
 
     @Override
@@ -120,8 +121,8 @@ public class RoleCmd extends EndlessCommand
             this.help = "Gives the specified role to the specified member";
             this.arguments = "<role> to <user>";
             this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
+            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
         }
 
         @Override
@@ -152,7 +153,7 @@ public class RoleCmd extends EndlessCommand
                 return;
             }
 
-            List<net.dv8tion.jda.core.entities.Role> rlist = FinderUtil.findRoles(role, event.getGuild());
+            List<Role> rlist = FinderUtil.findRoles(role, event.getGuild());
 
             if(rlist.isEmpty())
             {
@@ -180,14 +181,14 @@ public class RoleCmd extends EndlessCommand
             }
             else m = mlist.get(0);
 
-            if(!(author.canInteract(rol)))
-            {
-                event.replyError("You can't interact with that role!");
-                return;
-            }
-            if(!(event.getSelfMember().canInteract(rol)))
+            if(!(Checks.canMemberInteract(author, rol)))
             {
                 event.replyError("I can't interact with that role!");
+                return;
+            }
+            if(!(Checks.canMemberInteract(author, rol)))
+            {
+                event.replyError("You can't interact with that role!");
                 return;
             }
 
@@ -203,8 +204,8 @@ public class RoleCmd extends EndlessCommand
             this.help = "Takes the specified role from the specified member";
             this.arguments = "<role> from <user>";
             this.category = Categories.TOOLS;
-            this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
-            this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
+            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
         }
 
         @Override
@@ -263,14 +264,14 @@ public class RoleCmd extends EndlessCommand
             }
             else m = mlist.get(0);
 
-            if(!(author.canInteract(rol)))
-            {
-                event.replyError("You can't interact with that role!");
-                return;
-            }
-            if(!(event.getSelfMember().canInteract(rol)))
+            if(!(Checks.canMemberInteract(event.getSelfMember(), rol)))
             {
                 event.replyError("I can't interact with that role!");
+                return;
+            }
+            if(!(Checks.canMemberInteract(author, rol)))
+            {
+                event.replyError("You can't interact with that role!");
                 return;
             }
 

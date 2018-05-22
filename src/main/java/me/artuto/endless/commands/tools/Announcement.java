@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Role;
@@ -41,8 +42,8 @@ public class Announcement extends EndlessCommand
         this.arguments = "<message> | [channel] | [role to ping|everyone|here]";
         this.aliases = new String[]{"announce"};
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
-        this.userPermissions = new Permission[]{Permission.MANAGE_ROLES, Permission.MANAGE_SERVER};
+        this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+        this.userPerms = new Permission[]{Permission.MANAGE_ROLES, Permission.MANAGE_SERVER};
     }
 
      @Override
@@ -139,25 +140,25 @@ public class Announcement extends EndlessCommand
 
          if(ping)
          {
-             if(!(event.getSelfMember().canInteract(role)))
+             if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
              {
                  event.replyError("I can't interact with the specified role!");
                  return;
              }
 
-             if(!(event.getMember().canInteract(role)))
+             if(!(Checks.canMemberInteract(event.getMember(), role)))
              {
                  event.replyError("You can't interact with the specified role!");
                  return;
              }
 
-             if(role.isPublicRole() && !(event.getSelfMember().hasPermission(Permission.MESSAGE_MENTION_EVERYONE)))
+             if(role.isPublicRole() && !(Checks.hasPermission(event.getSelfMember(), tc, Permission.MESSAGE_MENTION_EVERYONE)))
              {
                  event.replyError("I can't mention everyone!");
                  return;
              }
 
-             if(role.isPublicRole() && !(event.getMember().hasPermission(Permission.MESSAGE_MENTION_EVERYONE)))
+             if(role.isPublicRole() && !(Checks.hasPermission(event.getMember(), tc, Permission.MESSAGE_MENTION_EVERYONE)))
              {
                  event.replyError("You can't mention everyone!");
                  return;

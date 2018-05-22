@@ -47,7 +47,7 @@ public class Translate extends EndlessCommand
         this.help = "Translate something!";
         this.arguments = "<target language> <text>";
         this.category = Categories.UTILS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
     }
 

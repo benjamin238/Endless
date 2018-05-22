@@ -41,7 +41,7 @@ public class GuildInfo extends EndlessCommand
         this.aliases = new String[]{"server", "serverinfo", "guildinfo", "ginfo", "sinfo"};
         this.help = "Shows info about the current guild";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
 
     @Override

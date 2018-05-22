@@ -20,6 +20,7 @@ package me.artuto.endless;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import me.artuto.endless.bootloader.EndlessLoader;
+import me.artuto.endless.cmddata.CommandHelper;
 import me.artuto.endless.commands.bot.*;
 import me.artuto.endless.commands.botadm.*;
 import me.artuto.endless.commands.fun.*;
@@ -117,6 +118,7 @@ public class Bot extends ListenerAdapter
         client.setScheduleExecutor(loader.cmdThread);
         client.setListener(new CommandLogging(this));
         client.setLinkedCacheSize(6);
+        client.setHelpConsumer(CommandHelper::getHelp);
 
         if(maintenance)
         {

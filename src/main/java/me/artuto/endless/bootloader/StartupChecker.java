@@ -45,13 +45,13 @@ public class StartupChecker
 
     private boolean isConfigValid()
     {
-        String owner = String.valueOf(config.getOwnerId());
-        String rootGuild = String.valueOf(config.getRootGuildId());
+        long owner = config.getOwnerId();
+        long rootGuild = config.getRootGuildId();
 
-        if(!(owner.equals(Const.ARTUTO_ID) || owner.equals(Const.ARTUTO_ALT_ID)))
+        if(!(owner==Const.ARTUTO_ID || owner==Const.ARTUTO_ALT_ID))
             throw new OwnerException();
 
-        if(!(rootGuild.equals(Const.MAIN_GUILD) || rootGuild.equals(Const.GUILD_TESTING)))
+        if(!(rootGuild==Const.MAIN_GUILD || rootGuild==Const.GUILD_TESTING))
             throw new GuildException();
 
         return true;

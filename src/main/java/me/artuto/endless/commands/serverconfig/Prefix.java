@@ -38,7 +38,7 @@ public class Prefix extends EndlessCommand
         this.children = new Command[]{new Add(), new Remove()};
         this.help = "Displays or adds a prefix";
         this.category = Categories.SERVER_CONFIG;
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override
@@ -67,7 +67,7 @@ public class Prefix extends EndlessCommand
             this.name = "add";
             this.help = "Adds a custom prefix";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -92,7 +92,7 @@ public class Prefix extends EndlessCommand
             this.name = "remove";
             this.help = "Removes a custom prefix";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override

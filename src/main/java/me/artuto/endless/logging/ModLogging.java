@@ -19,6 +19,7 @@ package me.artuto.endless.logging;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -60,14 +61,10 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
-            {
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            }
             else
-            {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Ban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
-            }
         }
     }
 
@@ -82,14 +79,10 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
-            {
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            }
             else
-            {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Hackban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") hackbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"+"`[Reason]:` "+reason).queue();
-            }
         }
     }
 
@@ -104,14 +97,10 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
-            {
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            }
             else
-            {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Kick]:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
-            }
         }
     }
 
@@ -126,14 +115,10 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
-            {
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            }
             else
-            {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Softban]:` :banana: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") softbanned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
-            }
         }
     }
 
@@ -148,14 +133,10 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
-            {
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            }
             else
-            {
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Unban]:` :wrench: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"+"`[Reason]:` "+reason).queue();
-            }
         }
     }
 
@@ -171,10 +152,8 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))
-            {
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            }
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)))
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.CLEARMODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
             {
                 try
@@ -214,7 +193,7 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
             {
@@ -235,7 +214,7 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Mute]:` :mute: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") " +
@@ -249,7 +228,7 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
             {

@@ -24,6 +24,7 @@ import me.artuto.endless.Messages;
 import me.artuto.endless.data.managers.GuildSettingsDataManager;
 import me.artuto.endless.tempdata.MessagesLogging;
 import me.artuto.endless.tools.Variables;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.IgnoreUtils;
 import me.artuto.endless.utils.TimeUtils;
@@ -74,7 +75,7 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(serverlog == null))
         {
-            if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Join]:` :inbox_tray: :bust_in_silhouette: **"+newMember.getName()+"**#**"+newMember.getDiscriminator()+"** ("+newMember.getId()+") joined the guild! User count: **"+guild.getMembers().size()+"** members").queue();
@@ -82,9 +83,9 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(welcome == null) && !(msg == null))
         {
-            if(!(welcome.getGuild().getSelfMember().hasPermission(welcome, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), welcome, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue()));
-            else welcome.sendMessage(parser.parse(msg).trim()).queueAfter(2, TimeUnit.SECONDS);
+            else welcome.sendMessage(parser.parse(msg).trim()).queueAfter(1, TimeUnit.SECONDS);
         }
     }
 
@@ -101,10 +102,10 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(serverlog == null))
         {
-            if(guild.getSelfMember().hasPermission(Permission.BAN_MEMBERS))
+            if(Checks.hasPermission(guild.getSelfMember(), null, Permission.BAN_MEMBERS))
                 if(wasBanned(event.getMember())) return;
 
-            if(!(serverlog.getGuild().getSelfMember().hasPermission(serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldMember.getName()+"**#**"+oldMember.getDiscriminator()+"** ("+oldMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
@@ -112,7 +113,7 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(leave == null) && !(msg == null))
         {
-            if(!(leave.getGuild().getSelfMember().hasPermission(leave, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), leave, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue()));
             else leave.sendMessage(parser.parse(msg).trim()).queue();
         }
@@ -149,7 +150,7 @@ public class ServerLogging extends ListenerAdapter
             if(IgnoreUtils.isIgnored(event.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
                 return;
 
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
@@ -191,7 +192,7 @@ public class ServerLogging extends ListenerAdapter
             if(IgnoreUtils.isIgnored(message.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
                 return;
 
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
@@ -230,7 +231,7 @@ public class ServerLogging extends ListenerAdapter
                     if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()))
                         return;
 
-                    if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+                    if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))
                         guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
                     else
                     {
@@ -260,7 +261,7 @@ public class ServerLogging extends ListenerAdapter
             if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vc.getId(), tc.getTopic()))
                 return;
 
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Join]:`  **"+user.getName()+"#"+user.getDiscriminator()+"** has joined a Voice Channel: **"+vc.getName()+"** (ID: "+vc.getId()+")").queue();
@@ -282,7 +283,7 @@ public class ServerLogging extends ListenerAdapter
             if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vcnew.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vcold.getId(), tc.getTopic()))
                 return;
 
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Move]:` **"+user.getName()+"#"+user.getDiscriminator()+"** switched between Voice Channels: From: **"+vcold.getName()+"** To: **"+vcnew.getName()+"**").queue();
@@ -303,7 +304,7 @@ public class ServerLogging extends ListenerAdapter
             if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vc.getId(), tc.getTopic()))
                 return;
 
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Left]:` **"+user.getName()+"#"+user.getDiscriminator()+"** left a Voice Channel: **"+vc.getName()+"**").queue();
@@ -320,11 +321,11 @@ public class ServerLogging extends ListenerAdapter
 
         if(!(tc == null))
         {
-            if(!(tc.getGuild().getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
-                if(guild.getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS))
+                if(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
                     tc.sendMessage(":hammer: `"+TimeUtils.getTimeAndDate()+" [User Banned]:` **"+user.getName()+"#"+user.getDiscriminator()+"** has been banned!\n" +
                         "`[Reason]:` "+getBanReason(user, guild)).queue();
 
@@ -346,7 +347,7 @@ public class ServerLogging extends ListenerAdapter
 
         if(reason==null || reason.isEmpty() || reason.equals("null"))
         {
-            if(guild.getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS))
+            if(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
                 reason = guild.getAuditLogs().type(ActionType.BAN).complete().stream().filter(entry -> entry.getTargetIdLong()==user.getIdLong()).limit(1).map(AuditLogEntry::getReason).collect(Collectors.joining("\n"));
             else reason = "[no reason specified]";
         }

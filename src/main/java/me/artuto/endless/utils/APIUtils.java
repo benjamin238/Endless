@@ -55,7 +55,7 @@ public class APIUtils
         User user = jda.getUserById(id);
 
         if(!(user == null))
-            user.getMutualGuilds().stream().filter(g -> g.getMember(user).hasPermission(Permission.MANAGE_SERVER)).forEach(g -> guilds.add(g));
+            user.getMutualGuilds().stream().filter(g -> Checks.hasPermission(g.getMember(user), null, Permission.MANAGE_SERVER)).forEach(g -> guilds.add(g));
 
         return guilds;
     }

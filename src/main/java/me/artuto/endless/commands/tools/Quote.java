@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -42,8 +43,8 @@ public class Quote extends EndlessCommand
         this.help = "Quotes a message";
         this.arguments = "<message id> [channel]";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY};
-        this.userPermissions = new Permission[]{Permission.MESSAGE_HISTORY};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY};
+        this.userPerms = new Permission[]{Permission.MESSAGE_HISTORY};
     }
 
     protected void executeCommand(CommandEvent event)
@@ -84,15 +85,15 @@ public class Quote extends EndlessCommand
         }
         else tc = tList.get(0);
 
-        if(!(event.getSelfMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
+        if(!(Checks.hasPermission(event.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
         {
-            event.replyError("I can't see that channel or I don't have `MESSAGE_HISTORY` permission on it!");
+            event.replyError("I can't see that channel or I don't have Read Message History permission on it!");
             return;
         }
 
-        if(!(event.getMember().hasPermission(tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
+        if(!(Checks.hasPermission(event.getMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
         {
-            event.replyError("You can't see that channel or you don't have `MESSAGE_HISTORY` permission on it!");
+            event.replyError("You can't see that channel or you don't have Read Message History permission on it!");
             return;
         }
 

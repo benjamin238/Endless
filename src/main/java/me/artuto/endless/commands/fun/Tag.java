@@ -259,7 +259,7 @@ public class Tag extends EndlessCommand
             this.help = "Imports a tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -349,7 +349,7 @@ public class Tag extends EndlessCommand
             this.help = "Unimports a tag";
             this.arguments = "<name>";
             this.category = Categories.FUN;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override

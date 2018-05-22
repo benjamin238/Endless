@@ -37,6 +37,7 @@ public class Welcome extends EndlessCommand
         this.aliases = new String[]{"welcomemessage", "welcomemsg"};
         this.help = "Changes or shows the welcome message";
         this.category = Categories.SERVER_CONFIG;
+        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override
@@ -57,7 +58,7 @@ public class Welcome extends EndlessCommand
             this.help = "Changes the welcome message";
             this.aliases = new String[]{"set"};
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override

@@ -44,7 +44,7 @@ public class Lookup extends EndlessCommand
         this.help = "Retrieves info about an invite, a guild or an user using their ID from Discord's servers.";
         this.arguments = "<User ID | Invite code | Invite URL | Guild ID>";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
     }
 

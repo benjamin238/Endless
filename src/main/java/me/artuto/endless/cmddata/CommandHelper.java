@@ -19,9 +19,18 @@ package me.artuto.endless.cmddata;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Const;
+import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.utils.Checks;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 
+import java.awt.*;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Artuto
@@ -29,8 +38,81 @@ import java.util.Arrays;
 
 public class CommandHelper
 {
-    public static void getHelpBiConsumer(CommandEvent event, Command command)
+    public static void getHelp(CommandEvent event)
     {
+        EmbedBuilder eBuilder = new EmbedBuilder();
+        eBuilder.setColor(Color.decode("#33ff00"));
+        String args = event.getArgs().trim();
+
+        if(args.isEmpty())
+        {
+            eBuilder.addField(Const.ENDLESS+" Bot Commands:", "e!help bot", false);
+            if(event.isOwner())
+                eBuilder.addField(Const.BOTADM+" Bot Administrator Commands:", "e!help botadm", false);
+            eBuilder.addField(Const.GIPHY+" Fun Commands:", "e!help fun", false);
+            if(event.isFromType(ChannelType.TEXT))
+            {
+                eBuilder.addField(Const.BAN+" Moderation Commands:", "e!help moderation", false);
+                eBuilder.addField(Const.SERVER_SETTINGS+" Server Settings Commands:", "e!help settings", false);
+            }
+            eBuilder.addField(Const.PEOPLE+" Tool Commands:", "e!help tool", false);
+            eBuilder.addField(Const.GOOGLE+" Util Commands:", "e!help util", false);
+        }
+        else
+        {
+            if(args.equalsIgnoreCase("bot"))
+                getHelpCategoryEmbed(Categories.BOT, event, eBuilder);
+            else if(args.equalsIgnoreCase("botadm"))
+                if(event.isOwner())
+                    getHelpCategoryEmbed(Categories.BOTADM, event, eBuilder);
+                else
+                {
+                    event.replyError("This Category is only available for Bot Administrators!");
+                    return;
+                }
+            else if(args.equalsIgnoreCase("fun"))
+                getHelpCategoryEmbed(Categories.FUN, event, eBuilder);
+            else if(args.equalsIgnoreCase("moderation"))
+            {
+                if(event.isFromType(ChannelType.TEXT))
+                    getHelpCategoryEmbed(Categories.MODERATION, event, eBuilder);
+                else
+                {
+                    event.replyError("This Category is only available in a Guild!");
+                    return;
+                }
+            }
+            else if(args.equalsIgnoreCase("settings"))
+                if(event.isFromType(ChannelType.TEXT))
+                    getHelpCategoryEmbed(Categories.SERVER_CONFIG, event, eBuilder);
+                else
+                {
+                    event.replyError("This Category is only available in a Guild!");
+                    return;
+                }
+            else if(args.equalsIgnoreCase("tools"))
+                getHelpCategoryEmbed(Categories.TOOLS, event, eBuilder);
+            else if(args.equalsIgnoreCase("utils"))
+                getHelpCategoryEmbed(Categories.UTILS, event, eBuilder);
+            else if(args.equalsIgnoreCase("support"))
+                getSupport(event, eBuilder);
+            else
+            {
+                event.replyWarning("Category not found!");
+                return;
+            }
+        }
+
+        if(!(eBuilder.isEmpty()))
+            event.replyInDm(new MessageBuilder(Const.ENDLESS+" Endless Help:").setEmbed(eBuilder.build()).build(), s -> event.reactSuccess(),
+                    e -> event.replyWarning("Help cannot be sent because you are blocking Drect Messages."));
+        else
+            event.replyWarning("Commands not available for this category! (Missing permissions?)");
+    }
+
+    public static void getHelpBiConsumer(CommandEvent event, Command preCmd)
+    {
+        EndlessCommand command = (EndlessCommand)preCmd;
         StringBuilder sb = new StringBuilder("**Help for `");
         String[] aliases = command.getAliases();
         Command[] children = command.getChildren();
@@ -55,10 +137,11 @@ public class CommandHelper
         if(!(children.length==0))
         {
             StringBuilder childrenBuilder = new StringBuilder("**Subcommands:**");
-            Arrays.stream(children).filter(c -> {
+            Arrays.stream(children).filter(preC -> {
+                EndlessCommand c = (EndlessCommand)preC;
                 if(event.isFromType(ChannelType.TEXT))
                 {
-                    if(event.getMember().hasPermission(c.getUserPermissions()) || event.getMember().hasPermission(event.getTextChannel(), c.getUserPermissions()))
+                    if(Checks.hasPermission(event.getMember(), event.getTextChannel(), c.getUserPerms()))
                         return true;
                     else if(event.isOwner())
                         return true;
@@ -67,7 +150,6 @@ public class CommandHelper
                 }
                 else if(c.isGuildOnly())
                     return false;
-
                 return true;
             }).forEach(c -> childrenBuilder.append("\n`e!").append(command.getName()).append(" ")
                     .append(c.getName()).append(" ").append(c.getArguments()==null?"":c.getArguments()).append("` - *").append(c.getHelp()).append("*"));
@@ -77,5 +159,43 @@ public class CommandHelper
 
         event.replyInDm(sb.toString(), s -> event.reactSuccess(),
                 e -> event.replyWarning("Help cannot be sent because you are blocking Drect Messages."));
+    }
+
+    private static void getHelpCategoryEmbed(Command.Category cat, CommandEvent event, EmbedBuilder eBuilder)
+    {
+        List<Command> cmds = event.getClient().getCommands().stream().filter(c -> c.getCategory().equals(cat))
+                .filter(preCmd -> {
+                    EndlessCommand c = (EndlessCommand)preCmd;
+                    if(event.isFromType(ChannelType.TEXT))
+                    {
+                        if(Checks.hasPermission(event.getMember(), event.getTextChannel(), c.getUserPerms()))
+                            return true;
+                        else if(event.isOwner())
+                            return true;
+                        else
+                            return false;
+                    }
+                    else if(c.isGuildOnly())
+                        return false;
+                    return true;
+                }).collect(Collectors.toList());
+
+        for(Command cmd : cmds)
+            eBuilder.addField("e!"+cmd.getName()+" "+(cmd.getArguments()==null?"":cmd.getArguments()), cmd.getHelp(), false);
+
+        if(!(eBuilder.isEmpty()))
+            eBuilder.setFooter("For support type e!help support", null);
+    }
+
+    private static void getSupport(CommandEvent event, EmbedBuilder eBuilder)
+    {
+        eBuilder.setColor(Color.blue);
+        eBuilder.setFooter(null, null);
+        eBuilder.setDescription(Const.INFO+" Need support? Join the official server, where you can get, support (woah), " +
+                "announcements about the bot, updates of the bot, request features or report bugs.\n\n" +
+                ":interrobang: **Invite:** [Support Server]("+Const.INVITE+")\n" +
+                Const.GITHUB+" **GitHub:** [GitHub Repository](https://github.com/EndlessBot/Endless)\n" +
+                ":link: **Bot Invite:** [Bot Invite]("+event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR)+")\n" +
+                ":moneybag: **Donate:** [Support Endless Development](https://paypal.me/artuto)");
     }
 }

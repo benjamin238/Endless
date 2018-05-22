@@ -46,7 +46,7 @@ public class Cat extends EndlessCommand
         this.name = "cat";
         this.help = "Displays a cute kitty.";
         this.category = Categories.FUN;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
         this.cooldown = 10;
     }

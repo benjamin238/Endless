@@ -46,7 +46,7 @@ public class About extends EndlessCommand
         this.name = "about";
         this.category = Categories.BOT;
         this.help = "Info about the bot";
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
     }
 

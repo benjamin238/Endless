@@ -23,6 +23,7 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -43,7 +44,7 @@ public class Starboard extends EndlessCommand
         this.aliases = new String[]{"sb"};
         this.help = "If no valid arguments are given the setup to install the starboard is launched.";
         this.category = Categories.SERVER_CONFIG;
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override
@@ -66,7 +67,7 @@ public class Starboard extends EndlessCommand
                     event.replyWarning("Alright, setup cancelled.");
                     break;
                 case "create":
-                    if(!(event.getSelfMember().hasPermission(Permission.MANAGE_CHANNEL)) || !(event.getSelfMember().hasPermission(Permission.MANAGE_PERMISSIONS)))
+                    if(!(Checks.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_CHANNEL) || Checks.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_PERMISSIONS)))
                     {
                         event.replyError("An error happened when creating the channel and setting the permissions! Check I have the proper permissions.");
                         waitForChannel(event);
@@ -169,7 +170,7 @@ public class Starboard extends EndlessCommand
             this.aliases = new String[]{"channel"};
             this.help = "Changes the channel of the starboard.";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
@@ -203,7 +204,7 @@ public class Starboard extends EndlessCommand
             this.aliases = new String[]{"count", "amount", "setamount"};
             this.help = "Changes the amount of stars required to be in the starboard.";
             this.category = Categories.SERVER_CONFIG;
-            this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
         @Override
