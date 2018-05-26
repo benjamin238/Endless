@@ -140,29 +140,29 @@ public class Bot extends ListenerAdapter
 
         client.addCommands(
                 //Bot
-                new About(this), new Donate(this), new Invite(), new Ping(), new Stats(),
+                new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(), new StatsCmd(),
 
                 //Bot Administration
-                new Bash(), new BlacklistUsers(this), new BotCPanel(), new Eval(this), new Shutdown(),
-
-                //Moderation
-                new Ban(this), new Clear(this), new DBansCheck(this), new Kick(this),
-                new Hackban(this), new Mute(this), new Softban(this), new Unban(this),
-
-                //Server Settings
-                new Leave(this), new Prefix(this), new ServerSettings(this),
-                new Setup(this), new Starboard(this), new Welcome(this),
-
-                //Tools
-                new Afk(), new Announcement(), new Avatar(), new GuildInfo(),
-                new Lookup(), new Quote(), new RoleCmd(), new UserInfo(),
+                new BashCmd(), new BlacklistUsersCmd(this), new BotCPanelCmd(), new EvalCmd(this), new ShutdownCmd(),
 
                 //Fun
-                new Cat(this), new Choose(), new Dog(this),
-                new GiphyGif(this), new Profile(this), new Say(), new Tag(this),
+                new CatCmd(this), new ChooseCmd(), new DogCmd(this),
+                new GiphyGifCmd(this), new ProfileCmd(this), new SayCmd(), new TagCmd(this),
+
+                //Moderation
+                new BanCmd(this), new ClearCmd(this), new DBansCheckCmd(this), new KickCmd(this),
+                new HackbanCmd(this), new MuteCmd(this), new SoftbanCmd(this), new UnbanCmd(this),
+
+                //Server Settings
+                new LeaveCmd(this), new PrefixCmd(this), new ServerSettingsCmd(this),
+                new SetupCmd(this), new StarboardCmd(this), new WelcomeCmd(this),
+
+                //Tools
+                new AfkCmd(), new AnnouncementCmd(), new AvatarCmd(), new GuildInfoCmd(),
+                new LookupCmd(), new QuoteCmd(), new RoleCmd(), new UserInfoCmd(),
 
                 //Utils
-                new GoogleSearch(), new Roleme(this), new TimeFor(this), new Translate(this));
+                new GoogleSearchCmd(), new RoleMeCmd(this), new TimeForCmd(this), new TranslateCmd(this));
 
         Endless.LOG.info("Starting JDA...");
 
