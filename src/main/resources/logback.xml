@@ -15,22 +15,40 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<configuration debug="false">
+<configuration>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
         <encoder>
-            <pattern>[%d{dd-MM-yyyy HH:mm:ss, -5}] [%boldCyan(%thread)] [%boldGreen(%logger{0})] [%level] - %msg%n
-            </pattern>
+            <pattern>[%d{dd-MM-yyyy HH:mm:ss}] [%boldCyan(%thread)] [%boldGreen(%logger{0})] [%level] - %msg%n</pattern>
         </encoder>
     </appender>
 
     <appender name="Sentry" class="io.sentry.logback.SentryAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>WARN</level>
+            <level>ERROR</level>
         </filter>
     </appender>
 
-    <root level="INFO">
+    <appender name="Webhook" class="me.artuto.endless.logging.appenders.WebhookAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <config>webhook.txt</config>
+    </appender>
+
+    <appender name="Webhook-Debug" class="me.artuto.endless.logging.appenders.WebhookDebugAppender">
+        <config>webhook.txt</config>
+    </appender>
+
+    <root level="DEBUG">
         <appender-ref ref="Console"/>
         <appender-ref ref="Sentry"/>
+        <appender-ref ref="Webhook"/>
+        <appender-ref ref="Webhook-Debug"/>
     </root>
 </configuration>

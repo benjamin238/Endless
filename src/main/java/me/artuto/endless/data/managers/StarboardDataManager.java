@@ -21,8 +21,6 @@ import me.artuto.endless.data.Database;
 import me.artuto.endless.entities.StarboardMessage;
 import me.artuto.endless.entities.impl.StarboardMessageImpl;
 import net.dv8tion.jda.core.entities.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -32,16 +30,10 @@ import java.sql.Statement;
 public class StarboardDataManager
 {
     private final Connection connection;
-    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public StarboardDataManager(Database db)
     {
         connection = db.getConnection();
-    }
-
-    public Connection getConnection()
-    {
-        return connection;
     }
 
     public boolean addMessage(Message msg, Integer amount)
@@ -64,7 +56,7 @@ public class StarboardDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while adding a message to the starboard. Message ID: "+msg.getId()+" TC ID: "+msg.getTextChannel().getId(), e);
             return false;
         }
     }
@@ -89,7 +81,7 @@ public class StarboardDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the starboard message ID. Message ID: "+msg.getId()+". TC ID: "+msg.getTextChannel().getId()+". Starboard Message ID: "+starboardMsg, e);
             return false;
         }
     }
@@ -114,7 +106,7 @@ public class StarboardDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while updating the count of stars of a message. Message ID: "+msg, e);
             return false;
         }
     }
@@ -134,7 +126,7 @@ public class StarboardDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting a message from the starboard. Message ID: "+message, e);
             return null;
         }
     }
@@ -157,7 +149,7 @@ public class StarboardDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while deleting a message from the starboard. Message ID: "+msg+". Starboard Message ID: "+starboardMsg, e);
         }
     }
 }

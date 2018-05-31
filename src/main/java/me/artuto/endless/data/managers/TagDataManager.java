@@ -20,8 +20,6 @@ package me.artuto.endless.data.managers;
 import me.artuto.endless.data.Database;
 import me.artuto.endless.entities.ImportedTag;
 import me.artuto.endless.entities.impl.ImportedTagImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -33,7 +31,6 @@ import java.util.List;
 public class TagDataManager
 {
     private final Connection connection;
-    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public TagDataManager(Database db)
     {
@@ -57,7 +54,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while adding a tag.", e);
         }
     }
 
@@ -78,7 +75,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while editing a tag.", e);
         }
     }
 
@@ -91,14 +88,16 @@ public class TagDataManager
             String content;
             try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content FROM TAGS WHERE TAG_NAME = \"%s\"", name)))
             {
-                if(results.next()) content = results.getString("tag_content");
-                else content = null;
+                if(results.next())
+                    content = results.getString("tag_content");
+                else
+                    content = null;
             }
             return content;
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting a tag content.", e);
             return null;
         }
     }
@@ -121,7 +120,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while removing a tag.", e);
         }
     }
 
@@ -133,13 +132,15 @@ public class TagDataManager
             statement.closeOnCompletion();
             try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_owner FROM TAGS WHERE tag_name = \"%s\"", name)))
             {
-                if(results.next()) return results.getLong("tag_owner");
-                else return null;
+                if(results.next())
+                    return results.getLong("tag_owner");
+                else
+                    return null;
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the owner of a tag.", e);
             return null;
         }
     }
@@ -157,7 +158,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while checking if a tag is imported. Guild ID: "+guild, e);
             return false;
         }
     }
@@ -182,7 +183,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while importing a tag. Guild ID: "+guild, e);
         }
     }
 
@@ -204,7 +205,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while unimporting a tag. Guild ID: "+guild, e);
         }
     }
 
@@ -226,7 +227,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting a list of imported tags.", e);
             return null;
         }
     }
@@ -249,7 +250,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting a list of imported tags. Guild ID: "+guild, e);
             return null;
         }
     }

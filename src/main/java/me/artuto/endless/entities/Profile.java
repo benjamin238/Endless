@@ -15,27 +15,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data.managers;
+package me.artuto.endless.entities;
 
-import com.jagrosh.jdautilities.command.GuildSettingsManager;
-import me.artuto.endless.data.Database;
-import net.dv8tion.jda.core.entities.Guild;
+/**
+ * @author Artuto
+ */
 
-import javax.annotation.Nullable;
-
-public class ClientGSDM implements GuildSettingsManager<ClientGSDMProvider>
+public interface Profile
 {
-    private final Database db;
+    String getTimezone();
 
-    public ClientGSDM(Database db)
-    {
-        this.db = db;
-    }
+    int getDonatedAmount();
 
-    @Nullable
-    @Override
-    public ClientGSDMProvider getSettings(Guild guild)
-    {
-        return new ClientGSDMProvider(guild, db);
-    }
+    String getTwitter();
+
+    String getSteam();
+
+    String getWii();
+
+    String getNNID();
+
+    String getXboxLive();
+
+    String getPSN();
+
+    String get3DS();
+
+    String getSkype();
+
+    String getAbout();
+
+    String getReddit();
+
+    String getMKWii();
+
+    String getSplatoon();
+
+    String getBattle();
+
+    String getWOW();
+
+    String getLOL();
+
+    String getMinecraft();
+
+    String getEmail();
+
+    String getTwitch();
+
+    String getYouTube();
 }

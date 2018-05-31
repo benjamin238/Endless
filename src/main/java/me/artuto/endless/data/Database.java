@@ -34,7 +34,7 @@ import java.util.Set;
 public class Database
 {
     private final Connection connection;
-    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
+    public static final Logger LOG = LoggerFactory.getLogger(Database.class);
     private final GuildSettings DEFAULT = new GuildSettingsImpl(null, 0, 0,null,
             0L, 0L, 0L,0L,
             0L, 0L, null, null);
@@ -45,14 +45,12 @@ public class Database
     }
 
     //Connection getter
-
     public Connection getConnection()
     {
         return connection;
     }
 
     //Guild settings
-
     public GuildSettings getSettings(Guild guild)
     {
         try
@@ -99,7 +97,7 @@ public class Database
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            LOG.warn("Error while getting the settings of a guild. ID: "+guild.getId(), e);
             return DEFAULT;
         }
     }
@@ -118,7 +116,7 @@ public class Database
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            LOG.warn("Error while checking the settings of a guild. ID: "+guild.getId(), e);
             return false;
         }
     }
@@ -137,7 +135,7 @@ public class Database
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            LOG.warn("Error while checking the settings of a guild. ID: "+guild, e);
             return false;
         }
     }
@@ -150,7 +148,7 @@ public class Database
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            LOG.warn("Unexpected error while shutdown process!", e);
         }
     }
 }

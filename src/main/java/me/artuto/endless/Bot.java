@@ -76,7 +76,7 @@ public class Bot extends ListenerAdapter
     // Threads
     public ScheduledExecutorService clearThread;
 
-    public void boot(boolean maintenance) throws LoginException
+    void boot(boolean maintenance) throws LoginException
     {
         Endless.LOG.info("Starting Endless "+Const.VERSION+"...");
         if(maintenance)
@@ -114,7 +114,7 @@ public class Bot extends ListenerAdapter
         client.setEmojis(config.getDoneEmote(), config.getWarnEmote(), config.getErrorEmote());
         client.setPrefix(config.getPrefix());
         client.setAlternativePrefix("<@310578566695878658>");
-        client.setGuildSettingsManager(new ClientGSDM(db, gsdm));
+        client.setGuildSettingsManager(new ClientGSDM(db));
         client.setScheduleExecutor(loader.cmdThread);
         client.setListener(new CommandLogging(this));
         client.setLinkedCacheSize(6);

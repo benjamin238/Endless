@@ -20,8 +20,6 @@ package me.artuto.endless.data.managers;
 import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -33,16 +31,10 @@ import java.util.List;
 public class DonatorsDataManager
 {
     private static Connection connection;
-    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public DonatorsDataManager(Database db)
     {
         connection = db.getConnection();
-    }
-
-    public Connection getConnection()
-    {
-        return connection;
     }
 
     public boolean hasDonated(User user)
@@ -54,14 +46,15 @@ public class DonatorsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donated_amount FROM PROFILES WHERE user_id = %s", user.getId())))
             {
-                if(results.next()) if(results.getString("donated_amount") == null) return false;
-                else return true;
-                else return false;
+                if(results.next())
+                    return !(results.getString("donated_amount")==null);
+                else
+                    return false;
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while checking if the specified user has donated. ID: "+user.getId(), e);
             return false;
         }
     }
@@ -91,7 +84,7 @@ public class DonatorsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting a donation for the specified user. ID: "+user.getId(), e);
         }
     }
 
@@ -104,13 +97,15 @@ public class DonatorsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donated_amount FROM PROFILES WHERE user_id = %s", user.getId())))
             {
-                if(results.next()) return results.getString("donated_amount");
-                else return null;
+                if(results.next())
+                    return results.getString("donated_amount");
+                else
+                    return null;
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the donated amount of the specified user. ID: "+user.getId(), e);
             return null;
         }
     }
@@ -128,15 +123,17 @@ public class DonatorsDataManager
                 users = new LinkedList<>();
                 while(results.next())
                 {
-                    User u = jda.retrieveUserById(results.getLong("user_id")).complete();
-                    if(hasDonated(u)) users.add(u);
+                    jda.retrieveUserById(results.getLong("user_id")).queue(u -> {
+                        if(hasDonated(u))
+                            users.add(u);
+                    }, e -> {});
                 }
             }
             return users;
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the users that donated list.", e);
             return null;
         }
     }

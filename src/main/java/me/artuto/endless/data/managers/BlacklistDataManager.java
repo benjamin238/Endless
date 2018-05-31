@@ -22,8 +22,6 @@ import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -34,17 +32,11 @@ import java.util.List;
 
 public class BlacklistDataManager
 {
-    private static Connection connection;
-    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
+    private Connection connection;
 
     public BlacklistDataManager(Database db)
     {
         connection = db.getConnection();
-    }
-
-    public Connection getConnection()
-    {
-        return connection;
     }
 
     public boolean isBlacklisted(long id)
@@ -61,7 +53,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while checking if the specified ID is blacklisted. ID: "+id, e);
             return false;
         }
     }
@@ -94,7 +86,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while adding the specified ID to the blacklisted entities list. ID: "+id, e);
         }
     }
 
@@ -117,7 +109,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while removing the specified ID from the blacklisted entities list. ID: "+id, e);
             return false;
         }
     }
@@ -146,7 +138,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error whiile getting the blacklisted guilds list.", e);
             return null;
         }
     }
@@ -172,7 +164,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the blacklisted users list.", e);
             return null;
         }
     }
@@ -195,7 +187,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the raw blacklisted guilds list.", e);
             return null;
         }
     }
@@ -218,7 +210,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the raw blacklisted users list.", e);
             return null;
         }
     }

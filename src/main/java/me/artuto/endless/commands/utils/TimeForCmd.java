@@ -23,9 +23,8 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.data.managers.ProfileDataManager;
+import me.artuto.endless.entities.Profile;
 import me.artuto.endless.utils.FormatUtil;
-import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
@@ -55,7 +54,7 @@ public class TimeForCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        ProfileDataManager.Profile p;
+        Profile p;
         ZonedDateTime t;
         ZoneId zone;
         String time;
@@ -69,16 +68,16 @@ public class TimeForCmd extends EndlessCommand
             p = bot.prdm.getProfile(user);
             name = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
 
-            if(!(bot.prdm.hasAProfile(user))) event.replyError("You don't have a timezone configured!");
+            if(!(bot.prdm.hasProfile(user))) event.replyError("You don't have a timezone configured!");
             else
             {
                 try
                 {
-                    zone = ZoneId.of(p.timezone);
+                    zone = ZoneId.of(p.getTimezone());
                 }
                 catch(ZoneRulesException e)
                 {
-                    event.replyError("`"+p.timezone+"` isn't a valid timezone!");
+                    event.replyError("`"+p.getTimezone()+"` isn't a valid timezone!");
                     return;
                 }
 
@@ -108,16 +107,16 @@ public class TimeForCmd extends EndlessCommand
             p = bot.prdm.getProfile(user);
             name = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
 
-            if(!(bot.prdm.hasAProfile(user))) event.replyError(name+" doesn't has a timezone configured!");
+            if(!(bot.prdm.hasProfile(user))) event.replyError(name+" doesn't has a timezone configured!");
             else
             {
                 try
                 {
-                    zone = ZoneId.of(p.timezone);
+                    zone = ZoneId.of(p.getTimezone());
                 }
                 catch(ZoneRulesException e)
                 {
-                    event.replyError("`"+p.timezone+"` isn't a valid timezone!");
+                    event.replyError("`"+p.getTimezone()+"` isn't a valid timezone!");
                     return;
                 }
 

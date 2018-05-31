@@ -18,9 +18,9 @@
 package me.artuto.endless.data.managers;
 
 import me.artuto.endless.data.Database;
+import me.artuto.endless.entities.Profile;
+import me.artuto.endless.entities.impl.ProfileImpl;
 import net.dv8tion.jda.core.entities.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -30,8 +30,7 @@ import java.sql.Statement;
 public class ProfileDataManager
 {
     private final Connection connection;
-    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
-    private final Profile DEFAULT = new Profile("", 0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
+    private final Profile DEFAULT = new ProfileImpl(0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
 
     public ProfileDataManager(Database db)
     {
@@ -50,20 +49,27 @@ public class ProfileDataManager
             {
                 if(results.next())
                 {
-                    p = new Profile(results.getString("timezone"), results.getInt("donated_amount"), results.getString("twitter"), results.getString("steam"), results.getString("wii"), results.getString("nnid"), results.getString("xboxlive"), results.getString("psn"), results.getString("3ds"), results.getString("skype"), results.getString("youtube"), results.getString("about"), results.getString("twitch"), results.getString("minecraft"), results.getString("email"), results.getString("lol"), results.getString("wow"), results.getString("battle"), results.getString("splatoon"), results.getString("mkwii"), results.getString("reddit"));
+                    p = new ProfileImpl(results.getInt("donated_amount"), results.getString("timezone"), results.getString("twitter"),
+                            results.getString("steam"), results.getString("wii"), results.getString("nnid"),
+                            results.getString("xboxlive"), results.getString("psn"), results.getString("3ds"),
+                            results.getString("skype"), results.getString("youtube"), results.getString("about"),
+                            results.getString("twitch"), results.getString("minecraft"), results.getString("email"),
+                            results.getString("lol"), results.getString("wow"), results.getString("battle"),
+                            results.getString("splatoon"), results.getString("mkwii"), results.getString("reddit"));
                 }
-                else p = DEFAULT;
+                else
+                    p = DEFAULT;
             }
             return p;
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the profile of the specified user. ID: "+user.getId(), e);
             return DEFAULT;
         }
     }
 
-    public boolean hasAProfile(User user)
+    public boolean hasProfile(User user)
     {
         try
         {
@@ -77,7 +83,7 @@ public class ProfileDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while checking if the specified user has a profile. ID: "+user.getId(), e);
             return false;
         }
     }
@@ -107,57 +113,7 @@ public class ProfileDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
-        }
-    }
-
-    public class Profile
-    {
-        public final String timezone;
-        final int donatedAmount;
-        final String twitter;
-        final String steam;
-        final String wii;
-        final String nnid;
-        final String xboxLive;
-        final String psn;
-        final String threeds;
-        final String skype;
-        final String youtube;
-        final String about;
-        final String twitch;
-        final String minecraft;
-        final String email;
-        final String lol;
-        final String wow;
-        final String battle;
-        final String splatoon;
-        final String mkwii;
-        final String reddit;
-
-        private Profile(String timezone, int donatedAmount, String twitter, String steam, String wii, String nnid, String xboxLive, String psn, String threeds, String skype, String youtube, String about, String twitch, String minecraft, String email, String lol, String wow, String battle, String splatoon, String mkwii, String reddit)
-        {
-            this.timezone = timezone;
-            this.donatedAmount = donatedAmount;
-            this.twitter = twitter;
-            this.steam = steam;
-            this.wii = wii;
-            this.nnid = nnid;
-            this.xboxLive = xboxLive;
-            this.psn = psn;
-            this.threeds = threeds;
-            this.skype = skype;
-            this.youtube = youtube;
-            this.about = about;
-            this.twitch = twitch;
-            this.minecraft = minecraft;
-            this.email = email;
-            this.lol = lol;
-            this.wow = wow;
-            this.battle = battle;
-            this.splatoon = splatoon;
-            this.mkwii = mkwii;
-            this.reddit = reddit;
+            Database.LOG.error("Error while setting the timezone of the specified user. ID: "+user.getId(), e);
         }
     }
 }

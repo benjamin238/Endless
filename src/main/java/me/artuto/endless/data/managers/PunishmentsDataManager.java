@@ -29,8 +29,6 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -49,14 +47,13 @@ import java.util.TimeZone;
 public class PunishmentsDataManager
 {
     private final Connection connection;
-    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public PunishmentsDataManager(Database db)
     {
         this.connection = db.getConnection();
     }
 
-    public boolean addPunishment(long user, long guild, Const.PunishmentType type)
+    public void addPunishment(long user, long guild, Const.PunishmentType type)
     {
         try
         {
@@ -70,17 +67,15 @@ public class PunishmentsDataManager
                 results.updateLong("guild_id", guild);
                 results.updateString("type", type.name());
                 results.insertRow();
-                return true;
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
-            return false;
+            Database.LOG.error("Error while adding a punishment. User ID: "+user+". Guild ID: "+guild, e);
         }
     }
 
-    public boolean removePunishment(long user, long guild, Const.PunishmentType type)
+    public void removePunishment(long user, long guild, Const.PunishmentType type)
     {
         try
         {
@@ -95,16 +90,14 @@ public class PunishmentsDataManager
             }
             statement.executeUpdate(String.format("DELETE FROM PUNISHMENTS WHERE user_id = %s AND guild_id = %s AND type = \"%s\"", user, guild, type.name()));
             statement.closeOnCompletion();
-            return true;
         }
         catch(SQLException e)
         {
-            LOG.warn("", e);
-            return false;
+            Database.LOG.error("Error while adding a punishment. User ID: "+user+". Guild ID: "+guild, e);
         }
     }
 
-    public boolean addTempPunishment(long user, long guild, long time, Const.PunishmentType type)
+    public void addTempPunishment(long user, long guild, long time, Const.PunishmentType type)
     {
         try
         {
@@ -119,13 +112,11 @@ public class PunishmentsDataManager
                 results.updateLong("time", time);
                 results.updateString("type", type.name());
                 results.insertRow();
-                return true;
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
-            return false;
+            Database.LOG.error("Error while adding a temporal punishment. User ID: "+user+". Guild ID: "+guild, e);
         }
     }
 
@@ -140,12 +131,13 @@ public class PunishmentsDataManager
             {
                 if(results.next())
                     return new PunishmentImpl(type, guild, user, null);
-                else return null;
+                else
+                    return null;
             }
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting a punishment. User ID: "+user+". Guild ID: "+guild, e);
             return null;
         }
     }
@@ -170,7 +162,7 @@ public class PunishmentsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting a temporal punishment. User ID: "+user+". Guild ID: "+guild, e);
             return null;
         }
     }
@@ -193,7 +185,7 @@ public class PunishmentsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the list of punishments.", e);
             return null;
         }
     }
@@ -221,7 +213,7 @@ public class PunishmentsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the list of temporal punishments.", e);
             return null;
         }
     }

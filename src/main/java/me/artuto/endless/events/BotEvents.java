@@ -77,10 +77,10 @@ public class BotEvents extends ListenerAdapter
         User selfuser = event.getJDA().getSelfUser();
         User owner = event.getJDA().getUserById(bot.config.getOwnerId());
 
-        Endless.LOG.info("My robotic body is ready!");
-        Endless.LOG.info("Logged in as: "+selfuser.getName()+"#"+selfuser.getDiscriminator()+" ("+selfuser.getId()+")");
-        Endless.LOG.info("Using prefix: "+bot.config.getPrefix());
-        Endless.LOG.info("Owner: "+owner.getName()+"#"+owner.getDiscriminator()+" ("+owner.getId()+")");
+        Endless.LOG.info("My robotic body is ready!\n" +
+                "Logged in as: "+selfuser.getName()+"#"+selfuser.getDiscriminator()+" ("+selfuser.getId()+")\n" +
+                "Using prefix: "+bot.config.getPrefix()+"\n" +
+                "Owner: "+owner.getName()+"#"+owner.getDiscriminator()+" ("+owner.getId()+")");
 
         if(!(maintenance))
         {

@@ -22,8 +22,6 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.json.JSONArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -34,19 +32,11 @@ import java.util.List;
 
 public class GuildSettingsDataManager
 {
-    private final Database db;
     private final Connection connection;
-    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
 
     public GuildSettingsDataManager(Database db)
     {
-        this.db = db;
         connection = db.getConnection();
-    }
-
-    public Connection getConnection()
-    {
-        return connection;
     }
 
     public TextChannel getModlogChannel(Guild guild)
@@ -58,14 +48,16 @@ public class GuildSettingsDataManager
             TextChannel tc;
             try(ResultSet results = statement.executeQuery(String.format("SELECT modlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("modlog_id")));
-                else tc = null;
+                if(results.next())
+                    tc = guild.getTextChannelById(Long.toString(results.getLong("modlog_id")));
+                else
+                    tc = null;
             }
             return tc;
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the modlog for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -79,14 +71,16 @@ public class GuildSettingsDataManager
             TextChannel tc;
             try(ResultSet results = statement.executeQuery(String.format("SELECT serverlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("serverlog_id")));
-                else tc = null;
+                if(results.next())
+                    tc = guild.getTextChannelById(Long.toString(results.getLong("serverlog_id")));
+                else
+                    tc = null;
             }
             return tc;
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the serverlog for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -116,7 +110,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the modlog channel for the guild "+guild.getId(), e);
         }
     }
 
@@ -145,7 +139,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the serverlog channel for the guild "+guild.getId(), e);
         }
     }
 
@@ -165,7 +159,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the welcome channel for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -195,7 +189,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the welcome channel for the guild "+guild.getId(), e);
         }
     }
 
@@ -215,7 +209,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the leave channel for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -245,7 +239,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the leave channel for the guild "+guild.getId(), e);
         }
     }
 
@@ -265,7 +259,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the welcome message for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -295,7 +289,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the welcome message for the guild "+guild.getId(), e);
         }
     }
 
@@ -315,7 +309,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the leave message for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -345,7 +339,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the leave message for the guild "+guild.getId(), e);
         }
     }
 
@@ -365,7 +359,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the starboard channel for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -395,7 +389,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the starboard channel for the guild "+guild.getId(), e);
         }
     }
 
@@ -415,7 +409,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the starboard count for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -445,7 +439,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the starboard count for the guild "+guild.getId(), e);
         }
     }
 
@@ -483,7 +477,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while adding a prefix for the guild "+guild.getId(), e);
             return false;
         }
     }
@@ -517,7 +511,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while checking if a prefix exists for the guild "+guild.getId(), e);
             return false;
         }
         return false;
@@ -559,7 +553,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while removing a prefix for the guild "+guild.getId(), e);
             return false;
         }
     }
@@ -603,7 +597,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the roleme roles for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -642,7 +636,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while adding a roleme role for the guild "+guild.getId(), e);
             return false;
         }
     }
@@ -683,7 +677,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while removing a roleme role from the guild "+guild.getId(), e);
             return false;
         }
     }
@@ -704,7 +698,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the muted role for the guild "+guild.getId(), e);
             return null;
         }
     }
@@ -736,7 +730,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while setting the muted role for the guild "+guild.getId(), e);
             return false;
         }
     }
@@ -750,14 +744,16 @@ public class GuildSettingsDataManager
             int days;
             try(ResultSet results = statement.executeQuery(String.format("SELECT muted_role FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) days = results.getInt("ban_delete_days");
-                else days = 0;
+                if(results.next())
+                    days = results.getInt("ban_delete_days");
+                else
+                    days = 0;
             }
             return days;
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while getting the ban delete days number for the guild "+guild.getId(), e);
             return 0;
         }
     }
@@ -788,7 +784,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.warn(e.toString());
+            Database.LOG.error("Error while settings the ban delete days number for the guild "+guild.getId(), e);
         }
     }
 }

@@ -32,7 +32,7 @@ public class Endless
 
     public static void main(String[] args)
     {
-        LOGGER.setLevel(Level.INFO);
+        //LOGGER.setLevel(Level.INFO);
         Bot bot = new Bot();
 
         if(args.length==0)
@@ -57,8 +57,7 @@ public class Endless
         }
         catch(Exception e)
         {
-            LOG.error(""+e);
-            e.printStackTrace();
+            LOG.error("Error while starting Endless!", e);
             System.exit(0);
         }
     }
