@@ -97,7 +97,7 @@ public class RoleCmd extends EndlessCommand
             builder.addField(":1234: ID: ", "**"+rol.getId()+"**", false);
             builder.addField(":calendar: Creation Date: ", "**"+rol.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", false);
             builder.addField(":paintbrush: Color: ", color == null ? "**#000000**" : "**#"+Integer.toHexString(color.getRGB()).substring(2).toUpperCase()+"**", true);
-            builder.addField(":small_red_triangle: Position: ", String.valueOf("**"+rol.getPosition()+"**"), true);
+            builder.addField(":small_red_triangle: Position: ", String.valueOf("**"+(event.getGuild().getRoles().indexOf(rol)+1)+"**"), true);
             builder.addField(":bell: Mentionable: ", (rol.isMentionable() ? "**Yes**" : "**No**"), true);
             builder.addField(":wrench: Managed: ", (rol.isManaged() ? "**Yes**" : "**No**"), true);
             builder.addField(":link: Hoisted: ", (rol.isHoisted() ? "**Yes**" : "**No**"), true);
