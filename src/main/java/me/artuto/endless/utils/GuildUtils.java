@@ -54,7 +54,7 @@ public class GuildUtils
             String msg = "Hey! I'm leaving this guild (**"+guild.getName()+"**) because I won't allow Bot Guilds, this means you have a lot of bots compared to the real user count.";
             TextChannel tc = FinderUtil.getDefaultChannel(guild);
             if(!(tc==null))
-                tc.sendMessage(msg).queue(null, (e) -> guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(msg).queue()));
+                tc.sendMessage(msg).queue(null, (e) -> guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(msg).queue(null, e2 -> {})));
 
             guild.leave().queue();
             return "LEFT: BOTS";
