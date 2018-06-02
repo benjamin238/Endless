@@ -22,6 +22,7 @@ import me.artuto.endless.Const;
 import me.artuto.endless.Endless;
 import me.artuto.endless.bootloader.StartupChecker;
 import me.artuto.endless.utils.GuildUtils;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.User;
@@ -30,6 +31,7 @@ import net.dv8tion.jda.core.events.ReconnectedEvent;
 import net.dv8tion.jda.core.events.ResumedEvent;
 import net.dv8tion.jda.core.events.ShutdownEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.managers.Presence;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
 
@@ -63,30 +65,18 @@ public class BotEvents extends ListenerAdapter
     @Override
     public void onReady(ReadyEvent event)
     {
-        /*if(config.api())
-        {
-            LOG.info("Starting the API...");
-            //startAPI();
-            LOG.info("Successfully started the API!");
-        }*/
-
         Endless.LOG.info("Leaving Pointless Guilds...");
         GuildUtils.leaveBadGuilds(event.getJDA());
         Endless.LOG.info("Done!");
 
         User selfuser = event.getJDA().getSelfUser();
         User owner = event.getJDA().getUserById(bot.config.getOwnerId());
+        Presence presence = event.getJDA().getPresence();
 
         Endless.LOG.info("My robotic body is ready!\n" +
                 "Logged in as: "+selfuser.getName()+"#"+selfuser.getDiscriminator()+" ("+selfuser.getId()+")\n" +
                 "Using prefix: "+bot.config.getPrefix()+"\n" +
                 "Owner: "+owner.getName()+"#"+owner.getDiscriminator()+" ("+owner.getId()+")");
-
-        if(!(maintenance))
-        {
-            event.getJDA().getPresence().setGame(Game.playing("Type "+bot.config.getPrefix()+"help | Version "+Const.VERSION+" | On "+event.getJDA().getGuilds().size()+" Guilds | "+event.getJDA().getUsers().size()+" Users | "+event.getJDA().getTextChannels().size()+" Channels"));
-            event.getJDA().getPresence().setStatus(bot.config.getStatus());
-        }
 
         if(event.getJDA().getGuildCache().isEmpty())
         {
@@ -99,6 +89,12 @@ public class BotEvents extends ListenerAdapter
 
         bot.muteScheduler.scheduleWithFixedDelay(() -> bot.pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, event.getJDA()),
                 0, 10, TimeUnit.SECONDS);
+
+        if(!(maintenance))
+            presence.setPresence(bot.config.getStatus(), Game.playing("Type "+bot.config.getPrefix()+"help | Version "+Const.VERSION+" | On "+event.getJDA().getGuildCache().size()+" Guilds | "+event.getJDA().getUserCache().size()+
+                    " Users | "+event.getJDA().getTextChannelCache().size()+" Channels"));
+        else
+            presence.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("Maintenance mode enabled"));
     }
 
     @Override

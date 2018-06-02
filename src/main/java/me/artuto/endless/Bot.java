@@ -120,17 +120,6 @@ public class Bot extends ListenerAdapter
         client.setLinkedCacheSize(6);
         client.setHelpConsumer(CommandHelper::getHelp);
 
-        if(maintenance)
-        {
-            client.setGame(Game.playing("Maintenance mode enabled"));
-            client.setStatus(OnlineStatus.DO_NOT_DISTURB);
-        }
-        else
-        {
-            client.setGame(Game.playing("Type e!help"));
-            client.setStatus(OnlineStatus.ONLINE);
-        }
-
         if(!(Arrays.toString(owners).isEmpty()))
             client.setCoOwnerIds(owners);
         if(!(config.getDBotsToken().isEmpty() || config.getDBotsToken()==null))
