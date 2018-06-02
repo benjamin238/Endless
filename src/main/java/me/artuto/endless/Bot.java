@@ -61,7 +61,7 @@ public class Bot extends ListenerAdapter
     public GuildSettingsDataManager gsdm;
     public PunishmentsDataManager pdm;
     public ProfileDataManager prdm;
-    public StarboardDataManager sdm;
+    private StarboardDataManager sdm;
     public TagDataManager tdm;
 
     // EventWaiter
@@ -128,29 +128,29 @@ public class Bot extends ListenerAdapter
             client.setDiscordBotListKey(config.getDBotsListToken());
 
         client.addCommands(
-                //Bot
+                // Bot
                 new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(), new StatsCmd(),
 
-                //Bot Administration
+                // Bot Administration
                 new BashCmd(), new BlacklistUsersCmd(this), new BotCPanelCmd(), new EvalCmd(this), new ShutdownCmd(),
 
-                //Fun
+                // Fun
                 new CatCmd(this), new ChooseCmd(), new DogCmd(this),
                 new GiphyGifCmd(this), new ProfileCmd(this), new SayCmd(), new TagCmd(this),
 
-                //Moderation
+                // Moderation
                 new BanCmd(this), new ClearCmd(this), new DBansCheckCmd(this), new KickCmd(this),
                 new HackbanCmd(this), new MuteCmd(this), new SoftbanCmd(this), new UnbanCmd(this),
 
-                //Server Settings
+                // Server Settings
                 new LeaveCmd(this), new PrefixCmd(this), new ServerSettingsCmd(this),
                 new SetupCmd(this), new StarboardCmd(this), new WelcomeCmd(this),
 
-                //Tools
+                // Tools
                 new AfkCmd(), new AnnouncementCmd(), new AvatarCmd(), new GuildInfoCmd(),
                 new LookupCmd(), new QuoteCmd(), new RoleCmd(), new UserInfoCmd(),
 
-                //Utils
+                // Utils
                 new GoogleSearchCmd(), new RoleMeCmd(this), new TimeForCmd(this), new TranslateCmd(this));
 
         Endless.LOG.info("Starting JDA...");
