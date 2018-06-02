@@ -93,7 +93,7 @@ public class DonateCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(!(event.getClient().getOwnerId().equals(Const.ARTUTO_ID)))
+            if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
                 event.replyError("This command is not available on a selfhosted instance!");
                 return;
@@ -156,7 +156,7 @@ public class DonateCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(!(event.getClient().getOwnerId().equals(Const.ARTUTO_ID)))
+            if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
                 event.replyError("This command is not available on a selfhosted instance!");
                 return;
