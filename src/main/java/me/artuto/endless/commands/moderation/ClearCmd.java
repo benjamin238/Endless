@@ -210,7 +210,7 @@ public class ClearCmd extends EndlessCommand
             catch(Exception e)
             {
                 event.replyError(Messages.CLEAR_ERROR+"**"+deletion.size()+"** messages!");
-                LoggerFactory.getLogger("MySQL Database").error(e.toString());
+                LoggerFactory.getLogger(ClearCmd.class).error("Error while cleaning messages in TC: "+event.getTextChannel().getId(), e);
                 e.printStackTrace();
                 return;
             }
@@ -222,8 +222,10 @@ public class ClearCmd extends EndlessCommand
 
     private static boolean hasImage(Message msg)
     {
-        if(msg.getAttachments().stream().anyMatch(Message.Attachment::isImage)) return true;
-        if(msg.getEmbeds().stream().anyMatch(e -> !(e.getImage() == null) || !(e.getVideoInfo() == null))) return true;
+        if(msg.getAttachments().stream().anyMatch(Message.Attachment::isImage))
+            return true;
+        if(msg.getEmbeds().stream().anyMatch(e -> !(e.getImage() == null) || !(e.getVideoInfo() == null)))
+            return true;
         return false;
     }
 }

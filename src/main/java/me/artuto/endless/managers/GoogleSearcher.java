@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 public class GoogleSearcher
 {
-    private final Logger LOG = LoggerFactory.getLogger("MySQL Database");
+    private final Logger LOG = LoggerFactory.getLogger(GoogleSearcher.class);
 
     public ArrayList<String> getGoogleData(String query)
     {
@@ -42,8 +42,7 @@ public class GoogleSearcher
         }
         catch(UnsupportedEncodingException e)
         {
-            LOG.error(e.toString());
-            e.printStackTrace();
+            LOG.error("Error while encoding the needed URL to search in Google!", e);
             return null;
         }
 
@@ -65,15 +64,12 @@ public class GoogleSearcher
                     if(!(results.contains("/settings/ads/preferences") && !(results.startsWith("http://webcache.googleusercontent.com"))))
                         result.add(results);
                 }
-                catch(UnsupportedEncodingException e)
-                {
-                }
+                catch(UnsupportedEncodingException ignored) { }
             });
         }
         catch(IOException e)
         {
-            LOG.error("Search went wrong!: "+e);
-            e.printStackTrace();
+            LOG.error("Search went wrong!", e);
             return null;
         }
 

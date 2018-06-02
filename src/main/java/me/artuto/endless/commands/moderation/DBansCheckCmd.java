@@ -137,9 +137,7 @@ public class DBansCheckCmd extends EndlessCommand
         catch(IOException e)
         {
             event.replyError("An error was thrown when doing the check! Ask the Owner to check the Console.");
-            LOG.error(e.toString());
-
-            if(bot.config.isDebugEnabled()) e.printStackTrace();
+            LOG.error("Error while checking the status of a user in DiscordBans. ID: "+user.getId(), e);
         }
     }
 }

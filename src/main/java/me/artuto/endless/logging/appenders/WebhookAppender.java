@@ -20,6 +20,7 @@ package me.artuto.endless.logging.appenders;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+import me.artuto.endless.utils.LogUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
@@ -60,8 +61,8 @@ public class WebhookAppender extends AppenderBase<ILoggingEvent>
 
         EmbedBuilder eBuilder = new EmbedBuilder();
         eBuilder.setColor(color);
-        eBuilder.setDescription(event.getFormattedMessage());
-        eBuilder.setFooter("Endless Log", null);
+        eBuilder.setDescription(LogUtils.getStackTrace(event));
+        eBuilder.setFooter("Endless Log", "https://cdn.discordapp.com/avatars/328625129309339649/2c1ca7ef1e1b58e5a686b413b6d756c5.png");
         eBuilder.setTimestamp(Instant.now());
         eBuilder.setTitle(event.getLoggerName());
 
