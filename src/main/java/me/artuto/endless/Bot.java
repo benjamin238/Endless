@@ -113,7 +113,7 @@ public class Bot extends ListenerAdapter
         client.setServerInvite(Const.INVITE);
         client.setEmojis(config.getDoneEmote(), config.getWarnEmote(), config.getErrorEmote());
         client.setPrefix(config.getPrefix());
-        client.setAlternativePrefix("<@310578566695878658>");
+        client.setAlternativePrefix("@mention");
         client.setGuildSettingsManager(new ClientGSDM(db));
         client.setScheduleExecutor(loader.cmdThread);
         client.setListener(new CommandLogging(this));
