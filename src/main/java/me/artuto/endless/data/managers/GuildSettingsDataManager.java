@@ -94,6 +94,12 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, modlog_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
+                if(tc==null)
+                {
+                    results.updateN
+                }
+
+
                 if(results.next())
                 {
                     results.updateLong("modlog_id", tc == null ? null : tc.getIdLong());
@@ -689,10 +695,12 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             Role role;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT muted_role FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT muted_role_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) role = guild.getRoleById(results.getLong("muted_role"));
-                else role = null;
+                if(results.next())
+                    role = guild.getRoleById(results.getLong("muted_role_id"));
+                else
+                    role = null;
             }
             return role;
         }
@@ -742,7 +750,7 @@ public class GuildSettingsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             int days;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT muted_role FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT ban_delete_days FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
                 if(results.next())
                     days = results.getInt("ban_delete_days");

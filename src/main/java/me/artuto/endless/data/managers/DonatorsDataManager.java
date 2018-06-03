@@ -44,10 +44,10 @@ public class DonatorsDataManager
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donated_amount FROM PROFILES WHERE user_id = %s", user.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donation FROM PROFILES WHERE user_id = %s", user.getId())))
             {
                 if(results.next())
-                    return !(results.getString("donated_amount")==null);
+                    return !(results.getString("donation")==null);
                 else
                     return false;
             }
@@ -59,53 +59,53 @@ public class DonatorsDataManager
         }
     }
 
-    public void setDonation(User user, String amount)
+    public void setDonation(long user, String donation)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donated_amount FROM PROFILES WHERE user_id = %s", user.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donation FROM PROFILES WHERE user_id = %s", user)))
             {
                 if(results.next())
                 {
-                    results.updateString("donated_amount", amount);
+                    results.updateString("donation", donation);
                     results.updateRow();
                 }
                 else
                 {
                     results.moveToInsertRow();
-                    results.updateLong("user_id", user.getIdLong());
-                    results.updateString("donated_amount", amount);
+                    results.updateLong("user_id", user);
+                    results.updateString("donation", donation);
                     results.insertRow();
                 }
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting a donation for the specified user. ID: "+user.getId(), e);
+            Database.LOG.error("Error while setting a donation for the specified user. ID: "+user, e);
         }
     }
 
-    public String getAmount(User user)
+    public String getDonation(User user)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donated_amount FROM PROFILES WHERE user_id = %s", user.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donation FROM PROFILES WHERE user_id = %s", user.getId())))
             {
                 if(results.next())
-                    return results.getString("donated_amount");
+                    return results.getString("donation");
                 else
                     return null;
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the donated amount of the specified user. ID: "+user.getId(), e);
+            Database.LOG.error("Error while getting the donation of the specified user. ID: "+user.getId(), e);
             return null;
         }
     }
@@ -118,15 +118,16 @@ public class DonatorsDataManager
             statement.closeOnCompletion();
             List<User> users;
 
-            try(ResultSet results = statement.executeQuery("SELECT user_id, donated_amount FROM PROFILES"))
+            try(ResultSet results = statement.executeQuery("SELECT user_id, donation FROM PROFILES"))
             {
                 users = new LinkedList<>();
                 while(results.next())
                 {
-                    jda.retrieveUserById(results.getLong("user_id")).queue(u -> {
+                    long id = results.getLong("user_id");
+                    jda.retrieveUserById(id).queue(u -> {
                         if(hasDonated(u))
                             users.add(u);
-                    }, e -> {});
+                    }, e -> setDonation(id, null));
                 }
             }
             return users;

@@ -23,7 +23,6 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.cmddata.CommandHelper;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -67,9 +66,10 @@ public class DonateCmd extends EndlessCommand
         if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
         else color = event.getGuild().getSelfMember().getColor();
 
-        if(list.isEmpty()) sb.append("None has donated yet ):");
+        if(list.isEmpty())
+            sb.append("None has donated yet ):");
         else for(User user : list)
-            sb.append(String.format("%#s - %s\n", user, bot.ddm.getAmount(user)));
+            sb.append(String.format("**%#s** - %s\n", user, bot.ddm.getDonation(user)));
 
         builder.setColor(color);
         builder.addField(":moneybag: Donations:", "Actually, I host Endless on a very basic VPS, which can cause some lag sometimes.\n"+"I'll appreciate your donation. All the recauded money will be for get a new and better VPS.\n", false);
@@ -107,14 +107,14 @@ public class DonateCmd extends EndlessCommand
 
             String[] args;
             String id;
-            String amount;
+            String donation;
             User user;
 
             try
             {
                 args = event.getArgs().split(" ", 2);
                 id = args[0];
-                amount = args[1];
+                donation = args[1];
             }
             catch(ArrayIndexOutOfBoundsException e)
             {
@@ -128,7 +128,7 @@ public class DonateCmd extends EndlessCommand
             {
                 event.getJDA().retrieveUserById(id).queue(s ->
                 {
-                    bot.ddm.setDonation(s, amount);
+                    bot.ddm.setDonation(s.getIdLong(), donation);
                     event.replySuccess(String.format("Successfully added %#s to the donators list!", s));
                 }, e -> event.replyError("Invalid ID!"));
             }
@@ -136,7 +136,7 @@ public class DonateCmd extends EndlessCommand
             else
             {
                 user = list.get(0).getUser();
-                bot.ddm.setDonation(user, amount);
+                bot.ddm.setDonation(user.getIdLong(), donation);
                 event.replySuccess(String.format("Successfully added %#s to the donators list!", user));
             }
         }
@@ -177,12 +177,12 @@ public class DonateCmd extends EndlessCommand
                 {
                     if(!(bot.ddm.hasDonated(s)))
                     {
-                        bot.ddm.setDonation(s, null);
+                        bot.ddm.setDonation(s.getIdLong(), null);
                         event.replyError("This user hasn't donated!");
                     }
                     else
                     {
-                        bot.ddm.setDonation(s, null);
+                        bot.ddm.setDonation(s.getIdLong(), null);
                         event.replySuccess(String.format("Successfully removed %#s from the donators list!", s));
                     }
                 }, e -> event.replyError("Invalid ID!"));
@@ -194,12 +194,12 @@ public class DonateCmd extends EndlessCommand
 
                 if(!(bot.ddm.hasDonated(user)))
                 {
-                    bot.ddm.setDonation(user, null);
+                    bot.ddm.setDonation(user.getIdLong(), null);
                     event.replyError("This user hasn't donated!");
                 }
                 else
                 {
-                    bot.ddm.setDonation(user, null);
+                    bot.ddm.setDonation(user.getIdLong(), null);
                     event.replySuccess(String.format("Successfully removed %#s from the donators list!", user));
                 }
             }
