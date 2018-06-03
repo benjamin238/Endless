@@ -261,10 +261,8 @@ public class ServerSettingsCmd extends EndlessCommand
                         return;
                     }
 
-                    if(bot.gsdm.setMutedRole(event.getGuild(), list.get(0)))
-                        event.replySuccess("The muted role is now "+list.get(0).getAsMention());
-                    else
-                        event.replyError("Something went wrong while setting the muted role!");
+                    bot.gsdm.setMutedRole(event.getGuild(), list.get(0));
+                    event.replySuccess("The muted role is now "+list.get(0).getAsMention());
                 }
             }
         }

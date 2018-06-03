@@ -76,11 +76,12 @@ public class PrefixCmd extends EndlessCommand
             String args = event.getArgs();
             Guild guild = event.getGuild();
 
-            if(args.isEmpty()) event.replyWarning("You didn't provided me a prefix!");
+            if(args.isEmpty())
+                event.replyWarning("You didn't provided me a prefix!");
             else
             {
-                if(bot.gsdm.addPrefix(guild, args.toLowerCase().trim())) event.replySuccess("Successfully added prefix!");
-                else event.replyError("There was an error when adding the prefix. Contact the owner.");
+                bot.gsdm.addPrefix(guild, args.toLowerCase().trim());
+                event.replySuccess("Successfully added prefix!");
             }
         }
     }
@@ -106,11 +107,12 @@ public class PrefixCmd extends EndlessCommand
             {
                 if(bot.gsdm.prefixExists(guild, args.toLowerCase().trim()))
                 {
-                    if(bot.gsdm.removePrefix(guild, args.toLowerCase().trim()))
-                        event.replySuccess("Successfully removed a prefix!");
-                    else event.replyError("There was an error when removing the prefix. Contact the owner.");
+                    bot.gsdm.removePrefix(guild, args.toLowerCase().trim());
+                    event.replySuccess("Successfully removed a prefix!");
+                    event.replyError("There was an error when removing the prefix. Contact the owner.");
                 }
-                else event.replyWarning("That prefix doesn't exists!");
+                else
+                    event.replyWarning("That prefix doesn't exists!");
             }
         }
     }

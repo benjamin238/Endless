@@ -90,7 +90,7 @@ public class BlacklistDataManager
         }
     }
 
-    public boolean removeBlacklist(long id)
+    public void removeBlacklist(long id)
     {
         try
         {
@@ -100,17 +100,12 @@ public class BlacklistDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE id = %s", id)))
             {
                 if(results.next())
-                {
                     results.deleteRow();
-                    return true;
-                }
-                else return false;
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while removing the specified ID from the blacklisted entities list. ID: "+id, e);
-            return false;
         }
     }
 

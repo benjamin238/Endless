@@ -66,12 +66,20 @@ public class WelcomeCmd extends EndlessCommand
         {
             if(event.getArgs().isEmpty())
             {
-                event.replyWarning("Specify a new welcome message!");
+                event.replyWarning("Specify a new welcome message or `none` to disable it.");
                 return;
             }
 
-            bot.gsdm.setWelcomeMessage(event.getGuild(), event.getArgs());
-            event.replySuccess("Welcome message configured.");
+            if(event.getArgs().equalsIgnoreCase("none"))
+            {
+                bot.gsdm.setWelcomeMessage(event.getGuild(), null);
+                event.replySuccess("Successfully removed welcome message");
+            }
+            else
+            {
+                bot.gsdm.setWelcomeMessage(event.getGuild(), event.getArgs());
+                event.replySuccess("Welcome message configured.");
+            }
         }
     }
 }

@@ -160,10 +160,11 @@ public class RoleMeCmd extends EndlessCommand
 
                 if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
                     event.replyError("I can't interact with that role!");
-                else if(bot.gsdm.addRolemeRole(guild, role))
-                    event.replySuccess("Successfully added the role *"+role.getName()+"* to the RoleMe roles list.");
                 else
-                    event.replyError("Something has gone wrong while adding the role to the RoleMe roles list, please contact the bot owner.");
+                {
+                    bot.gsdm.addRolemeRole(guild, role);
+                    event.replySuccess("Successfully added the role *"+role.getName()+"* to the RoleMe roles list.");
+                }
             }
         }
     }
@@ -213,10 +214,8 @@ public class RoleMeCmd extends EndlessCommand
                     return;
                 }
 
-                if(bot.gsdm.removeRolemeRole(guild, role))
-                    event.replySuccess("Successfully removed the role *"+role.getName()+"* from the RoleMe roles list.");
-                else
-                    event.replyError("Something has gone wrong while removing the role from the RoleMe roles list, please contact the bot owner.");
+                bot.gsdm.removeRolemeRole(guild, role);
+                event.replySuccess("Successfully removed the role *"+role.getName()+"* from the RoleMe roles list.");
             }
 
         }

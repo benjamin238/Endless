@@ -30,6 +30,7 @@ import net.dv8tion.jda.core.entities.User;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -68,14 +69,15 @@ public class TimeForCmd extends EndlessCommand
             p = bot.prdm.getProfile(user);
             name = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
 
-            if(!(bot.prdm.hasProfile(user))) event.replyError("You don't have a timezone configured!");
+            if(bot.prdm.getProfile(user).getTimezone()==null)
+                event.replyWarning("You don't have a timezone configured!");
             else
             {
                 try
                 {
                     zone = ZoneId.of(p.getTimezone());
                 }
-                catch(ZoneRulesException e)
+                catch(DateTimeException e)
                 {
                     event.replyError("`"+p.getTimezone()+"` isn't a valid timezone!");
                     return;

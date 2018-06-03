@@ -70,8 +70,16 @@ public class LeaveCmd extends EndlessCommand
                 return;
             }
 
-            bot.gsdm.setLeaveMessage(event.getGuild(), event.getArgs());
-            event.replySuccess("leave message configured.");
+            if(event.getArgs().equalsIgnoreCase("none"))
+            {
+                bot.gsdm.setLeaveMessage(event.getGuild(), null);
+                event.replySuccess("Successfully removed leave message");
+            }
+            else
+            {
+                bot.gsdm.setLeaveMessage(event.getGuild(), event.getArgs());
+                event.replySuccess("Leave message configured.");
+            }
         }
     }
 }

@@ -49,7 +49,7 @@ public class ProfileDataManager
             {
                 if(results.next())
                 {
-                    p = new ProfileImpl(results.getInt("donated_amount"), results.getString("timezone"), results.getString("twitter"),
+                    p = new ProfileImpl(results.getInt("donation"), results.getString("timezone"), results.getString("twitter"),
                             results.getString("steam"), results.getString("wii"), results.getString("nnid"),
                             results.getString("xboxlive"), results.getString("psn"), results.getString("3ds"),
                             results.getString("skype"), results.getString("youtube"), results.getString("about"),
@@ -95,7 +95,7 @@ public class ProfileDataManager
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, timezone FROM PROFILES WHERE timezone = %s", user.getId())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, timezone FROM PROFILES WHERE user_id = %s", user.getId())))
             {
                 if(results.next())
                 {

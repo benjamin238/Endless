@@ -49,7 +49,7 @@ public class GuildSettingsDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT modlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
                 if(results.next())
-                    tc = guild.getTextChannelById(Long.toString(results.getLong("modlog_id")));
+                    tc = guild.getTextChannelById(results.getLong("modlog_id"));
                 else
                     tc = null;
             }
@@ -72,7 +72,7 @@ public class GuildSettingsDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT serverlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
                 if(results.next())
-                    tc = guild.getTextChannelById(Long.toString(results.getLong("serverlog_id")));
+                    tc = guild.getTextChannelById(results.getLong("serverlog_id"));
                 else
                     tc = null;
             }
@@ -96,21 +96,26 @@ public class GuildSettingsDataManager
             {
                 if(tc==null)
                 {
-                    results.updateN
-                }
-
-
-                if(results.next())
-                {
-                    results.updateLong("modlog_id", tc == null ? null : tc.getIdLong());
-                    results.updateRow();
+                    if(results.next())
+                    {
+                        results.updateNull("modlog_id");
+                        results.updateRow();
+                    }
                 }
                 else
                 {
-                    results.moveToInsertRow();
-                    results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("modlog_id", tc == null ? null : tc.getIdLong());
-                    results.insertRow();
+                    if(results.next())
+                    {
+                        results.updateLong("modlog_id", tc.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("modlog_id", tc.getIdLong());
+                        results.insertRow();
+                    }
                 }
             }
         }
@@ -129,17 +134,28 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, serverlog_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
-                if(results.next())
+                if(tc==null)
                 {
-                    results.updateLong("serverlog_id", tc == null ? 0l : tc.getIdLong());
-                    results.updateRow();
+                    if(results.next())
+                    {
+                        results.updateNull("serverlog_id");
+                        results.updateRow();
+                    }
                 }
                 else
                 {
-                    results.moveToInsertRow();
-                    results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("serverlog_id", tc == null ? 0l : tc.getIdLong());
-                    results.insertRow();
+                    if(results.next())
+                    {
+                        results.updateLong("serverlog_id", tc.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("serverlog_id", tc.getIdLong());
+                        results.insertRow();
+                    }
                 }
             }
         }
@@ -158,8 +174,10 @@ public class GuildSettingsDataManager
             TextChannel tc;
             try(ResultSet results = statement.executeQuery(String.format("SELECT welcome_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("welcome_id")));
-                else tc = null;
+                if(results.next())
+                    tc = guild.getTextChannelById(results.getLong("welcome_id"));
+                else
+                    tc = null;
             }
             return tc;
         }
@@ -179,17 +197,28 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
-                if(results.next())
+                if(tc==null)
                 {
-                    results.updateLong("welcome_id", tc == null ? null : tc.getIdLong());
-                    results.updateRow();
+                    if(results.next())
+                    {
+                        results.updateNull("welcome_id");
+                        results.updateRow();
+                    }
                 }
                 else
                 {
-                    results.moveToInsertRow();
-                    results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("welcome_id", tc == null ? null : tc.getIdLong());
-                    results.insertRow();
+                    if(results.next())
+                    {
+                        results.updateLong("welcome_id", tc.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("welcome_id", tc.getIdLong());
+                        results.insertRow();
+                    }
                 }
             }
         }
@@ -208,8 +237,10 @@ public class GuildSettingsDataManager
             TextChannel tc;
             try(ResultSet results = statement.executeQuery(String.format("SELECT leave_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("leave_id")));
-                else tc = null;
+                if(results.next())
+                    tc = guild.getTextChannelById(results.getLong("leave_id"));
+                else
+                    tc = null;
             }
             return tc;
         }
@@ -229,17 +260,28 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, leave_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
-                if(results.next())
+                if(tc==null)
                 {
-                    results.updateLong("leave_id", tc == null ? null : tc.getIdLong());
-                    results.updateRow();
+                    if(results.next())
+                    {
+                        results.updateNull("leave_id");
+                        results.updateRow();
+                    }
                 }
                 else
                 {
-                    results.moveToInsertRow();
-                    results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("leave_id", tc == null ? null : tc.getIdLong());
-                    results.insertRow();
+                    if(results.next())
+                    {
+                        results.updateLong("leave_id", tc.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("leave_id", tc.getIdLong());
+                        results.insertRow();
+                    }
                 }
             }
         }
@@ -258,8 +300,10 @@ public class GuildSettingsDataManager
             String message;
             try(ResultSet results = statement.executeQuery(String.format("SELECT welcome_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) message = results.getString("welcome_msg");
-                else message = "";
+                if(results.next())
+                    message = results.getString("welcome_msg");
+                else
+                    message = "";
             }
             return message;
         }
@@ -279,17 +323,28 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_msg FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
-                if(results.next())
+                if(message==null)
                 {
-                    results.updateString("welcome_msg", message.isEmpty() ? "" : message);
-                    results.updateRow();
+                    if(results.next())
+                    {
+                        results.updateNull("welcome_msg");
+                        results.updateRow();
+                    }
                 }
                 else
                 {
-                    results.moveToInsertRow();
-                    results.updateLong("guild_id", guild.getIdLong());
-                    results.updateString("welcome_msg", message.isEmpty() ? "" : message);
-                    results.insertRow();
+                    if(results.next())
+                    {
+                        results.updateString("welcome_msg", message);
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateString("welcome_msg", message);
+                        results.insertRow();
+                    }
                 }
             }
         }
@@ -308,8 +363,10 @@ public class GuildSettingsDataManager
             String message;
             try(ResultSet results = statement.executeQuery(String.format("SELECT leave_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) message = results.getString("leave_msg");
-                else message = "";
+                if(results.next())
+                    message = results.getString("leave_msg");
+                else
+                    message = "";
             }
             return message;
         }
@@ -329,17 +386,28 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, leave_msg FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
-                if(results.next())
+                if(message==null)
                 {
-                    results.updateString("leave_msg", message.isEmpty() ? null : message);
-                    results.updateRow();
+                    if(results.next())
+                    {
+                        results.updateNull("leave_msg");
+                        results.updateRow();
+                    }
                 }
                 else
                 {
-                    results.moveToInsertRow();
-                    results.updateLong("guild_id", guild.getIdLong());
-                    results.updateString("leave_msg", message.isEmpty() ? null : message);
-                    results.insertRow();
+                    if(results.next())
+                    {
+                        results.updateString("leave_msg", message);
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateString("leave_msg", message);
+                        results.insertRow();
+                    }
                 }
             }
         }
@@ -358,8 +426,10 @@ public class GuildSettingsDataManager
             TextChannel tc;
             try(ResultSet results = statement.executeQuery(String.format("SELECT starboard_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) tc = guild.getTextChannelById(Long.toString(results.getLong("starboard_id")));
-                else tc = null;
+                if(results.next())
+                    tc = guild.getTextChannelById(results.getLong("starboard_id"));
+                else
+                    tc = null;
             }
             return tc;
         }
@@ -379,17 +449,28 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, starboard_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
-                if(results.next())
+                if(tc==null)
                 {
-                    results.updateLong("starboard_id", tc==null?null:tc.getIdLong());
-                    results.updateRow();
+                    if(results.next())
+                    {
+                        results.updateNull("starboard_id");
+                        results.updateRow();
+                    }
                 }
                 else
                 {
-                    results.moveToInsertRow();
-                    results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("starboard_id", tc==null?null:tc.getIdLong());
-                    results.insertRow();
+                    if(results.next())
+                    {
+                        results.updateLong("starboard_id", tc.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("starboard_id", tc.getIdLong());
+                        results.insertRow();
+                    }
                 }
             }
         }
@@ -408,8 +489,10 @@ public class GuildSettingsDataManager
             Integer count;
             try(ResultSet results = statement.executeQuery(String.format("SELECT starboard_count FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
             {
-                if(results.next()) count = results.getInt("starboard_count");
-                else count = null;
+                if(results.next())
+                    count = results.getInt("starboard_count");
+                else
+                    count = null;
             }
             return count;
         }
@@ -449,7 +532,7 @@ public class GuildSettingsDataManager
         }
     }
 
-    public boolean addPrefix(Guild guild, String prefix)
+    public void addPrefix(Guild guild, String prefix)
     {
         try
         {
@@ -469,7 +552,6 @@ public class GuildSettingsDataManager
 
                     results.updateString("prefixes", array.toString());
                     results.updateRow();
-                    return true;
                 }
                 else
                 {
@@ -477,14 +559,12 @@ public class GuildSettingsDataManager
                     results.updateLong("guild_id", guild.getIdLong());
                     results.updateString("prefixes", new JSONArray().put(prefix).toString());
                     results.insertRow();
-                    return true;
                 }
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while adding a prefix for the guild "+guild.getId(), e);
-            return false;
         }
     }
 
@@ -523,7 +603,7 @@ public class GuildSettingsDataManager
         return false;
     }
 
-    public boolean removePrefix(Guild guild, String prefix)
+    public void removePrefix(Guild guild, String prefix)
     {
         try
         {
@@ -547,20 +627,25 @@ public class GuildSettingsDataManager
                             if(array.get(i).toString().equals(prefix))
                             {
                                 array.remove(i);
-                                results.updateString("prefixes", array.length()<0 ? null : array.toString());
-                                results.updateRow();
-                                return true;
+                                if(array.length()<0)
+                                {
+                                    results.updateNull("prefixes");
+                                    results.updateRow();
+                                }
+                                else
+                                {
+                                    results.updateString("prefixes", array.toString());
+                                    results.updateRow();
+                                }
                             }
                         }
                     }
                 }
-                return false;
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while removing a prefix for the guild "+guild.getId(), e);
-            return false;
         }
     }
 
@@ -608,7 +693,7 @@ public class GuildSettingsDataManager
         }
     }
 
-    public boolean addRolemeRole(Guild guild, Role role)
+    public void addRolemeRole(Guild guild, Role role)
     {
         try
         {
@@ -628,7 +713,6 @@ public class GuildSettingsDataManager
 
                     results.updateString("roleme_roles", array.toString());
                     results.updateRow();
-                    return true;
                 }
                 else
                 {
@@ -636,18 +720,16 @@ public class GuildSettingsDataManager
                     results.updateLong("guild_id", guild.getIdLong());
                     results.updateString("roleme_roles", new JSONArray().put(role.getId()).toString());
                     results.insertRow();
-                    return true;
                 }
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while adding a roleme role for the guild "+guild.getId(), e);
-            return false;
         }
     }
 
-    public boolean removeRolemeRole(Guild guild, Role role)
+    public void removeRolemeRole(Guild guild, Role role)
     {
         try
         {
@@ -671,20 +753,25 @@ public class GuildSettingsDataManager
                             if(array.get(i).toString().equals(role.getId()))
                             {
                                 array.remove(i);
-                                results.updateString("roleme_roles", array.length()<0 ? null : array.toString());
-                                results.updateRow();
-                                return true;
+                                if(array.length()<0)
+                                {
+                                    results.updateNull("roleme_roles");
+                                    results.updateRow();
+                                }
+                                else
+                                {
+                                    results.updateString("roleme_roles", array.toString());
+                                    results.updateRow();
+                                }
                             }
                         }
                     }
                 }
-                return false;
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while removing a roleme role from the guild "+guild.getId(), e);
-            return false;
         }
     }
 
@@ -711,7 +798,7 @@ public class GuildSettingsDataManager
         }
     }
 
-    public boolean setMutedRole(Guild guild, Role role)
+    public void setMutedRole(Guild guild, Role role)
     {
         try
         {
@@ -720,26 +807,34 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, muted_role_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
-                if(results.next())
+                if(role==null)
                 {
-                    results.updateLong("muted_role_id", role==null?null:role.getIdLong());
-                    results.updateRow();
-                    return true;
+                    if(results.next())
+                    {
+                        results.updateNull("muted_role_id");
+                        results.updateRow();
+                    }
                 }
                 else
                 {
-                    results.moveToInsertRow();
-                    results.updateLong("guild_id", guild.getIdLong());
-                    results.updateLong("muted_role_id", role==null?null:role.getIdLong());
-                    results.insertRow();
-                    return true;
+                    if(results.next())
+                    {
+                        results.updateLong("muted_role_id", role.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("muted_role_id", role.getIdLong());
+                        results.insertRow();
+                    }
                 }
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the muted role for the guild "+guild.getId(), e);
-            return false;
         }
     }
 
@@ -776,17 +871,28 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, ban_delete_days FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
-                if(results.next())
+                if(days==0)
                 {
-                    results.updateInt("ban_delete_days", days);
-                    results.updateRow();
+                    if(results.next())
+                    {
+                        results.updateNull("ban_delete_days");
+                        results.updateRow();
+                    }
                 }
                 else
                 {
-                    results.moveToInsertRow();
-                    results.updateLong("guild_id", guild.getIdLong());
-                    results.updateInt("ban_delete_days", days);
-                    results.insertRow();
+                    if(results.next())
+                    {
+                        results.updateInt("ban_delete_days", days);
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateInt("ban_delete_days", days);
+                        results.insertRow();
+                    }
                 }
             }
         }
