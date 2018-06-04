@@ -25,6 +25,7 @@ public class IgnoreUtils
 {
     public static boolean isIgnored(String id, String topic)
     {
-        return topic.contains("{ignore:"+id+"}");
+
+        return topic==null?false:topic.contains("{ignore:"+id+"}");
     }
 }
