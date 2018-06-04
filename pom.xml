@@ -23,7 +23,7 @@
 
     <groupId>me.artuto.endless</groupId>
     <artifactId>Endless</artifactId>
-    <version>4.3.5</version>
+    <version>4.3.6</version>
 
     <repositories>
         <repository>
