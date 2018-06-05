@@ -67,12 +67,12 @@ public class CommandLogging implements CommandListener
     @Override
     public void onCommandException(CommandEvent event, Command command, Throwable throwable)
     {
-        event.replyError("An error occurred while executing this command. Please ask the owner to check the log.");
+        event.replyError("An error occurred while executing this command. Please join the support server by doing `e!help support`.");
 
         if(event.getGuild()==null)
         {
-            Endless.LOG.error(String.format("Command Error: %s | Message ID: %s | Executed in: Direct Message",
-                    command.getName(), event.getMessage().getIdLong()), throwable);
+            Endless.LOG.error(String.format("Command Error: %s | Message ID: %s | Executed in: Direct Message %s",
+                    command.getName(), event.getMessage().getIdLong(), event.getPrivateChannel().getIdLong()), throwable);
         }
         else
         {
