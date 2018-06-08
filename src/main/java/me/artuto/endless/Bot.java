@@ -33,8 +33,8 @@ import me.artuto.endless.data.managers.*;
 import me.artuto.endless.events.*;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.*;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -72,6 +72,9 @@ public class Bot extends ListenerAdapter
 
     // Schedulers
     public ScheduledExecutorService muteScheduler;
+
+    // ShardManager
+    public ShardManager shards;
 
     // Threads
     public ScheduledExecutorService clearThread;
@@ -112,6 +115,8 @@ public class Bot extends ListenerAdapter
         client.setOwnerId(String.valueOf(config.getOwnerId()));
         client.setServerInvite(Const.INVITE);
         client.setEmojis(config.getDoneEmote(), config.getWarnEmote(), config.getErrorEmote());
+        client.setGame(null);
+        client.setStatus(null);
         client.setPrefix(config.getPrefix());
         client.setAlternativePrefix("@mention");
         client.setGuildSettingsManager(new ClientGSDM(db));
@@ -129,10 +134,10 @@ public class Bot extends ListenerAdapter
 
         client.addCommands(
                 // Bot
-                new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(), new StatsCmd(),
+                new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(), new StatusCmd(),
 
                 // Bot Administration
-                new BashCmd(), new BlacklistUsersCmd(this), new BotCPanelCmd(), new EvalCmd(this), new ShutdownCmd(),
+                new BashCmd(), new BlacklistUsersCmd(this), new BotCPanelCmd(), new EvalCmd(this), new ShutdownCmd(this),
 
                 // Fun
                 new CatCmd(this), new ChooseCmd(), new DogCmd(this),
@@ -155,7 +160,24 @@ public class Bot extends ListenerAdapter
 
         Endless.LOG.info("Starting JDA...");
 
-        JDABuilder builder = new JDABuilder(AccountType.BOT)
+        DefaultShardManagerBuilder builder = new DefaultShardManagerBuilder()
+                .setToken(config.getToken())
+                .setStatus(OnlineStatus.DO_NOT_DISTURB)
+                .setGame(Game.playing("[ENDLESS] Loading..."))
+                .setBulkDeleteSplittingEnabled(false)
+                .setAutoReconnect(true)
+                .setEnableShutdownHook(true)
+                .setShardsTotal(3);
+        if(maintenance)
+            builder.addEventListeners(client.build(), new Bot());
+        else
+            builder.addEventListeners(loader.waiter, client.build(), new BotEvents(this, loader.botlogThread, false),
+                    new ServerLogging(gsdm), new GuildEvents(this),
+                    new StarboardEvents(gsdm, sdm, loader.starboardThread), new UserEvents(config));
+
+        shards = builder.build();
+
+        /*JDABuilder builder = new JDABuilder(AccountType.BOT)
                 .setToken(config.getToken())
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setGame(Game.playing("[ENDLESS] Loading..."))
@@ -169,6 +191,6 @@ public class Bot extends ListenerAdapter
                     new ServerLogging(gsdm), new GuildEvents(this),
                     new StarboardEvents(gsdm, sdm, loader.starboardThread), new UserEvents(config));
 
-        builder.buildAsync();
+        builder.buildAsync();*/
     }
 }
