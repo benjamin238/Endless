@@ -55,8 +55,8 @@ public class CommandHelper
                 eBuilder.addField(Const.BAN+" Moderation Commands:", "e!help moderation", false);
                 eBuilder.addField(Const.SERVER_SETTINGS+" Server Settings Commands:", "e!help settings", false);
             }
-            eBuilder.addField(Const.PEOPLE+" Tool Commands:", "e!help tool", false);
-            eBuilder.addField(Const.GOOGLE+" Util Commands:", "e!help util", false);
+            eBuilder.addField(Const.PEOPLE+" Tool Commands:", "e!help tools", false);
+            eBuilder.addField(Const.GOOGLE+" Util Commands:", "e!help utils", false);
         }
         else
         {
