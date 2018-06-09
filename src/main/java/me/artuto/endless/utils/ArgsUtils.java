@@ -17,6 +17,8 @@
 
 package me.artuto.endless.utils;
 
+import com.jagrosh.jdautilities.command.CommandEvent;
+
 /**
  * @author Artuto
  */
@@ -49,5 +51,18 @@ public class ArgsUtils
         }
 
         return timeinseconds;
+    }
+
+    public static String[] splitWithReason(int limit, String args, String regex)
+    {
+        try
+        {
+            String[] argsArr = args.split(regex, limit);
+            return new String[]{argsArr[0], argsArr[1]};
+        }
+        catch(IndexOutOfBoundsException e)
+        {
+            return new String[]{args, "[no reason provided]"};
+        }
     }
 }

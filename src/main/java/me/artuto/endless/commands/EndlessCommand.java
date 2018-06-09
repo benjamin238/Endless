@@ -89,6 +89,11 @@ public abstract class EndlessCommand extends Command
 
     protected abstract void executeCommand(CommandEvent event);
 
+    public boolean isOwnerCommand()
+    {
+        return ownerCommand;
+    }
+
     public Permission[] getBotPerms()
     {
         return botPerms;

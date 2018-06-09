@@ -90,7 +90,7 @@ public class GuildEvents extends ListenerAdapter
         GuildUtils.checkBadGuild(guild);
         TextChannel tc = event.getJDA().getTextChannelById(bot.config.getBotlogChannelId());
 
-        if(bot.bdm.isBlacklisted(guild.getIdLong()) || bot.bdm.isBlacklisted(owner.getIdLong()))
+        if(!(bot.bdm.getBlacklist(guild.getIdLong())==null || bot.bdm.getBlacklist(owner.getIdLong())==null))
         {
             LoggerFactory.getLogger("Logging").info("[BLACKLISTED GUILD/OWNER JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n" +
                     "Owner: "+owner.getName()+"#"+owner.getDiscriminator()+" (ID: "+owner.getId()+")");
@@ -210,7 +210,7 @@ public class GuildEvents extends ListenerAdapter
             {
                 if(msg.getMentionedUsers().contains(user))
                 {
-                    if(!(user.isBot()) || !(bot.bdm.isBlacklisted(author.getIdLong())))
+                    if(!(user.isBot()) || !(bot.bdm.getBlacklist(user.getIdLong())==null))
                     {
                         EmbedBuilder builder = new EmbedBuilder();
 

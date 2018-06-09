@@ -23,20 +23,24 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.entities.Blacklist;
+import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public class BlacklistUsersCmd extends EndlessCommand
+public class BlacklistUserCmd extends EndlessCommand
 {
     private final Bot bot;
 
-    public BlacklistUsersCmd(Bot bot)
+    public BlacklistUserCmd(Bot bot)
     {
         this.bot = bot;
         this.name = "blacklistuser";
@@ -51,12 +55,7 @@ public class BlacklistUsersCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        String prefix = event.getClient().getPrefix();
-
-        if(event.getArgs().isEmpty())
-            event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"blacklistuser add`: Adds a user ID to the blacklisted users list.\n"+"- `"+prefix+"blacklistuser remove`: Removes a user ID from the blacklisted users list.\n"+"- `"+prefix+"blacklistuser list`: Displays blacklisted users.\n"+"- `"+prefix+"blacklistuser check`: Checks if a user ID is blacklisted.");
-        else if(!(event.getArgs().contains("add")) || !(event.getArgs().contains("remove")) || !(event.getArgs().contains("list") || !(event.getArgs().contains("check"))))
-            event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"blacklistuser add`: Adds a user ID to the blacklisted users list.\n"+"- `"+prefix+"blacklistuser remove`: Removes a user ID from the blacklisted users list.\n"+"- `"+prefix+"blacklistuser list`: Displays blacklisted users.\n"+"- `"+prefix+"blacklistuser check`: Checks if a user ID is blacklisted.");
+        event.replyWarning("Please specify a subcommand!");
     }
 
     private class Add extends EndlessCommand
@@ -74,39 +73,24 @@ public class BlacklistUsersCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            User user;
-
             if(event.getArgs().isEmpty())
             {
                 event.replyWarning("Please specify a user ID!");
                 return;
             }
 
-            try
-            {
-                user = event.getJDA().retrieveUserById(event.getArgs()).complete();
-            }
-            catch(Exception e)
-            {
-                event.replyError("That ID isn't valid!");
-                return;
-            }
+            String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
 
-            if(bot.bdm.isBlacklisted(user.getIdLong()))
-            {
-                event.replyError("That user is already on the blacklist!");
-                return;
-            }
+            event.getJDA().retrieveUserById(args[0]).queue(user -> {
+                if(!(bot.bdm.getBlacklist(user.getIdLong())==null))
+                {
+                    event.replyError("That user is already on the blacklist!");
+                    return;
+                }
 
-            try
-            {
-                bot.bdm.addBlacklist(user.getIdLong(), null, Const.BlacklistType.USER);
+                bot.bdm.addBlacklist(Const.BlacklistType.USER, user.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
                 event.replySuccess("Added **"+user.getName()+"#"+user.getDiscriminator()+"** to the blacklist.");
-            }
-            catch(Exception e)
-            {
-                event.replyError("Something went wrong when adding the user: \n```"+e+"```");
-            }
+            }, e -> event.replyError("That ID isn't valid!"));
         }
     }
 
@@ -125,47 +109,22 @@ public class BlacklistUsersCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            User user;
-
             if(event.getArgs().isEmpty())
             {
                 event.replyWarning("Please specify a user ID!");
                 return;
             }
 
-            try
-            {
-                user = event.getJDA().retrieveUserById(event.getArgs()).complete();
-            }
-            catch(Exception e)
-            {
-                event.replyError("That ID isn't valid!");
-                return;
-            }
-
-            try
-            {
-                if(!(bot.bdm.isBlacklisted(user.getIdLong())))
+            event.getJDA().retrieveUserById(event.getArgs()).queue(user -> {
+                if(bot.bdm.getBlacklist(user.getIdLong())==null)
                 {
                     event.replyError("That ID isn't in the blacklist!");
                     return;
                 }
-            }
-            catch(Exception e)
-            {
-                event.replyError("Something went wrong when getting the blacklisted users list: \n```"+e+"```");
-                return;
-            }
 
-            try
-            {
                 bot.bdm.removeBlacklist(user.getIdLong());
                 event.replySuccess("Removed **"+user.getName()+"#"+user.getDiscriminator()+"** from the blacklist.");
-            }
-            catch(Exception e)
-            {
-                event.replyError("Something went wrong when writing to the blacklisted users file: \n```"+e+"```");
-            }
+            }, e -> event.replyError("That ID isn't valid!"));
         }
     }
 
@@ -183,7 +142,7 @@ public class BlacklistUsersCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            List<User> list;
+            Map<Blacklist, User> map;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
 
@@ -192,23 +151,19 @@ public class BlacklistUsersCmd extends EndlessCommand
             else
                 color = event.getGuild().getSelfMember().getColor();
 
-            try
-            {
-                list = bot.bdm.getBlacklistedUsers(event.getJDA());
+            map = bot.bdm.getBlacklistedUsers(event.getJDA());
 
-                if(list.isEmpty())
-                    event.reply("The list is empty!");
-                else
-                {
-                    builder.setDescription(list.stream().map(u -> u.getName()+"#"+u.getDiscriminator()+" (ID: "+u.getId()+")").collect(Collectors.joining("\n")));
-                    builder.setFooter(event.getSelfUser().getName()+"'s Blacklisted Users", event.getSelfUser().getEffectiveAvatarUrl());
-                    builder.setColor(color);
-                    event.reply(builder.build());
-                }
-            }
-            catch(Exception e)
+            if(map.isEmpty())
+                event.reply("The list is empty!");
+            else
             {
-                event.replyError("Something went wrong when getting the blacklisted users list: \n```"+e+"```");
+                StringBuilder sb = new StringBuilder();
+                map.forEach((b, u) -> sb.append(u.getName()).append("#").append(u.getDiscriminator()).append(" (ID: ")
+                        .append(u.getId()).append(")"));
+                builder.setDescription(sb);
+                builder.setFooter(event.getSelfUser().getName()+"'s Blacklisted Users", event.getSelfUser().getEffectiveAvatarUrl());
+                builder.setColor(color);
+                event.reply(builder.build());
             }
         }
     }
@@ -227,35 +182,23 @@ public class BlacklistUsersCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            User user;
-
             if(event.getArgs().isEmpty())
             {
                 event.replyWarning("Please specify a user ID!");
                 return;
             }
 
-            try
-            {
-                user = event.getJDA().retrieveUserById(event.getArgs()).complete();
-            }
-            catch(Exception e)
-            {
-                event.replyError("That ID isn't valid!");
-                return;
-            }
-
-            try
-            {
-                if(!(bot.bdm.isBlacklisted(user.getIdLong())))
+            event.getJDA().retrieveUserById(event.getArgs()).queue(user -> {
+                Blacklist blacklist = bot.bdm.getBlacklist(user.getIdLong());
+                if(blacklist==null)
                     event.replySuccess("**"+user.getName()+"#"+user.getDiscriminator()+"** isn't blacklisted!");
                 else
-                    event.replySuccess("**"+user.getName()+"#"+user.getDiscriminator()+"** is blacklisted!");
-            }
-            catch(Exception e)
-            {
-                event.replyError("Something went wrong when getting the blacklisted users list: \n```"+e+"```");
-            }
+                {
+                    String reason = blacklist.getReason()==null?"[no reason provided]":blacklist.getReason();
+                    event.replyWarning("**"+user.getName()+"#"+user.getDiscriminator()+"** is blacklisted!\n" +
+                            "Reason: `"+reason+"`");
+                }
+            }, e -> event.replyError("That ID isn't valid!"));
         }
     }
 }
