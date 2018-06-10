@@ -20,32 +20,18 @@ package me.artuto.endless.logging;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.Endless;
-import me.artuto.endless.bootloader.StartupChecker;
-import me.artuto.endless.handlers.ImportedTagHandler;
-import me.artuto.endless.handlers.MutedRoleHandler;
-import me.artuto.endless.handlers.StarboardHandler;
+import me.artuto.endless.handlers.*;
 import me.artuto.endless.tempdata.AfkManager;
-import me.artuto.endless.utils.GuildUtils;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.guild.GuildBanEvent;
-import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.core.events.guild.*;
+import net.dv8tion.jda.core.events.guild.member.*;
+import net.dv8tion.jda.core.events.guild.voice.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
+import net.dv8tion.jda.core.events.message.guild.*;
 import net.dv8tion.jda.core.events.message.guild.react.*;
 import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -81,34 +67,22 @@ public class Listener implements EventListener
         if(preEvent instanceof ReadyEvent)
         {
             ReadyEvent event = (ReadyEvent)preEvent;
-            Endless.LOG.info("Leaving Pointless Guilds...");
-            GuildUtils.leaveBadGuilds(event.getJDA());
-            Endless.LOG.info("Done!");
+            JDA jda = event.getJDA();
+            Presence presence = jda.getPresence();
+            JDA.ShardInfo shardInfo = jda.getShardInfo();
 
-            User selfuser = event.getJDA().getSelfUser();
-            User owner = event.getJDA().getUserById(bot.config.getOwnerId());
-            Presence presence = event.getJDA().getPresence();
-
-            Endless.LOG.info("My robotic body is ready!\n" +
-                    "Logged in as: "+selfuser.getName()+"#"+selfuser.getDiscriminator()+" ("+selfuser.getId()+")\n" +
-                    "Using prefix: "+bot.config.getPrefix()+"\n" +
-                    "Owner: "+owner.getName()+"#"+owner.getDiscriminator()+" ("+owner.getId()+")");
-
-            if(event.getJDA().getGuildCache().isEmpty())
-            {
-                StartupChecker.LOG.warn("Looks like I'm on any guild! Add me using the following link:");
-                StartupChecker.LOG.warn(event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR));
-            }
+            Endless.LOG.info("Shard "+shardInfo.getShardString()+" ready!");
 
             if(bot.config.isBotlogEnabled())
-                webhook.send("**Endless** is now <@&436352838822658049>!");
+                webhook.send(":radio_button: Connected to shard `"+shardInfo.getShardString()+"` Guilds: `"+jda.getGuildCache().size()+"` " +
+                        "Users: `"+jda.getUserCache().size()+"`");
 
             bot.muteScheduler.scheduleWithFixedDelay(() -> bot.pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, event.getJDA()),
                     0, 10, TimeUnit.SECONDS);
 
             if(!(maintenance))
                 presence.setPresence(bot.config.getStatus(), Game.playing("Type "+bot.config.getPrefix()+"help | Version "+Const.VERSION+" | On "+event.getJDA().getGuildCache().size()+" Guilds | "+event.getJDA().getUserCache().size()+
-                        " Users | "+event.getJDA().getTextChannelCache().size()+" Channels"));
+                        " Users | Shard "+(shardInfo.getShardId()+1)));
             else
                 presence.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("Maintenance mode enabled"));
         }

@@ -154,11 +154,11 @@ public class Bot
 
         clientBuilder.addCommands(
                 // Bot
-                new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(), new StatsCmd(),
+                new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(),
 
                 // Bot Administration
                 new BashCmd(), new BlacklistGuildCmd(this), new BlacklistUserCmd(this),
-                new BotCPanelCmd(), new EvalCmd(this), new ShutdownCmd(),
+                new BotCPanelCmd(), new EvalCmd(this), new ShutdownCmd(this), new StatusCmd(),
 
                 // Fun
                 new CatCmd(this), new ChooseCmd(), new DogCmd(this),
