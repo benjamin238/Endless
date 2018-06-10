@@ -86,7 +86,7 @@ public class EndlessLoader
 
     public void logLoad()
     {
-        logging.initialize();
+        logging.initialize(bot);
         botlog = logging.botlog;
         modlog = logging.modlog;
         serverlog = logging.serverlog;
