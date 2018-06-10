@@ -15,16 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.utils;
+package me.artuto.endless.bootloader;
+
+import me.artuto.endless.Bot;
+import me.artuto.endless.logging.BotLogging;
+import me.artuto.endless.logging.ModLogging;
+import me.artuto.endless.logging.ServerLogging;
 
 /**
  * @author Artuto
  */
 
-public class IgnoreUtils
+class LoggingLoader
 {
-    public static boolean isIgnored(String id, String topic)
+    BotLogging botlog;
+    ModLogging modlog;
+    ServerLogging serverlog;
+
+    void initialize(Bot bot)
     {
-        return !(topic==null) && topic.contains("{ignore:"+id+"}");
+        botlog = new BotLogging(bot);
+        modlog = new ModLogging(bot);
+        serverlog = new ServerLogging(bot);
     }
 }

@@ -111,7 +111,7 @@ public class Categories
         return bHandler.handleBlacklist(event);
     });
 
-    public static final Category OTHERS = new Category("Others", event ->
+    /*public static final Category OTHERS = new Category("Others", event ->
     {
         if(event.isOwner())
             return true;
@@ -120,5 +120,5 @@ public class Categories
             return sHandler.handleCommandInMaintenance(event);
 
         return bHandler.handleBlacklist(event);
-    });
+    });*/
 }

@@ -19,6 +19,8 @@ package me.artuto.endless.data.managers;
 
 import me.artuto.endless.Const;
 import me.artuto.endless.data.Database;
+import me.artuto.endless.entities.Blacklist;
+import me.artuto.endless.entities.impl.BlacklistImpl;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
@@ -27,8 +29,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.LinkedList;
-import java.util.List;
+import java.time.OffsetDateTime;
+import java.util.*;
 
 public class BlacklistDataManager
 {
@@ -39,7 +41,7 @@ public class BlacklistDataManager
         connection = db.getConnection();
     }
 
-    public boolean isBlacklisted(long id)
+    public Blacklist getBlacklist(long id)
     {
         try
         {
@@ -48,17 +50,24 @@ public class BlacklistDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE id = %s", id)))
             {
-                return results.next();
+                if(results.next())
+                {
+                    Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                    gmt.setTimeInMillis(results.getLong("time"));
+                    return new BlacklistImpl(Const.BlacklistType.valueOf(results.getString("type")), results.getLong("id"),
+                            OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()), results.getString("reason"));
+                }
+                else return null;
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while checking if the specified ID is blacklisted. ID: "+id, e);
-            return false;
+            return null;
         }
     }
 
-    public void addBlacklist(long id, String reason, Const.BlacklistType type)
+    public void addBlacklist(Const.BlacklistType type, long id, long time, String reason)
     {
         try
         {
@@ -70,7 +79,8 @@ public class BlacklistDataManager
                 if(results.next())
                 {
                     results.updateLong("id", id);
-                    results.updateString("reason", reason);
+                    results.updateString("reason", reason.equals("[no reason provided]")?null:reason);
+                    results.updateLong("time", time);
                     results.updateString("type", type.name());
                     results.updateRow();
                 }
@@ -79,6 +89,7 @@ public class BlacklistDataManager
                     results.moveToInsertRow();
                     results.updateLong("id", id);
                     results.updateString("reason", reason);
+                    results.updateLong("time", time);
                     results.updateString("type", type.name());
                     results.insertRow();
                 }
@@ -109,103 +120,109 @@ public class BlacklistDataManager
         }
     }
 
-    public List<Guild> getBlacklistedGuilds(JDA jda)
+    public Map<Blacklist, Guild> getBlacklistedGuilds(JDA jda)
     {
         try
         {
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
-            List<Guild> guilds;
+            Map<Blacklist, Guild> map;
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = %s", Const.BlacklistType.GUILD.name())))
             {
-                guilds = new LinkedList<>();
+                map = new HashMap<>();
                 while(results.next())
                 {
                     long id = results.getLong("id");
                     Guild guild = jda.getGuildCache().getElementById(id);
 
                     if(!(guild==null))
-                        guilds.add(guild);
+                        map.put(getBlacklist(id), guild);
                 }
             }
-            return guilds;
+            return map;
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error whiile getting the blacklisted guilds list.", e);
+            Database.LOG.error("Error whiile getting the blacklisted guilds map.", e);
             return null;
         }
     }
 
-    public List<User> getBlacklistedUsers(JDA jda)
+    public Map<Blacklist, User> getBlacklistedUsers(JDA jda)
     {
         try
         {
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
-            List<User> users;
+            Map<Blacklist, User> map;
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = \"%s\"", Const.BlacklistType.USER.name())))
             {
-                users = new LinkedList<>();
+                map = new HashMap<>();
                 while(results.next())
                 {
                     long id = results.getLong("id");
-                    jda.retrieveUserById(id).queue(users::add, e -> removeBlacklist(id));
+                    jda.retrieveUserById(id).queue(user -> map.put(getBlacklist(id), user), e -> removeBlacklist(id));
                 }
             }
-            return users;
+            return map;
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the blacklisted users list.", e);
+            Database.LOG.error("Error while getting the blacklisted users map.", e);
             return null;
         }
     }
 
-    public List<Long> getBlacklistedGuildsRaw()
+    public Map<Blacklist, Long> getBlacklistedGuildsRaw()
     {
         try
         {
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
-            List<Long> guilds;
+            Map<Blacklist, Long> map;
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = %s", Const.BlacklistType.GUILD.name())))
             {
-                guilds = new LinkedList<>();
+                map = new HashMap<>();
                 while(results.next())
-                    guilds.add(results.getLong("id"));
+                {
+                    long id = results.getLong("id");
+                        map.put(getBlacklist(id), id);
+                }
             }
-            return guilds;
+            return map;
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the raw blacklisted guilds list.", e);
+            Database.LOG.error("Error whiile getting the raw blacklisted guilds map.", e);
             return null;
         }
     }
 
-    public List<Long> getBlacklistedUsersRaw()
+    public Map<Blacklist, Long> getBlacklistedUsersRaw()
     {
         try
         {
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
-            List<Long> users;
+            Map<Blacklist, Long> map;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = %s", Const.BlacklistType.USER.name())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = \"%s\"", Const.BlacklistType.USER.name())))
             {
-                users = new LinkedList<>();
+                map = new HashMap<>();
                 while(results.next())
-                    users.add(results.getLong("id"));
+                {
+                    long id = results.getLong("id");
+                    map.put(getBlacklist(id), id);
+                }
             }
-            return users;
+            return map;
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the raw blacklisted users list.", e);
+            Database.LOG.error("Error while getting the raw blacklisted users map.", e);
             return null;
         }
     }

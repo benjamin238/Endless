@@ -15,16 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.utils;
+package me.artuto.endless.entities;
+
+import me.artuto.endless.Const;
+
+import java.time.OffsetDateTime;
 
 /**
  * @author Artuto
  */
 
-public class IgnoreUtils
+public interface Blacklist
 {
-    public static boolean isIgnored(String id, String topic)
-    {
-        return !(topic==null) && topic.contains("{ignore:"+id+"}");
-    }
+    Const.BlacklistType getType();
+
+    long getId();
+
+    OffsetDateTime getTime();
+
+    String getReason();
 }

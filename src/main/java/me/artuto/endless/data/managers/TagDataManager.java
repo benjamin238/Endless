@@ -222,7 +222,7 @@ public class TagDataManager
                 while(results.next())
                     tags.add(new ImportedTagImpl(results.getLong("tag_id"), results.getString("tag_name"), results.getString("tag_content"), results.getLong("tag_owner"), Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
 
-                return tags.isEmpty() ? null : tags;
+                return tags;
             }
         }
         catch(SQLException e)
@@ -245,7 +245,7 @@ public class TagDataManager
                 while(results.next())
                     tags.add(new ImportedTagImpl(results.getLong("tag_id"), results.getString("tag_name"), results.getString("tag_content"), results.getLong("tag_owner"), Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
 
-                return tags.isEmpty() ? null : tags;
+                return tags;
             }
         }
         catch(SQLException e)

@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.events;
+package me.artuto.endless.handlers;
 
+import me.artuto.endless.Bot;
 import me.artuto.endless.data.managers.GuildSettingsDataManager;
 import me.artuto.endless.data.managers.StarboardDataManager;
 import me.artuto.endless.entities.StarboardMessage;
@@ -28,7 +29,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveAllEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,22 +38,18 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
-public class StarboardEvents extends ListenerAdapter
+/**
+ * @author Artuto
+ */
+
+public class StarboardHandler
 {
-    private final GuildSettingsDataManager gsdm;
-    private final StarboardDataManager sdm;
-    private final Logger LOG = LoggerFactory.getLogger("Starboard");
-    private final ScheduledExecutorService thread;
+    private static final GuildSettingsDataManager gsdm = Bot.getInstance().gsdm;
+    private static final Logger LOG = LoggerFactory.getLogger("Starboard");
+    private static final ScheduledExecutorService thread = Bot.getInstance().starboardThread;
+    private static final StarboardDataManager sdm = Bot.getInstance().sdm;
 
-    public StarboardEvents(GuildSettingsDataManager gsdm, StarboardDataManager sdm, ScheduledExecutorService thread)
-    {
-        this.gsdm = gsdm;
-        this.sdm = sdm;
-        this.thread = thread;
-    }
-
-    @Override
-    public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event)
+    public static void checkAddReaction(GuildMessageReactionAddEvent event)
     {
         thread.submit(() -> {
             Guild guild = event.getGuild();
@@ -66,7 +63,10 @@ public class StarboardEvents extends ListenerAdapter
             if(!(isConfigured(guild))) return;
 
             TextChannel starboard = gsdm.getStarboardChannel(guild);
-            Message starredMsg = event.getChannel().getMessageById(event.getMessageId()).complete();
+            Message starredMsg = getMessage(event.getMessageIdLong(), event.getChannel());
+            if(starredMsg==null)
+                return;
+
             List<Message.Attachment> attachments = starredMsg.getAttachments().stream().filter(a -> !(a.isImage())).collect(Collectors.toList());
             List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
 
@@ -113,13 +113,15 @@ public class StarboardEvents extends ListenerAdapter
         });
     }
 
-    @Override
-    public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event)
+    public static void checkRemoveReaction(GuildMessageReactionRemoveEvent event)
     {
         thread.submit(() -> {
             if(!(isConfigured(event.getGuild()))) return;
 
-            Message starredMsg = event.getChannel().getMessageById(event.getMessageId()).complete();
+            Message starredMsg = getMessage(event.getMessageIdLong(), event.getChannel());
+            if(starredMsg==null)
+                return;
+
             StarboardMessage starboardMsg = sdm.getStarboardMessage(starredMsg.getIdLong());
             TextChannel starboard = gsdm.getStarboardChannel(event.getGuild());
 
@@ -139,34 +141,32 @@ public class StarboardEvents extends ListenerAdapter
         });
     }
 
-    @Override
-    public void onGuildMessageReactionRemoveAll(GuildMessageReactionRemoveAllEvent event)
+    public static void checkRemoveAllReactions(GuildMessageReactionRemoveAllEvent event)
     {
         thread.submit(() -> check(event.getGuild(), event.getMessageIdLong()));
     }
 
-    @Override
-    public void onGuildMessageDelete(GuildMessageDeleteEvent event)
+    public static void checkDeleteMessage(GuildMessageDeleteEvent event)
     {
         thread.submit(() -> check(event.getGuild(), event.getMessageIdLong()));
     }
 
-    private boolean isSameAuthor(User msgAuthor, User user)
+    private static boolean isSameAuthor(User msgAuthor, User user)
     {
         return msgAuthor.equals(user);
     }
 
-    private boolean isConfigured(Guild guild)
+    private static boolean isConfigured(Guild guild)
     {
         return !(gsdm.getStarboardChannel(guild) == null) && !(gsdm.getStarboardCount(guild) == null);
     }
 
-    private boolean amountPassed(Message msg)
+    private static boolean amountPassed(Message msg)
     {
         return getStarCount(msg) >= gsdm.getStarboardCount(msg.getGuild());
     }
 
-    private Integer getStarCount(Message msg)
+    private static int getStarCount(Message msg)
     {
         List<MessageReaction> reactions = msg.getReactions().stream().filter(r -> r.getReactionEmote().getName().equals("\u2B50")).collect(Collectors.toList());
         if(reactions.isEmpty()) return 0;
@@ -177,18 +177,18 @@ public class StarboardEvents extends ListenerAdapter
         else return users.size();
     }
 
-    private boolean existsOnStarboard(Long id)
+    private static boolean existsOnStarboard(Long id)
     {
         return !(sdm.getStarboardMessage(id)==null);
     }
 
-    private void updateCount(Message msg, Long starboardMsg, Integer amount)
+    private static void updateCount(Message msg, Long starboardMsg, Integer amount)
     {
         TextChannel tc = gsdm.getStarboardChannel(msg.getGuild());
         tc.getMessageById(starboardMsg).queue(s -> s.editMessage(getEmote(amount)+" **"+amount+"** "+msg.getTextChannel().getAsMention()+" ID: "+msg.getId()).queue(null, null), null);
     }
 
-    private String getEmote(Integer count)
+    private static String getEmote(Integer count)
     {
         if(count<5) return ":star:";
         else if(count>5 || count<=10) return ":star2:";
@@ -201,18 +201,33 @@ public class StarboardEvents extends ListenerAdapter
 
     }*/
 
-    private void delete(TextChannel starboard, StarboardMessage starboardMsg)
+    private static void delete(TextChannel starboard, StarboardMessage starboardMsg)
     {
-        starboard.getMessageById(starboardMsg.getStarboardMessageId()).queue(s -> s.delete().queue());
-        sdm.deleteMessage(starboardMsg.getMessageIdLong(), starboardMsg.getStarboardMessageIdLong());
+        starboard.getMessageById(starboardMsg.getStarboardMessageId()).queue(s -> {
+            s.delete().queue();
+            sdm.deleteMessage(starboardMsg.getMessageIdLong(), starboardMsg.getStarboardMessageIdLong());
+        }, e -> sdm.deleteMessage(starboardMsg.getMessageIdLong(), starboardMsg.getStarboardMessageIdLong()));
     }
 
-    private void check(Guild guild, long msg)
+    private static void check(Guild guild, long msg)
     {
         TextChannel starboard = gsdm.getStarboardChannel(guild);
         StarboardMessage starboardMsg = sdm.getStarboardMessage(msg);
 
         if(existsOnStarboard(msg))
             delete(starboard, starboardMsg);
+    }
+
+    private static Message getMessage(long id, TextChannel tc)
+    {
+        try
+        {
+            return tc.getMessageById(id).complete();
+        }
+        catch(ErrorResponseException e)
+        {
+            delete(gsdm.getStarboardChannel(tc.getGuild()), sdm.getStarboardMessage(id));
+            return null;
+        }
     }
 }

@@ -19,12 +19,14 @@ package me.artuto.endless.logging;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
-import me.artuto.endless.utils.Checks;
-import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.TimeUtils;
+import me.artuto.endless.entities.ParsedAuditLog;
+import me.artuto.endless.utils.*;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.audit.ActionType;
+import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.events.guild.GuildBanEvent;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
@@ -35,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Artuto
@@ -148,7 +151,7 @@ public class ModLogging
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
         String min = String.format("%02d", calendar.get(Calendar.MINUTE));
         String sec = String.format("%02d", calendar.get(Calendar.SECOND));
-        File file = new File("cleared.txt");
+        File file = new File("cleared"+System.currentTimeMillis()+".txt");
 
         if(!(tc == null))
         {
@@ -180,9 +183,11 @@ public class ModLogging
 
                 String message = "`["+hour+":"+min+":"+sec+"] [Clear]:` :wastebasket: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages in "+channel.getAsMention()+" ("+args+").\n"+"`[Reason]:` "+reason;
 
-                if(!(file.exists())) tc.sendMessage(message).queue();
+                if(!(file.exists()))
+                    tc.sendMessage(message).queue();
                 else
-                    tc.sendFile(file, "cleared.txt", new MessageBuilder().append(message).build()).queue((s) -> file.delete());
+                    //noinspection ResultOfMethodCallIgnored
+                    tc.sendFile(file, "cleared.txt", new MessageBuilder().append(message).build()).queue(s -> file.delete());
             }
         }
     }
@@ -238,6 +243,46 @@ public class ModLogging
                 else
                     tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Unmute]:` :speaker: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unmuted " +
                             "**"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
+            }
+        }
+    }
+
+    void onGuildBan(GuildBanEvent event)
+    {
+        Guild guild = event.getGuild();
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
+
+        if(!(tc == null))
+        {
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
+            else
+            {
+                if(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
+                {
+                    guild.getAuditLogs().type(ActionType.BAN).limit(20).queue(preEntries -> {
+                        List<AuditLogEntry> entries = preEntries.stream().filter(ale -> ale.getTargetIdLong()==event.getUser().getIdLong()).collect(Collectors.toList());
+
+                        if(entries.isEmpty())
+                            return;
+
+                        ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), null);
+                        if(parsedAuditLog==null)
+                            return;
+
+                        String reason = parsedAuditLog.getReason();
+                        User author = parsedAuditLog.getAuthor();
+                        User target = parsedAuditLog.getTarget();
+
+                        if(author.isBot())
+                            return;
+
+                        tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [User Banned]:` :hammer: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
+                                "banned **"+target.getName()+"#"+target.getDiscriminator()+"** ("+target.getId()+")\n" +
+                                "`[Reason]:` "+reason).queue();
+                    });
+                }
             }
         }
     }

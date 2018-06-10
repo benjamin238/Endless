@@ -20,14 +20,13 @@ package me.artuto.endless.logging;
 import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import com.jagrosh.jagtag.libraries.*;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.data.managers.GuildSettingsDataManager;
+import me.artuto.endless.entities.ParsedAuditLog;
 import me.artuto.endless.tempdata.MessagesLogging;
 import me.artuto.endless.tools.Variables;
-import me.artuto.endless.utils.Checks;
-import me.artuto.endless.utils.FinderUtil;
-import me.artuto.endless.utils.IgnoreUtils;
-import me.artuto.endless.utils.TimeUtils;
+import me.artuto.endless.utils.*;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -47,30 +46,30 @@ import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class ServerLogging extends ListenerAdapter
+public class ServerLogging
 {
-    private final GuildSettingsDataManager db;
+    private final GuildSettingsDataManager gsdm;
     private final Parser parser;
 
-    public ServerLogging(GuildSettingsDataManager db)
+    public ServerLogging(Bot bot)
     {
-        this.db = db;
+        this.gsdm = bot.gsdm;
         this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
     }
 
-    @Override
-    public void onGuildMemberJoin(GuildMemberJoinEvent event)
+    void onGuildMemberJoin(GuildMemberJoinEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel serverlog = db.getServerlogChannel(guild);
-        TextChannel welcome = db.getWelcomeChannel(guild);
+        TextChannel serverlog = gsdm.getServerlogChannel(guild);
+        TextChannel welcome = gsdm.getWelcomeChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User newMember = event.getMember().getUser();
-        String msg = db.getWelcomeMessage(guild);
+        String msg = gsdm.getWelcomeMessage(guild);
         parser.clear().put("user", newMember).put("guild", guild).put("channel", welcome);
 
         if(!(serverlog == null))
@@ -89,26 +88,43 @@ public class ServerLogging extends ListenerAdapter
         }
     }
 
-    @Override
-    public void onGuildMemberLeave(GuildMemberLeaveEvent event)
+    void onGuildMemberLeave(GuildMemberLeaveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel serverlog = db.getServerlogChannel(guild);
-        TextChannel leave = db.getLeaveChannel(guild);
+        TextChannel serverlog = gsdm.getServerlogChannel(guild);
+        TextChannel leave = gsdm.getLeaveChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User oldMember = event.getMember().getUser();
-        String msg = db.getLeaveMessage(guild);
+        String msg = gsdm.getLeaveMessage(guild);
         parser.clear().put("user", oldMember).put("guild", guild).put("channel", leave);
 
         if(!(serverlog == null))
         {
-            if(Checks.hasPermission(guild.getSelfMember(), null, Permission.BAN_MEMBERS))
-                if(wasBanned(event.getMember())) return;
+            if(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
+            {
+                guild.getAuditLogs().type(ActionType.BAN).limit(20).queue(preEntries -> {
+                    List<AuditLogEntry> entries = preEntries.stream().filter(ale -> ale.getTargetIdLong()==oldMember.getIdLong()).collect(Collectors.toList());
 
-            if(!(Checks.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                    if(entries.isEmpty())
+                        return;
+
+                    ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), null);
+                    if(!(parsedAuditLog==null))
+                        return;
+
+                    if(!(Checks.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+                        guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                    else
+                        serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldMember.getName()+"**#**"+oldMember.getDiscriminator()+"** ("+oldMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+                });
+            }
             else
-                serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldMember.getName()+"**#**"+oldMember.getDiscriminator()+"** ("+oldMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+            {
+                if(!(Checks.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+                    guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
+                else
+                    serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldMember.getName()+"**#**"+oldMember.getDiscriminator()+"** ("+oldMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
+            }
         }
 
         if(!(leave == null) && !(msg == null))
@@ -119,10 +135,9 @@ public class ServerLogging extends ListenerAdapter
         }
     }
 
-    @Override
-    public void onGuildMessageReceived(GuildMessageReceivedEvent event)
+    void onGuildMessageReceived(GuildMessageReceivedEvent event)
     {
-        TextChannel tc = db.getServerlogChannel(event.getGuild());
+        TextChannel tc = gsdm.getServerlogChannel(event.getGuild());
 
         if(!(tc == null) && !(event.getAuthor().isBot()))
         {
@@ -133,12 +148,11 @@ public class ServerLogging extends ListenerAdapter
         }
     }
 
-    @Override
-    public void onGuildMessageUpdate(GuildMessageUpdateEvent event)
+    void onGuildMessageUpdate(GuildMessageUpdateEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
-        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel tc = gsdm.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         Message newmsg = event.getMessage();
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
@@ -177,12 +191,11 @@ public class ServerLogging extends ListenerAdapter
         }
     }
 
-    @Override
-    public void onGuildMessageDelete(GuildMessageDeleteEvent event)
+    void onGuildMessageDelete(GuildMessageDeleteEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
-        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel tc = gsdm.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         StringBuilder sb = new StringBuilder();
@@ -211,8 +224,7 @@ public class ServerLogging extends ListenerAdapter
         }
     }
 
-    @Override
-    public void onUserUpdateAvatar(UserUpdateAvatarEvent event)
+    void onUserUpdateAvatar(UserUpdateAvatarEvent event)
     {
         List<Guild> guilds = event.getUser().getMutualGuilds();
         EmbedBuilder builder = new EmbedBuilder();
@@ -223,7 +235,7 @@ public class ServerLogging extends ListenerAdapter
         {
             for(Guild guild : guilds)
             {
-                TextChannel tc = db.getServerlogChannel(guild);
+                TextChannel tc = gsdm.getServerlogChannel(guild);
                 TextChannel channel = FinderUtil.getDefaultChannel(guild);
 
                 if(!(tc == null))
@@ -236,22 +248,24 @@ public class ServerLogging extends ListenerAdapter
                     else
                     {
                         builder.setAuthor(user.getName(), null, user.getEffectiveAvatarUrl());
-                        builder.setThumbnail(event.getOldAvatarUrl());
-                        builder.setImage(user.getEffectiveAvatarUrl());
+                        builder.setImage("attachment://avatarchange"+user.getId()+".png");
                         builder.setColor(guild.getSelfMember().getColor());
 
-                        tc.sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+                        File f = LogUtils.getAvatarUpdateImage(event);
+                        if(f==null)
+                            return;
+
+                        tc.sendFile(f, new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
                     }
                 }
             }
         }
     }
 
-    @Override
-    public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
+    void onGuildVoiceJoin(GuildVoiceJoinEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel tc = gsdm.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelJoined();
         User user = event.getMember().getUser();
@@ -268,11 +282,10 @@ public class ServerLogging extends ListenerAdapter
         }
     }
 
-    @Override
-    public void onGuildVoiceMove(GuildVoiceMoveEvent event)
+    void onGuildVoiceMove(GuildVoiceMoveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel tc = gsdm.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vcold = event.getChannelLeft();
         VoiceChannel vcnew = event.getChannelJoined();
@@ -290,11 +303,10 @@ public class ServerLogging extends ListenerAdapter
         }
     }
 
-    @Override
-    public void onGuildVoiceLeave(GuildVoiceLeaveEvent event)
+    void onGuildVoiceLeave(GuildVoiceLeaveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = db.getServerlogChannel(guild);
+        TextChannel tc = gsdm.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelLeft();
         User user = event.getMember().getUser();
@@ -309,49 +321,5 @@ public class ServerLogging extends ListenerAdapter
             else
                 tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Left]:` **"+user.getName()+"#"+user.getDiscriminator()+"** left a Voice Channel: **"+vc.getName()+"**").queue();
         }
-    }
-
-    @Override
-    public void onGuildBan(GuildBanEvent event)
-    {
-        Guild guild = event.getGuild();
-        TextChannel tc = db.getServerlogChannel(guild);
-        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-        User user = event.getUser();
-
-        if(!(tc == null))
-        {
-            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
-            else
-            {
-                if(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
-                    tc.sendMessage(":hammer: `"+TimeUtils.getTimeAndDate()+" [User Banned]:` **"+user.getName()+"#"+user.getDiscriminator()+"** has been banned!\n" +
-                        "`[Reason]:` "+getBanReason(user, guild)).queue();
-
-            }
-        }
-    }
-
-    private boolean wasBanned(Member member)
-    {
-        for(Guild.Ban ban : member.getGuild().getBanList().complete())
-            return ban.getUser().equals(member.getUser());
-        return false;
-    }
-
-    private String getBanReason(User user, Guild guild)
-    {
-        String reason;
-        reason = guild.getBanList().complete().stream().filter(ban -> ban.getUser().equals(user)).map(Guild.Ban::getReason).collect(Collectors.joining("\n"));
-
-        if(reason==null || reason.isEmpty() || reason.equals("null"))
-        {
-            if(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
-                reason = guild.getAuditLogs().type(ActionType.BAN).complete().stream().filter(entry -> entry.getTargetIdLong()==user.getIdLong()).limit(1).map(AuditLogEntry::getReason).collect(Collectors.joining("\n"));
-            else reason = "[no reason specified]";
-        }
-
-        return reason;
     }
 }

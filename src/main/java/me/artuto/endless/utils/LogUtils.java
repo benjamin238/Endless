@@ -22,9 +22,16 @@ import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Artuto
@@ -65,5 +72,32 @@ public class LogUtils
         }
 
         return stacktrace;
+    }
+
+    public static File getAvatarUpdateImage(UserUpdateAvatarEvent event)
+    {
+        String newA = event.getNewAvatarUrl()==null?event.getUser().getDefaultAvatarUrl():event.getUser().getEffectiveAvatarUrl();
+        String oldA = event.getOldAvatarUrl()==null?event.getUser().getDefaultAvatarUrl():event.getOldAvatarUrl();
+
+        try
+        {
+            BufferedImage img1 = ImageIO.read(Objects.requireNonNull(MiscUtils.getInputStream(oldA)));
+            BufferedImage img2 = ImageIO.read(Objects.requireNonNull(MiscUtils.getInputStream(newA)));
+            BufferedImage combo = new BufferedImage(256, 128, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = combo.createGraphics();
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0, 0, 256, 128);
+            g2.drawImage(img1, 0, 0, 128, 128, null);
+            g2.drawImage(img2, 128, 0, 128, 128, null);
+
+            File f = new File("avatarchange"+event.getUser().getId()+".png");
+            ImageIO.write(combo, "png", f);
+            return f;
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -17,14 +17,35 @@
 
 package me.artuto.endless.utils;
 
+import me.artuto.endless.Const;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * @author Artuto
  */
 
-public class IgnoreUtils
+public class MiscUtils
 {
-    public static boolean isIgnored(String id, String topic)
+    public static InputStream getInputStream(String url)
     {
-        return !(topic==null) && topic.contains("{ignore:"+id+"}");
+        try
+        {
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            Request request = new Request.Builder().url(url)
+                    .method("GET", null)
+                    .header("user-agent", Const.USER_AGENT)
+                    .build();
+
+            return client.newCall(request).execute().body().byteStream();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -47,7 +47,6 @@ public class DatabaseLoader
     private ProfileDataManager prdm;
     private StarboardDataManager sdm;
     private TagDataManager tdm;
-    private ModLogging modlog;
     private BlacklistHandler bHandler;
     private SpecialCaseHandler sHandler;
     private Categories categories;
@@ -72,7 +71,6 @@ public class DatabaseLoader
             prdm = new ProfileDataManager(db);
             sdm = new StarboardDataManager(db);
             tdm = new TagDataManager(db);
-            modlog = new ModLogging(bot);
             bHandler = new BlacklistHandler(bdm);
             sHandler = new SpecialCaseHandler();
             categories = new Categories(bHandler, sHandler, maintenance);
@@ -133,11 +131,6 @@ public class DatabaseLoader
     public SpecialCaseHandler getSpecialCaseHandler()
     {
         return sHandler;
-    }
-
-    public ModLogging getModlog()
-    {
-        return modlog;
     }
 
     public Categories getCategories()

@@ -21,6 +21,9 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import io.sentry.Sentry;
 import me.artuto.endless.Bot;
 import me.artuto.endless.loader.Config;
+import me.artuto.endless.logging.BotLogging;
+import me.artuto.endless.logging.ModLogging;
+import me.artuto.endless.logging.ServerLogging;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -39,6 +42,14 @@ public class EndlessLoader
 
     // EventWaiters
     public EventWaiter waiter;
+
+    // Loggers
+    public BotLogging botlog;
+    public ModLogging modlog;
+    public ServerLogging serverlog;
+
+    // Logging Loader
+    public final LoggingLoader logging = new LoggingLoader();
 
     // Schedulers
     public ScheduledExecutorService muteScheduler;
@@ -71,6 +82,14 @@ public class EndlessLoader
     public void databaseLoad(boolean maintenance)
     {
         dbLoader = new DatabaseLoader(config).initialize(maintenance, bot);
+    }
+
+    public void logLoad()
+    {
+        logging.initialize(bot);
+        botlog = logging.botlog;
+        modlog = logging.modlog;
+        serverlog = logging.serverlog;
     }
 
     public void threadLoad()
