@@ -49,7 +49,7 @@ public class ImportedTagHandler
         String contentRaw = event.getMessage().getContentRaw();
         String[] parts = null;
 
-        if(!(event.getAuthor().isBot() || event.getTextChannel().canTalk()))
+        if(!(event.getAuthor().isBot()))
         {
             if(client.getAltPrefix().equals("@mention") && (contentRaw.startsWith("<@" + event.getJDA().getSelfUser().getId() + ">")
                     || contentRaw.startsWith("<@!" + event.getJDA().getSelfUser().getId() + ">")))
