@@ -193,7 +193,7 @@ public class Bot
         if(maintenance)
             builder.addEventListeners(client);
         else
-            builder.addEventListeners(loader.waiter, client, new Listener());
+            builder.addEventListeners(loader.waiter, client, new Listener(this));
 
         shards = builder.build();
 
