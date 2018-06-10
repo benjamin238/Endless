@@ -28,12 +28,11 @@ import me.artuto.endless.logging.ServerLogging;
 
 class LoggingLoader
 {
-    private final Bot bot = Bot.getInstance();
     BotLogging botlog;
     ModLogging modlog;
     ServerLogging serverlog;
 
-    void initialize()
+    void initialize(Bot bot)
     {
         botlog = new BotLogging(bot);
         modlog = new ModLogging(bot);
