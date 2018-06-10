@@ -60,11 +60,16 @@ import java.util.concurrent.TimeUnit;
 
 public class Listener implements EventListener
 {
-    private final Bot bot = Bot.getInstance();
+    private final Bot bot;
     private final boolean maintenance = bot.maintenance;
     private final ModLogging modlog = bot.modlog;
     private final ServerLogging serverlog = bot.serverlog;
     private final WebhookClient webhook = bot.logWebhook;
+    
+    public Listener(Bot bot)
+    {
+        this.bot = bot;
+    }
 
     @Override
     public void onEvent(Event preEvent)
