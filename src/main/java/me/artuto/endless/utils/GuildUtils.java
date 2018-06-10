@@ -86,12 +86,17 @@ public class GuildUtils
         JDA jda = entry.getJDA();
         User author = entry.getUser();
         User target = jda.getUserById(entry.getTargetIdLong());
-        AuditLogChange change = entry.getChangeByKey(key);
 
-        if(change==null)
-            return null;
-
-        return new ParsedAuditLogImpl(key, change.getNewValue(), change.getOldValue(), entry.getReason(), author, target);
+        if(!(key==null))
+        {
+            AuditLogChange change = entry.getChangeByKey(key);
+            if(!(change==null))
+                return new ParsedAuditLogImpl(key, change.getNewValue(), change.getOldValue(), entry.getReason(), author, target);
+            else
+                return null;
+        }
+        else
+            return new ParsedAuditLogImpl(null, null, null, entry.getReason(), author, target);
     }
 
      public static boolean isABotListGuild(Guild guild)

@@ -71,7 +71,7 @@ public class ParsedAuditLogImpl implements ParsedAuditLog
     @Override
     public String getReason()
     {
-        return reason;
+        return reason==null?"[no reason specified]":reason;
     }
 
     @Override

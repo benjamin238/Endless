@@ -17,6 +17,8 @@
 
 package me.artuto.endless;
 
+import net.dv8tion.jda.core.JDAInfo;
+
 /**
  * @author Artuto
  */
@@ -26,6 +28,7 @@ public class Const
     public static String VERSION = Const.class.getPackage().getImplementationVersion()==null?"DEV":Const.class.getPackage().getImplementationVersion();
     public static String INVITE = "https://discord.gg/CXKfYW3";
     public static String DEV = "`@Artuto#0424 | 264499432538505217`";
+    public static String USER_AGENT = "Endless "+VERSION+" (Discord Bot/JDA "+JDAInfo.VERSION+")";
 
     // IDs
     public static long ARTUTO_ID = 264499432538505217L;

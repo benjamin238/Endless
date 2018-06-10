@@ -17,6 +17,7 @@
 
 package me.artuto.endless;
 
+import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import me.artuto.endless.bootloader.EndlessLoader;
@@ -30,14 +31,14 @@ import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
 import me.artuto.endless.data.Database;
 import me.artuto.endless.data.managers.*;
-import me.artuto.endless.events.*;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.*;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.webhook.WebhookClient;
+import net.dv8tion.jda.webhook.WebhookClientBuilder;
 
 import javax.security.auth.login.LoginException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -46,8 +47,9 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author Artuto
  */
 
-public class Bot extends ListenerAdapter
+public class Bot
 {
+    public boolean maintenance;
     private final EndlessLoader loader = new EndlessLoader(this);
 
     // Config
@@ -60,26 +62,39 @@ public class Bot extends ListenerAdapter
     public GuildSettingsDataManager gsdm;
     public PunishmentsDataManager pdm;
     public ProfileDataManager prdm;
-    private StarboardDataManager sdm;
+    public StarboardDataManager sdm;
     public TagDataManager tdm;
+
+    // Discord
+    public CommandClient client;
+    public ShardManager shards;
 
     // EventWaiter
     public EventWaiter waiter;
 
     // Logging
+    public BotLogging botlog;
     public ModLogging modlog;
+    public ServerLogging serverlog;
 
     // Schedulers
     public ScheduledExecutorService muteScheduler;
 
-    // ShardManager
-    public ShardManager shards;
-
     // Threads
     public ScheduledExecutorService clearThread;
+    public ScheduledExecutorService starboardThread;
+
+    // Webhooks
+    public WebhookClient logWebhook;
+
+    public static Bot getInstance()
+    {
+        return Endless.getBot();
+    }
 
     void boot(boolean maintenance) throws LoginException
     {
+        this.maintenance = maintenance;
         Endless.LOG.info("Starting Endless "+Const.VERSION+"...");
         if(maintenance)
             Endless.LOG.warn("WARNING - Starting on Maintenance Mode - WARNING");
@@ -95,23 +110,29 @@ public class Bot extends ListenerAdapter
         prdm = loader.dbLoader.getProfileDataManager();
         sdm = loader.dbLoader.getStarbordDataManager();
         tdm = loader.dbLoader.getTagDataManager();
-        modlog = loader.dbLoader.getModlog();
+
+        loader.logLoad();
+        botlog = loader.botlog;
+        logWebhook = new WebhookClientBuilder(config.getBotlogWebhook()).setExecutorService(loader.botlogThread).setDaemon(true).build();
+        modlog = loader.modlog;
+        serverlog = loader.serverlog;
 
         loader.threadLoad();
         clearThread = loader.clearThread;
+        muteScheduler = loader.muteScheduler;
+        starboardThread = loader.starboardThread;
+
         loader.waiterLoad();
         waiter = loader.waiter;
 
-        muteScheduler = loader.muteScheduler;
-
-        CommandClientBuilder client = new CommandClientBuilder();
+        CommandClientBuilder clientBuilder = new CommandClientBuilder();
         Long[] coOwners = config.getCoOwnerIds();
         String[] owners = new String[coOwners.length];
 
         for(int i = 0; i<owners.length; i++)
             owners[i] = String.valueOf(coOwners[i]);
 
-        client.setOwnerId(String.valueOf(config.getOwnerId()))
+        clientBuilder.setOwnerId(String.valueOf(config.getOwnerId()))
                 .setServerInvite(Const.INVITE)
                 .setEmojis(config.getDoneEmote(), config.getWarnEmote(), config.getErrorEmote())
                 .setGame(null)
@@ -125,13 +146,13 @@ public class Bot extends ListenerAdapter
                 .setHelpConsumer(CommandHelper::getHelp);
 
         if(!(owners.length==0))
-            client.setCoOwnerIds(owners);
+            clientBuilder.setCoOwnerIds(owners);
         if(!(config.getDBotsToken().isEmpty() || config.getDBotsToken()==null))
-            client.setDiscordBotsKey(config.getDBotsToken());
+            clientBuilder.setDiscordBotsKey(config.getDBotsToken());
         if(!(config.getDBotsListToken().isEmpty() || config.getDBotsListToken()==null))
-            client.setDiscordBotListKey(config.getDBotsListToken());
+            clientBuilder.setDiscordBotListKey(config.getDBotsListToken());
 
-        client.addCommands(
+        clientBuilder.addCommands(
                 // Bot
                 new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(), new StatsCmd(),
 
@@ -158,6 +179,7 @@ public class Bot extends ListenerAdapter
                 // Utils
                 new GoogleSearchCmd(), new RoleMeCmd(this), new TimeForCmd(this), new TranslateCmd(this));
 
+        client = clientBuilder.build();
         Endless.LOG.info("Starting JDA...");
 
         DefaultShardManagerBuilder builder = new DefaultShardManagerBuilder()
@@ -169,11 +191,9 @@ public class Bot extends ListenerAdapter
                 .setEnableShutdownHook(true);
                 //.setShardsTotal(3);
         if(maintenance)
-            builder.addEventListeners(client.build(), new Bot());
+            builder.addEventListeners(client);
         else
-            builder.addEventListeners(loader.waiter, client.build(), new BotEvents(this, loader.botlogThread, false),
-                    new ServerLogging(gsdm), new GuildEvents(this),
-                    new StarboardEvents(gsdm, sdm, loader.starboardThread), new UserEvents(config));
+            builder.addEventListeners(loader.waiter, client, new Listener());
 
         shards = builder.build();
 
