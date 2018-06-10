@@ -196,21 +196,5 @@ public class Bot
             builder.addEventListeners(loader.waiter, client, new Listener(this));
 
         shards = builder.build();
-
-        /*JDABuilder builder = new JDABuilder(AccountType.BOT)
-                .setToken(config.getToken())
-                .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setGame(Game.playing("[ENDLESS] Loading..."))
-                .setBulkDeleteSplittingEnabled(false)
-                .setAutoReconnect(true)
-                .setEnableShutdownHook(true);
-        if(maintenance)
-            builder.addEventListener(client.build(), new Bot());
-        else
-            builder.addEventListener(loader.waiter, client.build(), new BotEvents(this, loader.botlogThread, false),
-                    new ServerLogging(gsdm), new GuildEvents(this),
-                    new StarboardEvents(gsdm, sdm, loader.starboardThread), new UserEvents(config));
-
-        builder.buildAsync();*/
     }
 }
