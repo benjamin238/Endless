@@ -132,7 +132,7 @@ public class Listener implements EventListener
         else if(preEvent instanceof MessageReceivedEvent)
         {
             MessageReceivedEvent event = (MessageReceivedEvent)preEvent;
-            ImportedTagHandler.runTag(event);
+            ImportedTagHandler.runTag(bot, event);
         }
         else if(preEvent instanceof GuildMemberRoleAddEvent)
         {
