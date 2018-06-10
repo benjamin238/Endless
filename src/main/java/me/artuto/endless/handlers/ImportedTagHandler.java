@@ -34,9 +34,9 @@ import java.util.Collection;
 
 public class ImportedTagHandler
 {
-    public static void runTag(MessageReceivedEvent event)
+    public static void runTag(Bot bot, MessageReceivedEvent event)
     {
-        CommandClient client = Bot.getInstance().client;
+        CommandClient client = bot.client;
         EndlessCommand command = (EndlessCommand)client.getCommands().stream()
                 .filter(c -> c.getName().equals("tag")).findFirst().orElse(null);
 
@@ -80,7 +80,7 @@ public class ImportedTagHandler
                     return;
 
                 String[] tagParts = splitTagNameAndArgs(parts[1]);
-                ImportedTag tag = Bot.getInstance().tdm.getImportedTagsForGuild(event.getGuild().getIdLong())
+                ImportedTag tag = bot.tdm.getImportedTagsForGuild(event.getGuild().getIdLong())
                         .stream().filter(t -> t.getName().equals(tagParts[0])).findFirst().orElse(null);
 
                 if(tag==null)
