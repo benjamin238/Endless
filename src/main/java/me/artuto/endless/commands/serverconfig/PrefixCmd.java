@@ -22,6 +22,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.data.managers.ClientGSDMProvider;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -105,9 +106,7 @@ public class PrefixCmd extends EndlessCommand
             if(args.isEmpty()) event.replyWarning("You didn't provided me a prefix!");
             else
             {
-                ClientGSDMProvider settings = event.getClient().getSettingsFor(guild);
-          
-                if(settings.getPrefixes().contains(args.trim()))
+                if(event.getClient().getSettingsFor(guild).getPrefixes().contains(args.trim()))
                 {
                     bot.gsdm.removePrefix(guild, args.toLowerCase().trim());
                     event.replySuccess("Successfully removed a prefix!");
