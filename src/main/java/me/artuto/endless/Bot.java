@@ -189,7 +189,6 @@ public class Bot
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
                 .setEnableShutdownHook(true);
-                //.setShardsTotal(3);
         if(maintenance)
             builder.addEventListeners(client);
         else
