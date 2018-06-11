@@ -255,7 +255,7 @@ public class ServerLogging
                         if(f==null)
                             return;
 
-                        tc.sendFile(f, new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+                        tc.sendFile(f, new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue(s -> f.delete());
                     }
                 }
             }
