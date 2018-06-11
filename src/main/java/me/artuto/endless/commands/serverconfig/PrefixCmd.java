@@ -105,7 +105,9 @@ public class PrefixCmd extends EndlessCommand
             if(args.isEmpty()) event.replyWarning("You didn't provided me a prefix!");
             else
             {
-                if(event.getClient().getSettingsFor(guild).getPrefixes().contains(args.trim()))
+                ClientGSDMProvider settings = event.getClient().getSettingsFor(guild);
+          
+                if(settings.getPrefixes().contains(args.trim()))
                 {
                     bot.gsdm.removePrefix(guild, args.toLowerCase().trim());
                     event.replySuccess("Successfully removed a prefix!");
