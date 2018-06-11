@@ -37,10 +37,9 @@ public class ImportedTagHandler
     public static void runTag(Bot bot, MessageReceivedEvent event)
     {
         CommandClient client = bot.client;
-        EndlessCommand command = (EndlessCommand)client.getCommands().stream()
+        EndlessCommand tagCommand = (EndlessCommand)client.getCommands().stream()
                 .filter(c -> c.getName().equals("tag")).findFirst().orElse(null);
-
-        if(command==null)
+        if(tagCommand==null)
             return;
         if(event.getGuild()==null)
             return;
@@ -76,20 +75,23 @@ public class ImportedTagHandler
 
             if(!(parts==null))
             {
-                if(parts[1]==null)
+                String name = parts[0];
+                EndlessCommand command = (EndlessCommand)client.getCommands().stream().filter(c -> c.isCommandFor(name)).findFirst().orElse(null);
+                if(!(command==null))
                     return;
 
-                String[] tagParts = splitTagNameAndArgs(parts[1]);
+                String commandArgs = String.join(" ", parts[0], parts[1]==null?"":parts[1]);
+                String[] tagParts = splitTagNameAndArgs(commandArgs);
                 ImportedTag tag = bot.tdm.getImportedTagsForGuild(event.getGuild().getIdLong())
                         .stream().filter(t -> t.getName().equals(tagParts[0])).findFirst().orElse(null);
 
                 if(tag==null)
                     return;
 
-                CommandEvent cevent = new CommandEvent(event, parts[1], client);
+                CommandEvent cevent = new CommandEvent(event, commandArgs, client);
                 if(!(client.getListener()==null))
-                    client.getListener().onCommand(cevent, command);
-                command.run(cevent);
+                    client.getListener().onCommand(cevent, tagCommand);
+                tagCommand.run(cevent);
             }
         }
     }

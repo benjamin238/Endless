@@ -79,7 +79,7 @@ public class DatabaseLoader
         }
         catch(SQLException e)
         {
-            throw new DatabaseException();
+            throw new DatabaseException(e.getMessage());
         }
     }
 
