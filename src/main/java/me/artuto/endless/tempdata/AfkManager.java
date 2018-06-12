@@ -61,6 +61,8 @@ public class AfkManager
     public static void checkAfk(GuildMessageReceivedEvent event)
     {
         User author = event.getAuthor();
+        if(author.isBot())
+            return;
         if(isAfk(author.getIdLong()))
         {
             author.openPrivateChannel().queue(pc -> pc.sendMessage(Bot.getInstance().config.getDoneEmote()+" I've removed your AFK status.")
