@@ -109,42 +109,5 @@ public class AfkManager
                         .setEmbed(builder.build()).build()).queue();
             }
         });
-
-        /*afk.forEach((id, msg) -> {
-            User user = event.getJDA().getUserCache().getElementById(id);
-            if(!(user==null))
-            {
-                if(message.getMentionedUsers().contains(user) && !(author.isBot()))
-                {
-                    EmbedBuilder builder = new EmbedBuilder();
-
-                    builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
-                    builder.setDescription(message.getContentDisplay());
-                    builder.setFooter("#"+message.getTextChannel().getName()+", "+event.getGuild().getName(), event.getGuild().getIconUrl());
-                    builder.setTimestamp(message.getCreationTime());
-                    builder.setColor(event.getMember().getColor());
-
-
-                    user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build())
-                            .build()).queue(null, null));
-                }
-
-                if(!(event.getChannel().canTalk()))
-                    return;
-
-                if(getMessage(user.getIdLong())==null)
-                    event.getChannel().sendMessage(":bed: **"+user.getName()+"** is AFK!").queue();
-                else
-                {
-                    EmbedBuilder builder = new EmbedBuilder();
-
-                    builder.setDescription(AfkManager.getMessage(user.getIdLong()));
-                    builder.setColor(event.getGuild().getMember(user).getColor());
-
-                    event.getChannel().sendMessage(new MessageBuilder().append(":bed: **").append(user.getName()).append("** is AFK!")
-                            .setEmbed(builder.build()).build()).queue();
-                }
-            }
-        });*/
     }
 }
