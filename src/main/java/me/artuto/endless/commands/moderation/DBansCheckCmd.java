@@ -55,6 +55,7 @@ public class DBansCheckCmd extends EndlessCommand
         this.aliases = new String[]{"checkbans", "dbans"};
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.cooldown = 10;
+        this.needsArguments = false;
     }
 
     @Override
@@ -66,10 +67,7 @@ public class DBansCheckCmd extends EndlessCommand
         String title = "<:discordBans:368565133619757068> Info from Discord Bans:";
 
         if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("Please specify a user!");
-            return;
-        }
+            user = event.getAuthor();
 
         if(bot.config.getDBansToken().isEmpty())
         {

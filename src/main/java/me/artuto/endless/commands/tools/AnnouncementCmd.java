@@ -51,12 +51,6 @@ public class AnnouncementCmd extends EndlessCommand
      {
          String args = event.getArgs();
 
-         if(args.isEmpty())
-         {
-             event.replyWarning("Invalid Syntax! e!announcement "+arguments+"\nDon't forget the pipes (|)!");
-             return;
-         }
-
          boolean ping = true;
          Role role;
          String[] splittedArgs = args.split(" \\| ", 2);

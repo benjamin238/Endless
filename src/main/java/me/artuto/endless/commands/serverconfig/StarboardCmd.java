@@ -45,13 +45,13 @@ public class StarboardCmd extends EndlessCommand
         this.help = "If no valid arguments are given the setup to install the starboard is launched.";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+        this.needsArguments = false;
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
         event.replySuccess("Hi! Welcome to the Endless' Starboard Setup. This will automagically install an starboard on your server, I only need some "+"information to continue.");
-
         waitForChannel(event);
     }
 
@@ -171,13 +171,13 @@ public class StarboardCmd extends EndlessCommand
             this.help = "Changes the channel of the starboard.";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a text channel or NONE";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
-            else if(event.getArgs().equalsIgnoreCase("none"))
+            if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setStarboardChannel(event.getGuild(), null);
                 event.replySuccess("Starboard disabled");
@@ -185,8 +185,10 @@ public class StarboardCmd extends EndlessCommand
             else
             {
                 List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-                if(list.isEmpty()) event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
+                if(list.isEmpty())
+                    event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
+                else if(list.size()>1)
+                    event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
                     bot.gsdm.setStarboardChannel(event.getGuild(), list.get(0));
@@ -205,6 +207,7 @@ public class StarboardCmd extends EndlessCommand
             this.help = "Changes the amount of stars required to be in the starboard.";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a number between 1 and 20";
         }
 
         @Override

@@ -50,6 +50,7 @@ public class DogCmd extends EndlessCommand
         this.ownerCommand = false;
         this.guildOnly = false;
         this.cooldown = 10;
+        this.needsArguments = false;
     }
 
     @Override

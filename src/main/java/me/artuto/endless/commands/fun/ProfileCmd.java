@@ -35,6 +35,7 @@ public class ProfileCmd extends EndlessCommand
         this.help = "Displays or edits the profile of the specified user";
         this.arguments = "<user>";
         this.category = Categories.FUN;
+        this.needsArguments = false;
     }
 
     @Override

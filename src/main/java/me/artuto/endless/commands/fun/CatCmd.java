@@ -49,6 +49,7 @@ public class CatCmd extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
         this.cooldown = 10;
+        this.needsArguments = false;
     }
 
     protected void executeCommand(CommandEvent event)

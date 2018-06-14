@@ -48,12 +48,6 @@ public class HackbanCmd extends EndlessCommand
         String target;
         String reason;
 
-        if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"hackban <ID> for [reason]");
-            return;
-        }
-
         try
         {
             String[] args = event.getArgs().split(" for ", 2);

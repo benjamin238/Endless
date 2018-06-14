@@ -64,21 +64,16 @@ public class BlacklistUserCmd extends EndlessCommand
         {
             this.name = "add";
             this.help = "Adds a user ID to the blacklisted users list.";
-            this.arguments = "<user ID>";
+            this.arguments = "<user ID> for [reason]";
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a user ID and a reason!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Please specify a user ID!");
-                return;
-            }
-
             String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
 
             event.getJDA().retrieveUserById(args[0]).queue(user -> {
@@ -104,17 +99,12 @@ public class BlacklistUserCmd extends EndlessCommand
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a user ID!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Please specify a user ID!");
-                return;
-            }
-
             event.getJDA().retrieveUserById(event.getArgs()).queue(user -> {
                 if(bot.bdm.getBlacklist(user.getIdLong())==null)
                 {
@@ -137,6 +127,7 @@ public class BlacklistUserCmd extends EndlessCommand
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArguments = false;
         }
 
         @Override
@@ -177,6 +168,7 @@ public class BlacklistUserCmd extends EndlessCommand
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a user ID!";
         }
 
         @Override

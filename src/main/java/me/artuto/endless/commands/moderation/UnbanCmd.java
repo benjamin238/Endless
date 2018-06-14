@@ -57,12 +57,6 @@ public class UnbanCmd extends EndlessCommand
         String target;
         String reason;
 
-        if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"unban <@user|ID|username> for [reason]");
-            return;
-        }
-
         try
         {
             String[] args = event.getArgs().split(" for ", 2);

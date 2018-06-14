@@ -48,6 +48,7 @@ public class AboutCmd extends EndlessCommand
         this.help = "Info about the bot";
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
+        this.needsArguments = false;
     }
 
     @Override

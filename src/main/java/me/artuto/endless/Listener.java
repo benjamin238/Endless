@@ -15,12 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.logging;
+package me.artuto.endless;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.Endless;
 import me.artuto.endless.handlers.*;
+import me.artuto.endless.logging.ModLogging;
+import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.tempdata.AfkManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
@@ -79,6 +81,7 @@ public class Listener implements EventListener
 
             bot.muteScheduler.scheduleWithFixedDelay(() -> bot.pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, event.getJDA()),
                     0, 10, TimeUnit.SECONDS);
+            bot.optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
 
             if(!(maintenance))
                 presence.setPresence(bot.config.getStatus(), Game.playing("Type "+bot.config.getPrefix()+"help | Version "+Const.VERSION+" | On "+event.getJDA().getGuildCache().size()+" Guilds | "+event.getJDA().getUserCache().size()+

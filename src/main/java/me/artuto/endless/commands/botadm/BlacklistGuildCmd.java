@@ -61,21 +61,16 @@ public class BlacklistGuildCmd extends EndlessCommand
         {
             this.name = "add";
             this.help = "Adds a guild ID to the blacklisted guilds list.";
-            this.arguments = "<guild ID>";
+            this.arguments = "<guild ID> for [reason]";
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a Guild ID and a reason!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Please specify a guild ID!");
-                return;
-            }
-
             String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
             Guild guild = event.getJDA().getGuildCache().getElementById(args[0]);
 
@@ -107,6 +102,7 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a Guild ID!";
         }
 
         @Override
@@ -147,6 +143,7 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArguments = false;
         }
 
         @Override
@@ -186,17 +183,12 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a guild ID!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Please specify a guild ID!");
-                return;
-            }
-
             Blacklist blacklist = bot.bdm.getBlacklist(Long.valueOf(event.getArgs()));
             if(blacklist==null)
             {

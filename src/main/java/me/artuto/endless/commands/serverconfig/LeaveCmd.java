@@ -38,6 +38,7 @@ public class LeaveCmd extends EndlessCommand
         this.help = "Changes or shows the welcome message";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+        this.needsArguments = false;
     }
 
     @Override
@@ -46,8 +47,10 @@ public class LeaveCmd extends EndlessCommand
         Guild guild = event.getGuild();
         String msg = bot.gsdm.getLeaveMessage(guild);
 
-        if(!(msg == null)) event.replySuccess("Leave message at **"+guild.getName()+"**: `"+msg+"`");
-        else event.replyError("No message configured!");
+        if(!(msg==null))
+            event.replySuccess("Leave message at **"+guild.getName()+"**: `"+msg+"`");
+        else
+            event.replyError("No message configured!");
     }
 
     private class Change extends EndlessCommand
@@ -59,17 +62,12 @@ public class LeaveCmd extends EndlessCommand
             this.aliases = new String[]{"set"};
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Specify a new leave message!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Specify a new leave message!");
-                return;
-            }
-
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setLeaveMessage(event.getGuild(), null);

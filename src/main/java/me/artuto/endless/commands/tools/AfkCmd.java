@@ -33,6 +33,7 @@ public class AfkCmd extends EndlessCommand
         this.arguments = "[message]";
         this.category = Categories.TOOLS;
         this.guildOnly = false;
+        this.needsArguments = false;
     }
 
     protected void executeCommand(CommandEvent event)

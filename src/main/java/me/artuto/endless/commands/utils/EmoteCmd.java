@@ -20,6 +20,7 @@ package me.artuto.endless.commands.utils;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import net.dv8tion.jda.core.entities.Emote;
 
 /**
  * @author Artuto
@@ -30,7 +31,7 @@ public class EmoteCmd extends EndlessCommand
     public EmoteCmd()
     {
         this.name = "emote";
-        this.aliases = new String[]{"emoji"};
+        this.aliases = new String[]{"emoji", "charinfo"};
         this.help = "Get the info of a specified emote.";
         this.arguments = "<emote>";
         this.category = Categories.UTILS;
@@ -40,6 +41,14 @@ public class EmoteCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(event.getMessage().getEmotes().isEmpty())
+        {
 
+        }
+        else
+        {
+            Emote emote = event.getMessage().getEmotes().get(0);
+
+        }
     }
 }

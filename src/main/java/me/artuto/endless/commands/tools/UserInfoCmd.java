@@ -26,8 +26,10 @@ import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -48,21 +50,25 @@ public class UserInfoCmd extends EndlessCommand
         this.arguments = "<user>";
         this.category = Categories.TOOLS;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.guildOnly = false;
+        this.needsArguments = false;
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        EmbedBuilder builder = new EmbedBuilder();
+        Member member;
         String ranks;
         String roles;
         String emote;
-        EmbedBuilder builder = new EmbedBuilder();
-        Member member;
+        User user;
 
-        if(event.getArgs().isEmpty()) member = event.getMessage().getMember();
+        if(event.getArgs().isEmpty())
+            user = event.getAuthor();
         else
         {
-            List<Member> list = FinderUtil.findMembers(event.getArgs(), event.getGuild());
+            List<User> list = FinderUtil.findUsers(event.getArgs(), event.getJDA());
 
             if(list.isEmpty())
             {
@@ -71,59 +77,92 @@ public class UserInfoCmd extends EndlessCommand
             }
             else if(list.size()>1)
             {
-                event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
+                event.replyWarning(FormatUtil.listOfUsers(list, event.getArgs()));
                 return;
             }
-            else member = list.get(0);
+            else
+                user = list.get(0);
         }
 
-        String strjoins;
-        List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
-        Collections.sort(joins, (Member a, Member b) -> a.getJoinDate().compareTo(b.getJoinDate()));
-        int index = joins.indexOf(member);
-        int joinnumber = index;
-        index -= 3;
-        if(index<0) index = 0;
+        if(InfoTools.nitroCheck(user))
+            ranks = "<:nitro:334859814566101004>";
+        else
+            ranks = "";
 
-        if(joins.get(index).equals(member)) strjoins = "**"+joins.get(index).getUser().getName()+"**";
-        else strjoins = joins.get(index).getUser().getName();
+        String title = (user.isBot() ? ":information_source: Information about the bot **"+
+                user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** <:bot:334859813915983872>":
+                ":information_source: Information about the user **"+
+                        user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** "+ranks);
 
-        for(int i = index+1; i<index+7; i++)
+        if(event.isFromType(ChannelType.PRIVATE))
         {
-            if(i>=joins.size()) break;
-
-            Member m = joins.get(i);
-            String name = m.getUser().getName();
-
-            if(m.equals(member)) name = "**"+name+"**";
-
-            strjoins += " > "+name;
-        }
-
-        roles = InfoTools.mentionUserRoles(member);
-        emote = InfoTools.onlineStatus(member);
-
-        if(InfoTools.nitroCheck(member.getUser())) ranks = "<:nitro:334859814566101004>";
-        else ranks = "";
-
-        String title = (member.getUser().isBot() ? ":information_source: Information about the bot **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** <:bot:334859813915983872>" : ":information_source: Information about the user **"+member.getUser().getName()+"**"+"#"+"**"+member.getUser().getDiscriminator()+"** "+ranks);
-
-        try
-        {
-            builder.addField(":1234: ID: ", member.getUser().getId(), true);
-            builder.addField(":bust_in_silhouette: Nickname: ", (member.getNickname() == null ? "None" : member.getNickname()), true);
-            builder.addField(":hammer: Roles: ", roles, false);
-            builder.addField(emote+" Status: ", member.getOnlineStatus()+(member.getGame() == null ? "" : " ("+(member.getGame().getType() == Game.GameType.STREAMING ? "On Live at [*"+member.getGame().getName()+"*]" : "Playing "+member.getGame().getName())+")"+""), false);
-            builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
-            builder.addField(":calendar_spiral: Guild Join Date: ", member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
-            builder.addField("Join Order: `(#"+(joinnumber+1)+")`", strjoins, false);
+            member = user.getMutualGuilds().get(0).getMember(user);
+            emote = InfoTools.onlineStatus(member);
+            builder.addField(":1234: ID: ", user.getId(), true);
+            builder.addField(emote+" Status: ", member.getOnlineStatus()+
+                    (member.getGame() == null ? "" : " ("+(member.getGame().getType() == Game.GameType.STREAMING ?
+                            "On Live at [*"+member.getGame().getName()+"*]":"Playing "+member.getGame().getName())+")"+""), false);
             builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
-            builder.setColor(member.getColor());
-            event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+
         }
-        catch(Exception e)
+        else
         {
-            event.replyError("Something went wrong when getting the user info: \n```"+e+"```");
+             member = event.getGuild().getMember(user);
+             if(member==null)
+             {
+                 member = user.getMutualGuilds().get(0).getMember(user);
+                 emote = InfoTools.onlineStatus(member);
+                 builder.addField(":1234: ID: ", user.getId(), true);
+                 builder.addField(emote+" Status: ", member.getOnlineStatus()+
+                         (member.getGame() == null ? "" : " ("+(member.getGame().getType() == Game.GameType.STREAMING ?
+                                 "On Live at [*"+member.getGame().getName()+"*]":"Playing "+member.getGame().getName())+")"+""), false);
+                 builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
+             }
+             else
+             {
+                 String strjoins;
+                 List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
+                 Collections.sort(joins, (Member a, Member b) -> a.getJoinDate().compareTo(b.getJoinDate()));
+                 int index = joins.indexOf(member);
+                 int joinnumber = index;
+                 index -= 3;
+                 if(index<0) index = 0;
+
+                 if(joins.get(index).equals(member))
+                     strjoins = "**"+joins.get(index).getUser().getName()+"**";
+                 else
+                     strjoins = joins.get(index).getUser().getName();
+
+                 for(int i = index+1; i<index+7; i++)
+                 {
+                     if(i>=joins.size()) break;
+
+                     Member m = joins.get(i);
+                     String name = m.getUser().getName();
+
+                     if(m.equals(member)) name = "**"+name+"**";
+
+                     strjoins += " > "+name;
+                 }
+
+                 roles = InfoTools.mentionUserRoles(member);
+                 emote = InfoTools.onlineStatus(member);
+
+                 builder.addField(":1234: ID: ", user.getId(), true);
+                 if(!(member.getNickname()==null))
+                     builder.addField(":bust_in_silhouette: Nickname: ", member.getNickname(), true);
+                 builder.addField(emote+" Status: ", member.getOnlineStatus()+
+                         (member.getGame() == null ? "" : " ("+(member.getGame().getType() == Game.GameType.STREAMING ?
+                                 "On Live at [*"+member.getGame().getName()+"*]":"Playing "+member.getGame().getName())+")"+""), false);
+                 if(!(roles.isEmpty()))
+                     builder.addField(":performing_arts: Roles: ", roles, false);
+                 builder.addField(":calendar_spiral: Guild Join Date: ", member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
+                 builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
+                 builder.addField("Join Order: `(#"+(joinnumber+1)+")`", strjoins, false);
+                 builder.setColor(member.getColor());
+             }
         }
+
+        event.reply(new MessageBuilder(title).setEmbed(builder.build()).build());
     }
 }

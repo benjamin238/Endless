@@ -38,6 +38,7 @@ public class WelcomeCmd extends EndlessCommand
         this.help = "Changes or shows the welcome message";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+        this.needsArguments = false;
     }
 
     @Override
@@ -46,8 +47,10 @@ public class WelcomeCmd extends EndlessCommand
         Guild guild = event.getGuild();
         String msg = bot.gsdm.getWelcomeMessage(guild);
 
-        if(!(msg == null)) event.replySuccess("Welcome message at **"+guild.getName()+"**: `"+msg+"`");
-        else event.replyError("No message configured!");
+        if(!(msg==null))
+            event.replySuccess("Welcome message at **"+guild.getName()+"**: `"+msg+"`");
+        else
+            event.replyError("No message configured!");
     }
 
     private class Change extends EndlessCommand
@@ -59,17 +62,12 @@ public class WelcomeCmd extends EndlessCommand
             this.aliases = new String[]{"set"};
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Specify a new welcome message or `none` to disable it.";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Specify a new welcome message or `none` to disable it.");
-                return;
-            }
-
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setWelcomeMessage(event.getGuild(), null);

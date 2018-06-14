@@ -42,6 +42,7 @@ public class AvatarCmd extends EndlessCommand
         this.arguments = "<user>";
         this.category = Categories.TOOLS;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.needsArguments = false;
     }
 
     @Override
@@ -67,22 +68,13 @@ public class AvatarCmd extends EndlessCommand
                 return;
             }
             else
-            {
                 target = list.get(0);
-            }
         }
 
         String title = ":frame_photo: Avatar of **"+target.getUser().getName()+"**"+"#"+"**"+target.getUser().getDiscriminator()+"**";
 
-        try
-        {
-            builder.setImage(target.getUser().getEffectiveAvatarUrl());
-            builder.setColor(target.getColor());
-            event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
-        }
-        catch(Exception e)
-        {
-            event.replyError("An error happened when getting the avatar!");
-        }
+        builder.setImage(target.getUser().getEffectiveAvatarUrl()+"?size=512");
+        builder.setColor(target.getColor());
+        event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
     }
 }

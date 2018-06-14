@@ -53,6 +53,7 @@ public class EndlessLoader
 
     // Schedulers
     public ScheduledExecutorService muteScheduler;
+    public ScheduledExecutorService optimizerScheduler;
 
     // Thread Loader
     private final ThreadLoader threadLoader = new ThreadLoader();
@@ -98,6 +99,7 @@ public class EndlessLoader
         clearThread = threadLoader.createThread("Clear Command");
         cmdThread = threadLoader.createThread("Commands");
         muteScheduler = threadLoader.createThread("Mute");
+        optimizerScheduler = threadLoader.createThread("Optimizer");
         starboardThread = threadLoader.createThread("Starboard");
     }
 

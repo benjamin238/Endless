@@ -24,7 +24,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
-import me.artuto.endless.cmddata.CommandHelper;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.tools.Variables;
 import net.dv8tion.jda.core.Permission;
@@ -46,17 +45,12 @@ public class TagCmd extends EndlessCommand
         this.children = new Command[]{new Add(), new Delete(), new Edit(), new Import(), new Owner(), new Raw(), new Raw2(), new UnImport()};
         this.category = Categories.FUN;
         this.guildOnly = false;
+        this.needsArgumentsMessage = "Specify a tag name!";
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("Specify a tag name!");
-            return;
-        }
-
         String[] args;
         String tagname;
         String tagargs;
@@ -95,6 +89,7 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<name> <content>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a tag name and content!";
         }
 
         @Override
@@ -103,12 +98,6 @@ public class TagCmd extends EndlessCommand
             String[] args;
             String name;
             String content;
-
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Please specify a tag name and content!");
-                return;
-            }
 
             try
             {
@@ -143,17 +132,12 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<name>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Specify a tag name!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Specify a tag name!");
-                return;
-            }
-
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
             Long owner = bot.tdm.getTagOwner(event.getArgs().trim().toLowerCase());
 
@@ -179,6 +163,7 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<name> <new content>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a tag name and content!";
         }
 
         @Override
@@ -187,12 +172,6 @@ public class TagCmd extends EndlessCommand
             String[] args;
             String name;
             String content;
-
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Please specify a tag name and content!");
-                return;
-            }
 
             try
             {
@@ -231,17 +210,12 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<name>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Specify a tag name!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Specify a tag name!");
-                return;
-            }
-
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
             User owner = event.getJDA().retrieveUserById(bot.tdm.getTagOwner(event.getArgs())).complete();
 
@@ -260,17 +234,12 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<name>";
             this.category = Categories.FUN;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Specify a tag name!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Specify a tag name!");
-                return;
-            }
-
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
 
             if(tag == null) event.replyError("No tag found with that name!");
@@ -296,17 +265,12 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<name>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Specify a tag name!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Specify a tag name!");
-                return;
-            }
-
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
 
             if(tag == null) event.replyError("No tag found with that name!");
@@ -323,17 +287,12 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<name>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Specify a tag name!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Specify a tag name!");
-                return;
-            }
-
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
 
             if(tag == null) event.replyError("No tag found with that name!");
@@ -350,6 +309,7 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<name>";
             this.category = Categories.FUN;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Specify a tag name!";
         }
 
         @Override

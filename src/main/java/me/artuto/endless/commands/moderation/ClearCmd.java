@@ -42,7 +42,15 @@ public class ClearCmd extends EndlessCommand
     private final Pattern MENTION = Pattern.compile("<@!?(\\d{17,22})>");
     private final Pattern ID = Pattern.compile("(?:^|\\s)(\\d{17,22})(?:$|\\s)");
     private final Pattern NUM = Pattern.compile("(?:^|\\s)(\\d{1,4})(?:$|\\s)");
-    private final String limit = "This command, due a Discord API limitation, can't clear messages older than a week.";
+    private final String LIMIT = "This command, due a Discord API limitation, can't clear messages older than a week.";
+    private final String NO_PARAMS = "**No valid parameters detected:**\n"+"Pinned messages are ignored.\n"+
+        "**You can following parameters, the order doesn't matters:**\n"+
+        "-`<numberOfPosts>`: Number of post to clean, min. 2 and max. 1000.\n"+
+        "-`bots`: Clears messages by bots.\n"+"-`embeds`: Clears messages with embeds.\n"+
+        "-`links`: Clears messages which contains links.\n"+"-`images`: Clears messages with images.\n"+
+        "-`<@user|ID|nickname|username>`: Clears messages sent by the specified user.\n"+
+        "-`\"text\"`: Clears messages with the text specified in quotes.\n"+
+        "-` `regex` `: Clears messages that match the specified regex.";
 
     public ClearCmd(Bot bot)
     {
@@ -53,6 +61,7 @@ public class ClearCmd extends EndlessCommand
         this.category = Categories.MODERATION;
         this.botPerms = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
         this.userPerms = new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY};
+        this.needsArgumentsMessage = NO_PARAMS;
     }
 
     @Override
@@ -60,13 +69,6 @@ public class ClearCmd extends EndlessCommand
     {
         String params = event.getArgs();
         String r;
-
-        String noparams = "**No valid parameters detected:**\n"+"Pinned messages are ignored.\n"+"**You can following parameters, the order doesn't matters:**\n"+"-`<numberOfPosts>`: Number of post to clean, min. 2 and max. 1000.\n"+"-`bots`: Clears messages by bots.\n"+"-`embeds`: Clears messages with embeds.\n"+"-`links`: Clears messages which contains links.\n"+"-`images`: Clears messages with images.\n"+"-`<@user|ID|nickname|username>`: Clears messages sent by the specified user.\n"+"-`\"text\"`: Clears messages with the text specified in quotes.\n"+"-` `regex` `: Clears messages that match the specified regex.";
-        if(params.isEmpty())
-        {
-            event.replyWarning(noparams);
-            return;
-        }
 
         try
         {
@@ -115,7 +117,7 @@ public class ClearCmd extends EndlessCommand
 
         if(num == -1) if(all)
         {
-            event.replyWarning(noparams);
+            event.replyWarning(NO_PARAMS);
             return;
         }
         else num = 100;
@@ -164,7 +166,9 @@ public class ClearCmd extends EndlessCommand
                     break;
                 }
 
-                if(all || ids.contains(msg.getAuthor().getId()) || (bots && msg.getAuthor().isBot()) || (embed && !(msg.getEmbeds().isEmpty())) || (link && LINK.matcher(msg.getContentRaw()).find()) || (image && hasImage(msg)))
+                if(all || ids.contains(msg.getAuthor().getId()) || (bots && msg.getAuthor().isBot())
+                        || (embed && !(msg.getEmbeds().isEmpty())) || (link && LINK.matcher(msg.getContentRaw()).find())
+                        || (image && hasImage(msg)))
                 {
                     deletion.add(msg);
                     continue;
@@ -189,7 +193,7 @@ public class ClearCmd extends EndlessCommand
 
             if(deletion.isEmpty())
             {
-                event.replyWarning("There were no messages to clear!"+(weeks2 ? limit : ""));
+                event.replyWarning("There were no messages to clear!"+(weeks2 ? LIMIT : ""));
                 return;
             }
 
@@ -200,7 +204,8 @@ public class ClearCmd extends EndlessCommand
                 while(index<deletion.size())
                 {
                     if(index+100>deletion.size()) if(index+1 == deletion.size())
-                        deletion.get(deletion.size()-1).delete().reason("[CLEAR]["+event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"]").complete();
+                        deletion.get(deletion.size()-1).delete().reason("[CLEAR]["+event.getAuthor().getName()+
+                                "#"+event.getAuthor().getDiscriminator()+"]").complete();
                     else event.getTextChannel().deleteMessages(deletion.subList(index, deletion.size())).complete();
                     else event.getTextChannel().deleteMessages(deletion.subList(index, index+100)).complete();
 

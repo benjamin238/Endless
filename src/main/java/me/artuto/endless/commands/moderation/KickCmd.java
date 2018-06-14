@@ -58,12 +58,6 @@ public class KickCmd extends EndlessCommand
         String target;
         String reason;
 
-        if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"kick <@user|ID|nickname|username> for [reason]");
-            return;
-        }
-
         try
         {
             String[] args = event.getArgs().split(" for ", 2);

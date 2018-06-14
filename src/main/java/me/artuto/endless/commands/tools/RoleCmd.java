@@ -27,6 +27,7 @@ import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.IMentionable;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 
@@ -58,12 +59,6 @@ public class RoleCmd extends EndlessCommand
         String permissions;
         String membersInRole;
 
-        if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("Please specify a role!");
-            return;
-        }
-
         List<net.dv8tion.jda.core.entities.Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
 
         if(list.isEmpty())
@@ -83,7 +78,7 @@ public class RoleCmd extends EndlessCommand
 
         if(members.size()>20) membersInRole = String.valueOf(members.size());
         else if(members.isEmpty()) membersInRole = "Nobody";
-        else membersInRole = members.stream().map(m -> m.getAsMention()).collect(Collectors.joining(", "));
+        else membersInRole = members.stream().map(IMentionable::getAsMention).collect(Collectors.joining(", "));
 
         perm = rol.getPermissions();
 
@@ -128,15 +123,9 @@ public class RoleCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Invalid syntax: `"+event.getClient().getPrefix()+name+" "+arguments+"`");
-                return;
-            }
-
-            net.dv8tion.jda.core.entities.Role rol;
+            Role role;
             Member m;
-            String role;
+            String roleToAdd;
             String member;
             Member author = event.getMember();
 
@@ -144,7 +133,7 @@ public class RoleCmd extends EndlessCommand
             {
                 String[] args = event.getArgs().split(" to ", 2);
 
-                role = args[0].trim();
+                roleToAdd = args[0].trim();
                 member = args[1].trim();
             }
             catch(IndexOutOfBoundsException e)
@@ -153,7 +142,7 @@ public class RoleCmd extends EndlessCommand
                 return;
             }
 
-            List<Role> rlist = FinderUtil.findRoles(role, event.getGuild());
+            List<Role> rlist = FinderUtil.findRoles(roleToAdd, event.getGuild());
 
             if(rlist.isEmpty())
             {
@@ -165,7 +154,7 @@ public class RoleCmd extends EndlessCommand
                 event.replyWarning(FormatUtil.listOfRoles(rlist, event.getArgs()));
                 return;
             }
-            else rol = rlist.get(0);
+            else role = rlist.get(0);
 
             List<Member> mlist = FinderUtil.findMembers(member, event.getGuild());
 
@@ -181,18 +170,20 @@ public class RoleCmd extends EndlessCommand
             }
             else m = mlist.get(0);
 
-            if(!(Checks.canMemberInteract(author, rol)))
+            if(!(Checks.canMemberInteract(author, role)))
             {
                 event.replyError("I can't interact with that role!");
                 return;
             }
-            if(!(Checks.canMemberInteract(author, rol)))
+            if(!(Checks.canMemberInteract(author, role)))
             {
                 event.replyError("You can't interact with that role!");
                 return;
             }
 
-            event.getGuild().getController().addSingleRoleToMember(m, rol).reason("["+author.getUser().getName()+"#"+author.getUser().getDiscriminator()+"]").queue(s -> event.replySuccess("Successfully given the role **"+rol.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"), e -> event.replyError("An error happened when giving the role **"+rol.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"));
+            event.getGuild().getController().addSingleRoleToMember(m, role).reason("["+author.getUser().getName()+"#"+author.getUser().getDiscriminator()+"]").queue(s ->
+                    event.replySuccess("Successfully given the role **"+role.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"),
+                    e -> event.replyError("An error happened when giving the role **"+role.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"));
         }
     }
 
@@ -217,9 +208,9 @@ public class RoleCmd extends EndlessCommand
                 return;
             }
 
-            net.dv8tion.jda.core.entities.Role rol;
+            Role role;
             Member m;
-            String role;
+            String roleToAdd;
             String member;
             Member author = event.getMember();
 
@@ -227,7 +218,7 @@ public class RoleCmd extends EndlessCommand
             {
                 String[] args = event.getArgs().split(" from ", 2);
 
-                role = args[0].trim();
+                roleToAdd = args[0].trim();
                 member = args[1].trim();
             }
             catch(IndexOutOfBoundsException e)
@@ -236,7 +227,7 @@ public class RoleCmd extends EndlessCommand
                 return;
             }
 
-            List<net.dv8tion.jda.core.entities.Role> rlist = FinderUtil.findRoles(role, event.getGuild());
+            List<Role> rlist = FinderUtil.findRoles(roleToAdd, event.getGuild());
 
             if(rlist.isEmpty())
             {
@@ -248,7 +239,7 @@ public class RoleCmd extends EndlessCommand
                 event.replyWarning(FormatUtil.listOfRoles(rlist, event.getArgs()));
                 return;
             }
-            else rol = rlist.get(0);
+            else role = rlist.get(0);
 
             List<Member> mlist = FinderUtil.findMembers(member, event.getGuild());
 
@@ -264,18 +255,20 @@ public class RoleCmd extends EndlessCommand
             }
             else m = mlist.get(0);
 
-            if(!(Checks.canMemberInteract(event.getSelfMember(), rol)))
+            if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
             {
                 event.replyError("I can't interact with that role!");
                 return;
             }
-            if(!(Checks.canMemberInteract(author, rol)))
+            if(!(Checks.canMemberInteract(author, role)))
             {
                 event.replyError("You can't interact with that role!");
                 return;
             }
 
-            event.getGuild().getController().removeSingleRoleFromMember(m, rol).reason("["+author.getUser().getName()+"#"+author.getUser().getDiscriminator()+"]").queue(s -> event.replySuccess("Successfully removed the role **"+rol.getName()+"** from **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"), e -> event.replyError("An error happened when removing the role **"+rol.getName()+"** from **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"));
+            event.getGuild().getController().removeSingleRoleFromMember(m, role).reason("["+author.getUser().getName()+"#"+author.getUser().getDiscriminator()+"]").queue(s ->
+                    event.replySuccess("Successfully removed the role **"+role.getName()+"** from **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"),
+                    e -> event.replyError("An error happened when removing the role **"+role.getName()+"** from **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"));
         }
     }
 }

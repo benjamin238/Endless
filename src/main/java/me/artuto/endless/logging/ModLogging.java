@@ -247,7 +247,7 @@ public class ModLogging
         }
     }
 
-    void onGuildBan(GuildBanEvent event)
+    public void onGuildBan(GuildBanEvent event)
     {
         Guild guild = event.getGuild();
         TextChannel tc = bot.gsdm.getModlogChannel(guild);

@@ -67,12 +67,6 @@ public class LookupCmd extends EndlessCommand
         WidgetUtil.Widget widget;
         JDA jda = event.getJDA();
 
-        if(args.isEmpty())
-        {
-            event.replyWarning("No arguments provided!");
-            return;
-        }
-
         if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
         else color = event.getGuild().getSelfMember().getColor();
 

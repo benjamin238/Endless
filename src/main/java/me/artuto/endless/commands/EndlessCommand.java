@@ -18,6 +18,7 @@
 package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.CommandHelper;
 import me.artuto.endless.utils.Checks;
@@ -32,9 +33,11 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 public abstract class EndlessCommand extends Command
 {
+    protected boolean needsArguments = true;
     protected boolean ownerCommand = false;
     protected Permission[] botPerms = new Permission[0];
     protected Permission[] userPerms = new Permission[0];
+    protected String needsArgumentsMessage = null;
 
     public EndlessCommand()
     {
@@ -45,6 +48,7 @@ public abstract class EndlessCommand extends Command
     @Override
     public void execute(CommandEvent event)
     {
+        CommandClient client = event.getClient();
         Member member = event.getMember();
         Member selfMember = event.getSelfMember();
         TextChannel tc = event.getTextChannel();
@@ -52,6 +56,16 @@ public abstract class EndlessCommand extends Command
         if(ownerCommand && !(event.isOwner()))
         {
             event.replyError("This command is only for Bot Owners!");
+            return;
+        }
+
+        if(needsArguments && event.getArgs().isEmpty())
+        {
+            if(needsArgumentsMessage==null)
+                event.replyError("**Too few arguments provided!**\n" +
+                        "Try running `"+client.getPrefix()+this.name+" help` to get help.");
+            else
+                event.replyWarning(needsArgumentsMessage);
             return;
         }
 

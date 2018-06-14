@@ -48,13 +48,9 @@ public class BotCPanelCmd extends EndlessCommand
         String prefix = event.getClient().getPrefix();
 
         if(event.getArgs().isEmpty())
-        {
             event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n"+"- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n"+"- `"+prefix+"bot updategame`: Updates the default game.\n"+"- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
-        }
         else if(!(event.getArgs().contains("status")) || !(event.getArgs().contains("game") || !(event.getArgs().contains("updategame"))) || !(event.getArgs().contains("optimize")))
-        {
             event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n"+"- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n"+"- `"+prefix+"bot updategame`: Updates the default game.\n"+"- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
-        }
     }
 
     private class Status extends EndlessCommand
@@ -66,24 +62,12 @@ public class BotCPanelCmd extends EndlessCommand
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please provide me a valid OnlineStatus!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                event.replyError("Please provide me a valid OnlineStatus!");
-                return;
-            }
-
-            if(event.getArgs().equals("help"))
-            {
-                event.replyInDm("Help for subcommand `bot status`\n"+"Valid options: `ONLINE`, `DO_NOT_DISTURB`, `INVISIBLE`, `AWAY`");
-                event.reactSuccess();
-                return;
-            }
-
             try
             {
                 String status = event.getArgs();
@@ -107,6 +91,7 @@ public class BotCPanelCmd extends EndlessCommand
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArguments = false;
         }
 
         @Override
@@ -150,6 +135,7 @@ public class BotCPanelCmd extends EndlessCommand
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArguments = false;
         }
 
         @Override
@@ -177,6 +163,7 @@ public class BotCPanelCmd extends EndlessCommand
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.needsArguments = false;
         }
 
         @Override

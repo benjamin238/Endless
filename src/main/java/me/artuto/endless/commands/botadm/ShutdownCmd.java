@@ -40,6 +40,7 @@ public class ShutdownCmd extends EndlessCommand
         this.category = Categories.BOTADM;
         this.ownerCommand = true;
         this.guildOnly = false;
+        this.needsArguments = false;
     }
 
     @Override

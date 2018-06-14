@@ -50,6 +50,7 @@ public class TimeForCmd extends EndlessCommand
         this.help = "Shows the timezone for the specified user";
         this.arguments = "<user>";
         this.category = Categories.UTILS;
+        this.needsArguments = false;
     }
 
     @Override

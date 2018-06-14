@@ -27,6 +27,7 @@ public class SetupCmd extends EndlessCommand
         this.help = "Server setup";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+        this.needsArguments = false;
     }
 
     @Override

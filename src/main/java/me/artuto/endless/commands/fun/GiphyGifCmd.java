@@ -55,6 +55,7 @@ public class GiphyGifCmd extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.userPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
+        this.needsArguments = false;
     }
 
     @Override
@@ -122,8 +123,6 @@ public class GiphyGifCmd extends EndlessCommand
         {
             event.replyError("An error was thrown when getting a gif! Ask the Owner to check the Console.");
             LOG.error(e.getMessage());
-
-            if(bot.config.isDebugEnabled()) e.printStackTrace();
         }
     }
 
@@ -137,6 +136,7 @@ public class GiphyGifCmd extends EndlessCommand
             this.arguments = "[keyword]";
             this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.guildOnly = false;
+            this.needsArgumentsMessage = "No search terms specified!";
         }
 
         protected void executeCommand(CommandEvent event)
@@ -147,12 +147,6 @@ public class GiphyGifCmd extends EndlessCommand
             {
                 event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
                 LOG.warn("Someone triggered the Giphy command, but there isn't a key in the config file. In order to stop this message add a key to the config file.");
-                return;
-            }
-
-            if(args.isEmpty())
-            {
-                event.replyWarning("No search terms specified!");
                 return;
             }
 

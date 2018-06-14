@@ -39,17 +39,12 @@ public class BashCmd extends EndlessCommand
         this.category = Categories.BOTADM;
         this.ownerCommand = true;
         this.guildOnly = false;
+        this.needsArgumentsMessage = "Please specify a command!";
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        if(event.getArgs().isEmpty())
-        {
-            event.replyError("Cannot execute a empty command");
-            return;
-        }
-
         StringBuilder output = new StringBuilder();
         String finalOutput = null;
         try

@@ -61,6 +61,8 @@ public class AfkManager
     public static void checkAfk(GuildMessageReceivedEvent event)
     {
         User author = event.getAuthor();
+        if(author.isBot())
+            return;
         if(isAfk(author.getIdLong()))
         {
             author.openPrivateChannel().queue(pc -> pc.sendMessage(Bot.getInstance().config.getDoneEmote()+" I've removed your AFK status.")
@@ -75,11 +77,44 @@ public class AfkManager
         Message message = event.getMessage();
         User author = event.getAuthor();
 
-        afk.forEach((id, msg) -> {
+        message.getMentionedUsers().forEach(user -> {
+            if(!(isAfk(user.getIdLong())))
+                return;
+            if(author.isBot())
+                return;
+
+            EmbedBuilder builder = new EmbedBuilder();
+
+            builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
+            builder.setDescription(message.getContentDisplay());
+            builder.setFooter("#"+message.getTextChannel().getName()+", "+event.getGuild().getName(), event.getGuild().getIconUrl());
+            builder.setTimestamp(message.getCreationTime());
+            builder.setColor(event.getMember().getColor());
+
+            user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build())
+                    .build()).queue(null, null));
+            builder.clear();
+
+            if(!(event.getChannel().canTalk()))
+                return;
+
+            if(getMessage(user.getIdLong())==null)
+                event.getChannel().sendMessage(":bed: **"+user.getName()+"** is AFK!").queue();
+            else
+            {
+                builder.setDescription(AfkManager.getMessage(user.getIdLong()));
+                builder.setColor(event.getGuild().getMember(user).getColor());
+
+                event.getChannel().sendMessage(new MessageBuilder().append(":bed: **").append(user.getName()).append("** is AFK!")
+                        .setEmbed(builder.build()).build()).queue();
+            }
+        });
+
+        /*afk.forEach((id, msg) -> {
             User user = event.getJDA().getUserCache().getElementById(id);
             if(!(user==null))
             {
-                if(message.getMentionedUsers().contains(user) && !(user.isBot() || Bot.getInstance().bdm.getBlacklist(user.getIdLong())==null))
+                if(message.getMentionedUsers().contains(user) && !(author.isBot()))
                 {
                     EmbedBuilder builder = new EmbedBuilder();
 
@@ -110,6 +145,6 @@ public class AfkManager
                             .setEmbed(builder.build()).build()).queue();
                 }
             }
-        });
+        });*/
     }
 }

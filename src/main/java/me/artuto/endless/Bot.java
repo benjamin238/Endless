@@ -77,8 +77,9 @@ public class Bot
     public ModLogging modlog;
     public ServerLogging serverlog;
 
-    // Schedulers
+    // Schedulers;
     public ScheduledExecutorService muteScheduler;
+    public ScheduledExecutorService optimizerScheduler;
 
     // Threads
     public ScheduledExecutorService clearThread;
@@ -120,6 +121,7 @@ public class Bot
         loader.threadLoad();
         clearThread = loader.clearThread;
         muteScheduler = loader.muteScheduler;
+        optimizerScheduler = loader.optimizerScheduler;
         starboardThread = loader.starboardThread;
 
         loader.waiterLoad();
@@ -177,7 +179,8 @@ public class Bot
                 new LookupCmd(), new QuoteCmd(), new RoleCmd(), new UserInfoCmd(),
 
                 // Utils
-                new GoogleSearchCmd(), new RoleMeCmd(this), new TimeForCmd(this), new TranslateCmd(this));
+                /*new EmoteCmd(),*/ new GoogleSearchCmd(), new RoleMeCmd(this),
+                new TimeForCmd(this), new TranslateCmd(this));
 
         client = clientBuilder.build();
         Endless.LOG.info("Starting JDA...");

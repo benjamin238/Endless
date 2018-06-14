@@ -35,6 +35,7 @@ public class PingCmd extends EndlessCommand
         this.category = Categories.BOT;
         this.botPerms = new Permission[]{Permission.MESSAGE_WRITE};
         this.guildOnly = false;
+        this.needsArguments = false;
     }
 
     @Override

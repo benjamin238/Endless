@@ -49,6 +49,7 @@ public class StatusCmd extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
         this.ownerCommand = true;
+        this.needsArguments = false;
     }
 
     @Override

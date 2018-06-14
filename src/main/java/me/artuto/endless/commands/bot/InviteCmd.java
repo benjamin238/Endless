@@ -34,11 +34,12 @@ public class InviteCmd extends EndlessCommand
         this.help = "Shows the bot invite";
         this.category = Categories.BOT;
         this.guildOnly = false;
+        this.needsArguments = false;
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        event.reply("So you want invite Endless to your server? Here you have it:\n"+":link: **<https://discordapp.com/api/oauth2/authorize?client_id="+event.getSelfUser().getId()+"&scope=bot&permissions=8>**");
+        event.reply("So you want invite Endless to your server? Here you have it:\n"+":link: **<"+event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR)+"**");
     }
 }

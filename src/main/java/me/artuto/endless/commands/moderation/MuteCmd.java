@@ -67,12 +67,6 @@ public class MuteCmd extends EndlessCommand
         String reason = "";
         int time;
 
-        if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("Invalid Syntax: "+event.getClient().getPrefix()+"mute <@user|ID|nickname|username> for [time] for [reason]");
-            return;
-        }
-
         try
         {
             target = args[0].trim();

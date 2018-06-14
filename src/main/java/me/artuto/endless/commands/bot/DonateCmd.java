@@ -53,6 +53,7 @@ public class DonateCmd extends EndlessCommand
         this.category = Categories.BOT;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
+        this.needsArguments = false;
     }
 
     @Override
@@ -96,12 +97,6 @@ public class DonateCmd extends EndlessCommand
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
                 event.replyError("This command is not available on a selfhosted instance!");
-                return;
-            }
-
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Please specify the user ID and a donated amount!");
                 return;
             }
 
@@ -159,12 +154,6 @@ public class DonateCmd extends EndlessCommand
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
                 event.replyError("This command is not available on a selfhosted instance!");
-                return;
-            }
-
-            if(event.getArgs().isEmpty())
-            {
-                event.replyWarning("Please specify the user ID!");
                 return;
             }
 

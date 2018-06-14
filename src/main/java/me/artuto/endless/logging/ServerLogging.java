@@ -62,7 +62,7 @@ public class ServerLogging
         this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
     }
 
-    void onGuildMemberJoin(GuildMemberJoinEvent event)
+    public void onGuildMemberJoin(GuildMemberJoinEvent event)
     {
         Guild guild = event.getGuild();
         TextChannel serverlog = gsdm.getServerlogChannel(guild);
@@ -88,7 +88,7 @@ public class ServerLogging
         }
     }
 
-    void onGuildMemberLeave(GuildMemberLeaveEvent event)
+    public void onGuildMemberLeave(GuildMemberLeaveEvent event)
     {
         Guild guild = event.getGuild();
         TextChannel serverlog = gsdm.getServerlogChannel(guild);
@@ -135,7 +135,7 @@ public class ServerLogging
         }
     }
 
-    void onGuildMessageReceived(GuildMessageReceivedEvent event)
+    public void onGuildMessageReceived(GuildMessageReceivedEvent event)
     {
         TextChannel tc = gsdm.getServerlogChannel(event.getGuild());
 
@@ -148,7 +148,7 @@ public class ServerLogging
         }
     }
 
-    void onGuildMessageUpdate(GuildMessageUpdateEvent event)
+    public void onGuildMessageUpdate(GuildMessageUpdateEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
@@ -191,7 +191,7 @@ public class ServerLogging
         }
     }
 
-    void onGuildMessageDelete(GuildMessageDeleteEvent event)
+    public void onGuildMessageDelete(GuildMessageDeleteEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
@@ -224,7 +224,7 @@ public class ServerLogging
         }
     }
 
-    void onUserUpdateAvatar(UserUpdateAvatarEvent event)
+    public void onUserUpdateAvatar(UserUpdateAvatarEvent event)
     {
         List<Guild> guilds = event.getUser().getMutualGuilds();
         EmbedBuilder builder = new EmbedBuilder();
@@ -262,7 +262,7 @@ public class ServerLogging
         }
     }
 
-    void onGuildVoiceJoin(GuildVoiceJoinEvent event)
+    public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
     {
         Guild guild = event.getGuild();
         TextChannel tc = gsdm.getServerlogChannel(guild);
@@ -282,7 +282,7 @@ public class ServerLogging
         }
     }
 
-    void onGuildVoiceMove(GuildVoiceMoveEvent event)
+    public void onGuildVoiceMove(GuildVoiceMoveEvent event)
     {
         Guild guild = event.getGuild();
         TextChannel tc = gsdm.getServerlogChannel(guild);
@@ -303,7 +303,7 @@ public class ServerLogging
         }
     }
 
-    void onGuildVoiceLeave(GuildVoiceLeaveEvent event)
+    public void onGuildVoiceLeave(GuildVoiceLeaveEvent event)
     {
         Guild guild = event.getGuild();
         TextChannel tc = gsdm.getServerlogChannel(guild);

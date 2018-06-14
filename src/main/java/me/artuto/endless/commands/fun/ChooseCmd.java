@@ -36,25 +36,17 @@ public class ChooseCmd extends EndlessCommand
         this.arguments = "<option 1> <option 2> ...";
         this.category = Categories.FUN;
         this.guildOnly = false;
+        this.needsArgumentsMessage = "You didn't give me any choices!";
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        if(event.getArgs().isEmpty())
-            event.replyWarning("You didn't give me any choices!");
-        else
-        {
-            String[] options = event.getArgs().split("\\s+");
+        String[] options = event.getArgs().split("\\s+");
 
-            if(options.length == 1)
-            {
-                event.replyWarning("You only gave me one option: `"+options[0]+"`");
-            }
-            else
-            {
-                event.reply("I choose `"+options[(int) (Math.random()*options.length)]+"`");
-            }
-        }
+        if(options.length==1)
+            event.replyWarning("You only gave me one option: `"+options[0]+"`");
+        else
+            event.reply("I choose `"+options[(int) (Math.random()*options.length)]+"`");
     }
 }

@@ -65,12 +65,6 @@ public class TranslateCmd extends EndlessCommand
             return;
         }
 
-        if(args.isEmpty())
-        {
-            event.replyWarning("Invalid sytnax: `"+this.getArguments()+"`");
-            return;
-        }
-
         try
         {
             String[] arguments = args.split(" ", 2);

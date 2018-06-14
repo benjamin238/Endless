@@ -49,12 +49,6 @@ public class QuoteCmd extends EndlessCommand
 
     protected void executeCommand(CommandEvent event)
     {
-        if(event.getArgs().isEmpty())
-        {
-            event.replyWarning("You didn't provided a Message ID!");
-            return;
-        }
-
         TextChannel tc;
         String message;
         String textChannel;

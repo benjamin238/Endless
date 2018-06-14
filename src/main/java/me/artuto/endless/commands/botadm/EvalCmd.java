@@ -48,16 +48,26 @@ public class EvalCmd extends EndlessCommand
         this.category = Categories.BOTADM;
         this.ownerCommand = true;
         this.guildOnly = false;
+        this.needsArguments = false;
 
         engine = new ScriptEngineManager().getEngineByName("Groovy");
 
         try
         {
-            imports = Arrays.asList("com.jagrosh.jdautilities", "com.jagrosh.jdautilities.command", "com.jagrosh.jdautilities.command.impl", "com.jagrosh.jdautilities.entities", "com.jagrosh.jdautilities.menu", "com.jagrosh.jdautilities.utils", "com.jagrosh.jdautilities.waiter", "java.awt", "java.io", "java.lang", "java.util", "java.util.stream", "me.artuto.endless", "me.artuto.endless.cmddata", "me.artuto.endless.commands", "me.artuto.endless.data", "me.artuto.endless.events", "me.artuto.endless.loader", "me.artuto.endless.logging", "me.artuto.endless.managers", "me.artuto.endless.tools", "me.artuto.endless.utils", "net.dv8tion.jda.bot", "net.dv8tion.jda.bot.entities", "net.dv8tion.jda.bot.entities.impl", "net.dv8tion.jda.core", "net.dv8tion.jda.core.entities", "net.dv8tion.jda.core.entities.impl", "net.dv8tion.jda.core.managers", "net.dv8tion.jda.core.managers.impl", "net.dv8tion.jda.core.utils", "net.dv8tion.jda.webhook");
+            imports = Arrays.asList("com.jagrosh.jdautilities", "com.jagrosh.jdautilities.command",
+                    "com.jagrosh.jdautilities.command.impl", "com.jagrosh.jdautilities.entities",
+                    "com.jagrosh.jdautilities.menu", "com.jagrosh.jdautilities.utils",
+                    "com.jagrosh.jdautilities.waiter", "java.awt", "java.io",
+                    "java.lang", "java.util", "java.util.stream", "me.artuto.endless",
+                    "me.artuto.endless.cmddata", "me.artuto.endless.commands", "me.artuto.endless.data",
+                    "me.artuto.endless.events", "me.artuto.endless.loader", "me.artuto.endless.logging",
+                    "me.artuto.endless.managers", "me.artuto.endless.tools", "me.artuto.endless.utils",
+                    "net.dv8tion.jda.bot", "net.dv8tion.jda.bot.entities", "net.dv8tion.jda.bot.entities.impl",
+                    "net.dv8tion.jda.core", "net.dv8tion.jda.core.entities", "net.dv8tion.jda.core.entities.impl",
+                    "net.dv8tion.jda.core.managers", "net.dv8tion.jda.core.managers.impl", "net.dv8tion.jda.core.utils",
+                    "net.dv8tion.jda.webhook");
         }
-        catch(Exception ignored)
-        {
-        }
+        catch(Exception ignored) {}
     }
 
     @Override

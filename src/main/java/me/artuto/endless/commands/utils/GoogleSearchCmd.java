@@ -70,13 +70,9 @@ public class GoogleSearchCmd extends EndlessCommand
         ArrayList<String> results = searcher.getGoogleData(query);
 
         if(results == null)
-        {
             event.replyWarning("An error ocurred when using Google Search. Ask the bot owner to see the console.");
-        }
         else if(results.isEmpty())
-        {
             event.replyWarning("Any results found for `"+query+"`!");
-        }
         else
         {
             StringBuilder output = new StringBuilder("`"+query+"` \uD83D\uDD0E "+results.get(0));

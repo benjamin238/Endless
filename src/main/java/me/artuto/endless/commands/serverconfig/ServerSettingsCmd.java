@@ -49,6 +49,7 @@ public class ServerSettingsCmd extends EndlessCommand
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.guildOnly = true;
+        this.needsArguments = false;
     }
 
     @Override
@@ -99,13 +100,13 @@ public class ServerSettingsCmd extends EndlessCommand
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a text channel or NONE";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
-            else if(event.getArgs().equalsIgnoreCase("none"))
+            if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setModlogChannel(event.getGuild(), null);
                 event.replySuccess("Modlogging disabled");
@@ -113,8 +114,10 @@ public class ServerSettingsCmd extends EndlessCommand
             else
             {
                 List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-                if(list.isEmpty()) event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
+                if(list.isEmpty())
+                    event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
+                else if(list.size()>1)
+                    event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
                     bot.gsdm.setModlogChannel(event.getGuild(), list.get(0));
@@ -133,13 +136,13 @@ public class ServerSettingsCmd extends EndlessCommand
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a text channel or NONE";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
-            else if(event.getArgs().equalsIgnoreCase("none"))
+            if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setServerlogChannel(event.getGuild(), null);
                 event.replySuccess("Serverlogging disabled");
@@ -147,8 +150,10 @@ public class ServerSettingsCmd extends EndlessCommand
             else
             {
                 List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-                if(list.isEmpty()) event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
+                if(list.isEmpty())
+                    event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
+                else if(list.size()>1)
+                    event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
                     bot.gsdm.setServerlogChannel(event.getGuild(), list.get(0));
@@ -168,13 +173,13 @@ public class ServerSettingsCmd extends EndlessCommand
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a text channel or NONE";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
-            else if(event.getArgs().equalsIgnoreCase("none"))
+            if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setWelcomeChannel(event.getGuild(), null);
                 event.replySuccess("Welcome channel disabled");
@@ -182,8 +187,10 @@ public class ServerSettingsCmd extends EndlessCommand
             else
             {
                 List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-                if(list.isEmpty()) event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
+                if(list.isEmpty())
+                    event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
+                else if(list.size()>1)
+                    event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
                     bot.gsdm.setWelcomeChannel(event.getGuild(), list.get(0));
@@ -203,13 +210,13 @@ public class ServerSettingsCmd extends EndlessCommand
             this.arguments = "<#channel|Channel ID|Channel name>";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a text channel or NONE";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty()) event.replyError("Please include a text channel or NONE");
-            else if(event.getArgs().equalsIgnoreCase("none"))
+            if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setLeaveChannel(event.getGuild(), null);
                 event.replySuccess("Leave channel disabled");
@@ -217,8 +224,10 @@ public class ServerSettingsCmd extends EndlessCommand
             else
             {
                 List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-                if(list.isEmpty()) event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1) event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
+                if(list.isEmpty())
+                    event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
+                else if(list.size()>1)
+                    event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
                 else
                 {
                     bot.gsdm.setLeaveChannel(event.getGuild(), list.get(0));
@@ -237,13 +246,13 @@ public class ServerSettingsCmd extends EndlessCommand
             this.arguments = "<@Role|Role ID|Role name>";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a role or NONE";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty()) event.replyError("Please include a role or NONE");
-            else if(event.getArgs().equalsIgnoreCase("none"))
+            if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setMutedRole(event.getGuild(), null);
                 event.replySuccess("Muted role disabled");
@@ -251,8 +260,10 @@ public class ServerSettingsCmd extends EndlessCommand
             else
             {
                 List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
-                if(list.isEmpty()) event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1) event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
+                if(list.isEmpty())
+                    event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
+                else if(list.size()>1)
+                    event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
                 else
                 {
                     if(!(GuildUtils.getMutedRole(event.getGuild())==null))
@@ -277,13 +288,13 @@ public class ServerSettingsCmd extends EndlessCommand
             this.arguments = "<number of day(s)>";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a number or 0";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty()) event.replyError("Please include a number or 0");
-            else if(event.getArgs().equalsIgnoreCase("0"))
+            if(event.getArgs().equalsIgnoreCase("0"))
             {
                 bot.gsdm.setBanDeleteDays(event.getGuild(), 0);
                 event.replySuccess("Ban delete days set to 0 (No delete)");

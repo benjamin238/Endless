@@ -50,6 +50,7 @@ public class RoleMeCmd extends EndlessCommand
         this.category = Categories.UTILS;
         this.children = new Command[]{new Add(), new Remove()};
         this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+        this.needsArguments = false;
     }
 
     @Override
@@ -132,39 +133,34 @@ public class RoleMeCmd extends EndlessCommand
             String args = event.getArgs();
             Role role;
 
-            if(args.isEmpty())
-                event.replyWarning("Please specify a role to add!");
+            List<Role> list = FinderUtil.findRoles(args, event.getGuild());
+
+            if(list.isEmpty())
+            {
+                event.replyWarning("I was not able to found a role with the provided arguments: '"+event.getArgs()+"'");
+                return;
+            }
+            else if(list.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
+                return;
+            }
+            else role = list.get(0);
+
+            if(rolemeRoles==null)
+                event.replyError("Something has gone wrong while getting the RoleMe roles list, please contact the bot owner.");
+            else if(rolemeRoles.contains(role))
+            {
+                event.replyError("That role is already on the RoleMe roles list!");
+                return;
+            }
+
+            if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
+                event.replyError("I can't interact with that role!");
             else
             {
-                List<Role> list = FinderUtil.findRoles(args, event.getGuild());
-
-                if(list.isEmpty())
-                {
-                    event.replyWarning("I was not able to found a role with the provided arguments: '"+event.getArgs()+"'");
-                    return;
-                }
-                else if(list.size()>1)
-                {
-                    event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
-                    return;
-                }
-                else role = list.get(0);
-
-                if(rolemeRoles==null)
-                    event.replyError("Something has gone wrong while getting the RoleMe roles list, please contact the bot owner.");
-                else if(rolemeRoles.contains(role))
-                {
-                    event.replyError("That role is already on the RoleMe roles list!");
-                    return;
-                }
-
-                if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
-                    event.replyError("I can't interact with that role!");
-                else
-                {
-                    bot.gsdm.addRolemeRole(guild, role);
-                    event.replySuccess("Successfully added the role *"+role.getName()+"* to the RoleMe roles list.");
-                }
+                bot.gsdm.addRolemeRole(guild, role);
+                event.replySuccess("Successfully added the role *"+role.getName()+"* to the RoleMe roles list.");
             }
         }
     }
@@ -188,36 +184,30 @@ public class RoleMeCmd extends EndlessCommand
             String args = event.getArgs();
             Role role;
 
-            if(args.isEmpty())
-                event.replyWarning("Please specify a role to remove!");
-            else
+            List<Role> list = FinderUtil.findRoles(args, event.getGuild());
+
+            if(list.isEmpty())
             {
-                List<Role> list = FinderUtil.findRoles(args, event.getGuild());
+                event.replyWarning("I was not able to found a role with the provided arguments: '"+event.getArgs()+"'");
+                return;
+            }
+            else if(list.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
+                return;
+            }
+            else role = list.get(0);
 
-                if(list.isEmpty())
-                {
-                    event.replyWarning("I was not able to found a role with the provided arguments: '"+event.getArgs()+"'");
-                    return;
-                }
-                else if(list.size()>1)
-                {
-                    event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
-                    return;
-                }
-                else role = list.get(0);
-
-                if(rolemeRoles==null)
-                    event.replyError("Something has gone wrong while getting the RoleMe roles list, please contact the bot owner.");
-                else if(!(rolemeRoles.contains(role)))
-                {
-                    event.replyError("That role isn't on the RoleMe roles list!");
-                    return;
-                }
-
-                bot.gsdm.removeRolemeRole(guild, role);
-                event.replySuccess("Successfully removed the role *"+role.getName()+"* from the RoleMe roles list.");
+            if(rolemeRoles==null)
+                event.replyError("Something has gone wrong while getting the RoleMe roles list, please contact the bot owner.");
+            else if(!(rolemeRoles.contains(role)))
+            {
+                event.replyError("That role isn't on the RoleMe roles list!");
+                return;
             }
 
+            bot.gsdm.removeRolemeRole(guild, role);
+            event.replySuccess("Successfully removed the role *"+role.getName()+"* from the RoleMe roles list.");
         }
     }
 }
