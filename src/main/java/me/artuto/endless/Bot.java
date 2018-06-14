@@ -72,6 +72,9 @@ public class Bot
     // EventWaiter
     public EventWaiter waiter;
 
+    // Listeners
+    public Listener listener;
+
     // Logging
     public BotLogging botlog;
     public ModLogging modlog;
@@ -126,6 +129,8 @@ public class Bot
 
         loader.waiterLoad();
         waiter = loader.waiter;
+
+        listener = new Listener(this);
 
         CommandClientBuilder clientBuilder = new CommandClientBuilder();
         Long[] coOwners = config.getCoOwnerIds();
@@ -195,7 +200,7 @@ public class Bot
         if(maintenance)
             builder.addEventListeners(client);
         else
-            builder.addEventListeners(loader.waiter, client, new Listener(this));
+            builder.addEventListeners(loader.waiter, client, listener);
 
         shards = builder.build();
 
