@@ -65,7 +65,7 @@ public class QuoteCmd extends EndlessCommand
             textChannel = event.getTextChannel().getId();
         }
 
-        List<TextChannel> tList = FinderUtil.findTextChannels(textChannel, event.getGuild());
+        List<TextChannel> tList = FinderUtil.findTextChannels(textChannel, event.getJDA());
 
         if(tList.isEmpty())
         {
@@ -79,13 +79,13 @@ public class QuoteCmd extends EndlessCommand
         }
         else tc = tList.get(0);
 
-        if(!(Checks.hasPermission(event.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
+        if(!(Checks.hasPermission(tc.getGuild().getMember(event.getSelfUser()), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
         {
             event.replyError("I can't see that channel or I don't have Read Message History permission on it!");
             return;
         }
 
-        if(!(Checks.hasPermission(event.getMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
+        if(!(tc.getGuild().getMember(event.getAuthor())==null) && !(Checks.hasPermission(tc.getGuild().getMember(event.getAuthor()), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
         {
             event.replyError("You can't see that channel or you don't have Read Message History permission on it!");
             return;
@@ -93,24 +93,26 @@ public class QuoteCmd extends EndlessCommand
 
         final String id = message;
 
-        tc.getMessageById(message).queue(s -> {
+        tc.getMessageById(message).queue(msg -> {
             EmbedBuilder builder = new EmbedBuilder();
             StringBuilder sb = new StringBuilder();
-            User author = s.getAuthor();
+            User author = msg.getAuthor();
 
-            sb.append(s.getContentRaw()).append("\n");
+            sb.append(msg.getContentRaw()).append("\n");
 
-            if(s.getAttachments().size()==1)
-                builder.setImage(s.getAttachments().get(0).getUrl());
+            if(msg.getAttachments().size()==1)
+                builder.setImage(msg.getAttachments().get(0).getUrl());
             else
             {
-                for(Message.Attachment att : s.getAttachments())
+                for(Message.Attachment att : msg.getAttachments())
                     sb.append(att.getUrl()).append("\n");
             }
 
             builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
-            builder.setColor(event.getGuild().getMember(author)==null?event.getSelfMember().getColor():event.getGuild().getMember(author).getColor());
+            builder.setColor(event.getGuild().getMember(author)==null?null:event.getGuild().getMember(author).getColor());
             builder.setDescription(sb.toString());
+            builder.setFooter((msg.isEdited()?"Edited":"Sent")+" in #"+tc.getName(), null);
+            builder.setTimestamp(msg.isEdited()?msg.getEditedTime():msg.getCreationTime());
             event.reply(builder.build());
         }, e -> event.replyWarning("I couldn't find the message `"+id+"` in "+tc.getAsMention()+"!"));
     }
