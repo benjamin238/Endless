@@ -22,6 +22,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.data.managers.ClientGSDMProvider;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -39,6 +40,7 @@ public class PrefixCmd extends EndlessCommand
         this.help = "Displays or adds a prefix";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+        this.needsArguments = false;
     }
 
     @Override
@@ -50,7 +52,8 @@ public class PrefixCmd extends EndlessCommand
 
         Collection<String> prefixes = bot.db.getSettings(guild).getPrefixes();
 
-        if(prefixes == null) event.reply("The prefix for this guild is `"+defP+"`");
+        if(prefixes == null)
+            event.reply("The prefix for this guild is `"+defP+"`");
         else
         {
             sb.append("`").append(defP).append("`");
@@ -68,19 +71,21 @@ public class PrefixCmd extends EndlessCommand
             this.help = "Adds a custom prefix";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "You didn't provided me a prefix!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            String args = event.getArgs();
+            String args = event.getArgs().toLowerCase().trim();
             Guild guild = event.getGuild();
+            ClientGSDMProvider settings = event.getClient().getSettingsFor(guild);
 
-            if(args.isEmpty())
-                event.replyWarning("You didn't provided me a prefix!");
+            if(!(settings.getPrefixes()==null) && settings.getPrefixes().contains(args))
+                event.replyWarning("That prefix is already added!");
             else
             {
-                bot.gsdm.addPrefix(guild, args.toLowerCase().trim());
+                bot.gsdm.addPrefix(guild, args);
                 event.replySuccess("Successfully added prefix!");
             }
         }
@@ -94,26 +99,23 @@ public class PrefixCmd extends EndlessCommand
             this.help = "Removes a custom prefix";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "You didn't provided me a prefix!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            String args = event.getArgs();
+            String args = event.getArgs().toLowerCase().trim();
             Guild guild = event.getGuild();
+            ClientGSDMProvider settings = event.getClient().getSettingsFor(guild);
 
-            if(args.isEmpty()) event.replyWarning("You didn't provided me a prefix!");
-            else
+            if(!(settings.getPrefixes()==null) && settings.getPrefixes().contains(args))
             {
-                if(bot.gsdm.prefixExists(guild, args.toLowerCase().trim()))
-                {
-                    bot.gsdm.removePrefix(guild, args.toLowerCase().trim());
-                    event.replySuccess("Successfully removed a prefix!");
-                    event.replyError("There was an error when removing the prefix. Contact the owner.");
-                }
-                else
-                    event.replyWarning("That prefix doesn't exists!");
+                bot.gsdm.removePrefix(guild, args);
+                event.replySuccess("Successfully removed a prefix!");
             }
+            else
+                event.replyWarning("That prefix doesn't exists!");
         }
     }
 }
