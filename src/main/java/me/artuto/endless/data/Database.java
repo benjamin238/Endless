@@ -19,6 +19,7 @@ package me.artuto.endless.data;
 
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import org.json.JSONArray;
@@ -35,7 +36,7 @@ public class Database
 {
     private final Connection connection;
     public static final Logger LOG = LoggerFactory.getLogger(Database.class);
-    private final GuildSettings DEFAULT = new GuildSettingsImpl(null, 0, 0,null,
+    private final GuildSettings DEFAULT = new GuildSettingsImpl(null, null, 0, 0,null,
             0L, 0L, 0L,0L,
             0L, 0L, null, null);
 
@@ -87,7 +88,7 @@ public class Database
                         }
                     }
 
-                    gs = new GuildSettingsImpl(prefixes, results.getInt("ban_delete_days"), results.getInt("starboard_count"), roleMeRoles,
+                    gs = new GuildSettingsImpl(prefixes, guild, results.getInt("ban_delete_days"), results.getInt("starboard_count"), roleMeRoles,
                             results.getLong("leave_id"), results.getLong("modlog_id"), results.getLong("muted_role_id"), results.getLong("serverlog_id"),
                             results.getLong("starboard_id"), results.getLong("welcome_id"), results.getString("leave_msg"), results.getString("welcome_msg"));
                 }
@@ -100,6 +101,34 @@ public class Database
             LOG.warn("Error while getting the settings of a guild. ID: "+guild.getId(), e);
             return DEFAULT;
         }
+    }
+
+    public List<Guild> getGuildsThatHaveSettings(ShardManager jda)
+    {
+        Guild guild;
+        List<Guild> guilds = new LinkedList<>();
+
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery("SELECT * FROM GUILD_SETTINGS"))
+            {
+                while(results.next())
+                {
+                    guild = jda.getGuildById(results.getLong("guild_id"));
+                    if(!(guild==null))
+                        guilds.add(guild);
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn("Error while getting settings", e);
+            return guilds;
+        }
+        return guilds;
     }
 
     public boolean hasSettings(Guild guild)

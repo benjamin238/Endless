@@ -20,6 +20,7 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.cmddata.CommandHelper;
 import me.artuto.endless.utils.Checks;
 import net.dv8tion.jda.core.Permission;
@@ -46,8 +47,9 @@ public abstract class EndlessCommand extends Command
     }
 
     @Override
-    public void execute(CommandEvent event)
+    public void execute(CommandEvent preEvent)
     {
+        EndlessCommandEvent event = (EndlessCommandEvent)preEvent;
         CommandClient client = event.getClient();
         Member member = event.getMember();
         Member selfMember = event.getSelfMember();
@@ -101,7 +103,7 @@ public abstract class EndlessCommand extends Command
         executeCommand(event);
     }
 
-    protected abstract void executeCommand(CommandEvent event);
+    protected abstract void executeCommand(EndlessCommandEvent event);
 
     public boolean isOwnerCommand()
     {

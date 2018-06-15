@@ -27,18 +27,12 @@ import org.slf4j.LoggerFactory;
 
 public class Endless
 {
-    private static Bot bot;
+    public static Bot bot;
     public static Logger LOG = (Logger) LoggerFactory.getLogger("Endless");
-
-    public static Bot getBot()
-    {
-        return bot;
-    }
 
     public static void main(String[] args)
     {
-        //LOGGER.setLevel(Level.INFO);
-        Endless.bot = new Bot();
+        bot = new Bot();
 
         if(args.length==0)
             LOG.error("No arguments provided!");

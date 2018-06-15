@@ -18,7 +18,7 @@
 package me.artuto.endless.commands.utils;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
@@ -54,7 +54,7 @@ public class RoleMeCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         String args = event.getArgs();
         Guild guild = event.getGuild();
@@ -126,7 +126,7 @@ public class RoleMeCmd extends EndlessCommand
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
@@ -177,7 +177,7 @@ public class RoleMeCmd extends EndlessCommand
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);

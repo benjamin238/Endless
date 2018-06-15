@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.fun;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
@@ -54,7 +54,7 @@ public class DogCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         try
         {

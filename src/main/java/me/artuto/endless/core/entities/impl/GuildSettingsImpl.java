@@ -18,6 +18,7 @@
 package me.artuto.endless.core.entities.impl;
 
 import me.artuto.endless.core.entities.GuildSettings;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 
 import java.util.Collection;
@@ -26,15 +27,17 @@ import java.util.List;
 public class GuildSettingsImpl implements GuildSettings
 {
     private final Collection<String> prefixes;
+    private final Guild guild;
     private final int banDeleteDays, starboardCount;
     private final List<Role> roleMeRoles;
     private final long modlogId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
     private final String welcomeMsg, leaveMsg;
 
-    public GuildSettingsImpl(Collection<String> prefixes, int banDeleteDays, int starboardCount, List<Role> roleMeRoles, long leaveId, long modlogId, long mutedRoleId,
+    public GuildSettingsImpl(Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount, List<Role> roleMeRoles, long leaveId, long modlogId, long mutedRoleId,
                              long serverlogId, long starboardId, long welcomeId, String leaveMsg, String welcomeMsg)
     {
         this.prefixes = prefixes;
+        this.guild = guild;
         this.banDeleteDays = banDeleteDays;
         this.starboardCount = starboardCount;
         this.roleMeRoles = roleMeRoles;
@@ -52,6 +55,12 @@ public class GuildSettingsImpl implements GuildSettings
     public Collection<String> getPrefixes()
     {
         return prefixes;
+    }
+
+    @Override
+    public Guild getGuild()
+    {
+        return guild;
     }
 
     @Override

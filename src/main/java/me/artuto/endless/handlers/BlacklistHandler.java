@@ -18,6 +18,7 @@
 package me.artuto.endless.handlers;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.data.managers.BlacklistDataManager;
 import me.artuto.endless.core.entities.Blacklist;
 import net.dv8tion.jda.core.EmbedBuilder;

@@ -20,6 +20,9 @@ package me.artuto.endless;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.Endless;
+import me.artuto.endless.core.events.EndlessEvent;
+import me.artuto.endless.core.events.guildsettings.GuildSettingsUpdateEvent;
+import me.artuto.endless.core.hooks.EndlessListener;
 import me.artuto.endless.handlers.*;
 import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.logging.ServerLogging;
@@ -46,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * @author Artuto
  */
 
-public class Listener implements EventListener
+public class Listener implements EventListener, EndlessListener
 {
     private final Bot bot;
     private final boolean maintenance;
@@ -54,7 +57,7 @@ public class Listener implements EventListener
     private final ServerLogging serverlog;
     private final WebhookClient webhook;
     
-    public Listener(Bot bot)
+    Listener(Bot bot)
     {
         this.bot = bot;
         this.maintenance = bot.maintenance;
@@ -182,6 +185,15 @@ public class Listener implements EventListener
         {
             GuildBanEvent event = (GuildBanEvent)preEvent;
             modlog.onGuildBan(event);
+        }
+    }
+
+    @Override
+    public void onEvent(EndlessEvent preEvent)
+    {
+        if(preEvent instanceof GuildSettingsUpdateEvent)
+        {
+            GuildSettingsUpdateEvent event = (GuildSettingsUpdateEvent)preEvent;
         }
     }
 }

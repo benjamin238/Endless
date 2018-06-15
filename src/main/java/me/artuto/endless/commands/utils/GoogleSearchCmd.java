@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.utils;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.managers.GoogleSearcher;
@@ -44,7 +44,7 @@ public class GoogleSearchCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         String[] inputs = event.getArgs().split("\\s+", 2);

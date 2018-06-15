@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.utils;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.entities.Emote;
@@ -39,7 +39,7 @@ public class EmoteCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         if(event.getMessage().getEmotes().isEmpty())
         {

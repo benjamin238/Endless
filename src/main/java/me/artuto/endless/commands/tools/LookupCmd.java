@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.tools.InfoTools;
@@ -49,7 +49,7 @@ public class LookupCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         boolean userb = false;
         boolean tcb = false;

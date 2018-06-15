@@ -17,11 +17,28 @@
 
 package me.artuto.endless.core;
 
+import com.jagrosh.jdautilities.command.CommandClient;
+import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.hooks.EndlessListener;
+
+import javax.annotation.Nullable;
+import java.util.List;
+
 /**
  * @author Artuto
  */
 
 public interface EndlessCore
 {
+    CommandClient getClient();
 
+    EndlessListener getListener();
+
+    @Nullable
+    GuildSettings getGuildSettingsById(long id);
+
+    @Nullable
+    GuildSettings getGuildSettingsById(String id);
+
+    List<GuildSettings> getGuildSettings();
 }

@@ -18,10 +18,18 @@
 package me.artuto.endless.core.entities.impl;
 
 import com.jagrosh.jdautilities.command.CommandClient;
+import me.artuto.endless.Bot;
 import me.artuto.endless.core.EndlessCore;
+import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.hooks.EndlessListener;
 import net.dv8tion.jda.bot.sharding.ShardManager;
+import net.dv8tion.jda.core.entities.Guild;
 
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Artuto
@@ -29,14 +37,64 @@ import java.util.List;
 
 public class EndlessCoreImpl implements EndlessCore
 {
+    protected final Bot bot;
     protected final CommandClient client;
-    protected final List<Object> listeners;
+    protected final EndlessListener listener;
+    protected final List<GuildSettings> guildSettings;
     protected final ShardManager jda;
 
-    public EndlessCoreImpl(CommandClient client, ShardManager jda, List<Object> listeners)
+    public EndlessCoreImpl(Bot bot, CommandClient client, ShardManager jda, EndlessListener listener)
     {
+        this.bot = bot;
         this.client = client;
         this.jda = jda;
-        this.listeners = listeners;
+        this.guildSettings = new LinkedList<>();
+        this.listener = listener;
+    }
+
+    @Override
+    public CommandClient getClient()
+    {
+        return client;
+    }
+
+    @Override
+    public EndlessListener getListener()
+    {
+        return listener;
+    }
+
+    @Nullable
+    @Override
+    public GuildSettings getGuildSettingsById(long id)
+    {
+        Guild guild = jda.getGuildById(id);
+        if(!(guild==null))
+            return bot.db.getSettings(guild);
+        else
+            return null;
+    }
+
+    @Nullable
+    @Override
+    public GuildSettings getGuildSettingsById(String id)
+    {
+        Guild guild = jda.getGuildById(id);
+        if(!(guild==null))
+            return bot.db.getSettings(guild);
+        else
+            return null;
+    }
+
+    @Override
+    public List<GuildSettings> getGuildSettings()
+    {
+        return Collections.unmodifiableList(guildSettings);
+    }
+
+    public void makeCache()
+    {
+        for(Guild guild : bot.db.getGuildsThatHaveSettings(jda))
+            guildSettings.add(bot.db.getSettings(guild));
     }
 }
