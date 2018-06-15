@@ -15,23 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities;
+package me.artuto.endless.core.events;
 
-import me.artuto.endless.Const;
-
-import java.time.OffsetDateTime;
+import me.artuto.endless.core.EndlessCore;
 
 /**
  * @author Artuto
  */
 
-public interface TempPunishment
+public class Event
 {
-    Const.PunishmentType getType();
+    private final EndlessCore endless;
 
-    long getGuildId();
-
-    long getUserId();
-
-    OffsetDateTime getExpiryTime();
+    public Event(EndlessCore endless)
+    {
+        this.endless = endless;
+    }
 }

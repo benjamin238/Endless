@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities;
+package me.artuto.endless.core.entities;
 
 /**
  * @author Artuto

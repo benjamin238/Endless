@@ -18,8 +18,8 @@
 package me.artuto.endless.data.managers;
 
 import me.artuto.endless.data.Database;
-import me.artuto.endless.entities.StarboardMessage;
-import me.artuto.endless.entities.impl.StarboardMessageImpl;
+import me.artuto.endless.core.entities.StarboardMessage;
+import me.artuto.endless.core.entities.impl.StarboardMessageImpl;
 import net.dv8tion.jda.core.entities.Message;
 
 import java.sql.Connection;

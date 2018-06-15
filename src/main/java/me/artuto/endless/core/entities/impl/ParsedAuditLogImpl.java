@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities.impl;
+package me.artuto.endless.core.entities.impl;
 
-import me.artuto.endless.entities.ParsedAuditLog;
+import me.artuto.endless.core.entities.ParsedAuditLog;
 import net.dv8tion.jda.core.audit.AuditLogKey;
 import net.dv8tion.jda.core.entities.User;
 

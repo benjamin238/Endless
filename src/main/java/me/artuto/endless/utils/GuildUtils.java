@@ -18,8 +18,8 @@
 package me.artuto.endless.utils;
 
 import me.artuto.endless.Bot;
-import me.artuto.endless.entities.ParsedAuditLog;
-import me.artuto.endless.entities.impl.ParsedAuditLogImpl;
+import me.artuto.endless.core.entities.ParsedAuditLog;
+import me.artuto.endless.core.entities.impl.ParsedAuditLogImpl;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audit.AuditLogChange;
 import net.dv8tion.jda.core.audit.AuditLogEntry;

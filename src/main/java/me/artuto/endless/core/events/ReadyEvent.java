@@ -15,25 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities;
+package me.artuto.endless.core.events;
 
-public interface StarboardMessage
+import me.artuto.endless.core.EndlessCore;
+
+/**
+ * @author Artuto
+ */
+
+public class ReadyEvent extends Event
 {
-    String getMessageId();
-
-    Long getMessageIdLong();
-
-    String getTextChannelId();
-
-    Long getTextChannelIdLong();
-
-    String getGuildId();
-
-    Long getGuildIdLong();
-
-    Integer getAmount();
-
-    String getStarboardMessageId();
-
-    Long getStarboardMessageIdLong();
+    public ReadyEvent(EndlessCore endless)
+    {
+        super(endless);
+    }
 }

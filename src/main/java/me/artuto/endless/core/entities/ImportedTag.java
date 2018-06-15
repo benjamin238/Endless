@@ -15,26 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities;
+package me.artuto.endless.core.entities;
 
-import net.dv8tion.jda.core.audit.AuditLogKey;
-import net.dv8tion.jda.core.entities.User;
-
-/**
- * @author Artuto
- */
-
-public interface ParsedAuditLog
+public interface ImportedTag
 {
-    User getAuthor();
+    String getId();
 
-    AuditLogKey getKey();
+    Long getIdLong();
 
-    <T> T getNewValue();
+    String getName();
 
-    <T> T getOldValue();
+    String getInternalName();
 
-    String getReason();
+    String getContent();
 
-    User getTarget();
+    Long getOwnerId();
+
+    Long getGuildId();
 }

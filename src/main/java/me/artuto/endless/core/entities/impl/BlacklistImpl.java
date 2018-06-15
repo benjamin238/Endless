@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities.impl;
+package me.artuto.endless.core.entities.impl;
 
 import me.artuto.endless.Const;
-import me.artuto.endless.entities.Punishment;
-import me.artuto.endless.entities.TempPunishment;
+import me.artuto.endless.core.entities.Blacklist;
 
 import java.time.OffsetDateTime;
 
@@ -27,41 +26,42 @@ import java.time.OffsetDateTime;
  * @author Artuto
  */
 
-public class PunishmentImpl implements Punishment, TempPunishment
+public class BlacklistImpl implements Blacklist
 {
-    private Const.PunishmentType type;
-    private long guildId, userId;
-    private OffsetDateTime expiryTime;
+    private Const.BlacklistType type;
+    private long id;
+    private OffsetDateTime time;
+    private String reason;
 
-    public PunishmentImpl(Const.PunishmentType type, long guildId, long userId, OffsetDateTime expiryTime)
+    public BlacklistImpl(Const.BlacklistType type, long id, OffsetDateTime time, String reason)
     {
         this.type = type;
-        this.guildId = guildId;
-        this.userId = userId;
-        this.expiryTime = expiryTime;
+        this.id = id;
+        this.time = time;
+        this.reason = reason;
     }
 
     @Override
-    public Const.PunishmentType getType()
+    public Const.BlacklistType getType()
     {
         return type;
     }
 
     @Override
-    public long getGuildId()
+    public long getId()
     {
-        return guildId;
+        return id;
     }
 
     @Override
-    public long getUserId()
+    public OffsetDateTime getTime()
     {
-        return userId;
+        return time;
     }
 
     @Override
-    public OffsetDateTime getExpiryTime()
+    public String getReason()
     {
-        return expiryTime;
+        return reason;
     }
 }

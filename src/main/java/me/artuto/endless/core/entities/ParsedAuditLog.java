@@ -15,19 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities;
+package me.artuto.endless.core.entities;
 
-import me.artuto.endless.Const;
+import net.dv8tion.jda.core.audit.AuditLogKey;
+import net.dv8tion.jda.core.entities.User;
 
 /**
  * @author Artuto
  */
 
-public interface Punishment
+public interface ParsedAuditLog
 {
-    Const.PunishmentType getType();
+    User getAuthor();
 
-    long getGuildId();
+    AuditLogKey getKey();
 
-    long getUserId();
+    <T> T getNewValue();
+
+    <T> T getOldValue();
+
+    String getReason();
+
+    User getTarget();
 }

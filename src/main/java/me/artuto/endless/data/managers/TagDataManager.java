@@ -18,8 +18,8 @@
 package me.artuto.endless.data.managers;
 
 import me.artuto.endless.data.Database;
-import me.artuto.endless.entities.ImportedTag;
-import me.artuto.endless.entities.impl.ImportedTagImpl;
+import me.artuto.endless.core.entities.ImportedTag;
+import me.artuto.endless.core.entities.impl.ImportedTagImpl;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
