@@ -20,7 +20,7 @@ package me.artuto.endless.handlers;
 import me.artuto.endless.Bot;
 import me.artuto.endless.data.managers.GuildSettingsDataManager;
 import me.artuto.endless.data.managers.StarboardDataManager;
-import me.artuto.endless.entities.StarboardMessage;
+import me.artuto.endless.core.entities.StarboardMessage;
 import me.artuto.endless.utils.FinderUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;

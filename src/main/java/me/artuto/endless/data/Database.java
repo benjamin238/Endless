@@ -17,8 +17,8 @@
 
 package me.artuto.endless.data;
 
-import me.artuto.endless.entities.GuildSettings;
-import me.artuto.endless.entities.impl.GuildSettingsImpl;
+import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import org.json.JSONArray;

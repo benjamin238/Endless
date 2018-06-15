@@ -15,23 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities.impl;
+package me.artuto.endless.core.entities.impl;
 
-import me.artuto.endless.entities.Tag;
+import me.artuto.endless.core.entities.ImportedTag;
 
-public class TagImpl implements Tag
+public class ImportedTagImpl implements ImportedTag
 {
     private final Long tagId;
     private final String name;
     private final String content;
     private final Long owner;
+    private final Long guild;
 
-    public TagImpl(Long tagId, String name, String content, Long owner)
+    public ImportedTagImpl(Long tagId, String name, String content, Long owner, Long guild)
     {
         this.tagId = tagId;
         this.name = name;
         this.content = content;
         this.owner = owner;
+        this.guild = guild;
     }
 
     @Override
@@ -49,7 +51,13 @@ public class TagImpl implements Tag
     @Override
     public String getName()
     {
-        return name;
+        return name.toLowerCase().split(":", 2)[1];
+    }
+
+    @Override
+    public String getInternalName()
+    {
+        return name.toLowerCase();
     }
 
     @Override
@@ -65,8 +73,14 @@ public class TagImpl implements Tag
     }
 
     @Override
+    public Long getGuildId()
+    {
+        return guild;
+    }
+
+    @Override
     public String toString()
     {
-        return "T:"+getName()+" ("+tagId+")";
+        return "IT:"+getName()+"/"+guild+" ("+tagId+")";
     }
 }

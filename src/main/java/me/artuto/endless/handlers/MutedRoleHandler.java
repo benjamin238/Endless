@@ -19,9 +19,9 @@ package me.artuto.endless.handlers;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
-import me.artuto.endless.entities.ParsedAuditLog;
-import me.artuto.endless.entities.Punishment;
-import me.artuto.endless.entities.TempPunishment;
+import me.artuto.endless.core.entities.ParsedAuditLog;
+import me.artuto.endless.core.entities.Punishment;
+import me.artuto.endless.core.entities.TempPunishment;
 import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.GuildUtils;

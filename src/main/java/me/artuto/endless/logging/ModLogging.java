@@ -19,7 +19,7 @@ package me.artuto.endless.logging;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
-import me.artuto.endless.entities.ParsedAuditLog;
+import me.artuto.endless.core.entities.ParsedAuditLog;
 import me.artuto.endless.utils.*;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;

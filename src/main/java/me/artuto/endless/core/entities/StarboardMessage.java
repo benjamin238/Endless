@@ -15,23 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities;
+package me.artuto.endless.core.entities;
 
-import me.artuto.endless.Const;
-
-import java.time.OffsetDateTime;
-
-/**
- * @author Artuto
- */
-
-public interface Blacklist
+public interface StarboardMessage
 {
-    Const.BlacklistType getType();
+    String getMessageId();
 
-    long getId();
+    Long getMessageIdLong();
 
-    OffsetDateTime getTime();
+    String getTextChannelId();
 
-    String getReason();
+    Long getTextChannelIdLong();
+
+    String getGuildId();
+
+    Long getGuildIdLong();
+
+    Integer getAmount();
+
+    String getStarboardMessageId();
+
+    Long getStarboardMessageIdLong();
 }

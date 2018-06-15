@@ -15,21 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities;
+package me.artuto.endless.core.entities;
 
-public interface ImportedTag
+import me.artuto.endless.Const;
+
+import java.time.OffsetDateTime;
+
+/**
+ * @author Artuto
+ */
+
+public interface TempPunishment
 {
-    String getId();
+    Const.PunishmentType getType();
 
-    Long getIdLong();
+    long getGuildId();
 
-    String getName();
+    long getUserId();
 
-    String getInternalName();
-
-    String getContent();
-
-    Long getOwnerId();
-
-    Long getGuildId();
+    OffsetDateTime getExpiryTime();
 }

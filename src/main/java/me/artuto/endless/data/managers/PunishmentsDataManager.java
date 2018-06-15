@@ -19,9 +19,9 @@ package me.artuto.endless.data.managers;
 
 import me.artuto.endless.Const;
 import me.artuto.endless.data.Database;
-import me.artuto.endless.entities.Punishment;
-import me.artuto.endless.entities.TempPunishment;
-import me.artuto.endless.entities.impl.PunishmentImpl;
+import me.artuto.endless.core.entities.Punishment;
+import me.artuto.endless.core.entities.TempPunishment;
+import me.artuto.endless.core.entities.impl.PunishmentImpl;
 import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.JDA;

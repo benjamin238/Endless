@@ -15,17 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities;
+package me.artuto.endless.core;
 
-public interface Tag
+/**
+ * @author Artuto
+ */
+
+public interface EndlessCore
 {
-    String getId();
 
-    Long getIdLong();
-
-    String getName();
-
-    String getContent();
-
-    Long getOwnerId();
 }

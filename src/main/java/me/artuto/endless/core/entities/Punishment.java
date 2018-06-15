@@ -15,36 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.entities;
+package me.artuto.endless.core.entities;
 
-import net.dv8tion.jda.core.entities.Role;
+import me.artuto.endless.Const;
 
-import java.util.Collection;
-import java.util.List;
+/**
+ * @author Artuto
+ */
 
-public interface GuildSettings
+public interface Punishment
 {
-    Collection<String> getPrefixes();
+    Const.PunishmentType getType();
 
-    int getBanDeleteDays();
+    long getGuildId();
 
-    int getStarboardCount();
-
-    List<Role> getRoleMeRoles();
-
-    long getLeaveChannel();
-
-    long getModlog();
-
-    long getMutedRole();
-
-    long getServerlog();
-
-    long getStarboard();
-
-    long getWelcomeChannel();
-
-    String getLeaveMsg();
-
-    String getWelcomeMsg();
+    long getUserId();
 }
