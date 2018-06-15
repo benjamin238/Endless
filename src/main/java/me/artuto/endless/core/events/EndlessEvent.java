@@ -23,12 +23,17 @@ import me.artuto.endless.core.EndlessCore;
  * @author Artuto
  */
 
-public class Event
+public class EndlessEvent
 {
     private final EndlessCore endless;
 
-    public Event(EndlessCore endless)
+    public EndlessEvent(EndlessCore endless)
     {
         this.endless = endless;
+    }
+
+    public EndlessCore getEndless()
+    {
+        return endless;
     }
 }

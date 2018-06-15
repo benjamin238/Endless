@@ -19,6 +19,7 @@ package me.artuto.endless.logging;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import com.jagrosh.jdautilities.command.CommandListener;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;

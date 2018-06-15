@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.fun;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.Permission;
@@ -40,7 +40,7 @@ public class ChooseCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         String[] options = event.getArgs().split("\\s+");
 

@@ -29,6 +29,8 @@ import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.serverconfig.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
+import me.artuto.endless.core.EndlessCore;
+import me.artuto.endless.core.EndlessCoreBuilder;
 import me.artuto.endless.data.Database;
 import me.artuto.endless.data.managers.*;
 import me.artuto.endless.loader.Config;
@@ -51,6 +53,7 @@ public class Bot
 {
     public boolean maintenance;
     private final EndlessLoader loader = new EndlessLoader(this);
+    public EndlessCore endless;
 
     // Config
     public Config config;
@@ -67,7 +70,6 @@ public class Bot
 
     // Discord
     public CommandClient client;
-    public ShardManager shards;
 
     // EventWaiter
     public EventWaiter waiter;
@@ -93,7 +95,7 @@ public class Bot
 
     public static Bot getInstance()
     {
-        return Endless.getBot();
+        return Endless.bot;
     }
 
     void boot(boolean maintenance) throws LoginException
@@ -202,6 +204,10 @@ public class Bot
         else
             builder.addEventListeners(loader.waiter, client, listener);
 
-        shards = builder.build();
+        endless = new EndlessCoreBuilder(this)
+                .setCommandClient(client)
+                .setListener(listener)
+                .setShardManager(builder.build())
+                .build();
     }
 }

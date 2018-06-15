@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.bot;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import com.jagrosh.jdautilities.commons.JDAUtilitiesInfo;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
@@ -52,7 +52,7 @@ public class AboutCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         Color color;
 

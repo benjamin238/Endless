@@ -2,6 +2,7 @@ package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import com.jagrosh.jdautilities.menu.ButtonMenu;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
@@ -31,7 +32,7 @@ public class SetupCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         event.reply(Const.INFO+" Use this command to setup:\n" +
                 Const.LINE_START+" Muted role (and channel overrides)\n" +
@@ -50,7 +51,7 @@ public class SetupCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             Role mutedRole = GuildUtils.getMutedRole(guild);
