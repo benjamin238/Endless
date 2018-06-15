@@ -34,6 +34,7 @@ import net.dv8tion.jda.core.entities.User;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -102,8 +103,8 @@ public class UserInfoCmd extends EndlessCommand
             builder.addField(emote+" Status: ", member.getOnlineStatus()+
                     (member.getGame() == null ? "" : " ("+(member.getGame().getType() == Game.GameType.STREAMING ?
                             "On Live at [*"+member.getGame().getName()+"*]":"Playing "+member.getGame().getName())+")"+""), false);
+            builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
             builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
-
         }
         else
         {
@@ -116,13 +117,14 @@ public class UserInfoCmd extends EndlessCommand
                  builder.addField(emote+" Status: ", member.getOnlineStatus()+
                          (member.getGame() == null ? "" : " ("+(member.getGame().getType() == Game.GameType.STREAMING ?
                                  "On Live at [*"+member.getGame().getName()+"*]":"Playing "+member.getGame().getName())+")"+""), false);
+                 builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
                  builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
              }
              else
              {
                  String strjoins;
                  List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
-                 Collections.sort(joins, (Member a, Member b) -> a.getJoinDate().compareTo(b.getJoinDate()));
+                 Collections.sort(joins, Comparator.comparing(Member::getJoinDate));
                  int index = joins.indexOf(member);
                  int joinnumber = index;
                  index -= 3;
@@ -160,6 +162,7 @@ public class UserInfoCmd extends EndlessCommand
                  builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
                  builder.addField("Join Order: `(#"+(joinnumber+1)+")`", strjoins, false);
                  builder.setColor(member.getColor());
+                 builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
              }
         }
 
