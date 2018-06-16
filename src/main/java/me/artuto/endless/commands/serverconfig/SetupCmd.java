@@ -47,6 +47,7 @@ public class SetupCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.ADMINISTRATOR};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArguments = false;
         }
 
         @Override
