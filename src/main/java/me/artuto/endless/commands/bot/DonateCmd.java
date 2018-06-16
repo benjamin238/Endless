@@ -18,7 +18,7 @@
 package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
@@ -57,7 +57,7 @@ public class DonateCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Color color;
         EmbedBuilder builder = new EmbedBuilder();
@@ -92,7 +92,7 @@ public class DonateCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
@@ -149,7 +149,7 @@ public class DonateCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {

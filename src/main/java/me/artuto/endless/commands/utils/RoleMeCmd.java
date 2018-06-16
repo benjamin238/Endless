@@ -18,13 +18,13 @@
 package me.artuto.endless.commands.utils;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
@@ -54,7 +54,7 @@ public class RoleMeCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String args = event.getArgs();
         Guild guild = event.getGuild();
@@ -97,7 +97,7 @@ public class RoleMeCmd extends EndlessCommand
 
             if(rolemeRoles.contains(role))
             {
-                if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
+                if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
                     event.replyError("I can't interact with that role!");
                 else
                 {
@@ -126,7 +126,7 @@ public class RoleMeCmd extends EndlessCommand
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             Guild guild = event.getGuild();
             List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
@@ -155,7 +155,7 @@ public class RoleMeCmd extends EndlessCommand
                 return;
             }
 
-            if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
+            if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
                 event.replyError("I can't interact with that role!");
             else
             {
@@ -177,7 +177,7 @@ public class RoleMeCmd extends EndlessCommand
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         }
 
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             Guild guild = event.getGuild();
             List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);

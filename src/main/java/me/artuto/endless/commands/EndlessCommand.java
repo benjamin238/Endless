@@ -20,9 +20,8 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.cmddata.CommandHelper;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Member;
@@ -47,9 +46,8 @@ public abstract class EndlessCommand extends Command
     }
 
     @Override
-    public void execute(CommandEvent preEvent)
+    public void execute(CommandEvent event)
     {
-        EndlessCommandEvent event = (EndlessCommandEvent)preEvent;
         CommandClient client = event.getClient();
         Member member = event.getMember();
         Member selfMember = event.getSelfMember();
@@ -75,7 +73,7 @@ public abstract class EndlessCommand extends Command
         {
             for(Permission p : botPerms)
             {
-                if(!(Checks.hasPermission(selfMember, tc, p)))
+                if(!(ChecksUtil.hasPermission(selfMember, tc, p)))
                 {
                     event.replyError(String.format("I need the %s permission in this Guild to execute this command!", p.getName()));
                     return;
@@ -91,7 +89,7 @@ public abstract class EndlessCommand extends Command
 
             for(Permission p : userPerms)
             {
-                if(!(Checks.hasPermission(member, tc, p)))
+                if(!(ChecksUtil.hasPermission(member, tc, p)))
                 {
                     event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
                     return;
@@ -103,7 +101,7 @@ public abstract class EndlessCommand extends Command
         executeCommand(event);
     }
 
-    protected abstract void executeCommand(EndlessCommandEvent event);
+    protected abstract void executeCommand(CommandEvent event);
 
     public boolean isOwnerCommand()
     {

@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.moderation;
 
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
@@ -65,7 +65,7 @@ public class ClearCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String params = event.getArgs();
         String r;

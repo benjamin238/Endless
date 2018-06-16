@@ -18,7 +18,7 @@
 package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
@@ -51,7 +51,7 @@ public class BlacklistUserCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         event.replyWarning("Please specify a subcommand!");
     }
@@ -70,7 +70,7 @@ public class BlacklistUserCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
 
@@ -101,7 +101,7 @@ public class BlacklistUserCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             event.getJDA().retrieveUserById(event.getArgs()).queue(user -> {
                 if(bot.bdm.getBlacklist(user.getIdLong())==null)
@@ -129,7 +129,7 @@ public class BlacklistUserCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             Map<Blacklist, User> map;
             EmbedBuilder builder = new EmbedBuilder();
@@ -170,7 +170,7 @@ public class BlacklistUserCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {

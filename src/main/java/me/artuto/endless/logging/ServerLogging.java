@@ -72,7 +72,7 @@ public class ServerLogging
 
         if(!(serverlog == null))
         {
-            if(!(Checks.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Join]:` :inbox_tray: :bust_in_silhouette: **"+newMember.getName()+"**#**"+newMember.getDiscriminator()+"** ("+newMember.getId()+") joined the guild! User count: **"+guild.getMembers().size()+"** members").queue();
@@ -80,7 +80,7 @@ public class ServerLogging
 
         if(!(welcome == null) && !(msg == null))
         {
-            if(!(Checks.hasPermission(guild.getSelfMember(), welcome, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), welcome, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.WELCOME_NOPERMISSIONS).queue()));
             else welcome.sendMessage(parser.parse(msg).trim()).queueAfter(1, TimeUnit.SECONDS);
         }
@@ -98,7 +98,7 @@ public class ServerLogging
 
         if(!(serverlog == null))
         {
-            if(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
+            if(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
             {
                 guild.getAuditLogs().type(ActionType.BAN).limit(20).queue(preEntries -> {
                     List<AuditLogEntry> entries = preEntries.stream().filter(ale -> ale.getTargetIdLong()==oldMember.getIdLong()).collect(Collectors.toList());
@@ -110,7 +110,7 @@ public class ServerLogging
                     if(!(parsedAuditLog==null))
                         return;
 
-                    if(!(Checks.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+                    if(!(ChecksUtil.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                         guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
                     else
                         serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldMember.getName()+"**#**"+oldMember.getDiscriminator()+"** ("+oldMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
@@ -118,7 +118,7 @@ public class ServerLogging
             }
             else
             {
-                if(!(Checks.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+                if(!(ChecksUtil.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                     guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
                 else
                     serverlog.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Member Left]:` :outbox_tray: :bust_in_silhouette: **"+oldMember.getName()+"**#**"+oldMember.getDiscriminator()+"** ("+oldMember.getId()+") left the guild! User count: **"+guild.getMembers().size()+"** members").queue();
@@ -127,7 +127,7 @@ public class ServerLogging
 
         if(!(leave == null) && !(msg == null))
         {
-            if(!(Checks.hasPermission(guild.getSelfMember(), leave, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), leave, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.LEAVE_NOPERMISSIONS).queue()));
             else leave.sendMessage(parser.parse(msg).trim()).queue();
         }
@@ -162,7 +162,7 @@ public class ServerLogging
             if(IgnoreUtils.isIgnored(event.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
                 return;
 
-            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
@@ -205,7 +205,7 @@ public class ServerLogging
             if(IgnoreUtils.isIgnored(message.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
                 return;
 
-            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
             {
@@ -243,7 +243,7 @@ public class ServerLogging
                     if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()))
                         return;
 
-                    if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))
+                    if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))
                         guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
                     else
                     {
@@ -275,7 +275,7 @@ public class ServerLogging
             if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vc.getId(), tc.getTopic()))
                 return;
 
-            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Join]:`  **"+user.getName()+"#"+user.getDiscriminator()+"** has joined a Voice Channel: **"+vc.getName()+"** (ID: "+vc.getId()+")").queue();
@@ -296,7 +296,7 @@ public class ServerLogging
             if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vcnew.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vcold.getId(), tc.getTopic()))
                 return;
 
-            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Move]:` **"+user.getName()+"#"+user.getDiscriminator()+"** switched between Voice Channels: From: **"+vcold.getName()+"** To: **"+vcnew.getName()+"**").queue();
@@ -316,7 +316,7 @@ public class ServerLogging
             if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vc.getId(), tc.getTopic()))
                 return;
 
-            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.SRVLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Voice Left]:` **"+user.getName()+"#"+user.getDiscriminator()+"** left a Voice Channel: **"+vc.getName()+"**").queue();

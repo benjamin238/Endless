@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.bot;
 
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.Permission;
@@ -38,7 +38,7 @@ public class InviteCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         event.reply("So you want invite Endless to your server? Here you have it:\n"+":link: **<"+event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR)+"**");
     }

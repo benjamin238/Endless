@@ -18,7 +18,7 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.kdotj.simplegiphy.SimpleGiphy;
 import com.kdotj.simplegiphy.data.Giphy;
 import com.kdotj.simplegiphy.data.GiphyListResponse;
@@ -59,7 +59,7 @@ public class GiphyGifCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String args = event.getArgs();
 
@@ -139,7 +139,7 @@ public class GiphyGifCmd extends EndlessCommand
             this.needsArgumentsMessage = "No search terms specified!";
         }
 
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String args = event.getArgs();
 

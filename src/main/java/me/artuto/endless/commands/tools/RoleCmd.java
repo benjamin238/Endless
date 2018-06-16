@@ -18,11 +18,11 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -49,7 +49,7 @@ public class RoleCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Role rol;
         Color color;
@@ -121,7 +121,7 @@ public class RoleCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             Role role;
             Member m;
@@ -170,12 +170,12 @@ public class RoleCmd extends EndlessCommand
             }
             else m = mlist.get(0);
 
-            if(!(Checks.canMemberInteract(author, role)))
+            if(!(ChecksUtil.canMemberInteract(author, role)))
             {
                 event.replyError("I can't interact with that role!");
                 return;
             }
-            if(!(Checks.canMemberInteract(author, role)))
+            if(!(ChecksUtil.canMemberInteract(author, role)))
             {
                 event.replyError("You can't interact with that role!");
                 return;
@@ -200,7 +200,7 @@ public class RoleCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {
@@ -255,12 +255,12 @@ public class RoleCmd extends EndlessCommand
             }
             else m = mlist.get(0);
 
-            if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
+            if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
             {
                 event.replyError("I can't interact with that role!");
                 return;
             }
-            if(!(Checks.canMemberInteract(author, role)))
+            if(!(ChecksUtil.canMemberInteract(author, role)))
             {
                 event.replyError("You can't interact with that role!");
                 return;

@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.moderation;
 
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
@@ -25,7 +25,7 @@ import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.ArgsUtils;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
@@ -57,7 +57,7 @@ public class MuteCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Member member;
         User author = event.getAuthor();
@@ -102,13 +102,13 @@ public class MuteCmd extends EndlessCommand
         }
         else member = list.get(0);
 
-        if(!(Checks.canMemberInteract(event.getSelfMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), member)))
         {
             event.replyError("I can't mute the specified user!");
             return;
         }
 
-        if(!(Checks.canMemberInteract(event.getMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getMember(), member)))
         {
             event.replyError("You can't mute the specified user!");
             return;
@@ -139,7 +139,7 @@ public class MuteCmd extends EndlessCommand
             event.replyError("No muted role set! Please set one using `e!config mutedrole <role>` or let the me create one for you using `e!setup mutedrole`");
         else
         {
-            if(!(Checks.canMemberInteract(event.getSelfMember(), mutedRole)))
+            if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), mutedRole)))
             {
                 event.replyError("I can't interact with the Muted role!");
                 return;

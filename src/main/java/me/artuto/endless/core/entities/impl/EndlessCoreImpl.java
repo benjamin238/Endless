@@ -17,8 +17,10 @@
 
 package me.artuto.endless.core.entities.impl;
 
+import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Endless;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.hooks.EndlessListener;
@@ -37,6 +39,8 @@ import java.util.stream.Collectors;
 
 public class EndlessCoreImpl implements EndlessCore
 {
+    private final Logger LOG = Endless.LOG;
+
     protected final Bot bot;
     protected final CommandClient client;
     protected final EndlessListener listener;
@@ -94,7 +98,12 @@ public class EndlessCoreImpl implements EndlessCore
 
     public void makeCache()
     {
+        LOG.debug("Starting cache creation...");
+
         for(Guild guild : bot.db.getGuildsThatHaveSettings(jda))
+        {
             guildSettings.add(bot.db.getSettings(guild));
+            LOG.debug(String.format("Cached %s Guild Settings", guildSettings.size()));
+        }
     }
 }

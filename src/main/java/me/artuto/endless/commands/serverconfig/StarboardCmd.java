@@ -18,12 +18,12 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -49,13 +49,13 @@ public class StarboardCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         event.replySuccess("Hi! Welcome to the Endless' Starboard Setup. This will automagically install an starboard on your server, I only need some "+"information to continue.");
         waitForChannel(event);
     }
 
-    private void waitForChannel(EndlessCommandEvent event)
+    private void waitForChannel(CommandEvent event)
     {
         event.replySuccess("Alright! Lets start; First, Do you want to create a new channel or use a channel already created?\n"+"Type **\"create\"** to create a new channel and automatically setup permissions.\n"+"Type **\"created <channel name>\"** to use an already created channel.\n"+"Type **\"cancel\"** to cancel the setup.");
 
@@ -67,7 +67,7 @@ public class StarboardCmd extends EndlessCommand
                     event.replyWarning("Alright, setup cancelled.");
                     break;
                 case "create":
-                    if(!(Checks.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_CHANNEL) || Checks.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_PERMISSIONS)))
+                    if(!(ChecksUtil.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_CHANNEL) || ChecksUtil.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_PERMISSIONS)))
                     {
                         event.replyError("An error happened when creating the channel and setting the permissions! Check I have the proper permissions.");
                         waitForChannel(event);
@@ -116,7 +116,7 @@ public class StarboardCmd extends EndlessCommand
         }, 2, TimeUnit.MINUTES, () -> event.replyWarning("Oh uh.... You took more than 2 minutes to answer "+event.getAuthor().getAsMention()+"! Cancelling setup."));
     }
 
-    private void waitForStarCount(EndlessCommandEvent event)
+    private void waitForStarCount(CommandEvent event)
     {
         event.replySuccess("Now, what minimum amount of stars are needed to appear in the starboard? Minimum amount is 1 and maximum is 20.");
 
@@ -157,7 +157,7 @@ public class StarboardCmd extends EndlessCommand
         }, 2, TimeUnit.MINUTES, () -> event.replyWarning("Oh uh.... You took more than 2 minutes to answer "+event.getAuthor().getAsMention()+"! Cancelling setup."));
     }
 
-    private void finished(EndlessCommandEvent event)
+    private void finished(CommandEvent event)
     {
         event.replySuccess("The starboard has been installed successfully! Thanks for using Endless' starboard!");
     }
@@ -175,7 +175,7 @@ public class StarboardCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
@@ -211,7 +211,7 @@ public class StarboardCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             Integer args;
 

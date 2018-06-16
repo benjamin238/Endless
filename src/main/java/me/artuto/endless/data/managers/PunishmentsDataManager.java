@@ -22,7 +22,7 @@ import me.artuto.endless.data.Database;
 import me.artuto.endless.core.entities.Punishment;
 import me.artuto.endless.core.entities.TempPunishment;
 import me.artuto.endless.core.entities.impl.PunishmentImpl;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
@@ -231,7 +231,7 @@ public class PunishmentsDataManager
                 {
                      Member member = guild.getMemberById(p.getUserId());
                      Role mutedRole = GuildUtils.getMutedRole(guild);
-                     if(!(member==null) && guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES) && Checks.canMemberInteract(guild.getSelfMember(), mutedRole))
+                     if(!(member==null) && guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES) && ChecksUtil.canMemberInteract(guild.getSelfMember(), mutedRole))
                          guild.getController().removeSingleRoleFromMember(member, mutedRole).reason("[Tempumute finished]").queue();
                 }
             }
