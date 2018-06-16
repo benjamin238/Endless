@@ -70,6 +70,7 @@ public class EndlessCoreBuilder
         EndlessCoreImpl impl = new EndlessCoreImpl(bot, client, jda, listener);
         impl.makeCache();
 
+
         return impl;
     }
 }

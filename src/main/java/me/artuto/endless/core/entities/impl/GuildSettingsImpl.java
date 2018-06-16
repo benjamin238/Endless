@@ -128,4 +128,10 @@ public class GuildSettingsImpl implements GuildSettings
     {
         return welcomeMsg;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("GS:%s(%s)", guild.getName(), guild.getId());
+    }
 }
