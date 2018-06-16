@@ -39,6 +39,8 @@ import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
 
@@ -49,7 +51,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author Artuto
  */
 
-public class Bot
+public class Bot extends ListenerAdapter
 {
     public boolean maintenance;
     private final EndlessLoader loader = new EndlessLoader(this);
@@ -70,6 +72,7 @@ public class Bot
 
     // Discord
     public CommandClient client;
+    public ShardManager shardManager;
 
     // EventWaiter
     public EventWaiter waiter;
@@ -200,14 +203,20 @@ public class Bot
                 .setAutoReconnect(true)
                 .setEnableShutdownHook(true);
         if(maintenance)
-            builder.addEventListeners(client);
+            builder.addEventListeners(this, client);
         else
-            builder.addEventListeners(loader.waiter, client, listener);
+            builder.addEventListeners(this, loader.waiter, client, listener);
 
+        shardManager = builder.build();
+    }
+
+    @Override
+    public void onReady(ReadyEvent event)
+    {
         endless = new EndlessCoreBuilder(this)
                 .setCommandClient(client)
                 .setListener(listener)
-                .setShardManager(builder.build())
+                .setShardManager(shardManager)
                 .build();
     }
 }

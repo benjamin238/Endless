@@ -96,6 +96,12 @@ public class EndlessCoreImpl implements EndlessCore
         return Collections.unmodifiableList(guildSettings);
     }
 
+    @Override
+    public ShardManager getShardManager()
+    {
+        return jda;
+    }
+
     public void makeCache()
     {
         LOG.debug("Starting cache creation...");
