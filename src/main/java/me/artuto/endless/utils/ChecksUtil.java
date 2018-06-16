@@ -30,7 +30,7 @@ import net.dv8tion.jda.core.entities.User;
  * @author Artuto
  */
 
-public class Checks
+public class ChecksUtil
 {
     public static boolean canMemberInteract(Member issuer, Member target)
     {

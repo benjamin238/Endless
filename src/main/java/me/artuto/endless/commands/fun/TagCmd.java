@@ -21,7 +21,7 @@ import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jagtag.ParserBuilder;
 import com.jagrosh.jagtag.libraries.*;
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
@@ -49,7 +49,7 @@ public class TagCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         String[] args;
         String tagname;
@@ -93,7 +93,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String[] args;
             String name;
@@ -136,7 +136,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
             Long owner = bot.tdm.getTagOwner(event.getArgs().trim().toLowerCase());
@@ -167,7 +167,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String[] args;
             String name;
@@ -214,7 +214,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
             User owner = event.getJDA().retrieveUserById(bot.tdm.getTagOwner(event.getArgs())).complete();
@@ -238,7 +238,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
 
@@ -269,7 +269,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
 
@@ -291,7 +291,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
 
@@ -313,7 +313,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {

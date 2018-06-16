@@ -18,7 +18,7 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
@@ -42,7 +42,7 @@ public class WelcomeCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         Guild guild = event.getGuild();
         String msg = bot.gsdm.getWelcomeMessage(guild);
@@ -66,7 +66,7 @@ public class WelcomeCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {

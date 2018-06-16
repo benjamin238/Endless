@@ -2,13 +2,12 @@ package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.commands.EndlessCommandEvent;
 import com.jagrosh.jdautilities.menu.ButtonMenu;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
@@ -32,7 +31,7 @@ public class SetupCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         event.reply(Const.INFO+" Use this command to setup:\n" +
                 Const.LINE_START+" Muted role (and channel overrides)\n" +
@@ -51,7 +50,7 @@ public class SetupCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             Guild guild = event.getGuild();
             Role mutedRole = GuildUtils.getMutedRole(guild);
@@ -59,13 +58,13 @@ public class SetupCmd extends EndlessCommand
 
             if(!(mutedRole==null))
             {
-                if(!(Checks.canMemberInteract(event.getSelfMember(), mutedRole)))
+                if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), mutedRole)))
                 {
                     event.replyError("I can't interact with the existing *"+mutedRole.getName()+"* role!");
                     return;
                 }
 
-                if(!(Checks.canMemberInteract(event.getMember(), mutedRole)))
+                if(!(ChecksUtil.canMemberInteract(event.getMember(), mutedRole)))
                 {
                     event.replyError("You can't interact with the existing *"+mutedRole.getName()+"* role!");
                     return;

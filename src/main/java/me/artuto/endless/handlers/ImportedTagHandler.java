@@ -19,7 +19,7 @@ package me.artuto.endless.handlers;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.data.managers.ClientGSDMProvider;
@@ -89,7 +89,7 @@ public class ImportedTagHandler
                 if(tag==null)
                     return;
 
-                EndlessCommandEvent cevent = (EndlessCommandEvent)new CommandEvent(event, commandArgs, client);
+                CommandEvent cevent = (CommandEvent)new CommandEvent(event, commandArgs, client);
                 if(!(client.getListener()==null))
                     client.getListener().onCommand(cevent, tagCommand);
                 tagCommand.run(cevent);

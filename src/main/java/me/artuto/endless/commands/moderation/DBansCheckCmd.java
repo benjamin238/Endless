@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.moderation;
 
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
@@ -59,7 +59,7 @@ public class DBansCheckCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         User user;

@@ -18,7 +18,7 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
@@ -44,7 +44,7 @@ public class PrefixCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         StringBuilder sb = new StringBuilder();
         Guild guild = event.getGuild();
@@ -75,7 +75,7 @@ public class PrefixCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String args = event.getArgs().toLowerCase().trim();
             Guild guild = event.getGuild();
@@ -103,7 +103,7 @@ public class PrefixCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(EndlessCommandEvent event)
+        protected void executeCommand(CommandEvent event)
         {
             String args = event.getArgs().toLowerCase().trim();
             Guild guild = event.getGuild();

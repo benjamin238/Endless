@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.fun;
 
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.Permission;
@@ -37,7 +37,7 @@ public class SayCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         event.reply(event.getArgs());
     }

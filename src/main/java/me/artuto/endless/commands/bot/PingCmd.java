@@ -17,7 +17,7 @@
 
 package me.artuto.endless.commands.bot;
 
-import me.artuto.endless.commands.EndlessCommandEvent;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import net.dv8tion.jda.core.Permission;
@@ -39,7 +39,7 @@ public class PingCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(EndlessCommandEvent event)
+    protected void executeCommand(CommandEvent event)
     {
         long time = System.currentTimeMillis();
         event.reply("Ping!", (message) -> message.editMessageFormat("Pong! - "+"Discord API Ping: "+event.getJDA().getPing()+"ms - Ping: %dms", System.currentTimeMillis()-time).queue());
