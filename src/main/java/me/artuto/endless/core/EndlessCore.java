@@ -18,8 +18,8 @@
 package me.artuto.endless.core;
 
 import com.jagrosh.jdautilities.command.CommandClient;
+import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GuildSettings;
-import me.artuto.endless.core.hooks.EndlessListener;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 
 import javax.annotation.Nullable;
@@ -31,9 +31,9 @@ import java.util.List;
 
 public interface EndlessCore
 {
-    CommandClient getClient();
+    Bot getBot();
 
-    EndlessListener getListener();
+    CommandClient getClient();
 
     @Nullable
     GuildSettings getGuildSettingsById(long id);

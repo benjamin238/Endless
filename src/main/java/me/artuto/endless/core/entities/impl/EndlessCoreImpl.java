@@ -23,15 +23,14 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.entities.GuildSettings;
-import me.artuto.endless.core.hooks.EndlessListener;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.entities.Guild;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Artuto
@@ -39,33 +38,32 @@ import java.util.stream.Collectors;
 
 public class EndlessCoreImpl implements EndlessCore
 {
-    private final Logger LOG = Endless.LOG;
+    private boolean initialized = false;
+    private final Logger LOG = (Logger)LoggerFactory.getLogger(EndlessCore.class);
 
     protected final Bot bot;
     protected final CommandClient client;
-    protected final EndlessListener listener;
     protected final List<GuildSettings> guildSettings;
     protected final ShardManager jda;
 
-    public EndlessCoreImpl(Bot bot, CommandClient client, ShardManager jda, EndlessListener listener)
+    public EndlessCoreImpl(Bot bot, CommandClient client, ShardManager jda)
     {
         this.bot = bot;
         this.client = client;
         this.jda = jda;
         this.guildSettings = new LinkedList<>();
-        this.listener = listener;
+    }
+
+    @Override
+    public Bot getBot()
+    {
+        return bot;
     }
 
     @Override
     public CommandClient getClient()
     {
         return client;
-    }
-
-    @Override
-    public EndlessListener getListener()
-    {
-        return listener;
     }
 
     @Nullable
@@ -104,12 +102,32 @@ public class EndlessCoreImpl implements EndlessCore
 
     public void makeCache()
     {
-        LOG.debug("Starting cache creation...");
+        if(initialized)
+            throw new RuntimeException("This Endless instance is initialized already!");
 
+        LOG.debug("Starting cache creation...");
         for(Guild guild : bot.db.getGuildsThatHaveSettings(jda))
-        {
             guildSettings.add(bot.db.getSettings(guild));
-            LOG.debug(String.format("Cached %s Guild Settings", guildSettings.size()));
-        }
+        LOG.debug("Cached {} Guild Settings", guildSettings.size());
+
+        initialized = true;
+        LOG.debug("Successfully cached all needed entities.");
+    }
+
+    public void updateSettingsCache(Guild guild)
+    {
+        LOG.debug("Requested cache update of settings for Guild {}", guild.getIdLong());
+        GuildSettings settings = getGuildSettingsById(guild.getIdLong());
+
+        if(!(settings==null))
+            guildSettings.remove(settings);
+        guildSettings.add(bot.db.getSettings(guild));
+
+        LOG.debug("Successfully updated settings cache for Guild {}", guild.getIdLong());
+    }
+
+    public void updateInstances()
+    {
+        bot.gsdm.endlessImpl = this;
     }
 }

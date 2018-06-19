@@ -17,6 +17,8 @@
 
 package me.artuto.endless.data.managers;
 
+import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
@@ -33,10 +35,12 @@ import java.util.List;
 public class GuildSettingsDataManager
 {
     private final Connection connection;
+    public EndlessCoreImpl endlessImpl;
 
-    public GuildSettingsDataManager(Database db)
+    public GuildSettingsDataManager(Bot bot)
     {
-        connection = db.getConnection();
+        this.connection = bot.db.getConnection();
+        this.endlessImpl = (EndlessCoreImpl)bot.endless;
     }
 
     public TextChannel getModlogChannel(Guild guild)
@@ -117,6 +121,7 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -157,6 +162,7 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -220,6 +226,7 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -283,6 +290,7 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -346,6 +354,7 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -409,6 +418,7 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -472,6 +482,7 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -503,7 +514,7 @@ public class GuildSettingsDataManager
         }
     }
 
-    public void setStarboardCount(Guild guild, Integer count)
+    public void setStarboardCount(Guild guild, int count)
     {
         try
         {
@@ -524,6 +535,7 @@ public class GuildSettingsDataManager
                     results.updateInt("starboard_count", count);
                     results.insertRow();
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -560,47 +572,13 @@ public class GuildSettingsDataManager
                     results.updateString("prefixes", new JSONArray().put(prefix).toString());
                     results.insertRow();
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while adding a prefix for the guild "+guild.getId(), e);
         }
-    }
-
-    public boolean prefixExists(Guild guild, String prefix)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            String prefixes;
-            JSONArray array;
-
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, prefixes FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
-            {
-                if(results.next())
-                {
-                    prefixes = results.getString("prefixes");
-
-                    if(prefixes == null) return false;
-                    else
-                    {
-                        array = new JSONArray(prefixes);
-
-                        for(Object p : array)
-                            return p.toString().equals(prefix);
-                    }
-                }
-                else return false;
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while checking if a prefix exists for the guild "+guild.getId(), e);
-            return false;
-        }
-        return false;
     }
 
     public void removePrefix(Guild guild, String prefix)
@@ -639,6 +617,7 @@ public class GuildSettingsDataManager
                                 }
                             }
                         }
+                        endlessImpl.updateSettingsCache(guild);
                     }
                 }
             }
@@ -721,6 +700,7 @@ public class GuildSettingsDataManager
                     results.updateString("roleme_roles", new JSONArray().put(role.getId()).toString());
                     results.insertRow();
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -765,6 +745,7 @@ public class GuildSettingsDataManager
                                 }
                             }
                         }
+                        endlessImpl.updateSettingsCache(guild);
                     }
                 }
             }
@@ -772,29 +753,6 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while removing a roleme role from the guild "+guild.getId(), e);
-        }
-    }
-
-    public Role getMutedRole(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            Role role;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT muted_role_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    role = guild.getRoleById(results.getLong("muted_role_id"));
-                else
-                    role = null;
-            }
-            return role;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the muted role for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -830,6 +788,7 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)
@@ -860,8 +819,7 @@ public class GuildSettingsDataManager
             return 0;
         }
     }
-
-
+    
     public void setBanDeleteDays(Guild guild, int days)
     {
         try
@@ -894,6 +852,7 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                endlessImpl.updateSettingsCache(guild);
             }
         }
         catch(SQLException e)

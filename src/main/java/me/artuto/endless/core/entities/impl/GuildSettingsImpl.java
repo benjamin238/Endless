@@ -26,6 +26,7 @@ import java.util.List;
 
 public class GuildSettingsImpl implements GuildSettings
 {
+    private final boolean isDefault;
     private final Collection<String> prefixes;
     private final Guild guild;
     private final int banDeleteDays, starboardCount;
@@ -33,9 +34,11 @@ public class GuildSettingsImpl implements GuildSettings
     private final long modlogId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
     private final String welcomeMsg, leaveMsg;
 
-    public GuildSettingsImpl(Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount, List<Role> roleMeRoles, long leaveId, long modlogId, long mutedRoleId,
+    public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
+                             List<Role> roleMeRoles, long leaveId, long modlogId, long mutedRoleId,
                              long serverlogId, long starboardId, long welcomeId, String leaveMsg, String welcomeMsg)
     {
+        this.isDefault = isDefault;
         this.prefixes = prefixes;
         this.guild = guild;
         this.banDeleteDays = banDeleteDays;
@@ -49,6 +52,20 @@ public class GuildSettingsImpl implements GuildSettings
         this.welcomeId = welcomeId;
         this.leaveMsg = leaveMsg;
         this.welcomeMsg = welcomeMsg;
+    }
+
+    @Override
+    public boolean isDefault()
+    {
+        return isDefault;
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return (prefixes==null || prefixes.isEmpty()) && banDeleteDays==0 && starboardCount==0 && (roleMeRoles==null || roleMeRoles.isEmpty())
+                && leaveId==0L && modlogId==0L && serverlogId==0L && starboardId==0L && welcomeId==0L && (leaveMsg==null || leaveMsg.isEmpty())
+                && (welcomeMsg==null || welcomeMsg.isEmpty());
     }
 
     @Override

@@ -59,7 +59,13 @@ public class ServerSettingsCmd extends EndlessCommand
         Guild guild = event.getGuild();
         String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
 
-        GuildSettings settings = bot.db.getSettings(guild);
+        GuildSettings settings = bot.endless.getGuildSettingsById(guild.getIdLong());
+        if(settings==null)
+        {
+            event.replyWarning("This server doesn't has settings!");
+            return;
+        }
+
         int banDeleteDays = settings.getBanDeleteDays();
         int starboardCount = settings.getStarboardCount();
         Role mutedRole = GuildUtils.getMutedRole(guild);
