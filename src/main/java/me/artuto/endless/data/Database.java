@@ -36,9 +36,19 @@ public class Database
 {
     private final Connection connection;
     public static final Logger LOG = LoggerFactory.getLogger(Database.class);
-    private final GuildSettings DEFAULT = new GuildSettingsImpl(null, null, 0, 0,null,
-            0L, 0L, 0L,0L,
-            0L, 0L, null, null);
+
+    public GuildSettings getDefault(Guild guild)
+    {
+        return new GuildSettingsImpl(true, null, null, 0, 0,null,
+                0L, 0L, 0L,0L,
+                0L, 0L, null, null){
+            @Override
+            public String toString()
+            {
+                return String.format("GS DEFAULT:%s(%s)", guild.getName(), guild.getId());
+            }
+        };
+    }
 
     public Database(String host, String user, String pass) throws SQLException
     {
@@ -88,18 +98,18 @@ public class Database
                         }
                     }
 
-                    gs = new GuildSettingsImpl(prefixes, guild, results.getInt("ban_delete_days"), results.getInt("starboard_count"), roleMeRoles,
+                    gs = new GuildSettingsImpl(false, prefixes, guild, results.getInt("ban_delete_days"), results.getInt("starboard_count"), roleMeRoles,
                             results.getLong("leave_id"), results.getLong("modlog_id"), results.getLong("muted_role_id"), results.getLong("serverlog_id"),
                             results.getLong("starboard_id"), results.getLong("welcome_id"), results.getString("leave_msg"), results.getString("welcome_msg"));
                 }
-                else gs = DEFAULT;
+                else gs = getDefault(guild);
             }
             return gs;
         }
         catch(SQLException e)
         {
             LOG.warn("Error while getting the settings of a guild. ID: "+guild.getId(), e);
-            return DEFAULT;
+            return getDefault(guild);
         }
     }
 

@@ -19,14 +19,8 @@ package me.artuto.endless.core;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
-import me.artuto.endless.bootloader.EndlessLoader;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.core.hooks.EndlessListener;
 import net.dv8tion.jda.bot.sharding.ShardManager;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Artuto
@@ -34,28 +28,18 @@ import java.util.List;
 
 public class EndlessCoreBuilder
 {
-    protected final EndlessLoader loader;
-
     protected Bot bot;
     protected CommandClient client;
-    protected EndlessListener listener;
     protected ShardManager jda;
 
     public EndlessCoreBuilder(Bot bot)
     {
         this.bot = bot;
-        this.loader = new EndlessLoader(bot);
     }
 
     public EndlessCoreBuilder setCommandClient(CommandClient client)
     {
         this.client = client;
-        return this;
-    }
-
-    public EndlessCoreBuilder setListener(EndlessListener listener)
-    {
-        this.listener = listener;
         return this;
     }
 
@@ -67,9 +51,9 @@ public class EndlessCoreBuilder
 
     public EndlessCore build()
     {
-        EndlessCoreImpl impl = new EndlessCoreImpl(bot, client, jda, listener);
+        EndlessCoreImpl impl = new EndlessCoreImpl(bot, client, jda);
         impl.makeCache();
-
+        impl.updateInstances();
 
         return impl;
     }

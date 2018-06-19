@@ -25,6 +25,10 @@ import java.util.List;
 
 public interface GuildSettings
 {
+    boolean isDefault();
+
+    boolean isEmpty();
+
     Collection<String> getPrefixes();
 
     Guild getGuild();
