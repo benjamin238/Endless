@@ -18,7 +18,9 @@
 package me.artuto.endless.data.managers;
 
 import com.jagrosh.jdautilities.command.GuildSettingsProvider;
+import me.artuto.endless.Bot;
 import me.artuto.endless.data.Database;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.entities.Guild;
 
 import javax.annotation.Nullable;
@@ -27,18 +29,16 @@ import java.util.Collection;
 public class ClientGSDMProvider implements GuildSettingsProvider
 {
     private final Guild guild;
-    private final Database db;
 
-    ClientGSDMProvider(Guild guild, Database db)
+    ClientGSDMProvider(Guild guild)
     {
         this.guild = guild;
-        this.db = db;
     }
 
     @Nullable
     @Override
     public Collection<String> getPrefixes()
     {
-        return db.getSettings(guild).getPrefixes();
+        return GuildUtils.getPrefixes(guild);
     }
 }

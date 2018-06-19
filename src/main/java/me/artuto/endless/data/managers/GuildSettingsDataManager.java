@@ -29,8 +29,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.LinkedList;
-import java.util.List;
 
 public class GuildSettingsDataManager
 {
@@ -41,52 +39,6 @@ public class GuildSettingsDataManager
     {
         this.connection = bot.db.getConnection();
         this.endlessImpl = (EndlessCoreImpl)bot.endless;
-    }
-
-    public TextChannel getModlogChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT modlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("modlog_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the modlog for the guild "+guild.getId(), e);
-            return null;
-        }
-    }
-
-    public TextChannel getServerlogChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT serverlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("serverlog_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the serverlog for the guild "+guild.getId(), e);
-            return null;
-        }
     }
 
     public void setModlogChannel(Guild guild, TextChannel tc)
@@ -171,29 +123,6 @@ public class GuildSettingsDataManager
         }
     }
 
-    public TextChannel getWelcomeChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT welcome_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("welcome_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the welcome channel for the guild "+guild.getId(), e);
-            return null;
-        }
-    }
-
     public void setWelcomeChannel(Guild guild, TextChannel tc)
     {
         try
@@ -232,29 +161,6 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the welcome channel for the guild "+guild.getId(), e);
-        }
-    }
-
-    public TextChannel getLeaveChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT leave_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("leave_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the leave channel for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -299,29 +205,6 @@ public class GuildSettingsDataManager
         }
     }
 
-    public String getWelcomeMessage(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            String message;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT welcome_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    message = results.getString("welcome_msg");
-                else
-                    message = "";
-            }
-            return message;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the welcome message for the guild "+guild.getId(), e);
-            return null;
-        }
-    }
-
     public void setWelcomeMessage(Guild guild, String message)
     {
         try
@@ -360,29 +243,6 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the welcome message for the guild "+guild.getId(), e);
-        }
-    }
-
-    public String getLeaveMessage(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            String message;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT leave_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    message = results.getString("leave_msg");
-                else
-                    message = "";
-            }
-            return message;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the leave message for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -427,29 +287,6 @@ public class GuildSettingsDataManager
         }
     }
 
-    public TextChannel getStarboardChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT starboard_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("starboard_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the starboard channel for the guild "+guild.getId(), e);
-            return null;
-        }
-    }
-
     public void setStarboardChannel(Guild guild, TextChannel tc)
     {
         try
@@ -488,29 +325,6 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the starboard channel for the guild "+guild.getId(), e);
-        }
-    }
-
-    public Integer getStarboardCount(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            Integer count;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT starboard_count FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    count = results.getInt("starboard_count");
-                else
-                    count = null;
-            }
-            return count;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the starboard count for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -625,50 +439,6 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while removing a prefix for the guild "+guild.getId(), e);
-        }
-    }
-
-    public List<Role> getRolemeRoles(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            String rolemeRoles;
-            JSONArray array;
-            List<Role> roles = new LinkedList<>();
-
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, roleme_roles FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
-            {
-                if(results.next())
-                {
-                    rolemeRoles = results.getString("roleme_roles");
-
-                    if(rolemeRoles == null) return roles;
-                    else
-                    {
-                        array = new JSONArray(rolemeRoles);
-                        Role role;
-
-                        for(Object r : array)
-                        {
-                            role = guild.getRoleById(r.toString());
-
-                            if(!(role==null))
-                                roles.add(role);
-                        }
-
-                        return roles;
-                    }
-
-                }
-                else return roles;
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the roleme roles for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -794,29 +564,6 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the muted role for the guild "+guild.getId(), e);
-        }
-    }
-
-    public int getBanDeleteDays(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            int days;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT ban_delete_days FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    days = results.getInt("ban_delete_days");
-                else
-                    days = 0;
-            }
-            return days;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the ban delete days number for the guild "+guild.getId(), e);
-            return 0;
         }
     }
 

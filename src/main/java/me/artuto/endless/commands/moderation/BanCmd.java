@@ -25,6 +25,7 @@ import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
@@ -99,7 +100,7 @@ public class BanCmd extends EndlessCommand
         String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
         String fReason = reason;
 
-        event.getGuild().getController().ban(member, bot.gsdm.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
+        event.getGuild().getController().ban(member, GuildUtils.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
             event.replySuccess(Messages.BAN_SUCCESS+username);
             bot.modlog.logBan(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
         }, e -> event.replyError(Messages.BAN_ERROR+username));

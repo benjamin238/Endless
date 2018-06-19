@@ -63,11 +63,11 @@ public class ServerLogging
     public void onGuildMemberJoin(GuildMemberJoinEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel serverlog = gsdm.getServerlogChannel(guild);
-        TextChannel welcome = gsdm.getWelcomeChannel(guild);
+        TextChannel serverlog = GuildUtils.getServerlogChannel(guild);
+        TextChannel welcome = GuildUtils.getWelcomeChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User newMember = event.getMember().getUser();
-        String msg = gsdm.getWelcomeMessage(guild);
+        String msg = GuildUtils.getWelcomeMessage(guild);
         parser.clear().put("user", newMember).put("guild", guild).put("channel", welcome);
 
         if(!(serverlog == null))
@@ -89,11 +89,11 @@ public class ServerLogging
     public void onGuildMemberLeave(GuildMemberLeaveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel serverlog = gsdm.getServerlogChannel(guild);
-        TextChannel leave = gsdm.getLeaveChannel(guild);
+        TextChannel serverlog = GuildUtils.getServerlogChannel(guild);
+        TextChannel leave = GuildUtils.getLeaveChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         User oldMember = event.getMember().getUser();
-        String msg = gsdm.getLeaveMessage(guild);
+        String msg = GuildUtils.getLeaveMessage(guild);
         parser.clear().put("user", oldMember).put("guild", guild).put("channel", leave);
 
         if(!(serverlog == null))
@@ -135,7 +135,7 @@ public class ServerLogging
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event)
     {
-        TextChannel tc = gsdm.getServerlogChannel(event.getGuild());
+        TextChannel tc = GuildUtils.getServerlogChannel(event.getGuild());
 
         if(!(tc == null) && !(event.getAuthor().isBot()))
         {
@@ -150,7 +150,7 @@ public class ServerLogging
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
-        TextChannel tc = gsdm.getServerlogChannel(guild);
+        TextChannel tc = GuildUtils.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         Message newmsg = event.getMessage();
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
@@ -195,7 +195,7 @@ public class ServerLogging
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
-        TextChannel tc = gsdm.getServerlogChannel(guild);
+        TextChannel tc = GuildUtils.getServerlogChannel(guild);
         Message message = MessagesLogging.getMsg(event.getMessageIdLong());
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         StringBuilder sb = new StringBuilder();
@@ -235,7 +235,7 @@ public class ServerLogging
         {
             for(Guild guild : guilds)
             {
-                TextChannel tc = gsdm.getServerlogChannel(guild);
+                TextChannel tc = GuildUtils.getServerlogChannel(guild);
                 TextChannel channel = FinderUtil.getDefaultChannel(guild);
 
                 if(!(tc == null))
@@ -265,7 +265,7 @@ public class ServerLogging
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = gsdm.getServerlogChannel(guild);
+        TextChannel tc = GuildUtils.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelJoined();
         User user = event.getMember().getUser();
@@ -285,7 +285,7 @@ public class ServerLogging
     public void onGuildVoiceMove(GuildVoiceMoveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = gsdm.getServerlogChannel(guild);
+        TextChannel tc = GuildUtils.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vcold = event.getChannelLeft();
         VoiceChannel vcnew = event.getChannelJoined();
@@ -306,7 +306,7 @@ public class ServerLogging
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = gsdm.getServerlogChannel(guild);
+        TextChannel tc = GuildUtils.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
         VoiceChannel vc = event.getChannelLeft();
         User user = event.getMember().getUser();
