@@ -819,7 +819,7 @@ public class GuildSettingsDataManager
             return 0;
         }
     }
-    
+
     public void setBanDeleteDays(Guild guild, int days)
     {
         try
