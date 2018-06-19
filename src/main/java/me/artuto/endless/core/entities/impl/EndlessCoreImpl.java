@@ -72,7 +72,7 @@ public class EndlessCoreImpl implements EndlessCore
     {
         Guild guild = jda.getGuildById(id);
         if(!(guild==null))
-            return bot.db.getSettings(guild);
+            return guildSettings.stream().filter(gs -> gs.getGuild().getIdLong()==id).findFirst().orElse(null);
         else
             return null;
     }
@@ -83,7 +83,7 @@ public class EndlessCoreImpl implements EndlessCore
     {
         Guild guild = jda.getGuildById(id);
         if(!(guild==null))
-            return bot.db.getSettings(guild);
+            return guildSettings.stream().filter(gs -> gs.getGuild().getId().equals(id)).findFirst().orElse(null);
         else
             return null;
     }

@@ -148,7 +148,7 @@ public class Bot extends ListenerAdapter
         botlog = new BotLogging(this);
         logWebhook = new WebhookClientBuilder(config.getBotlogWebhook())
                 .setExecutorService(ThreadLoader.createThread("Botlog")).setDaemon(true).build();
-        modlog = new ModLogging(this);
+        modlog = new ModLogging();
         serverlog = new ServerLogging(this);
 
         clearThread = ThreadLoader.createThread("Clear Command");
@@ -174,7 +174,7 @@ public class Bot extends ListenerAdapter
                 .setStatus(null)
                 .setPrefix(config.getPrefix())
                 .setAlternativePrefix("@mention")
-                .setGuildSettingsManager(new ClientGSDM(db))
+                .setGuildSettingsManager(new ClientGSDM())
                 .setScheduleExecutor(ThreadLoader.createThread("Commands"))
                 .setListener(new CommandLogging(this))
                 .setLinkedCacheSize(6)

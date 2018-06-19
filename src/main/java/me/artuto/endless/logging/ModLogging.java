@@ -46,16 +46,9 @@ import java.util.stream.Collectors;
 
 public class ModLogging
 {
-    private Bot bot;
-
-    public ModLogging(Bot bot)
-    {
-        this.bot = bot;
-    }
-
     public void logBan(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -73,7 +66,7 @@ public class ModLogging
 
     public void logHackban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -91,7 +84,7 @@ public class ModLogging
 
     public void logKick(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -109,7 +102,7 @@ public class ModLogging
 
     public void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -127,7 +120,7 @@ public class ModLogging
 
     public void logUnban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -145,7 +138,7 @@ public class ModLogging
 
     public void logClear(User author, TextChannel channel, String reason, Guild guild, List<Message> deleted, String args)
     {
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -194,7 +187,7 @@ public class ModLogging
 
     public void logMute(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
 
         if(!(tc == null))
         {
@@ -214,7 +207,7 @@ public class ModLogging
 
     public void logTempMute(User author, Member target, String reason, Guild guild, TextChannel channel, int time)
     {
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         String formattedTime = FormatUtil.formatTimeFromSeconds(time);
 
         if(!(tc == null))
@@ -229,7 +222,7 @@ public class ModLogging
 
     public void logUnmute(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
 
         if(!(tc == null))
         {
@@ -250,7 +243,7 @@ public class ModLogging
     public void onGuildBan(GuildBanEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = bot.gsdm.getModlogChannel(guild);
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
 
         if(!(tc == null))
