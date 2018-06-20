@@ -43,6 +43,10 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 
+
+import org.apache.commons.lang3.StringUtils;
+
+
 import java.awt.*;
 import java.io.File;
 import java.util.List;
@@ -174,9 +178,11 @@ public class ServerLogging
                     newContent.append(att.getUrl()).append("\n");
 
                 String title = "`"+TimeUtils.getTimeAndDate()+" [Message Edited]:` :pencil2: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was edited in "+message.getTextChannel().getAsMention()+":";
+                String diff = StringUtils.difference(oldContent.toString(), newContent.toString());
+                String diffF ="["+diff+"](https://google.com)";
 
                 builder.addField("From:", oldContent.toString(), false);
-                builder.addField("To:", newContent.toString(), false);
+                builder.addField("To:", newContent.toString().replace(diff, diffF), false);
                 builder.setFooter("Message ID: "+message.getId(), null);
                 builder.setColor(Color.YELLOW);
 
@@ -229,7 +235,7 @@ public class ServerLogging
         User user = event.getUser();
         String title = "`"+TimeUtils.getTimeAndDate()+" [Avatar Update]:` :frame_photo: **"+user.getName()+"#"+user.getDiscriminator()+"** changed their avatar: ";
 
-        if(!(guilds.isEmpty()) && !(user.isBot()))
+        if(!(user.isBot()))
         {
             for(Guild guild : guilds)
             {
