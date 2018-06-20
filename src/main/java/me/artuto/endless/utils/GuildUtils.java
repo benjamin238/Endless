@@ -33,7 +33,7 @@ import java.util.List;
 
 public class GuildUtils
 {
-    private static Bot bot;
+    public static Bot bot;
 
     public GuildUtils(Bot bot)
     {

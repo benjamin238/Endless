@@ -34,6 +34,7 @@ import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.EndlessCoreBuilder;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.data.Database;
 import me.artuto.endless.data.managers.*;
 import me.artuto.endless.exceptions.ConfigException;
@@ -44,6 +45,7 @@ import me.artuto.endless.logging.*;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
@@ -55,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.login.LoginException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.stream.Collectors;
 
 /**
  * @author Artuto
@@ -63,6 +66,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class Bot extends ListenerAdapter
 {
     public boolean maintenance;
+    private boolean initialized = false;
     public EndlessCore endless;
 
     // Config
@@ -142,7 +146,7 @@ public class Bot extends ListenerAdapter
         tdm = new TagDataManager(db);
         BlacklistHandler bHandler = new BlacklistHandler(bdm);
         SpecialCaseHandler sHandler = new SpecialCaseHandler();
-        new Categories(bHandler, sHandler, maintenance);
+        new Categories(initialized, maintenance, bHandler, sHandler);
         new GuildUtils(this);
 
         botlog = new BotLogging(this);
@@ -157,7 +161,6 @@ public class Bot extends ListenerAdapter
         starboardThread = ThreadLoader.createThread("Starboard");
 
         waiter = new EventWaiter();
-
         listener = new Listener(this);
 
         CommandClientBuilder clientBuilder = new CommandClientBuilder();
@@ -228,17 +231,24 @@ public class Bot extends ListenerAdapter
         if(maintenance)
             builder.addEventListeners(this, client);
         else
-            builder.addEventListeners(this, waiter, client, listener);
-
+            builder.addEventListeners(this, client, listener, waiter);
         shardManager = builder.build();
+
+        endless = new EndlessCoreBuilder(this)
+                .setCommandClient(client)
+                .setShardManager(shardManager)
+                .build();
     }
 
     @Override
     public void onReady(ReadyEvent event)
     {
-        endless = new EndlessCoreBuilder(this)
-                .setCommandClient(client)
-                .setShardManager(shardManager)
-                .build();
+        // System.out.println(shardManager.getShards().stream().allMatch(shard -> shard.getStatus().equals(JDA.Status.CONNECTED)));
+        if(shardManager.getShards().stream().filter(shard -> !(shard.getStatus().equals(JDA.Status.CONNECTED)))
+                .collect(Collectors.toList()).isEmpty())
+        {
+            EndlessCoreImpl impl = (EndlessCoreImpl)endless;
+            impl.makeCache();
+        }
     }
 }

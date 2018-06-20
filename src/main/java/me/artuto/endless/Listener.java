@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Listener implements EventListener
 {
-    private final Bot bot;
+    protected Bot bot;
     private final boolean maintenance;
     private final ModLogging modlog;
     private final ServerLogging serverlog;

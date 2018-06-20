@@ -20,7 +20,6 @@ package me.artuto.endless.core.entities.impl;
 import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Endless;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.entities.GuildSettings;
 import net.dv8tion.jda.bot.sharding.ShardManager;
@@ -38,7 +37,6 @@ import java.util.List;
 
 public class EndlessCoreImpl implements EndlessCore
 {
-    private boolean initialized = false;
     private final Logger LOG = (Logger)LoggerFactory.getLogger(EndlessCore.class);
 
     protected final Bot bot;
@@ -102,15 +100,12 @@ public class EndlessCoreImpl implements EndlessCore
 
     public void makeCache()
     {
-        if(initialized)
-            throw new RuntimeException("This Endless instance is initialized already!");
-
         LOG.debug("Starting cache creation...");
+
         for(Guild guild : bot.db.getGuildsThatHaveSettings(jda))
             guildSettings.add(bot.db.getSettings(guild));
         LOG.debug("Cached {} Guild Settings", guildSettings.size());
 
-        initialized = true;
         LOG.debug("Successfully cached all needed entities.");
     }
 

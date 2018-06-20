@@ -37,7 +37,7 @@ public class Database
     private final Connection connection;
     public static final Logger LOG = LoggerFactory.getLogger(Database.class);
 
-    public GuildSettings getDefault(Guild guild)
+    private GuildSettings getDefault(Guild guild)
     {
         return new GuildSettingsImpl(true, null, null, 0, 0,null,
                 0L, 0L, 0L,0L,
