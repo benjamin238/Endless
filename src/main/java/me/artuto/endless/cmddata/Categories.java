@@ -23,15 +23,17 @@ import me.artuto.endless.handlers.SpecialCaseHandler;
 
 public class Categories
 {
+    private static boolean initialized;
+    private static boolean maintenance;
     private static BlacklistHandler bHandler;
     private static SpecialCaseHandler sHandler;
-    private static boolean maintenance;
 
-    public Categories(BlacklistHandler bHandler, SpecialCaseHandler shHndler, boolean maintenance)
+    public Categories(boolean initialized, boolean maintenance, BlacklistHandler bHandler, SpecialCaseHandler shHndler)
     {
         Categories.bHandler = bHandler;
-        sHandler = shHndler;
+        Categories.initialized = initialized;
         Categories.maintenance = maintenance;
+        Categories.sHandler = shHndler;
     }
 
     public static final Category BOT = new Category("Bot", event ->
@@ -39,6 +41,8 @@ public class Categories
         if(event.isOwner())
             return true;
 
+        if(!(initialized))
+            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -61,6 +65,8 @@ public class Categories
         if(event.isOwner())
             return true;
 
+        if(!(initialized))
+            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -72,6 +78,8 @@ public class Categories
         if(event.isOwner())
             return true;
 
+        if(!(initialized))
+            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -83,6 +91,8 @@ public class Categories
         if(event.isOwner())
             return true;
 
+        if(!(initialized))
+            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -94,6 +104,8 @@ public class Categories
         if(event.isOwner())
             return true;
 
+        if(!(initialized))
+            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -105,6 +117,8 @@ public class Categories
         if(event.isOwner())
             return true;
 
+        if(!(initialized))
+            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 

@@ -52,7 +52,6 @@ public class EndlessCoreBuilder
     public EndlessCore build()
     {
         EndlessCoreImpl impl = new EndlessCoreImpl(bot, client, jda);
-        impl.makeCache();
         impl.updateInstances();
 
         return impl;
