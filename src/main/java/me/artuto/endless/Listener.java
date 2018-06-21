@@ -67,10 +67,8 @@ public class Listener implements EventListener
         {
             ReadyEvent event = (ReadyEvent)preEvent;
             JDA jda = event.getJDA();
-            Presence presence = jda.getPresence();
             JDA.ShardInfo shardInfo = jda.getShardInfo();
-
-            Endless.LOG.info("Shard "+shardInfo.getShardString()+" ready!");
+            Presence presence = jda.getPresence();
 
             if(bot.config.isBotlogEnabled())
                 webhook.send(":radio_button: Connected to shard `"+shardInfo.getShardString()+"` Guilds: `"+jda.getGuildCache().size()+"` " +
@@ -81,10 +79,12 @@ public class Listener implements EventListener
             bot.optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
 
             if(!(maintenance))
-                presence.setPresence(bot.config.getStatus(), Game.playing("Type "+bot.config.getPrefix()+"help | Version "+Const.VERSION+" | On "+event.getJDA().getGuildCache().size()+" Guilds | "+event.getJDA().getUserCache().size()+
+                presence.setPresence(bot.config.getStatus(), Game.playing("Type "+bot.config.getPrefix()+"help | Version "+Const.VERSION+" | On "+jda.getGuildCache().size()+" Guilds | "+jda.getUserCache().size()+
                         " Users | Shard "+(shardInfo.getShardId()+1)));
             else
                 presence.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("Maintenance mode enabled"));
+
+            Endless.LOG.info("Shard "+shardInfo.getShardString()+" ready!");
         }
         else if(preEvent instanceof GuildJoinEvent)
         {
@@ -98,6 +98,8 @@ public class Listener implements EventListener
         }
         else if(preEvent instanceof GuildMessageReceivedEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMessageReceivedEvent event = (GuildMessageReceivedEvent)preEvent;
             AfkManager.checkAfk(event);
             AfkManager.checkPings(event);
@@ -105,78 +107,108 @@ public class Listener implements EventListener
         }
         else if(preEvent instanceof MessageReceivedEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             MessageReceivedEvent event = (MessageReceivedEvent)preEvent;
             ImportedTagHandler.runTag(bot, event);
         }
         else if(preEvent instanceof GuildMemberRoleAddEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMemberRoleAddEvent event = (GuildMemberRoleAddEvent)preEvent;
             MutedRoleHandler.checkRoleAdd(event);
         }
         else if(preEvent instanceof GuildMemberRoleRemoveEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMemberRoleRemoveEvent event = (GuildMemberRoleRemoveEvent)preEvent;
             MutedRoleHandler.checkRoleRemove(event);
         }
         else if(preEvent instanceof GuildMemberJoinEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMemberJoinEvent event = (GuildMemberJoinEvent)preEvent;
             MutedRoleHandler.checkJoin(event);
             serverlog.onGuildMemberJoin(event);
         }
         else if(preEvent instanceof GuildMemberLeaveEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMemberLeaveEvent event = (GuildMemberLeaveEvent)preEvent;
             serverlog.onGuildMemberLeave(event);
         }
         else if(preEvent instanceof GuildMessageReactionAddEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMessageReactionAddEvent event = (GuildMessageReactionAddEvent)preEvent;
             StarboardHandler.checkAddReaction(event);
         }
         else if(preEvent instanceof GuildMessageReactionRemoveEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMessageReactionRemoveEvent event = (GuildMessageReactionRemoveEvent)preEvent;
             StarboardHandler.checkRemoveReaction(event);
         }
         else if(preEvent instanceof GuildMessageReactionRemoveAllEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMessageReactionRemoveAllEvent event = (GuildMessageReactionRemoveAllEvent)preEvent;
             StarboardHandler.checkRemoveAllReactions(event);
         }
         else if(preEvent instanceof GuildMessageDeleteEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMessageDeleteEvent event = (GuildMessageDeleteEvent)preEvent;
             StarboardHandler.checkDeleteMessage(event);
             serverlog.onGuildMessageDelete(event);
         }
         else if(preEvent instanceof GuildMessageUpdateEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildMessageUpdateEvent event = (GuildMessageUpdateEvent)preEvent;
             serverlog.onGuildMessageUpdate(event);
         }
         else if(preEvent instanceof UserUpdateAvatarEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             UserUpdateAvatarEvent event = (UserUpdateAvatarEvent)preEvent;
             serverlog.onUserUpdateAvatar(event);
         }
         else if(preEvent instanceof GuildVoiceJoinEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildVoiceJoinEvent event = (GuildVoiceJoinEvent)preEvent;
             serverlog.onGuildVoiceJoin(event);
         }
         else if(preEvent instanceof GuildVoiceMoveEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildVoiceMoveEvent event = (GuildVoiceMoveEvent)preEvent;
             serverlog.onGuildVoiceMove(event);
         }
         else if(preEvent instanceof GuildVoiceLeaveEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildVoiceLeaveEvent event = (GuildVoiceLeaveEvent)preEvent;
             serverlog.onGuildVoiceLeave(event);
         }
         else if(preEvent instanceof GuildBanEvent)
         {
+            if(bot.maintenance || !(bot.initialized))
+                return;
             GuildBanEvent event = (GuildBanEvent)preEvent;
             modlog.onGuildBan(event);
         }

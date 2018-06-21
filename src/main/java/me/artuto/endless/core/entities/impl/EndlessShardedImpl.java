@@ -17,39 +17,43 @@
 
 package me.artuto.endless.core.entities.impl;
 
-import ch.qos.logback.classic.Logger;
-import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.EndlessCore;
+import me.artuto.endless.core.EndlessSharded;
 import me.artuto.endless.core.entities.GuildSettings;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Artuto
  */
 
-public class EndlessCoreImpl implements EndlessCore
+public class EndlessShardedImpl implements EndlessSharded
 {
-    private final Logger LOG = (Logger)LoggerFactory.getLogger(EndlessCore.class);
+    private final Bot bot;
+    private final List<EndlessCore> shards;
+    private final ShardManager shardManager;
 
-    protected final Bot bot;
-    protected final CommandClient client;
-    protected final List<GuildSettings> guildSettings;
-    protected final JDA jda;
+    private final List<GuildSettings> guildSettings;
+    private final Map<JDA, EndlessCore> shardsMap;
 
-    public EndlessCoreImpl(Bot bot, CommandClient client, JDA jda)
+    public EndlessShardedImpl(Bot bot, ShardManager shardManager, List<EndlessCore> shards)
     {
         this.bot = bot;
-        this.client = client;
-        this.jda = jda;
+        this.shardManager = shardManager;
+        this.shards = shards;
+
         this.guildSettings = new LinkedList<>();
+        this.shardsMap = new HashMap<>();
+
+        shards.forEach(shard -> {
+            guildSettings.addAll(shard.getGuildSettings());
+            shardsMap.put(shard.getJDA(), shard);
+        });
     }
 
     @Override
@@ -59,16 +63,16 @@ public class EndlessCoreImpl implements EndlessCore
     }
 
     @Override
-    public CommandClient getClient()
+    public EndlessCore getShard(JDA jda)
     {
-        return client;
+        return shardsMap.get(jda);
     }
 
     @Nullable
     @Override
     public GuildSettings getGuildSettingsById(long id)
     {
-        Guild guild = jda.getGuildById(id);
+        Guild guild = shardManager.getGuildById(id);
         if(!(guild==null))
             return guildSettings.stream().filter(gs -> gs.getGuild().getIdLong()==id).findFirst().orElse(null);
         else
@@ -79,17 +83,11 @@ public class EndlessCoreImpl implements EndlessCore
     @Override
     public GuildSettings getGuildSettingsById(String id)
     {
-        Guild guild = jda.getGuildById(id);
+        Guild guild = shardManager.getGuildById(id);
         if(!(guild==null))
             return guildSettings.stream().filter(gs -> gs.getGuild().getId().equals(id)).findFirst().orElse(null);
         else
             return null;
-    }
-
-    @Override
-    public JDA getJDA()
-    {
-        return jda;
     }
 
     @Override
@@ -99,36 +97,14 @@ public class EndlessCoreImpl implements EndlessCore
     }
 
     @Override
-    public String toString()
+    public List<EndlessCore> getShards()
     {
-        return "EndlessShard: "+jda.getShardInfo().getShardString();
+        return Collections.unmodifiableList(shards);
     }
 
-    public void makeCache()
+    @Override
+    public ShardManager getShardManager()
     {
-        LOG.debug("Starting cache creation...");
-
-        for(Guild guild : bot.db.getGuildsThatHaveSettings(jda))
-            guildSettings.add(bot.db.getSettings(guild));
-        LOG.debug("Cached {} Guild Settings", guildSettings.size());
-
-        LOG.debug("Successfully cached all needed entities.");
-    }
-
-    public void updateSettingsCache(Guild guild)
-    {
-        LOG.debug("Requested cache update of settings for Guild {}", guild.getIdLong());
-        GuildSettings settings = getGuildSettingsById(guild.getIdLong());
-
-        if(!(settings==null))
-            guildSettings.remove(settings);
-        guildSettings.add(bot.db.getSettings(guild));
-
-        LOG.debug("Successfully updated settings cache for Guild {}", guild.getIdLong());
-    }
-
-    public void updateInstances()
-    {
-        bot.gsdm.endlessImpl = this;
+        return shardManager;
     }
 }

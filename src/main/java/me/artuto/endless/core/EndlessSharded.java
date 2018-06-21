@@ -17,9 +17,9 @@
 
 package me.artuto.endless.core;
 
-import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GuildSettings;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 
 import javax.annotation.Nullable;
@@ -29,11 +29,11 @@ import java.util.List;
  * @author Artuto
  */
 
-public interface EndlessCore
+public interface EndlessSharded
 {
     Bot getBot();
 
-    CommandClient getClient();
+    EndlessCore getShard(JDA jda);
 
     @Nullable
     GuildSettings getGuildSettingsById(long id);
@@ -43,5 +43,7 @@ public interface EndlessCore
 
     List<GuildSettings> getGuildSettings();
 
-    JDA getJDA();
+    List<EndlessCore> getShards();
+
+    ShardManager getShardManager();
 }

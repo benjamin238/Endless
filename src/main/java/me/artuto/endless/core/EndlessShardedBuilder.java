@@ -17,31 +17,38 @@
 
 package me.artuto.endless.core;
 
-import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.GuildSettings;
-import net.dv8tion.jda.core.JDA;
+import me.artuto.endless.core.entities.impl.EndlessShardedImpl;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 
-import javax.annotation.Nullable;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
  * @author Artuto
  */
 
-public interface EndlessCore
+public class EndlessShardedBuilder
 {
-    Bot getBot();
+    private final Bot bot;
+    private final ShardManager shardManager;
 
-    CommandClient getClient();
+    private final List<EndlessCore> shards;
 
-    @Nullable
-    GuildSettings getGuildSettingsById(long id);
+    public EndlessShardedBuilder(Bot bot, ShardManager shardManager)
+    {
+        this.bot = bot;
+        this.shardManager = shardManager;
+        this.shards = new LinkedList<>();
+    }
 
-    @Nullable
-    GuildSettings getGuildSettingsById(String id);
+    public void addShard(EndlessCore shard)
+    {
+        shards.add(shard);
+    }
 
-    List<GuildSettings> getGuildSettings();
-
-    JDA getJDA();
+    public EndlessSharded build()
+    {
+        return new EndlessShardedImpl(bot, shardManager, shards);
+    }
 }
