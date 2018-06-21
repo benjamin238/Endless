@@ -32,9 +32,9 @@ import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.serverconfig.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
-import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.EndlessCoreBuilder;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
+import me.artuto.endless.core.EndlessSharded;
+import me.artuto.endless.core.EndlessShardedBuilder;
 import me.artuto.endless.data.Database;
 import me.artuto.endless.data.managers.*;
 import me.artuto.endless.exceptions.ConfigException;
@@ -49,6 +49,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
@@ -57,7 +58,6 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.login.LoginException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.stream.Collectors;
 
 /**
  * @author Artuto
@@ -65,9 +65,10 @@ import java.util.stream.Collectors;
 
 public class Bot extends ListenerAdapter
 {
+    public EndlessSharded endless;
     public boolean maintenance;
-    private boolean initialized = false;
-    public EndlessCore endless;
+    public boolean initialized = false;
+    private EndlessShardedBuilder endlessBuilder;
 
     // Config
     public Config config;
@@ -227,28 +228,35 @@ public class Bot extends ListenerAdapter
                 .setGame(Game.playing("[ENDLESS] Loading..."))
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
-                .setEnableShutdownHook(true);
+                .setEnableShutdownHook(true)
+                .setShardsTotal(2);
         if(maintenance)
             builder.addEventListeners(this, client);
         else
             builder.addEventListeners(this, client, listener, waiter);
         shardManager = builder.build();
 
-        endless = new EndlessCoreBuilder(this)
-                .setCommandClient(client)
-                .setShardManager(shardManager)
-                .build();
+        endlessBuilder = new EndlessShardedBuilder(this, shardManager);
     }
 
     @Override
     public void onReady(ReadyEvent event)
     {
-        // System.out.println(shardManager.getShards().stream().allMatch(shard -> shard.getStatus().equals(JDA.Status.CONNECTED)));
-        if(shardManager.getShards().stream().filter(shard -> !(shard.getStatus().equals(JDA.Status.CONNECTED)))
-                .collect(Collectors.toList()).isEmpty())
+        endlessBuilder.addShard(new EndlessCoreBuilder(this, event.getJDA())
+                .setCommandClient(client)
+                .build());
+    }
+
+    @Override
+    public void onStatusChange(StatusChangeEvent event)
+    {
+        if(event.getNewStatus()==JDA.Status.CONNECTED)
         {
-            EndlessCoreImpl impl = (EndlessCoreImpl)endless;
-            impl.makeCache();
+            if(event.getJDA().asBot().getShardManager().getShards().stream().allMatch(shard -> shard.getStatus()==JDA.Status.CONNECTED))
+            {
+                this.endless = endlessBuilder.build();
+                this.initialized = true;
+            }
         }
     }
 }

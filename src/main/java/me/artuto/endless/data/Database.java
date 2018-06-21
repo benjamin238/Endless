@@ -20,6 +20,7 @@ package me.artuto.endless.data;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import net.dv8tion.jda.bot.sharding.ShardManager;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import org.json.JSONArray;
@@ -113,7 +114,7 @@ public class Database
         }
     }
 
-    public List<Guild> getGuildsThatHaveSettings(ShardManager jda)
+    public List<Guild> getGuildsThatHaveSettings(JDA jda)
     {
         Guild guild;
         List<Guild> guilds = new LinkedList<>();

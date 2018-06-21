@@ -55,12 +55,12 @@ import java.util.stream.Collectors;
 
 public class ServerLogging
 {
-    private final GuildSettingsDataManager gsdm;
+    private final Bot bot;
     private final Parser parser;
 
     public ServerLogging(Bot bot)
     {
-        this.gsdm = bot.gsdm;
+        this.bot = bot;
         this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
     }
 
