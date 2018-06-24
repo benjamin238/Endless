@@ -105,7 +105,7 @@ public class QuoteCmd extends EndlessCommand
             else
             {
                 for(Message.Attachment att : msg.getAttachments())
-                    sb.append(":paperclip: **").append(att.getName()).append("**: ").append(att.getUrl()).append("\n");
+                    sb.append(":paperclip: **").append(att.getFileName()).append("**: ").append(att.getUrl()).append("\n");
             }
 
             builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
