@@ -18,20 +18,19 @@
 package me.artuto.endless.cmddata;
 
 import com.jagrosh.jdautilities.command.Command.Category;
+import me.artuto.endless.Bot;
 import me.artuto.endless.handlers.BlacklistHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
 
 public class Categories
 {
-    private static boolean initialized;
     private static boolean maintenance;
     private static BlacklistHandler bHandler;
     private static SpecialCaseHandler sHandler;
 
-    public Categories(boolean initialized, boolean maintenance, BlacklistHandler bHandler, SpecialCaseHandler shHndler)
+    public Categories(boolean maintenance, BlacklistHandler bHandler, SpecialCaseHandler shHndler)
     {
         Categories.bHandler = bHandler;
-        Categories.initialized = initialized;
         Categories.maintenance = maintenance;
         Categories.sHandler = shHndler;
     }
@@ -41,7 +40,7 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(initialized))
+        if(!(Bot.getInstance().initialized))
             return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
@@ -65,7 +64,7 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(initialized))
+        if(!(Bot.getInstance().initialized))
             return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
@@ -78,7 +77,7 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(initialized))
+        if(!(Bot.getInstance().initialized))
             return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
@@ -91,7 +90,7 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(initialized))
+        if(!(Bot.getInstance().initialized))
             return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
@@ -104,7 +103,7 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(initialized))
+        if(!(Bot.getInstance().initialized))
             return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
@@ -117,7 +116,7 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(initialized))
+        if(!(Bot.getInstance().initialized))
             return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);

@@ -17,19 +17,11 @@
 
 package me.artuto.endless.core.entities;
 
-public interface ImportedTag
+/**
+ * @author Artuto
+ */
+
+public interface GlobalTag extends Tag
 {
-    String getId();
 
-    Long getIdLong();
-
-    String getName();
-
-    String getInternalName();
-
-    String getContent();
-
-    Long getOwnerId();
-
-    Long getGuildId();
 }

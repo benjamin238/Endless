@@ -44,7 +44,7 @@ public class CommandLogging implements CommandListener
     @Override
     public void onCommand(CommandEvent event, Command command)
     {
-        TextChannel commandLog = event.getJDA().getTextChannelById(bot.config.getCommandslogChannelId());
+        TextChannel commandLog = bot.shardManager.getTextChannelById(bot.config.getCommandslogChannelId());
         User author = event.getAuthor();
         Guild guild = event.getGuild();
         

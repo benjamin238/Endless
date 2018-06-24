@@ -21,15 +21,14 @@ import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.EndlessCore;
+import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.LocalTag;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Artuto
@@ -39,17 +38,33 @@ public class EndlessCoreImpl implements EndlessCore
 {
     private final Logger LOG = (Logger)LoggerFactory.getLogger(EndlessCore.class);
 
-    protected final Bot bot;
-    protected final CommandClient client;
-    protected final List<GuildSettings> guildSettings;
-    protected final JDA jda;
+    private final Bot bot;
+    private final CommandClient client;
+    private final JDA jda;
+
+    private final List<GuildSettings> guildSettings;
+    private final Map<Guild, GuildSettings> guildSettingsMap;
+
+    private final List<GlobalTag> globalTags;
+    private final List<LocalTag> localTags;
+    private final Map<String, GlobalTag> globalTagMap;
+    private final Map<String, LocalTag> localTagMap;
 
     public EndlessCoreImpl(Bot bot, CommandClient client, JDA jda)
     {
         this.bot = bot;
         this.client = client;
         this.jda = jda;
+
         this.guildSettings = new LinkedList<>();
+        this.guildSettingsMap = new HashMap<>();
+
+        this.globalTags = new LinkedList<>();
+        this.globalTagMap = new HashMap<>();
+        this.localTags = new LinkedList<>();
+        this.localTagMap = new HashMap<>();
+
+        guildSettings.forEach(gs -> guildSettingsMap.put(gs.getGuild(), gs));
     }
 
     @Override
@@ -64,26 +79,30 @@ public class EndlessCoreImpl implements EndlessCore
         return client;
     }
 
-    @Nullable
+    @Override
+    public GlobalTag getGlobalTag(String name)
+    {
+        return globalTagMap.get(name);
+    }
+
+    @Override
+    public GuildSettings getGuildSettings(Guild guild)
+    {
+        return guildSettingsMap.getOrDefault(guild, bot.db.createDefault(guild));
+    }
+
     @Override
     public GuildSettings getGuildSettingsById(long id)
     {
         Guild guild = jda.getGuildById(id);
-        if(!(guild==null))
-            return guildSettings.stream().filter(gs -> gs.getGuild().getIdLong()==id).findFirst().orElse(null);
-        else
-            return null;
+        return guildSettingsMap.getOrDefault(guild, bot.db.createDefault(guild));
     }
 
-    @Nullable
     @Override
     public GuildSettings getGuildSettingsById(String id)
     {
         Guild guild = jda.getGuildById(id);
-        if(!(guild==null))
-            return guildSettings.stream().filter(gs -> gs.getGuild().getId().equals(id)).findFirst().orElse(null);
-        else
-            return null;
+        return guildSettingsMap.getOrDefault(guild, bot.db.createDefault(guild));
     }
 
     @Override
@@ -93,9 +112,27 @@ public class EndlessCoreImpl implements EndlessCore
     }
 
     @Override
+    public List<GlobalTag> getGlobalTags()
+    {
+        return Collections.unmodifiableList(globalTags);
+    }
+
+    @Override
     public List<GuildSettings> getGuildSettings()
     {
         return Collections.unmodifiableList(guildSettings);
+    }
+
+    @Override
+    public List<LocalTag> getLocalTags()
+    {
+        return Collections.unmodifiableList(localTags);
+    }
+
+    @Override
+    public LocalTag getLocalTag(long guildId, String name)
+    {
+        return localTagMap.get(guildId+":"+name);
     }
 
     @Override
@@ -106,29 +143,53 @@ public class EndlessCoreImpl implements EndlessCore
 
     public void makeCache()
     {
-        LOG.debug("Starting cache creation...");
+        LOG.debug("Starting cache creation for shard "+jda.getShardInfo().getShardId()+"...");
 
         for(Guild guild : bot.db.getGuildsThatHaveSettings(jda))
-            guildSettings.add(bot.db.getSettings(guild));
+        {
+            GuildSettings settings = bot.db.getSettings(guild);
+            addSettings(guild, settings);
+        }
         LOG.debug("Cached {} Guild Settings", guildSettings.size());
 
-        LOG.debug("Successfully cached all needed entities.");
+        for(GlobalTag tag : bot.tdm.getGlobalTags())
+            addGlobalTag(tag);
+        LOG.debug("Cached {} Global tags", globalTags.size());
+
+        jda.getGuilds().forEach(guild -> {
+            for(LocalTag tag : bot.tdm.getLocalTagsForGuild(guild))
+                addLocalTag(tag);
+        });
+        LOG.debug("Cached {} Local tags", localTags.size());
+
+        LOG.debug("Successfully cached all needed entities for shard "+jda.getShardInfo().getShardId()+".");
     }
 
-    public void updateSettingsCache(Guild guild)
+    public void addGlobalTag(GlobalTag tag)
     {
-        LOG.debug("Requested cache update of settings for Guild {}", guild.getIdLong());
-        GuildSettings settings = getGuildSettingsById(guild.getIdLong());
-
-        if(!(settings==null))
-            guildSettings.remove(settings);
-        guildSettings.add(bot.db.getSettings(guild));
-
-        LOG.debug("Successfully updated settings cache for Guild {}", guild.getIdLong());
+        globalTags.add(tag);
+        globalTagMap.put(tag.getName(), tag);
     }
 
-    public void updateInstances()
+    public void addLocalTag(LocalTag tag)
     {
-        bot.gsdm.endlessImpl = this;
+        localTags.add(tag);
+        localTagMap.put(tag.getGuildId()+":"+tag.getName(), tag);
+    }
+
+    public void addSettings(Guild guild, GuildSettings settings)
+    {
+        guildSettings.add(settings);
+        guildSettingsMap.put(guild, settings);
+    }
+
+    public void removeGlobalTag(String name)
+    {
+        globalTags.remove(globalTagMap.remove(name));
+    }
+
+    public void removeLocalTag(long guild, String name)
+    {
+        localTags.remove(localTagMap.remove(guild+":"+name));
     }
 }

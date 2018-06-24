@@ -17,47 +17,35 @@
 
 package me.artuto.endless.core.entities.impl;
 
-import me.artuto.endless.core.entities.ImportedTag;
+import me.artuto.endless.core.entities.GlobalTag;
 
-public class ImportedTagImpl implements ImportedTag
+/**
+ * @author Artuto
+ */
+
+public class GlobalTagImpl implements GlobalTag
 {
-    private final Long tagId;
-    private final String name;
-    private final String content;
-    private final Long owner;
-    private final Long guild;
+    private long ownerId, tagId;
+    private String content, name;
 
-    public ImportedTagImpl(Long tagId, String name, String content, Long owner, Long guild)
+    public GlobalTagImpl(long ownerId, long tagId, String content, String name)
     {
+        this.ownerId = ownerId;
         this.tagId = tagId;
-        this.name = name;
         this.content = content;
-        this.owner = owner;
-        this.guild = guild;
+        this.name = name;
     }
 
     @Override
-    public String getId()
-    {
-        return tagId.toString();
-    }
-
-    @Override
-    public Long getIdLong()
+    public long getId()
     {
         return tagId;
     }
 
     @Override
-    public String getName()
+    public long getOwnerId()
     {
-        return name.toLowerCase().split(":", 2)[1];
-    }
-
-    @Override
-    public String getInternalName()
-    {
-        return name.toLowerCase();
+        return ownerId;
     }
 
     @Override
@@ -67,20 +55,29 @@ public class ImportedTagImpl implements ImportedTag
     }
 
     @Override
-    public Long getOwnerId()
+    public String getName()
     {
-        return owner;
-    }
-
-    @Override
-    public Long getGuildId()
-    {
-        return guild;
+        return name;
     }
 
     @Override
     public String toString()
     {
-        return "IT:"+getName()+"/"+guild+" ("+tagId+")";
+        return String.format("GlobalTag: %s(%s)", name, tagId);
+    }
+
+    public void setContent(String newContent)
+    {
+        this.content = newContent;
+    }
+
+    public void setOwnerId(long ownerId)
+    {
+        this.ownerId = ownerId;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 }

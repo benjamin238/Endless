@@ -99,7 +99,7 @@ public class Bot extends ListenerAdapter
     public ServerLogging serverlog;
 
     // Loggers
-    private final Logger CONFIGLOG = (Logger) LoggerFactory.getLogger("Config Loader");
+    private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
 
     // Schedulers;
     public ScheduledExecutorService muteScheduler;
@@ -144,10 +144,10 @@ public class Bot extends ListenerAdapter
         pdm = new PunishmentsDataManager(db);
         prdm = new ProfileDataManager(db);
         sdm = new StarboardDataManager(db);
-        tdm = new TagDataManager(db);
+        tdm = new TagDataManager(this);
         BlacklistHandler bHandler = new BlacklistHandler(bdm);
         SpecialCaseHandler sHandler = new SpecialCaseHandler();
-        new Categories(initialized, maintenance, bHandler, sHandler);
+        new Categories(maintenance, bHandler, sHandler);
         new GuildUtils(this);
 
         botlog = new BotLogging(this);
@@ -253,10 +253,7 @@ public class Bot extends ListenerAdapter
         if(event.getNewStatus()==JDA.Status.CONNECTED)
         {
             if(event.getJDA().asBot().getShardManager().getShards().stream().allMatch(shard -> shard.getStatus()==JDA.Status.CONNECTED))
-            {
                 this.endless = endlessBuilder.build();
-                this.initialized = true;
-            }
         }
     }
 }
