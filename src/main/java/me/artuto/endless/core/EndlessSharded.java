@@ -18,11 +18,13 @@
 package me.artuto.endless.core;
 
 import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.LocalTag;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Guild;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -35,15 +37,23 @@ public interface EndlessSharded
 
     EndlessCore getShard(JDA jda);
 
-    @Nullable
+    GlobalTag getGlobalTag(String name);
+
+    GuildSettings getGuildSettings(Guild guild);
+
     GuildSettings getGuildSettingsById(long id);
 
-    @Nullable
     GuildSettings getGuildSettingsById(String id);
 
+    List<GlobalTag> getGlobalTags();
+
     List<GuildSettings> getGuildSettings();
+
+    List<LocalTag> getLocalTags();
 
     List<EndlessCore> getShards();
 
     ShardManager getShardManager();
+
+    LocalTag getLocalTag(long guildId, String name);
 }

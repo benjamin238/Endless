@@ -19,8 +19,11 @@ package me.artuto.endless.core;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.LocalTag;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Guild;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -35,13 +38,21 @@ public interface EndlessCore
 
     CommandClient getClient();
 
-    @Nullable
+    GlobalTag getGlobalTag(String name);
+
+    GuildSettings getGuildSettings(Guild guild);
+
     GuildSettings getGuildSettingsById(long id);
 
-    @Nullable
     GuildSettings getGuildSettingsById(String id);
+
+    JDA getJDA();
+
+    List<GlobalTag> getGlobalTags();
 
     List<GuildSettings> getGuildSettings();
 
-    JDA getJDA();
+    List<LocalTag> getLocalTags();
+
+    LocalTag getLocalTag(long guildId, String name);
 }

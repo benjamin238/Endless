@@ -19,11 +19,10 @@ package me.artuto.endless.handlers;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.data.managers.ClientGSDMProvider;
-import me.artuto.endless.core.entities.ImportedTag;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
@@ -83,13 +82,12 @@ public class ImportedTagHandler
 
                 String commandArgs = String.join(" ", parts[0], parts[1]==null?"":parts[1]);
                 String[] tagParts = splitTagNameAndArgs(commandArgs);
-                ImportedTag tag = bot.tdm.getImportedTagsForGuild(event.getGuild().getIdLong())
+                Tag tag = bot.endless.getGuildSettings(event.getGuild()).getImportedTags()
                         .stream().filter(t -> t.getName().equals(tagParts[0])).findFirst().orElse(null);
-
                 if(tag==null)
                     return;
 
-                CommandEvent cevent = (CommandEvent)new CommandEvent(event, commandArgs, client);
+                CommandEvent cevent = new CommandEvent(event, commandArgs, client);
                 if(!(client.getListener()==null))
                     client.getListener().onCommand(cevent, tagCommand);
                 tagCommand.run(cevent);

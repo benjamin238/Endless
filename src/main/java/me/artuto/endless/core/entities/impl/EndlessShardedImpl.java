@@ -20,12 +20,13 @@ package me.artuto.endless.core.entities.impl;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.EndlessSharded;
+import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.LocalTag;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -36,10 +37,16 @@ public class EndlessShardedImpl implements EndlessSharded
 {
     private final Bot bot;
     private final List<EndlessCore> shards;
+    private final Map<JDA, EndlessCore> shardMap;
     private final ShardManager shardManager;
 
     private final List<GuildSettings> guildSettings;
-    private final Map<JDA, EndlessCore> shardsMap;
+    private final Map<Guild, GuildSettings> guildSettingsMap;
+
+    private final List<GlobalTag> globalTags;
+    private final List<LocalTag> localTags;
+    private final Map<String, GlobalTag> globalTagMap;
+    private final Map<String, LocalTag> localTagMap;
 
     public EndlessShardedImpl(Bot bot, ShardManager shardManager, List<EndlessCore> shards)
     {
@@ -48,11 +55,22 @@ public class EndlessShardedImpl implements EndlessSharded
         this.shards = shards;
 
         this.guildSettings = new LinkedList<>();
-        this.shardsMap = new HashMap<>();
+        this.guildSettingsMap = new HashMap<>();
+        this.shardMap = new HashMap<>();
+
+        this.globalTags = new LinkedList<>();
+        this.globalTagMap = new HashMap<>();
+        this.localTags = new LinkedList<>();
+        this.localTagMap = new HashMap<>();
 
         shards.forEach(shard -> {
             guildSettings.addAll(shard.getGuildSettings());
-            shardsMap.put(shard.getJDA(), shard);
+            guildSettings.forEach(gs -> guildSettingsMap.put(gs.getGuild(), gs));
+            globalTags.addAll(shard.getGlobalTags());
+            globalTags.forEach(gTag -> globalTagMap.put(gTag.getName(), gTag));
+            localTags.addAll(shard.getLocalTags());
+            localTags.forEach(lTag -> localTagMap.put(lTag.getGuildId()+":"+lTag.getName(), lTag));
+            shardMap.put(shard.getJDA(), shard);
         });
     }
 
@@ -65,35 +83,33 @@ public class EndlessShardedImpl implements EndlessSharded
     @Override
     public EndlessCore getShard(JDA jda)
     {
-        return shardsMap.get(jda);
+        return shardMap.get(jda);
     }
 
-    @Nullable
+    @Override
+    public GlobalTag getGlobalTag(String name)
+    {
+        return globalTagMap.get(name);
+    }
+
+    @Override
+    public GuildSettings getGuildSettings(Guild guild)
+    {
+        return guildSettingsMap.getOrDefault(guild, bot.db.createDefault(guild));
+    }
+
     @Override
     public GuildSettings getGuildSettingsById(long id)
     {
         Guild guild = shardManager.getGuildById(id);
-        if(!(guild==null))
-            return guildSettings.stream().filter(gs -> gs.getGuild().getIdLong()==id).findFirst().orElse(null);
-        else
-            return null;
+        return guildSettingsMap.getOrDefault(guild, bot.db.createDefault(guild));
     }
 
-    @Nullable
     @Override
     public GuildSettings getGuildSettingsById(String id)
     {
         Guild guild = shardManager.getGuildById(id);
-        if(!(guild==null))
-            return guildSettings.stream().filter(gs -> gs.getGuild().getId().equals(id)).findFirst().orElse(null);
-        else
-            return null;
-    }
-
-    @Override
-    public List<GuildSettings> getGuildSettings()
-    {
-        return Collections.unmodifiableList(guildSettings);
+        return guildSettingsMap.getOrDefault(guild, bot.db.createDefault(guild));
     }
 
     @Override
@@ -103,8 +119,60 @@ public class EndlessShardedImpl implements EndlessSharded
     }
 
     @Override
+    public List<GlobalTag> getGlobalTags()
+    {
+        return Collections.unmodifiableList(globalTags);
+    }
+
+    @Override
+    public List<GuildSettings> getGuildSettings()
+    {
+        return Collections.unmodifiableList(guildSettings);
+    }
+
+    @Override
+    public List<LocalTag> getLocalTags()
+    {
+        return Collections.unmodifiableList(localTags);
+    }
+
+    @Override
+    public LocalTag getLocalTag(long guildId, String name)
+    {
+        return localTagMap.get(guildId+":"+name);
+    }
+
+    @Override
     public ShardManager getShardManager()
     {
         return shardManager;
+    }
+
+    public void addGlobalTag(GlobalTag tag)
+    {
+        globalTags.add(tag);
+        globalTagMap.put(tag.getName(), tag);
+    }
+
+    public void addLocalTag(LocalTag tag)
+    {
+        localTags.add(tag);
+        localTagMap.put(tag.getGuildId()+":"+tag.getName(), tag);
+    }
+
+    public void addSettings(Guild guild, GuildSettings settings)
+    {
+        guildSettings.add(settings);
+        guildSettingsMap.put(guild, settings);
+    }
+
+    public void removeGlobalTag(String name)
+    {
+        globalTags.remove(globalTagMap.remove(name));
+    }
+
+    public void removeLocalTag(long guild, String name)
+    {
+        localTags.remove(localTagMap.remove(guild+":"+name));
     }
 }

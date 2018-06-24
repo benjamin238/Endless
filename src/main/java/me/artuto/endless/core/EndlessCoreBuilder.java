@@ -19,13 +19,8 @@ package me.artuto.endless.core;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.managers.Presence;
 
 /**
  * @author Artuto
@@ -52,8 +47,6 @@ public class EndlessCoreBuilder
     public EndlessCore build()
     {
         EndlessCoreImpl impl = new EndlessCoreImpl(bot, client, jda);
-
-        impl.updateInstances();
         impl.makeCache();
 
         return impl;

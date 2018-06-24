@@ -39,6 +39,8 @@ public interface GuildSettings
 
     List<Role> getRoleMeRoles();
 
+    List<Tag> getImportedTags();
+
     long getLeaveChannel();
 
     long getModlog();

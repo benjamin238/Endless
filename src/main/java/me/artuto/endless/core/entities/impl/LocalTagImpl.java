@@ -17,39 +17,42 @@
 
 package me.artuto.endless.core.entities.impl;
 
-import me.artuto.endless.core.entities.Tag;
+import me.artuto.endless.core.entities.LocalTag;
 
-public class TagImpl implements Tag
+/**
+ * @author Artuto
+ */
+
+public class LocalTagImpl implements LocalTag
 {
-    private final Long tagId;
-    private final String name;
-    private final String content;
-    private final Long owner;
+    private long guildId, ownerId, tagId;
+    private String content, name;
 
-    public TagImpl(Long tagId, String name, String content, Long owner)
+    public LocalTagImpl(long guildId, long ownerId, long tagId, String content, String name)
     {
+        this.guildId = guildId;
+        this.ownerId = ownerId;
         this.tagId = tagId;
-        this.name = name;
         this.content = content;
-        this.owner = owner;
+        this.name = name;
     }
 
     @Override
-    public String getId()
+    public long getGuildId()
     {
-        return tagId.toString();
+        return guildId;
     }
 
     @Override
-    public Long getIdLong()
+    public long getId()
     {
         return tagId;
     }
 
     @Override
-    public String getName()
+    public long getOwnerId()
     {
-        return name;
+        return ownerId;
     }
 
     @Override
@@ -59,14 +62,34 @@ public class TagImpl implements Tag
     }
 
     @Override
-    public Long getOwnerId()
+    public String getName()
     {
-        return owner;
+        return name;
     }
 
     @Override
     public String toString()
     {
-        return "T:"+getName()+" ("+tagId+")";
+        return String.format("LocalTag: %s(%s:%s)", name, guildId, tagId);
+    }
+
+    public void setContent(String newContent)
+    {
+        this.content = newContent;
+    }
+
+    public void setGuildId(long guildId)
+    {
+        this.guildId = guildId;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public void setOwnerId(long ownerId)
+    {
+        this.ownerId = ownerId;
     }
 }

@@ -19,13 +19,11 @@ package me.artuto.endless.core.entities;
 
 public interface Tag
 {
-    String getId();
+    long getId();
 
-    Long getIdLong();
-
-    String getName();
+    long getOwnerId();
 
     String getContent();
 
-    Long getOwnerId();
+    String getName();
 }

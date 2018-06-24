@@ -18,24 +18,27 @@
 package me.artuto.endless.core.entities.impl;
 
 import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.Tag;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class GuildSettingsImpl implements GuildSettings
 {
-    private final boolean isDefault;
-    private final Collection<String> prefixes;
-    private final Guild guild;
-    private final int banDeleteDays, starboardCount;
-    private final List<Role> roleMeRoles;
-    private final long modlogId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
-    private final String welcomeMsg, leaveMsg;
+    private boolean isDefault;
+    private Collection<String> prefixes;
+    private Guild guild;
+    private int banDeleteDays, starboardCount;
+    private List<Role> roleMeRoles;
+    private List<Tag> importedTags;
+    private long modlogId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
+    private String welcomeMsg, leaveMsg;
 
     public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
-                             List<Role> roleMeRoles, long leaveId, long modlogId, long mutedRoleId,
+                             List<Role> roleMeRoles, List<Tag> importedTags, long leaveId, long modlogId, long mutedRoleId,
                              long serverlogId, long starboardId, long welcomeId, String leaveMsg, String welcomeMsg)
     {
         this.isDefault = isDefault;
@@ -44,6 +47,7 @@ public class GuildSettingsImpl implements GuildSettings
         this.banDeleteDays = banDeleteDays;
         this.starboardCount = starboardCount;
         this.roleMeRoles = roleMeRoles;
+        this.importedTags = importedTags;
         this.leaveId = leaveId;
         this.modlogId = modlogId;
         this.mutedRoleId = mutedRoleId;
@@ -57,21 +61,21 @@ public class GuildSettingsImpl implements GuildSettings
     @Override
     public boolean isDefault()
     {
-        return isDefault;
+        return isDefault && isEmpty();
     }
 
     @Override
     public boolean isEmpty()
     {
         return (prefixes==null || prefixes.isEmpty()) && banDeleteDays==0 && starboardCount==0 && (roleMeRoles==null || roleMeRoles.isEmpty())
-                && leaveId==0L && modlogId==0L && serverlogId==0L && starboardId==0L && welcomeId==0L && (leaveMsg==null || leaveMsg.isEmpty())
-                && (welcomeMsg==null || welcomeMsg.isEmpty());
+                && (importedTags==null || importedTags.isEmpty()) && leaveId==0L && modlogId==0L && serverlogId==0L && starboardId==0L
+                && welcomeId==0L && (leaveMsg==null || leaveMsg.isEmpty()) && (welcomeMsg==null || welcomeMsg.isEmpty());
     }
 
     @Override
     public Collection<String> getPrefixes()
     {
-        return prefixes;
+        return Collections.unmodifiableCollection(prefixes);
     }
 
     @Override
@@ -95,7 +99,12 @@ public class GuildSettingsImpl implements GuildSettings
     @Override
     public List<Role> getRoleMeRoles()
     {
-        return roleMeRoles;
+        return Collections.unmodifiableList(roleMeRoles);
+    }
+
+    public List<Tag> getImportedTags()
+    {
+        return Collections.unmodifiableList(importedTags);
     }
 
     @Override
@@ -149,6 +158,94 @@ public class GuildSettingsImpl implements GuildSettings
     @Override
     public String toString()
     {
-        return String.format("GS:%s(%s)", guild.getName(), guild.getId());
+        if(isDefault())
+            return String.format("GS DEFAULT:%s(%s)", guild.getName(), guild.getId());
+        else
+            return String.format("GS:%s(%s)", guild.getName(), guild.getId());
+    }
+
+    public void addImportedTag(Tag tag)
+    {
+        importedTags.add(tag);
+    }
+
+    public void addPrefix(String prefix)
+    {
+        prefixes.add(prefix);
+    }
+
+    public void addRoleMeRole(Role role)
+    {
+        roleMeRoles.add(role);
+    }
+
+    public void removeImportedTag(Tag tag)
+    {
+        importedTags.remove(tag);
+    }
+
+    public void removePrefix(String prefix)
+    {
+        prefixes.remove(prefix);
+    }
+
+    public void removeRoleMeRole(Role role)
+    {
+        roleMeRoles.remove(role);
+    }
+
+    public void setBanDeleteDays(int banDeleteDays)
+    {
+        this.banDeleteDays = banDeleteDays;
+    }
+
+    public void setGuild(Guild guild)
+    {
+        this.guild = guild;
+    }
+
+    public void setLeaveId(long leaveId)
+    {
+        this.leaveId = leaveId;
+    }
+
+    public void setLeaveMsg(String leaveMsg)
+    {
+        this.leaveMsg = leaveMsg;
+    }
+
+    public void setModlogId(long modlogId)
+    {
+        this.modlogId = modlogId;
+    }
+
+    public void setMutedRoleId(long mutedRoleId)
+    {
+        this.mutedRoleId = mutedRoleId;
+    }
+
+    public void setServerlogId(long serverlogId)
+    {
+        this.serverlogId = serverlogId;
+    }
+
+    public void setStarboardCount(int starboardCount)
+    {
+        this.starboardCount = starboardCount;
+    }
+
+    public void setStarboardId(long starboardId)
+    {
+        this.starboardId = starboardId;
+    }
+
+    public void setWelcomeId(long welcomeId)
+    {
+        this.welcomeId = welcomeId;
+    }
+
+    public void setWelcomeMsg(String welcomeMsg)
+    {
+        this.welcomeMsg = welcomeMsg;
     }
 }

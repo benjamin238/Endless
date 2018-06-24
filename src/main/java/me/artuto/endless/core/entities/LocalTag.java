@@ -15,31 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data.managers;
+package me.artuto.endless.core.entities;
 
-import com.jagrosh.jdautilities.command.GuildSettingsProvider;
-import me.artuto.endless.Bot;
-import me.artuto.endless.data.Database;
-import me.artuto.endless.utils.GuildUtils;
-import net.dv8tion.jda.core.entities.Guild;
+/**
+ * @author Artuto
+ */
 
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-
-public class ClientGSDMProvider implements GuildSettingsProvider
+public interface LocalTag extends Tag
 {
-    private final Guild guild;
-
-    ClientGSDMProvider(Guild guild)
-    {
-        this.guild = guild;
-    }
-
-    @Nullable
-    @Override
-    public Collection<String> getPrefixes()
-    {
-        return GuildUtils.getPrefixes(guild);
-    }
+    long getGuildId();
 }
