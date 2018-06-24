@@ -100,12 +100,12 @@ public class QuoteCmd extends EndlessCommand
 
             sb.append(msg.getContentRaw()).append("\n");
 
-            if(msg.getAttachments().size()==1)
+            if(msg.getAttachments().size()==1 && msg.getAttachments().get(0).isImage())
                 builder.setImage(msg.getAttachments().get(0).getUrl());
             else
             {
                 for(Message.Attachment att : msg.getAttachments())
-                    sb.append(att.getUrl()).append("\n");
+                    sb.append(":paperclip: **").append(att.getName()).append("**: ").append(att.getUrl()).append("\n");
             }
 
             builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
