@@ -47,18 +47,16 @@ public class BotLogging
         long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
         long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
         long totalCount = guild.getMemberCache().size();
-        GuildUtils.checkBadGuild(guild);
         TextChannel tc = event.getJDA().getTextChannelCache().getElementById(bot.config.getBotlogChannelId());
 
-        if(!(bot.bdm.getBlacklist(guild.getIdLong())==null || bot.bdm.getBlacklist(owner.getIdLong())==null))
+        if(!(bot.endless.getBlacklist(guild.getIdLong())==null || bot.endless.getBlacklist(owner.getIdLong())==null))
         {
             LoggerFactory.getLogger("Logging").info("[BLACKLISTED GUILD/OWNER JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n" +
                     "Owner: "+owner.getName()+"#"+owner.getDiscriminator()+" (ID: "+owner.getId()+")");
-            guild.leave().queue();
             return;
         }
 
-        if(!(GuildUtils.isBadGuild(guild)) && bot.config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
+        if(bot.config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
         {
             tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+
                     "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();

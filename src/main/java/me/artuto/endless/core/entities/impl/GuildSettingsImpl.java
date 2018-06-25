@@ -1,0 +1,251 @@
+/*
+ * Copyright (C) 2017-2018 Artuto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package me.artuto.endless.core.entities.impl;
+
+import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.Tag;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Role;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+public class GuildSettingsImpl implements GuildSettings
+{
+    private boolean isDefault;
+    private Collection<String> prefixes;
+    private Guild guild;
+    private int banDeleteDays, starboardCount;
+    private List<Role> roleMeRoles;
+    private List<Tag> importedTags;
+    private long modlogId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
+    private String welcomeMsg, leaveMsg;
+
+    public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
+                             List<Role> roleMeRoles, List<Tag> importedTags, long leaveId, long modlogId, long mutedRoleId,
+                             long serverlogId, long starboardId, long welcomeId, String leaveMsg, String welcomeMsg)
+    {
+        this.isDefault = isDefault;
+        this.prefixes = prefixes;
+        this.guild = guild;
+        this.banDeleteDays = banDeleteDays;
+        this.starboardCount = starboardCount;
+        this.roleMeRoles = roleMeRoles;
+        this.importedTags = importedTags;
+        this.leaveId = leaveId;
+        this.modlogId = modlogId;
+        this.mutedRoleId = mutedRoleId;
+        this.serverlogId = serverlogId;
+        this.starboardId = starboardId;
+        this.welcomeId = welcomeId;
+        this.leaveMsg = leaveMsg;
+        this.welcomeMsg = welcomeMsg;
+    }
+
+    @Override
+    public boolean isDefault()
+    {
+        return isDefault && isEmpty();
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return (prefixes==null || prefixes.isEmpty()) && banDeleteDays==0 && starboardCount==0 && (roleMeRoles==null || roleMeRoles.isEmpty())
+                && (importedTags==null || importedTags.isEmpty()) && leaveId==0L && modlogId==0L && serverlogId==0L && starboardId==0L
+                && welcomeId==0L && (leaveMsg==null || leaveMsg.isEmpty()) && (welcomeMsg==null || welcomeMsg.isEmpty());
+    }
+
+    @Override
+    public Collection<String> getPrefixes()
+    {
+        return Collections.unmodifiableCollection(prefixes);
+    }
+
+    @Override
+    public Guild getGuild()
+    {
+        return guild;
+    }
+
+    @Override
+    public int getBanDeleteDays()
+    {
+        return banDeleteDays;
+    }
+
+    @Override
+    public int getStarboardCount()
+    {
+        return starboardCount;
+    }
+
+    @Override
+    public List<Role> getRoleMeRoles()
+    {
+        return Collections.unmodifiableList(roleMeRoles);
+    }
+
+    public List<Tag> getImportedTags()
+    {
+        return Collections.unmodifiableList(importedTags);
+    }
+
+    @Override
+    public long getLeaveChannel()
+    {
+        return leaveId;
+    }
+
+    @Override
+    public long getModlog()
+    {
+        return modlogId;
+    }
+
+    @Override
+    public long getMutedRole()
+    {
+        return mutedRoleId;
+    }
+
+    @Override
+    public long getServerlog()
+    {
+        return serverlogId;
+    }
+
+    @Override
+    public long getStarboard()
+    {
+        return starboardId;
+    }
+
+    @Override
+    public long getWelcomeChannel()
+    {
+        return welcomeId;
+    }
+
+    @Override
+    public String getLeaveMsg()
+    {
+        return leaveMsg;
+    }
+
+    @Override
+    public String getWelcomeMsg()
+    {
+        return welcomeMsg;
+    }
+
+    @Override
+    public String toString()
+    {
+        if(isDefault())
+            return String.format("GS DEFAULT:%s(%s)", guild.getName(), guild.getId());
+        else
+            return String.format("GS:%s(%s)", guild.getName(), guild.getId());
+    }
+
+    public void addImportedTag(Tag tag)
+    {
+        importedTags.add(tag);
+    }
+
+    public void addPrefix(String prefix)
+    {
+        prefixes.add(prefix);
+    }
+
+    public void addRoleMeRole(Role role)
+    {
+        roleMeRoles.add(role);
+    }
+
+    public void removeImportedTag(Tag tag)
+    {
+        importedTags.remove(tag);
+    }
+
+    public void removePrefix(String prefix)
+    {
+        prefixes.remove(prefix);
+    }
+
+    public void removeRoleMeRole(Role role)
+    {
+        roleMeRoles.remove(role);
+    }
+
+    public void setBanDeleteDays(int banDeleteDays)
+    {
+        this.banDeleteDays = banDeleteDays;
+    }
+
+    public void setGuild(Guild guild)
+    {
+        this.guild = guild;
+    }
+
+    public void setLeaveId(long leaveId)
+    {
+        this.leaveId = leaveId;
+    }
+
+    public void setLeaveMsg(String leaveMsg)
+    {
+        this.leaveMsg = leaveMsg;
+    }
+
+    public void setModlogId(long modlogId)
+    {
+        this.modlogId = modlogId;
+    }
+
+    public void setMutedRoleId(long mutedRoleId)
+    {
+        this.mutedRoleId = mutedRoleId;
+    }
+
+    public void setServerlogId(long serverlogId)
+    {
+        this.serverlogId = serverlogId;
+    }
+
+    public void setStarboardCount(int starboardCount)
+    {
+        this.starboardCount = starboardCount;
+    }
+
+    public void setStarboardId(long starboardId)
+    {
+        this.starboardId = starboardId;
+    }
+
+    public void setWelcomeId(long welcomeId)
+    {
+        this.welcomeId = welcomeId;
+    }
+
+    public void setWelcomeMsg(String welcomeMsg)
+    {
+        this.welcomeMsg = welcomeMsg;
+    }
+}

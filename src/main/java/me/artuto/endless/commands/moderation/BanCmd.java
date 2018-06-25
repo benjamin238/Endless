@@ -21,10 +21,11 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
@@ -84,13 +85,13 @@ public class BanCmd extends EndlessCommand
         }
         else member = list.get(0);
 
-        if(!(Checks.canMemberInteract(event.getSelfMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), member)))
         {
             event.replyError("I can't ban the specified user!");
             return;
         }
 
-        if(!(Checks.canMemberInteract(event.getMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getMember(), member)))
         {
             event.replyError("You can't ban the specified user!");
             return;
@@ -99,7 +100,7 @@ public class BanCmd extends EndlessCommand
         String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
         String fReason = reason;
 
-        event.getGuild().getController().ban(member, bot.gsdm.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
+        event.getGuild().getController().ban(member, GuildUtils.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
             event.replySuccess(Messages.BAN_SUCCESS+username);
             bot.modlog.logBan(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
         }, e -> event.replyError(Messages.BAN_ERROR+username));

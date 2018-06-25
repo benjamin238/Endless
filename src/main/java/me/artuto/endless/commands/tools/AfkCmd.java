@@ -18,10 +18,9 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.tempdata.AfkManager;
-import net.dv8tion.jda.core.Permission;
+import me.artuto.endless.storage.tempdata.AfkManager;
 import net.dv8tion.jda.core.entities.User;
 
 public class AfkCmd extends EndlessCommand

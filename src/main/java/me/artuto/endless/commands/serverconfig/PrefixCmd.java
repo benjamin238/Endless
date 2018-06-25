@@ -20,9 +20,10 @@ package me.artuto.endless.commands.serverconfig;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.data.managers.ClientGSDMProvider;
+import me.artuto.endless.storage.data.managers.ClientGSDMProvider;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -50,9 +51,9 @@ public class PrefixCmd extends EndlessCommand
         Guild guild = event.getGuild();
         String defP = event.getClient().getPrefix();
 
-        Collection<String> prefixes = bot.db.getSettings(guild).getPrefixes();
+        Collection<String> prefixes = GuildUtils.getPrefixes(guild);
 
-        if(prefixes == null)
+        if(prefixes.isEmpty())
             event.reply("The prefix for this guild is `"+defP+"`");
         else
         {
