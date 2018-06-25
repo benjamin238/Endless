@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data.managers;
+package me.artuto.endless.storage.data.managers;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.core.entities.impl.EndlessShardedImpl;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
-import me.artuto.endless.data.Database;
+import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;

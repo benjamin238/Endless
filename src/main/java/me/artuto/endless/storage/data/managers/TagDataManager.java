@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data.managers;
+package me.artuto.endless.storage.data.managers;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.LocalTag;
 import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.core.entities.impl.*;
-import me.artuto.endless.data.Database;
+import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import org.json.JSONArray;

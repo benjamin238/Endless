@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data.managers;
+package me.artuto.endless.storage.data.managers;
 
-import me.artuto.endless.data.Database;
+import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
 

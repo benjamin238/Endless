@@ -15,20 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data.managers;
+package me.artuto.endless.core.exceptions;
 
-import com.jagrosh.jdautilities.command.GuildSettingsManager;
-import me.artuto.endless.data.Database;
-import net.dv8tion.jda.core.entities.Guild;
+/**
+ * @author Artuto
+ */
 
-import javax.annotation.Nullable;
-
-public class ClientGSDM implements GuildSettingsManager<ClientGSDMProvider>
+public class DatabaseException extends RuntimeException
 {
-    @Nullable
-    @Override
-    public ClientGSDMProvider getSettings(Guild guild)
+    public DatabaseException()
     {
-        return new ClientGSDMProvider(guild);
+        throw new DatabaseException("Error when connecting to the MySQL database!");
+    }
+
+    public DatabaseException(String message)
+    {
+        super(message);
     }
 }

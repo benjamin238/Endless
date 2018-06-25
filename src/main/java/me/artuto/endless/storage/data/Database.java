@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data;
+package me.artuto.endless.storage.data;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GuildSettings;

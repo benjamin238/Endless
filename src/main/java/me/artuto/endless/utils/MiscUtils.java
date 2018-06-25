@@ -17,12 +17,25 @@
 
 package me.artuto.endless.utils;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.classic.spi.StackTraceElementProxy;
+import ch.qos.logback.classic.spi.ThrowableProxy;
 import me.artuto.endless.Const;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Artuto
@@ -30,6 +43,38 @@ import java.io.InputStream;
 
 public class MiscUtils
 {
+    public static boolean isIgnored(String id, String topic)
+    {
+        return !(topic==null) && topic.contains("{ignore:"+id+"}");
+    }
+
+    public static File getAvatarUpdateImage(UserUpdateAvatarEvent event)
+    {
+        String newA = event.getNewAvatarUrl()==null?event.getUser().getDefaultAvatarUrl():event.getUser().getEffectiveAvatarUrl();
+        String oldA = event.getOldAvatarUrl()==null?event.getUser().getDefaultAvatarUrl():event.getOldAvatarUrl();
+
+        try
+        {
+            BufferedImage img1 = ImageIO.read(Objects.requireNonNull(getInputStream(oldA)));
+            BufferedImage img2 = ImageIO.read(Objects.requireNonNull(getInputStream(newA)));
+            BufferedImage combo = new BufferedImage(256, 128, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = combo.createGraphics();
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0, 0, 256, 128);
+            g2.drawImage(img1, 0, 0, 128, 128, null);
+            g2.drawImage(img2, 128, 0, 128, 128, null);
+
+            File f = new File("avatarchange"+event.getUser().getId()+".png");
+            ImageIO.write(combo, "png", f);
+            return f;
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static InputStream getInputStream(String url)
     {
         try
@@ -47,5 +92,40 @@ public class MiscUtils
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static StringBuilder getStackTrace(ILoggingEvent event)
+    {
+        IThrowableProxy proxy = event.getThrowableProxy();
+        ThrowableProxy throwableImpl = (ThrowableProxy)proxy;
+        StringBuilder stacktrace = new StringBuilder(event.getFormattedMessage());
+
+        if(!(proxy==null))
+        {
+            Throwable throwable = throwableImpl.getThrowable();
+
+            List<StackTraceElementProxy> list = Arrays.asList(proxy.getStackTraceElementProxyArray());
+            String message = proxy.getMessage();
+            if(!(message==null))
+            {
+                stacktrace.append("\n\n```java\n");
+                if(!(throwable==null))
+                    stacktrace.append(throwable.getClass().getName()).append(": ");
+                stacktrace.append(message);
+            }
+            for(StackTraceElementProxy element : list)
+            {
+                String call = element.getSTEAsString();
+                if(call.length()+stacktrace.length()>MessageEmbed.TEXT_MAX_LENGTH)
+                {
+                    stacktrace.append("\n... (").append(list.size()-list.indexOf(element)+1).append(" more calls)");
+                    break;
+                }
+                stacktrace.append("\n").append(call).append("\n");
+            }
+            stacktrace.append("```");
+        }
+
+        return stacktrace;
     }
 }

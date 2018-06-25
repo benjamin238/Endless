@@ -19,9 +19,9 @@ package me.artuto.endless.bootloader;
 
 import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Const;
-import me.artuto.endless.exceptions.ConfigException;
-import me.artuto.endless.exceptions.GuildException;
-import me.artuto.endless.exceptions.OwnerException;
+import me.artuto.endless.core.exceptions.ConfigException;
+import me.artuto.endless.core.exceptions.GuildException;
+import me.artuto.endless.core.exceptions.OwnerException;
 import me.artuto.endless.loader.Config;
 import org.slf4j.LoggerFactory;
 

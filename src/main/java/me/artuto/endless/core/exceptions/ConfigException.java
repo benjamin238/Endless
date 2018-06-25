@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.exceptions;
+package me.artuto.endless.core.exceptions;
 
 /**
  * @author Artuto
  */
 
-public class DatabaseException extends RuntimeException
+public class ConfigException extends RuntimeException
 {
-    public DatabaseException()
+    public ConfigException()
     {
-        throw new DatabaseException("Error when connecting to the MySQL database!");
+        throw new ConfigException("No valid config file found! Make sure you edited the config.yml.sample file!");
     }
 
-    public DatabaseException(String message)
+    public ConfigException(String message)
     {
         super(message);
     }

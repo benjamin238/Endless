@@ -18,8 +18,8 @@
 package me.artuto.endless.handlers;
 
 import me.artuto.endless.Bot;
-import me.artuto.endless.data.managers.GuildSettingsDataManager;
-import me.artuto.endless.data.managers.StarboardDataManager;
+import me.artuto.endless.storage.data.managers.GuildSettingsDataManager;
+import me.artuto.endless.storage.data.managers.StarboardDataManager;
 import me.artuto.endless.core.entities.StarboardMessage;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.GuildUtils;
