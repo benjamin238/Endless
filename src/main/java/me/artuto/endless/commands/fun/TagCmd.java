@@ -18,8 +18,6 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jagtag.Parser;
-import com.jagrosh.jagtag.ParserBuilder;
-import com.jagrosh.jagtag.libraries.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
@@ -27,7 +25,7 @@ import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.Tag;
-import me.artuto.endless.tools.Variables;
+import me.artuto.endless.utils.TagUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 
@@ -39,10 +37,7 @@ public class TagCmd extends EndlessCommand
     public TagCmd(Bot bot)
     {
         this.bot = bot;
-        this.parser = new ParserBuilder().addMethods(Variables.getMethods())
-                .addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods())
-                .addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods())
-                .setMaxOutput(2000).setMaxIterations(1000).build();
+        this.parser = TagUtil.parser;
         this.name = "tag";
         this.aliases = new String[]{"t"};
         this.help = "Retrieves a tag with the specified name";
@@ -83,7 +78,7 @@ public class TagCmd extends EndlessCommand
             }
         }
 
-        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel()).put("args", tagArgs);
+        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getChannel()).put("args", tagArgs);
         event.reply(parser.parse(tag.getContent()));
     }
 

@@ -18,14 +18,10 @@
 package me.artuto.endless.logging;
 
 import com.jagrosh.jagtag.Parser;
-import com.jagrosh.jagtag.ParserBuilder;
-import com.jagrosh.jagtag.libraries.*;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
-import me.artuto.endless.data.managers.GuildSettingsDataManager;
 import me.artuto.endless.core.entities.ParsedAuditLog;
 import me.artuto.endless.tempdata.MessagesLogging;
-import me.artuto.endless.tools.Variables;
 import me.artuto.endless.utils.*;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -33,6 +29,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.audit.ActionType;
 import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.impl.TextChannelImpl;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
@@ -57,7 +54,7 @@ public class ServerLogging
     public ServerLogging(Bot bot)
     {
         this.bot = bot;
-        this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
+        this.parser = TagUtil.parser;
     }
 
     public void onGuildMemberJoin(GuildMemberJoinEvent event)
