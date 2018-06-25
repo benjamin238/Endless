@@ -67,8 +67,21 @@ public class TagCmd extends EndlessCommand
             tagArgs = "";
         }
 
-        Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), tagName);
-        if(tag==null)
+        Tag tag;
+        if(event.isFromType(ChannelType.TEXT))
+        {
+            tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), tagName);
+            if(tag==null)
+            {
+                tag = bot.endless.getGlobalTag(tagName);
+                if(tag==null)
+                {
+                    event.replyError("Tag \""+tagName+"\" not found.");
+                    return;
+                }
+            }
+        }
+        else
         {
             tag = bot.endless.getGlobalTag(tagName);
             if(tag==null)
@@ -76,6 +89,12 @@ public class TagCmd extends EndlessCommand
                 event.replyError("Tag \""+tagName+"\" not found.");
                 return;
             }
+        }
+
+        if(tag.isNSFW() && !(TagUtil.isNSFWAllowed(event)))
+        {
+            event.replyError("This tag has been marked as NSFW! To use this tag mark this channel as NSFW or try in DMs.");
+            return;
         }
 
         parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getChannel()).put("args", tagArgs);
