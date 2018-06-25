@@ -18,67 +18,101 @@
 package me.artuto.endless.utils;
 
 import me.artuto.endless.Bot;
-import me.artuto.endless.entities.ParsedAuditLog;
-import me.artuto.endless.entities.impl.ParsedAuditLogImpl;
+import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.ParsedAuditLog;
+import me.artuto.endless.core.entities.impl.ParsedAuditLogImpl;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audit.AuditLogChange;
 import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.audit.AuditLogKey;
 import net.dv8tion.jda.core.entities.*;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 public class GuildUtils
 {
-    private static Bot bot;
+    public static Bot bot;
 
     public GuildUtils(Bot bot)
     {
         GuildUtils.bot = bot;
     }
 
-    public static void leaveBadGuilds(JDA jda)
+    public static Collection<String> getPrefixes(Guild guild)
     {
-        jda.getGuilds().stream().filter(g ->
-        {
-            if(bot.db.hasSettings(g)) return false;
+        if(bot.endless==null)
+            return Collections.emptySet();
 
-            long botCount = g.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
-            return botCount>20 && ((double) botCount/g.getMembers().size())>.50;
-
-        }).forEach(g -> g.leave().queue());
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getPrefixes();
     }
 
-    public static String checkBadGuild(Guild guild)
+    public static int getBanDeleteDays(Guild guild)
     {
-        if(isBadGuild(guild))
-        {
-            String msg = "Hey! I'm leaving this guild (**"+guild.getName()+"**) because I won't allow Bot Guilds, this means you have a lot of bots compared to the real user count.";
-            TextChannel tc = FinderUtil.getDefaultChannel(guild);
-            if(!(tc==null))
-                tc.sendMessage(msg).queue(null, (e) -> guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(msg).queue(null, e2 -> {})));
-
-            guild.leave().queue();
-            return "LEFT: BOTS";
-        }
-        else if(isABotListGuild(guild))
-        {
-            User owner = guild.getJDA().getUserById(bot.config.getOwnerId());
-            guild.getJDA().getUserById("264499432538505217").openPrivateChannel().queue(s -> s.sendMessage("**"+owner.getName()+"#"+owner.getDiscriminator()+"** has a copy of Endless at "+guild.getName()).queue());
-            return "LEFT: BOTLIST";
-        }
-        else return "STAY";
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getBanDeleteDays();
     }
 
-    public static boolean isBadGuild(Guild guild)
+    public static int getStarboardCount(Guild guild)
     {
-        long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getStarboardCount();
+    }
 
-        if(bot.db.hasSettings(guild)) return false;
-        else return botCount>20 && ((double) botCount/guild.getMembers().size())>.65;
+    public static List<Role> getRoleMeRoles(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getRoleMeRoles();
     }
 
     public static Role getMutedRole(Guild guild)
     {
-        return guild.getRolesByName("Muted", true).stream().findFirst().orElse(guild.getRoleById(bot.db.getSettings(guild).getMutedRole()));
+        return guild.getRolesByName("Muted", true)
+                .stream().findFirst().orElse(guild.getRoleById(bot.endless.getGuildSettings(guild).getMutedRole()));
+    }
+
+    public static String getLeaveMessage(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getLeaveMsg();
+    }
+
+    public static String getWelcomeMessage(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getWelcomeMsg();
+    }
+
+    public static TextChannel getLeaveChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getLeaveChannel());
+    }
+
+    public static TextChannel getModlogChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getModlog());
+    }
+
+    public static TextChannel getServerlogChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getServerlog());
+    }
+
+    public static TextChannel getStarboardChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getStarboard());
+    }
+
+    public static TextChannel getWelcomeChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getWelcomeChannel());
     }
 
     public static ParsedAuditLog getAuditLog(AuditLogEntry entry, AuditLogKey key)
@@ -98,15 +132,4 @@ public class GuildUtils
         else
             return new ParsedAuditLogImpl(null, null, null, entry.getReason(), author, target);
     }
-
-     public static boolean isABotListGuild(Guild guild)
-     {
-         if(guild.getIdLong()==110373943822540800L || guild.getIdLong()==264445053596991498L || guild.getIdLong()==330777295952543744L
-                 || guild.getIdLong()==226404143999221761L || guild.getIdLong()==374071874222686211L)
-         {
-             return !(bot.config.getOwnerId() == 264499432538505217L || bot.config.getOwnerId() == 302534881370439681L);
-         }
-         else
-             return false;
-     }
 }

@@ -19,10 +19,10 @@ package me.artuto.endless.handlers;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
-import me.artuto.endless.entities.ParsedAuditLog;
-import me.artuto.endless.entities.Punishment;
-import me.artuto.endless.entities.TempPunishment;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.core.entities.ParsedAuditLog;
+import me.artuto.endless.core.entities.Punishment;
+import me.artuto.endless.core.entities.TempPunishment;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
@@ -53,7 +53,7 @@ public class MutedRoleHandler
         if(!(event.getRoles().contains(mutedRole)))
             return;
 
-        if(!(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
+        if(!(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
             return;
 
         guild.getAuditLogs().type(ActionType.MEMBER_ROLE_UPDATE).limit(1).queue(preEntries -> {
@@ -86,7 +86,7 @@ public class MutedRoleHandler
         if(!(event.getRoles().contains(mutedRole)))
             return;
 
-        if(!(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
+        if(!(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
             return;
 
         guild.getAuditLogs().type(ActionType.MEMBER_ROLE_UPDATE).limit(1).queue(entries -> {
@@ -116,14 +116,14 @@ public class MutedRoleHandler
         {
             Role mutedRole = GuildUtils.getMutedRole(event.getGuild());
 
-            if(!(mutedRole==null) && Checks.hasPermission(guild.getSelfMember(), null, Permission.MANAGE_ROLES) && Checks.canMemberInteract(guild.getSelfMember(), mutedRole))
+            if(!(mutedRole==null) && ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.MANAGE_ROLES) && ChecksUtil.canMemberInteract(guild.getSelfMember(), mutedRole))
                 guild.getController().addSingleRoleToMember(event.getMember(), mutedRole).reason("[Mute restore]").queue(s -> {}, e -> {});
         }
         else if(!(tempPunishment==null))
         {
             Role mutedRole = GuildUtils.getMutedRole(event.getGuild());
 
-            if(!(mutedRole==null) && Checks.hasPermission(guild.getSelfMember(), null, Permission.MANAGE_ROLES) && Checks.canMemberInteract(guild.getSelfMember(), mutedRole))
+            if(!(mutedRole==null) && ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.MANAGE_ROLES) && ChecksUtil.canMemberInteract(guild.getSelfMember(), mutedRole))
                 event.getGuild().getController().addSingleRoleToMember(event.getMember(), mutedRole).reason("[Mute restore]").queue(s -> {}, e-> {});
         }
     }

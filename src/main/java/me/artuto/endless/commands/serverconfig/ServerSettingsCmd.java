@@ -23,7 +23,7 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.entities.GuildSettings;
+import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -58,8 +58,8 @@ public class ServerSettingsCmd extends EndlessCommand
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
         String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
 
-        GuildSettings settings = bot.db.getSettings(guild);
         int banDeleteDays = settings.getBanDeleteDays();
         int starboardCount = settings.getStarboardCount();
         Role mutedRole = GuildUtils.getMutedRole(guild);

@@ -7,7 +7,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
@@ -59,13 +59,13 @@ public class SetupCmd extends EndlessCommand
 
             if(!(mutedRole==null))
             {
-                if(!(Checks.canMemberInteract(event.getSelfMember(), mutedRole)))
+                if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), mutedRole)))
                 {
                     event.replyError("I can't interact with the existing *"+mutedRole.getName()+"* role!");
                     return;
                 }
 
-                if(!(Checks.canMemberInteract(event.getMember(), mutedRole)))
+                if(!(ChecksUtil.canMemberInteract(event.getMember(), mutedRole)))
                 {
                     event.replyError("You can't interact with the existing *"+mutedRole.getName()+"* role!");
                     return;
