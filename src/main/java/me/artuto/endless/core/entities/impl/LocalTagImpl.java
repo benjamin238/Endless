@@ -38,12 +38,6 @@ public class LocalTagImpl implements LocalTag
     }
 
     @Override
-    public boolean isNSFW()
-    {
-        return content.toLowerCase().contains("{nsfw}");
-    }
-
-    @Override
     public long getGuildId()
     {
         return guildId;

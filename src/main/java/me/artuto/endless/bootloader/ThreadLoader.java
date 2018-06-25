@@ -17,9 +17,7 @@
 
 package me.artuto.endless.bootloader;
 
-import ch.qos.logback.classic.Logger;
 import me.artuto.endless.tools.EndlessThreadFactory;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -30,9 +28,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class ThreadLoader
 {
-    private final Logger LOG = (Logger) LoggerFactory.getLogger("Thread Loader");
-
-    public ScheduledExecutorService createThread(String name)
+    public static ScheduledExecutorService createThread(String name)
     {
         try
         {

@@ -23,7 +23,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
@@ -84,13 +84,13 @@ public class SoftbanCmd extends EndlessCommand
         }
         else member = list.get(0);
 
-        if(!(Checks.canMemberInteract(event.getSelfMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), member)))
         {
             event.replyError("I can't softban the specified user!");
             return;
         }
 
-        if(!(Checks.canMemberInteract(event.getMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getMember(), member)))
         {
             event.replyError("You can't softban the specified user!");
             return;

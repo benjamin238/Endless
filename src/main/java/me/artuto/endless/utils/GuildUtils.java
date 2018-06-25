@@ -18,6 +18,7 @@
 package me.artuto.endless.utils;
 
 import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.ParsedAuditLog;
 import me.artuto.endless.core.entities.impl.ParsedAuditLogImpl;
 import net.dv8tion.jda.core.JDA;
@@ -26,18 +27,92 @@ import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.audit.AuditLogKey;
 import net.dv8tion.jda.core.entities.*;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 public class GuildUtils
 {
-    private static Bot bot;
+    public static Bot bot;
 
     public GuildUtils(Bot bot)
     {
         GuildUtils.bot = bot;
     }
 
+    public static Collection<String> getPrefixes(Guild guild)
+    {
+        if(bot.endless==null)
+            return Collections.emptySet();
+
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getPrefixes();
+    }
+
+    public static int getBanDeleteDays(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getBanDeleteDays();
+    }
+
+    public static int getStarboardCount(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getStarboardCount();
+    }
+
+    public static List<Role> getRoleMeRoles(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getRoleMeRoles();
+    }
+
     public static Role getMutedRole(Guild guild)
     {
-        return guild.getRolesByName("Muted", true).stream().findFirst().orElse(guild.getRoleById(bot.db.getSettings(guild).getMutedRole()));
+        return guild.getRolesByName("Muted", true)
+                .stream().findFirst().orElse(guild.getRoleById(bot.endless.getGuildSettings(guild).getMutedRole()));
+    }
+
+    public static String getLeaveMessage(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getLeaveMsg();
+    }
+
+    public static String getWelcomeMessage(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getWelcomeMsg();
+    }
+
+    public static TextChannel getLeaveChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getLeaveChannel());
+    }
+
+    public static TextChannel getModlogChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getModlog());
+    }
+
+    public static TextChannel getServerlogChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getServerlog());
+    }
+
+    public static TextChannel getStarboardChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getStarboard());
+    }
+
+    public static TextChannel getWelcomeChannel(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return guild.getTextChannelById(settings.getWelcomeChannel());
     }
 
     public static ParsedAuditLog getAuditLog(AuditLogEntry entry, AuditLogKey key)

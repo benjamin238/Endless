@@ -17,72 +17,27 @@
 
 package me.artuto.endless.data.managers;
 
+import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
+import me.artuto.endless.core.entities.impl.EndlessShardedImpl;
+import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import me.artuto.endless.data.Database;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.json.JSONArray;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.*;
 
 public class GuildSettingsDataManager
 {
+    private final Bot bot;
     private final Connection connection;
 
-    public GuildSettingsDataManager(Database db)
+    public GuildSettingsDataManager(Bot bot)
     {
-        connection = db.getConnection();
-    }
-
-    public TextChannel getModlogChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT modlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("modlog_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the modlog for the guild "+guild.getId(), e);
-            return null;
-        }
-    }
-
-    public TextChannel getServerlogChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT serverlog_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("serverlog_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the serverlog for the guild "+guild.getId(), e);
-            return null;
-        }
+        this.connection = bot.db.getConnection();
+        this.bot = bot;
     }
 
     public void setModlogChannel(Guild guild, TextChannel tc)
@@ -117,6 +72,13 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setModlogId(tc==null?0L:tc.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
             }
         }
         catch(SQLException e)
@@ -134,7 +96,7 @@ public class GuildSettingsDataManager
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, serverlog_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
             {
-                if(tc==null)
+                if(tc == null)
                 {
                     if(results.next())
                     {
@@ -157,34 +119,18 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                GuildSettingsImpl settings = (GuildSettingsImpl) bot.endless.getGuildSettings(guild);
+                settings.setServerlogId(tc == null ? 0L : tc.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the serverlog channel for the guild "+guild.getId(), e);
-        }
-    }
-
-    public TextChannel getWelcomeChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT welcome_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("welcome_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the welcome channel for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -220,34 +166,18 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setWelcomeId(tc==null?0L:tc.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the welcome channel for the guild "+guild.getId(), e);
-        }
-    }
-
-    public TextChannel getLeaveChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT leave_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("leave_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the leave channel for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -283,34 +213,18 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setLeaveId(tc==null?0L:tc.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the leave channel for the guild "+guild.getId(), e);
-        }
-    }
-
-    public String getWelcomeMessage(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            String message;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT welcome_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    message = results.getString("welcome_msg");
-                else
-                    message = "";
-            }
-            return message;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the welcome message for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -346,34 +260,18 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setWelcomeMsg(message);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the welcome message for the guild "+guild.getId(), e);
-        }
-    }
-
-    public String getLeaveMessage(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            String message;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT leave_msg FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    message = results.getString("leave_msg");
-                else
-                    message = "";
-            }
-            return message;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the leave message for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -409,34 +307,18 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setLeaveMsg(message);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the leave message for the guild "+guild.getId(), e);
-        }
-    }
-
-    public TextChannel getStarboardChannel(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            TextChannel tc;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT starboard_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    tc = guild.getTextChannelById(results.getLong("starboard_id"));
-                else
-                    tc = null;
-            }
-            return tc;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the starboard channel for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -472,6 +354,14 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setStarboardId(tc==null?0L:tc.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    settings.setGuild(guild);
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
             }
         }
         catch(SQLException e)
@@ -480,30 +370,7 @@ public class GuildSettingsDataManager
         }
     }
 
-    public Integer getStarboardCount(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            Integer count;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT starboard_count FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    count = results.getInt("starboard_count");
-                else
-                    count = null;
-            }
-            return count;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the starboard count for the guild "+guild.getId(), e);
-            return null;
-        }
-    }
-
-    public void setStarboardCount(Guild guild, Integer count)
+    public void setStarboardCount(Guild guild, int count)
     {
         try
         {
@@ -523,6 +390,13 @@ public class GuildSettingsDataManager
                     results.updateLong("guild_id", guild.getIdLong());
                     results.updateInt("starboard_count", count);
                     results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setStarboardCount(count);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
                 }
             }
         }
@@ -560,47 +434,19 @@ public class GuildSettingsDataManager
                     results.updateString("prefixes", new JSONArray().put(prefix).toString());
                     results.insertRow();
                 }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.addPrefix(prefix);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
             }
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while adding a prefix for the guild "+guild.getId(), e);
         }
-    }
-
-    public boolean prefixExists(Guild guild, String prefix)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            String prefixes;
-            JSONArray array;
-
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, prefixes FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
-            {
-                if(results.next())
-                {
-                    prefixes = results.getString("prefixes");
-
-                    if(prefixes == null) return false;
-                    else
-                    {
-                        array = new JSONArray(prefixes);
-
-                        for(Object p : array)
-                            return p.toString().equals(prefix);
-                    }
-                }
-                else return false;
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while checking if a prefix exists for the guild "+guild.getId(), e);
-            return false;
-        }
-        return false;
     }
 
     public void removePrefix(Guild guild, String prefix)
@@ -639,6 +485,13 @@ public class GuildSettingsDataManager
                                 }
                             }
                         }
+                        GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                        settings.removePrefix(prefix);
+                        if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                        {
+                            ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                            ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                        }
                     }
                 }
             }
@@ -646,50 +499,6 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while removing a prefix for the guild "+guild.getId(), e);
-        }
-    }
-
-    public List<Role> getRolemeRoles(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            String rolemeRoles;
-            JSONArray array;
-            List<Role> roles = new LinkedList<>();
-
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, roleme_roles FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
-            {
-                if(results.next())
-                {
-                    rolemeRoles = results.getString("roleme_roles");
-
-                    if(rolemeRoles == null) return roles;
-                    else
-                    {
-                        array = new JSONArray(rolemeRoles);
-                        Role role;
-
-                        for(Object r : array)
-                        {
-                            role = guild.getRoleById(r.toString());
-
-                            if(!(role==null))
-                                roles.add(role);
-                        }
-
-                        return roles;
-                    }
-
-                }
-                else return roles;
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the roleme roles for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -707,9 +516,10 @@ public class GuildSettingsDataManager
                 if(results.next())
                 {
                     roles = results.getString("roleme_roles");
-
-                    if(roles==null) array = new JSONArray().put(role.getId());
-                    else array = new JSONArray(roles).put(role.getId());
+                    if(roles==null)
+                        array = new JSONArray().put(role.getId());
+                    else
+                        array = new JSONArray(roles).put(role.getId());
 
                     results.updateString("roleme_roles", array.toString());
                     results.updateRow();
@@ -720,6 +530,13 @@ public class GuildSettingsDataManager
                     results.updateLong("guild_id", guild.getIdLong());
                     results.updateString("roleme_roles", new JSONArray().put(role.getId()).toString());
                     results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.addRoleMeRole(role);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
                 }
             }
         }
@@ -765,6 +582,13 @@ public class GuildSettingsDataManager
                                 }
                             }
                         }
+                        GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                        settings.removeRoleMeRole(role);
+                        if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                        {
+                            ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                            ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                        }
                     }
                 }
             }
@@ -772,29 +596,6 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while removing a roleme role from the guild "+guild.getId(), e);
-        }
-    }
-
-    public Role getMutedRole(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            Role role;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT muted_role_id FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    role = guild.getRoleById(results.getLong("muted_role_id"));
-                else
-                    role = null;
-            }
-            return role;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the muted role for the guild "+guild.getId(), e);
-            return null;
         }
     }
 
@@ -830,6 +631,13 @@ public class GuildSettingsDataManager
                         results.insertRow();
                     }
                 }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setMutedRoleId(role==null?0L:role.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
             }
         }
         catch(SQLException e)
@@ -837,30 +645,6 @@ public class GuildSettingsDataManager
             Database.LOG.error("Error while setting the muted role for the guild "+guild.getId(), e);
         }
     }
-
-    public int getBanDeleteDays(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            int days;
-            try(ResultSet results = statement.executeQuery(String.format("SELECT ban_delete_days FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                if(results.next())
-                    days = results.getInt("ban_delete_days");
-                else
-                    days = 0;
-            }
-            return days;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the ban delete days number for the guild "+guild.getId(), e);
-            return 0;
-        }
-    }
-
 
     public void setBanDeleteDays(Guild guild, int days)
     {
@@ -893,6 +677,13 @@ public class GuildSettingsDataManager
                         results.updateInt("ban_delete_days", days);
                         results.insertRow();
                     }
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setBanDeleteDays(days);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
                 }
             }
         }

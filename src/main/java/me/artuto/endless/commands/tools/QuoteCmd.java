@@ -100,7 +100,7 @@ public class QuoteCmd extends EndlessCommand
 
             sb.append(msg.getContentRaw()).append("\n");
 
-            if(msg.getAttachments().size()==1 && msg.getAttachments().get(0).isImage())
+            if(msg.getAttachments().size()==1)
                 builder.setImage(msg.getAttachments().get(0).getUrl());
             else
             {
