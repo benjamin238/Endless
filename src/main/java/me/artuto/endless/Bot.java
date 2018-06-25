@@ -138,7 +138,7 @@ public class Bot extends ListenerAdapter
         }
 
         db = new Database(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
-        bdm = new BlacklistDataManager(db);
+        bdm = new BlacklistDataManager(this);
         ddm = new DonatorsDataManager(db);
         gsdm = new GuildSettingsDataManager(this);
         pdm = new PunishmentsDataManager(db);
