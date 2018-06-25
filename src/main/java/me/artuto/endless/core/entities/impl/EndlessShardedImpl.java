@@ -160,6 +160,12 @@ public class EndlessShardedImpl implements EndlessSharded
         return shardManager;
     }
 
+    public void addBlacklist(Blacklist blacklist)
+    {
+        blacklists.add(blacklist);
+        blacklistMap.put(blacklist.getId(), blacklist);
+    }
+
     public void addGlobalTag(GlobalTag tag)
     {
         globalTags.add(tag);
@@ -204,6 +210,11 @@ public class EndlessShardedImpl implements EndlessSharded
 
             LOG.debug("Successfully cached {} across {} Shards", totalCache, shards.size());
         });
+    }
+
+    public void removeBlacklist(Blacklist blacklist)
+    {
+        blacklists.remove(blacklistMap.remove(blacklist.getId()));
     }
 
     public void removeGlobalTag(String name)

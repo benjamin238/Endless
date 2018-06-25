@@ -17,7 +17,9 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
+import me.artuto.endless.core.entities.impl.EndlessShardedImpl;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.core.entities.Blacklist;
 import me.artuto.endless.core.entities.impl.BlacklistImpl;
@@ -34,11 +36,13 @@ import java.util.*;
 
 public class BlacklistDataManager
 {
-    private Connection connection;
+    private final Bot bot;
+    private final Connection connection;
 
-    public BlacklistDataManager(Database db)
+    public BlacklistDataManager(Bot bot)
     {
-        connection = db.getConnection();
+        this.bot = bot;
+        this.connection = bot.db.getConnection();
     }
 
     private Blacklist getBlacklist(long id)
@@ -93,6 +97,9 @@ public class BlacklistDataManager
                     results.updateString("type", type.name());
                     results.insertRow();
                 }
+                Blacklist blacklist = bot.endless.getBlacklist(id);
+                if(blacklist==null)
+                    ((EndlessShardedImpl)bot.endless).addBlacklist(getBlacklist(id));
             }
         }
         catch(SQLException e)
@@ -112,6 +119,9 @@ public class BlacklistDataManager
             {
                 if(results.next())
                     results.deleteRow();
+                Blacklist blacklist = bot.endless.getBlacklist(id);
+                if(!(blacklist==null))
+                    ((EndlessShardedImpl)bot.endless).removeBlacklist(blacklist);
             }
         }
         catch(SQLException e)
