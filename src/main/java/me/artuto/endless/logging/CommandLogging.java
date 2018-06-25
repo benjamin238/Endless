@@ -19,7 +19,6 @@ package me.artuto.endless.logging;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.CommandListener;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
@@ -44,7 +43,7 @@ public class CommandLogging implements CommandListener
     @Override
     public void onCommand(CommandEvent event, Command command)
     {
-        TextChannel commandLog = bot.shardManager.getTextChannelById(bot.config.getCommandslogChannelId());
+        TextChannel commandLog = event.getJDA().getTextChannelById(bot.config.getCommandslogChannelId());
         User author = event.getAuthor();
         Guild guild = event.getGuild();
         

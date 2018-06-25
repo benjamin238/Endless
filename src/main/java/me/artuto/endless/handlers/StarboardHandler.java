@@ -20,9 +20,8 @@ package me.artuto.endless.handlers;
 import me.artuto.endless.Bot;
 import me.artuto.endless.data.managers.GuildSettingsDataManager;
 import me.artuto.endless.data.managers.StarboardDataManager;
-import me.artuto.endless.core.entities.StarboardMessage;
+import me.artuto.endless.entities.StarboardMessage;
 import me.artuto.endless.utils.FinderUtil;
-import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.*;
@@ -63,7 +62,7 @@ public class StarboardHandler
 
             if(!(isConfigured(guild))) return;
 
-            TextChannel starboard = GuildUtils.getStarboardChannel(event.getGuild());
+            TextChannel starboard = gsdm.getStarboardChannel(guild);
             Message starredMsg = getMessage(event.getMessageIdLong(), event.getChannel());
             if(starredMsg==null)
                 return;
@@ -124,7 +123,7 @@ public class StarboardHandler
                 return;
 
             StarboardMessage starboardMsg = sdm.getStarboardMessage(starredMsg.getIdLong());
-            TextChannel starboard = GuildUtils.getStarboardChannel(event.getGuild());
+            TextChannel starboard = gsdm.getStarboardChannel(event.getGuild());
 
             if(existsOnStarboard(starredMsg.getIdLong()))
             {
@@ -159,12 +158,12 @@ public class StarboardHandler
 
     private static boolean isConfigured(Guild guild)
     {
-        return !(GuildUtils.getStarboardChannel(guild) == null) && !(GuildUtils.getStarboardCount(guild) == 0);
+        return !(gsdm.getStarboardChannel(guild) == null) && !(gsdm.getStarboardCount(guild) == null);
     }
 
     private static boolean amountPassed(Message msg)
     {
-        return getStarCount(msg) >= GuildUtils.getStarboardCount(msg.getGuild());
+        return getStarCount(msg) >= gsdm.getStarboardCount(msg.getGuild());
     }
 
     private static int getStarCount(Message msg)
@@ -185,7 +184,7 @@ public class StarboardHandler
 
     private static void updateCount(Message msg, Long starboardMsg, Integer amount)
     {
-        TextChannel tc = GuildUtils.getStarboardChannel(msg.getGuild());
+        TextChannel tc = gsdm.getStarboardChannel(msg.getGuild());
         tc.getMessageById(starboardMsg).queue(s -> s.editMessage(getEmote(amount)+" **"+amount+"** "+msg.getTextChannel().getAsMention()+" ID: "+msg.getId()).queue(null, null), null);
     }
 
@@ -204,9 +203,6 @@ public class StarboardHandler
 
     private static void delete(TextChannel starboard, StarboardMessage starboardMsg)
     {
-        if(starboard==null)
-            return;
-
         starboard.getMessageById(starboardMsg.getStarboardMessageId()).queue(s -> {
             s.delete().queue();
             sdm.deleteMessage(starboardMsg.getMessageIdLong(), starboardMsg.getStarboardMessageIdLong());
@@ -215,7 +211,7 @@ public class StarboardHandler
 
     private static void check(Guild guild, long msg)
     {
-        TextChannel starboard = GuildUtils.getStarboardChannel(guild);
+        TextChannel starboard = gsdm.getStarboardChannel(guild);
         StarboardMessage starboardMsg = sdm.getStarboardMessage(msg);
 
         if(existsOnStarboard(msg))
@@ -230,7 +226,7 @@ public class StarboardHandler
         }
         catch(ErrorResponseException e)
         {
-            delete(GuildUtils.getStarboardChannel(tc.getGuild()), sdm.getStarboardMessage(id));
+            delete(gsdm.getStarboardChannel(tc.getGuild()), sdm.getStarboardMessage(id));
             return null;
         }
     }

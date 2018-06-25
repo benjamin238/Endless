@@ -25,11 +25,9 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.core.entities.GlobalTag;
-import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.tools.Variables;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
+import net.dv8tion.jda.core.entities.User;
 
 public class TagCmd extends EndlessCommand
 {
@@ -39,16 +37,12 @@ public class TagCmd extends EndlessCommand
     public TagCmd(Bot bot)
     {
         this.bot = bot;
-        this.parser = new ParserBuilder().addMethods(Variables.getMethods())
-                .addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods())
-                .addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods())
-                .setMaxOutput(2000).setMaxIterations(1000).build();
+        this.parser = new ParserBuilder().addMethods(Variables.getMethods()).addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods()).addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(com.jagrosh.jagtag.libraries.Variables.getMethods()).setMaxOutput(2000).setMaxIterations(1000).build();
         this.name = "tag";
         this.aliases = new String[]{"t"};
         this.help = "Retrieves a tag with the specified name";
         this.arguments = "<name>";
-        this.children = new Command[]{new CreateGlobal(), new CreateLocal(), new Delete(), new Edit(), new Exec(),
-                new Import(), new Owner(), new Raw(), new Raw2(), new UnImport()};
+        this.children = new Command[]{new Add(), new Delete(), new Edit(), new Import(), new Owner(), new Raw(), new Raw2(), new UnImport()};
         this.category = Categories.FUN;
         this.guildOnly = false;
         this.needsArgumentsMessage = "Specify a tag name!";
@@ -57,56 +51,57 @@ public class TagCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        String[] args = splitArgs(event.getArgs());
-        String tagName;
-        String tagArgs;
+        String[] args;
+        String tagname;
+        String tagargs;
 
         try
         {
-            tagName = args[0].trim().toLowerCase();
-            tagArgs = args[1];
+            args = event.getArgs().split(" ", 2);
+            tagname = args[0].toLowerCase().trim();
+            tagargs = args[1];
         }
-        catch(IndexOutOfBoundsException e)
+        catch(ArrayIndexOutOfBoundsException e)
         {
-            tagName = event.getArgs().trim().toLowerCase();
-            tagArgs = "";
+            tagname = event.getArgs().toLowerCase().trim();
+            tagargs = "";
         }
 
-        Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), tagName);
-        if(tag==null)
+        String tag = bot.tdm.getTagContent(tagname);
+
+        if(tag == null)
         {
-            tag = bot.endless.getGlobalTag(tagName);
-            if(tag==null)
-            {
-                event.replyError("Tag \""+tagName+"\" not found.");
-                return;
-            }
+            event.replyError("No tag found with that name!");
+            return;
         }
 
-        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel()).put("args", tagArgs);
-        event.reply(parser.parse(tag.getContent()));
+        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel()).put("args", tagargs);
+        event.reply(parser.parse(tag));
     }
 
-    private class CreateGlobal extends EndlessCommand
+    private class Add extends EndlessCommand
     {
-        CreateGlobal()
+        Add()
         {
-            this.name = "createglobal";
-            this.help = "Creates a new global tag";
+            this.name = "add";
+            this.aliases = new String[]{"create"};
+            this.help = "Creates a new tag";
             this.arguments = "<name> <content>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a tag name and content!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            String[] args = splitArgs(event.getArgs());
+            String[] args;
             String name;
             String content;
 
             try
             {
+                args = event.getArgs().split(" ", 2);
                 name = args[0].trim().toLowerCase();
                 content = args[1].trim();
             }
@@ -116,56 +111,14 @@ public class TagCmd extends EndlessCommand
                 return;
             }
 
-            Tag tag = bot.endless.getGlobalTag(name);
+            String tag = bot.tdm.getTagContent(name);
 
-            if(tag==null)
+            if(tag == null)
             {
-                bot.tdm.createGlobalTag(event.getGuild().getIdLong(), event.getAuthor().getIdLong(), content, name);
-                event.replySuccess("Tag \""+name+"\"` was created successfully!");
+                bot.tdm.addTag(name, content, event.getAuthor().getIdLong());
+                event.replySuccess("Tag `"+name+"` was created successfully!");
             }
-            else
-                event.replyError("A tag already exists with that name!");
-        }
-    }
-
-    private class CreateLocal extends EndlessCommand
-    {
-        CreateLocal()
-        {
-            this.name = "createlocal";
-            this.aliases = new String[]{"create"};
-            this.help = "Creates a new local tag";
-            this.arguments = "<name> <content>";
-            this.category = Categories.FUN;
-        }
-
-        @Override
-        protected void executeCommand(CommandEvent event)
-        {
-            String[] args = splitArgs(event.getArgs());
-            String name;
-            String content;
-
-            try
-            {
-                name = args[0].trim().toLowerCase();
-                content = args[1].trim();
-            }
-            catch(ArrayIndexOutOfBoundsException e)
-            {
-                event.replyWarning("Please specify a tag name and content!");
-                return;
-            }
-
-            Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), name);
-
-            if(tag==null)
-            {
-                bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getAuthor().getIdLong(), content, name);
-                event.replySuccess("Tag \""+name+"\"` was created successfully!");
-            }
-            else
-                event.replyError("A tag already exists with that name!");
+            else event.replyError("A tag already exists with that name!");
         }
     }
 
@@ -185,47 +138,18 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.isFromType(ChannelType.TEXT))
-            {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
+            String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
+            Long owner = bot.tdm.getTagOwner(event.getArgs().trim().toLowerCase());
 
-                if(tag == null)
-                {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-                    if(tag==null)
-                    {
-                        event.replyError("No tag found with that name!");
-                        return;
-                    }
-                }
-
-                if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
-                {
-                    if(tag instanceof GlobalTag)
-                        bot.tdm.deleteGlobalTag(event.getJDA(), event.getArgs().trim().toLowerCase());
-                    else
-                        bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
-                    event.replySuccess("Tag successfully deleted");
-                }
-                else
-                    event.replyError("You aren't the owner of the tag!");
-            }
+            if(tag == null) event.replyError("No tag found with that name!");
             else
             {
-                Tag tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-                if(tag==null)
+                if(owner.equals(event.getAuthor().getIdLong()) || event.isOwner())
                 {
-                    event.replyError("No tag found with that name!");
-                    return;
-                }
-
-                if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
-                {
-                    bot.tdm.deleteGlobalTag(event.getJDA(), event.getArgs().trim().toLowerCase());
+                    bot.tdm.removeTag(event.getArgs().trim().toLowerCase());
                     event.replySuccess("Tag successfully deleted");
                 }
-                else
-                    event.replyError("You aren't the owner of the tag!");
+                else event.replyError("You aren't the owner of the tag!");
             }
         }
     }
@@ -239,17 +163,19 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<name> <new content>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.needsArgumentsMessage = "Please specify a tag name and content!";
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            String[] args = splitArgs(event.getArgs());
+            String[] args;
             String name;
             String content;
 
             try
             {
+                args = event.getArgs().split(" ", 2);
                 name = args[0].trim().toLowerCase();
                 content = args[1].trim();
             }
@@ -259,66 +185,19 @@ public class TagCmd extends EndlessCommand
                 return;
             }
 
-            if(event.isFromType(ChannelType.TEXT))
-            {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), name);
-                if(tag==null)
-                {
-                    tag = bot.endless.getGlobalTag(name);
-                    if(tag==null)
-                    {
-                        event.replyError("No tag found with that name!");
-                        return;
-                    }
-                }
+            String tag = bot.tdm.getTagContent(name);
+            Long owner = bot.tdm.getTagOwner(name);
 
-                if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
-                {
-                    if(tag instanceof GlobalTag)
-                        bot.tdm.updateGlobalTagContent(event.getJDA(), name, content);
-                    else
-                        bot.tdm.updateLocalTagContent(event.getJDA(), event.getGuild().getIdLong(), name, content);
-                    event.replySuccess("Tag successfully edited!");
-                }
-                else
-                    event.replyError("You aren't the owner of the tag!");
-            }
+            if(tag == null) event.replyError("No tag found with that name!");
             else
             {
-                Tag tag = bot.endless.getGlobalTag(name);
-                if(tag==null)
+                if(owner.equals(event.getAuthor().getIdLong()) || event.isOwner())
                 {
-                    event.replyError("No tag found with that name!");
-                    return;
-                }
-
-                if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
-                {
-                    bot.tdm.updateGlobalTagContent(event.getJDA(), name, content);
+                    bot.tdm.editTag(name, content);
                     event.replySuccess("Tag successfully edited!");
                 }
-                else
-                    event.replyError("You aren't the owner of the tag!");
+                else event.replyError("You aren't the owner of the tag!");
             }
-        }
-    }
-
-    private class Exec extends EndlessCommand
-    {
-        Exec()
-        {
-            this.name = "exec";
-            this.help = "Parses the specified content";
-            this.arguments = "<content>";
-            this.category = Categories.FUN;
-            this.guildOnly = false;
-        }
-
-        @Override
-        protected void executeCommand(CommandEvent event)
-        {
-            parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel());
-            event.reply(parser.parse(event.getArgs()));
         }
     }
 
@@ -337,35 +216,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.isFromType(ChannelType.TEXT))
-            {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
-                if(tag==null)
-                {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-                    if(tag==null)
-                    {
-                        event.replyError("No tag found with that name!");
-                        return;
-                    }
-                }
-                Tag fTag = tag;
-                event.getJDA().retrieveUserById(tag.getOwnerId()).queue(user -> event.reply("The owner of the tag `"+fTag.getName()+
-                        "` is **"+user.getName()+"#"+user.getDiscriminator()+
-                        "** (ID: **"+user.getId()+"**)"), e -> event.reply("The owner of the tag `"+fTag.getName()+"` is **Unknown**."));
-            }
+            String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
+            User owner = event.getJDA().retrieveUserById(bot.tdm.getTagOwner(event.getArgs())).complete();
+
+            if(tag == null) event.replyError("No tag found with that name!");
             else
-            {
-                Tag tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-                if(tag==null)
-                {
-                    event.replyError("No tag found with that name!");
-                    return;
-                }
-                event.getJDA().retrieveUserById(tag.getOwnerId()).queue(user -> event.reply("The owner of the tag `"+tag.getName()+
-                        "` is **"+user.getName()+"#"+user.getDiscriminator()+
-                        "** (ID: **"+user.getId()+"**)"), e -> event.reply("The owner of the tag `"+tag.getName()+"` is **Unknown**."));
-            }
+                event.reply("The owner of the tag `"+event.getArgs().trim().toLowerCase()+"` is **"+owner.getName()+"#"+owner.getDiscriminator()+"** (ID: **"+owner.getId()+"**)");
         }
     }
 
@@ -384,25 +240,16 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.isFromType(ChannelType.TEXT))
+            String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
+
+            if(tag == null) event.replyError("No tag found with that name!");
+            else
             {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
-
-                if(tag==null)
-                {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-                    if(tag==null)
-                    {
-                        event.replyError("No tag found with that name!");
-                        return;
-                    }
-                }
-
-                if(bot.tdm.isImported(event.getGuild().getIdLong(), String.valueOf(tag.getId())))
+                if(bot.tdm.isTagImported(event.getArgs().trim().toLowerCase(), event.getGuild().getIdLong()))
                     event.replyError("This tag is already imported!");
                 else
                 {
-                    bot.tdm.importTag(event.getGuild().getIdLong(), tag);
+                    bot.tdm.importTag(event.getArgs().trim().toLowerCase(), tag, bot.tdm.getTagOwner(event.getArgs().trim().toLowerCase()), event.getGuild().getIdLong());
                     event.replySuccess("Successfully imported tag!");
                 }
             }
@@ -424,34 +271,10 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.isFromType(ChannelType.TEXT))
-            {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
+            String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
 
-                if(tag==null)
-                {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-                    if(tag==null)
-                    {
-                        event.replyError("No tag found with that name!");
-                        return;
-                    }
-                }
-
-                event.reply("```"+tag.getContent()+"```");
-            }
-            else
-            {
-                Tag tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-
-                if(tag==null)
-                {
-                    event.replyError("No tag found with that name!");
-                    return;
-                }
-
-                event.reply("```"+tag.getContent()+"```");
-            }
+            if(tag == null) event.replyError("No tag found with that name!");
+            else event.reply(tag);
         }
     }
 
@@ -470,34 +293,10 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.isFromType(ChannelType.TEXT))
-            {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
+            String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
 
-                if(tag==null)
-                {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-                    if(tag==null)
-                    {
-                        event.replyError("No tag found with that name!");
-                        return;
-                    }
-                }
-
-                event.reply("```"+tag.getContent()+"```");
-            }
-            else
-            {
-                Tag tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-
-                if(tag==null)
-                {
-                    event.replyError("No tag found with that name!");
-                    return;
-                }
-
-                event.reply("```"+tag.getContent()+"```");
-            }
+            if(tag == null) event.replyError("No tag found with that name!");
+            else event.reply("```"+tag+"```");
         }
     }
 
@@ -516,33 +315,25 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.isFromType(ChannelType.TEXT))
+            if(event.getArgs().isEmpty())
             {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
+                event.replyWarning("Specify a tag name!");
+                return;
+            }
 
-                if(tag==null)
-                {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
-                    if(tag==null)
-                    {
-                        event.replyError("No tag found with that name!");
-                        return;
-                    }
-                }
+            String tag = bot.tdm.getTagContent(event.getArgs().trim().toLowerCase());
 
-                if(!(bot.tdm.isImported(event.getGuild().getIdLong(), String.valueOf(tag.getId()))))
+            if(tag == null) event.replyError("No tag found with that name!");
+            else
+            {
+                if(!(bot.tdm.isTagImported(event.getArgs().trim().toLowerCase(), event.getGuild().getIdLong())))
                     event.replyError("This tag isn't imported!");
                 else
                 {
-                    bot.tdm.unimportTag(event.getGuild().getIdLong(), tag);
+                    bot.tdm.unImportTag(event.getArgs().trim().toLowerCase(), event.getGuild().getIdLong());
                     event.replySuccess("Successfully unimported tag!");
                 }
             }
         }
-    }
-
-    private String[] splitArgs(String args)
-    {
-        return args.split(" ", 2);
     }
 }

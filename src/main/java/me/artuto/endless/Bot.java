@@ -17,13 +17,10 @@
 
 package me.artuto.endless;
 
-import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import me.artuto.endless.bootloader.StartupChecker;
-import me.artuto.endless.bootloader.ThreadLoader;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.bootloader.EndlessLoader;
 import me.artuto.endless.cmddata.CommandHelper;
 import me.artuto.endless.commands.bot.*;
 import me.artuto.endless.commands.botadm.*;
@@ -32,43 +29,28 @@ import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.serverconfig.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
-import me.artuto.endless.core.EndlessCoreBuilder;
-import me.artuto.endless.core.EndlessSharded;
-import me.artuto.endless.core.EndlessShardedBuilder;
 import me.artuto.endless.data.Database;
 import me.artuto.endless.data.managers.*;
-import me.artuto.endless.exceptions.ConfigException;
-import me.artuto.endless.handlers.BlacklistHandler;
-import me.artuto.endless.handlers.SpecialCaseHandler;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.*;
-import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.StatusChangeEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
-import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
-import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Artuto
  */
 
-public class Bot extends ListenerAdapter
+public class Bot
 {
-    public EndlessSharded endless;
     public boolean maintenance;
-    public boolean initialized = false;
-    private EndlessShardedBuilder endlessBuilder;
+    private final EndlessLoader loader = new EndlessLoader(this);
 
     // Config
     public Config config;
@@ -85,7 +67,7 @@ public class Bot extends ListenerAdapter
 
     // Discord
     public CommandClient client;
-    public ShardManager shardManager;
+    public ShardManager shards;
 
     // EventWaiter
     public EventWaiter waiter;
@@ -97,9 +79,6 @@ public class Bot extends ListenerAdapter
     public BotLogging botlog;
     public ModLogging modlog;
     public ServerLogging serverlog;
-
-    // Loggers
-    private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
 
     // Schedulers;
     public ScheduledExecutorService muteScheduler;
@@ -114,54 +93,43 @@ public class Bot extends ListenerAdapter
 
     public static Bot getInstance()
     {
-        return Endless.bot;
+        return Endless.getBot();
     }
 
-    void boot(boolean maintenance) throws LoginException, SQLException
+    void boot(boolean maintenance) throws LoginException
     {
         this.maintenance = maintenance;
         Endless.LOG.info("Starting Endless "+Const.VERSION+"...");
         if(maintenance)
             Endless.LOG.warn("WARNING - Starting on Maintenance Mode - WARNING");
+        loader.preLoad();
+        config = loader.config;
 
-        CONFIGLOG.info("Loading config file...");
+        loader.databaseLoad(maintenance);
+        bdm = loader.dbLoader.getBlacklistDataManager();
+        db = loader.dbLoader.getDatabaseManager();
+        ddm = loader.dbLoader.getDonatorsDataManager();
+        gsdm = loader.dbLoader.getGuildSettingsDataManager();
+        pdm = loader.dbLoader.getPunishmentsDataManager();
+        prdm = loader.dbLoader.getProfileDataManager();
+        sdm = loader.dbLoader.getStarbordDataManager();
+        tdm = loader.dbLoader.getTagDataManager();
 
-        try
-        {
-            config = new Config();
-            StartupChecker.checkConfig(config);
-            CONFIGLOG.info("Successfully loaded config file!");
-        }
-        catch(Exception e)
-        {
-            throw new ConfigException(e.getMessage());
-        }
+        loader.logLoad();
+        botlog = loader.botlog;
+        logWebhook = new WebhookClientBuilder(config.getBotlogWebhook()).setExecutorService(loader.botlogThread).setDaemon(true).build();
+        modlog = loader.modlog;
+        serverlog = loader.serverlog;
 
-        db = new Database(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
-        bdm = new BlacklistDataManager(db);
-        ddm = new DonatorsDataManager(db);
-        gsdm = new GuildSettingsDataManager(this);
-        pdm = new PunishmentsDataManager(db);
-        prdm = new ProfileDataManager(db);
-        sdm = new StarboardDataManager(db);
-        tdm = new TagDataManager(this);
-        BlacklistHandler bHandler = new BlacklistHandler(bdm);
-        SpecialCaseHandler sHandler = new SpecialCaseHandler();
-        new Categories(maintenance, bHandler, sHandler);
-        new GuildUtils(this);
+        loader.threadLoad();
+        clearThread = loader.clearThread;
+        muteScheduler = loader.muteScheduler;
+        optimizerScheduler = loader.optimizerScheduler;
+        starboardThread = loader.starboardThread;
 
-        botlog = new BotLogging(this);
-        logWebhook = new WebhookClientBuilder(config.getBotlogWebhook())
-                .setExecutorService(ThreadLoader.createThread("Botlog")).setDaemon(true).build();
-        modlog = new ModLogging();
-        serverlog = new ServerLogging(this);
+        loader.waiterLoad();
+        waiter = loader.waiter;
 
-        clearThread = ThreadLoader.createThread("Clear Command");
-        muteScheduler = ThreadLoader.createThread("Mute");
-        optimizerScheduler = ThreadLoader.createThread("Optimizer");
-        starboardThread = ThreadLoader.createThread("Starboard");
-
-        waiter = new EventWaiter();
         listener = new Listener(this);
 
         CommandClientBuilder clientBuilder = new CommandClientBuilder();
@@ -178,8 +146,8 @@ public class Bot extends ListenerAdapter
                 .setStatus(null)
                 .setPrefix(config.getPrefix())
                 .setAlternativePrefix("@mention")
-                .setGuildSettingsManager(new ClientGSDM())
-                .setScheduleExecutor(ThreadLoader.createThread("Commands"))
+                .setGuildSettingsManager(new ClientGSDM(db))
+                .setScheduleExecutor(loader.cmdThread)
                 .setListener(new CommandLogging(this))
                 .setLinkedCacheSize(6)
                 .setHelpConsumer(CommandHelper::getHelp);
@@ -228,32 +196,12 @@ public class Bot extends ListenerAdapter
                 .setGame(Game.playing("[ENDLESS] Loading..."))
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
-                .setEnableShutdownHook(true)
-                .setShardsTotal(2);
+                .setEnableShutdownHook(true);
         if(maintenance)
-            builder.addEventListeners(this, client);
+            builder.addEventListeners(client);
         else
-            builder.addEventListeners(this, client, listener, waiter);
-        shardManager = builder.build();
+            builder.addEventListeners(loader.waiter, client, listener);
 
-        endlessBuilder = new EndlessShardedBuilder(this, shardManager);
-    }
-
-    @Override
-    public void onReady(ReadyEvent event)
-    {
-        endlessBuilder.addShard(new EndlessCoreBuilder(this, event.getJDA())
-                .setCommandClient(client)
-                .build());
-    }
-
-    @Override
-    public void onStatusChange(StatusChangeEvent event)
-    {
-        if(event.getNewStatus()==JDA.Status.CONNECTED)
-        {
-            if(event.getJDA().asBot().getShardManager().getShards().stream().allMatch(shard -> shard.getStatus()==JDA.Status.CONNECTED))
-                this.endless = endlessBuilder.build();
-        }
+        shards = builder.build();
     }
 }

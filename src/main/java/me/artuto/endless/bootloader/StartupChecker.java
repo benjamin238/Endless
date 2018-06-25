@@ -31,15 +31,19 @@ import org.slf4j.LoggerFactory;
 
 public class StartupChecker
 {
+    private Config config;
     public static Logger LOG = (Logger)LoggerFactory.getLogger("Startup Checker");
 
-    public static void checkConfig(Config config)
+    public Config checkConfig()
     {
-        if(!(isConfigValid(config)))
-            throw new ConfigException();
+        this.config = new ConfigLoader().loadConfig();
+
+        if(isConfigValid())
+            return config;
+        else throw new ConfigException();
     }
 
-    private static boolean isConfigValid(Config config)
+    private boolean isConfigValid()
     {
         long owner = config.getOwnerId();
         long rootGuild = config.getRootGuildId();

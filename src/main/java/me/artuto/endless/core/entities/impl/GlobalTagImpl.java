@@ -37,6 +37,12 @@ public class GlobalTagImpl implements GlobalTag
     }
 
     @Override
+    public boolean isNSFW()
+    {
+        return content.toLowerCase().contains("{nsfw}");
+    }
+
+    @Override
     public long getId()
     {
         return tagId;

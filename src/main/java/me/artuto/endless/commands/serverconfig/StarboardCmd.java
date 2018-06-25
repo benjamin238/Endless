@@ -23,7 +23,7 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.ChecksUtil;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -67,7 +67,7 @@ public class StarboardCmd extends EndlessCommand
                     event.replyWarning("Alright, setup cancelled.");
                     break;
                 case "create":
-                    if(!(ChecksUtil.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_CHANNEL) || ChecksUtil.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_PERMISSIONS)))
+                    if(!(Checks.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_CHANNEL) || Checks.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MANAGE_PERMISSIONS)))
                     {
                         event.replyError("An error happened when creating the channel and setting the permissions! Check I have the proper permissions.");
                         waitForChannel(event);

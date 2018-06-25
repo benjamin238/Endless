@@ -17,266 +17,167 @@
 
 package me.artuto.endless.data.managers;
 
-import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.GlobalTag;
-import me.artuto.endless.core.entities.LocalTag;
-import me.artuto.endless.core.entities.Tag;
-import me.artuto.endless.core.entities.impl.*;
 import me.artuto.endless.data.Database;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
-import org.json.JSONArray;
+import me.artuto.endless.entities.ImportedTag;
+import me.artuto.endless.entities.impl.ImportedTagImpl;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class TagDataManager
 {
-    private final Bot bot;
     private final Connection connection;
 
-    public TagDataManager(Bot bot)
+    public TagDataManager(Database db)
     {
-        this.bot = bot;
-        this.connection = bot.db.getConnection();
+        this.connection = db.getConnection();
     }
 
-    private GlobalTag getGlobalTag(String name)
+    public void addTag(String name, String content, Long owner)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GLOBAL_TAGS WHERE name = \"%s\"", name)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name = \"%s\"", name)))
             {
-                if(results.next())
-                    return new GlobalTagImpl(results.getLong("owner"), results.getInt("id"),
-                            results.getString("content"), results.getString("name"));
+                results.moveToInsertRow();
+                results.updateString("tag_name", name);
+                results.updateString("tag_content", content);
+                results.updateLong("tag_owner", owner);
+                results.insertRow();
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting a global tag.", e);
-            return null;
+            Database.LOG.error("Error while adding a tag.", e);
         }
-        return null;
     }
 
-    private LocalTag getLocalTag(long guild, String name)
+    public void editTag(String name, String content)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE name = \"%s\" AND guild = %s", name, guild)))
-            {
-                if(results.next())
-                    return new LocalTagImpl(results.getLong("guild"), results.getLong("owner"), results.getInt("id"),
-                            results.getString("content"), results.getString("name"));
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting a global tag.", e);
-            return null;
-        }
-        return null;
-    }
-
-    public boolean isImported(long guild, String id)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, imported_tags FROM GUILD_SETTINGS WHERE guild_id = \"%s\"", guild)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM TAGS WHERE tag_name = \"%s\"", name)))
             {
                 if(results.next())
                 {
-                    String array = results.getString("imported_tags");
-                    if(array==null)
-                        return false;
-                    else
-                        return new JSONArray(array).toList().contains(id);
+                    results.updateString("tag_content", content);
+                    results.updateRow();
                 }
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while importing a tag. Guild ID: "+guild, e);
+            Database.LOG.error("Error while editing a tag.", e);
+        }
+    }
+
+    public String getTagContent(String name)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.closeOnCompletion();
+            String content;
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content FROM TAGS WHERE TAG_NAME = \"%s\"", name)))
+            {
+                if(results.next())
+                    content = results.getString("tag_content");
+                else
+                    content = null;
+            }
+            return content;
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while getting a tag content.", e);
+            return null;
+        }
+    }
+
+    public void removeTag(String name)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM TAGS WHERE TAG_NAME = \"%s\"", name)))
+            {
+                if(results.next())
+                {
+                    results.updateInt("tag_id", 0);
+                    results.updateRow();
+                }
+            }
+            statement.executeUpdate(String.format("DELETE FROM TAGS WHERE tag_name = \"%s\"", name));
+            statement.closeOnCompletion();
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while removing a tag.", e);
+        }
+    }
+
+    public Long getTagOwner(String name)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_owner FROM TAGS WHERE tag_name = \"%s\"", name)))
+            {
+                if(results.next())
+                    return results.getLong("tag_owner");
+                else
+                    return null;
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while getting the owner of a tag.", e);
+            return null;
+        }
+    }
+
+    public boolean isTagImported(String name, Long guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name FROM TAGS WHERE tag_name = \"imported-%s:%s\"", guild, name)))
+            {
+                return results.next();
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while checking if a tag is imported. Guild ID: "+guild, e);
             return false;
         }
-        return false;
     }
 
-    public List<GlobalTag> getGlobalTags()
+    public void importTag(String name, String content, Long owner, Long guild)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery("SELECT * FROM GLOBAL_TAGS"))
-            {
-                List<GlobalTag> list = new LinkedList<>();
-                while(results.next())
-                {
-                    list.add(new GlobalTagImpl(results.getLong("owner"), results.getInt("id"),
-                        results.getString("content"), results.getString("name")));
-                }
-                return list;
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the list of global tags.", e);
-            return Collections.emptyList();
-        }
-    }
-
-    public List<LocalTag> getLocalTagsForGuild(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE guild = %s", guild.getIdLong())))
-            {
-                List<LocalTag> list = new LinkedList<>();
-                while(results.next())
-                {
-                    list.add(new LocalTagImpl(results.getLong("guild"), results.getLong("owner"), results.getInt("id"),
-                            results.getString("content"), results.getString("name")));
-                }
-                return list;
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the list of global tags.", e);
-            return Collections.emptyList();
-        }
-    }
-
-    public void createGlobalTag(long guild, long owner, String content, String name)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GLOBAL_TAGS WHERE name = \"%s\"", name)))
-            {
-                results.moveToInsertRow();
-                results.updateString("name", name);
-                results.updateString("content", content);
-                results.updateLong("owner", owner);
-                results.insertRow();
-                Tag tag = getGlobalTag(name);
-                ((EndlessCoreImpl)bot.endless.getShard(bot.shardManager.getGuildById(guild).getJDA())).addGlobalTag((GlobalTag)tag);
-                ((EndlessShardedImpl)bot.endless).addGlobalTag((GlobalTag)tag);
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while adding a global tag.", e);
-        }
-    }
-
-    public void createLocalTag(long guild, long owner, String content, String name)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE name = \"%s\"", name)))
-            {
-                results.moveToInsertRow();
-                results.updateString("name", name);
-                results.updateString("content", content);
-                results.updateLong("guild", guild);
-                results.updateLong("owner", owner);
-                results.insertRow();
-                Tag tag = getLocalTag(guild, name);
-                ((EndlessCoreImpl)bot.endless.getShard(bot.shardManager.getGuildById(guild).getJDA())).addLocalTag((LocalTag)tag);
-                ((EndlessShardedImpl)bot.endless).addLocalTag((LocalTag)tag);
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while adding a global tag.", e);
-        }
-    }
-
-    public void deleteGlobalTag(JDA jda, String name)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            statement.executeUpdate(String.format("DELETE FROM GLOBAL_TAGS WHERE name = \"%s\"", name));
-            ((EndlessCoreImpl)bot.endless.getShard(jda)).removeGlobalTag(name);
-            ((EndlessShardedImpl)bot.endless).removeGlobalTag(name);
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while deleting a global tag.", e);
-        }
-    }
-
-    public void deleteLocalTag(long guild, String name)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            statement.executeUpdate(String.format("DELETE FROM LOCAL_TAGS WHERE name = \"%s\" AND guild = %s", name, guild));
-            ((EndlessCoreImpl)bot.endless.getShard(bot.shardManager.getGuildById(guild).getJDA())).removeLocalTag(guild, name);
-            ((EndlessShardedImpl)bot.endless).removeLocalTag(guild, name);
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while deleting a local tag.", e);
-        }
-    }
-
-    public void importTag(long guild, Tag tag)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, imported_tags FROM GUILD_SETTINGS WHERE guild_id = \"%s\"", guild)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name = \"%s\"", name)))
             {
                 if(results.next())
                 {
-                    String importedTags = results.getString("imported_tags");
-                    JSONArray array;
-
-                    if(importedTags==null)
-                        array = new JSONArray().put(String.valueOf(tag.getId()));
-                    else
-                        array = new JSONArray(importedTags).put(String.valueOf(tag.getId()));
-
-                    results.updateString("imported_tags", array.toString());
-                    results.updateRow();
-                }
-                else
-                {
                     results.moveToInsertRow();
-                    results.updateLong("guild_id", guild);
-                    results.updateString("imported_tags", new JSONArray().put(String.valueOf(tag.getId())).toString());
+                    results.updateString("tag_name", "imported-"+guild+":"+name);
+                    results.updateString("tag_content", content);
+                    results.updateLong("tag_owner", owner);
                     results.insertRow();
-                }
-                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettingsById(guild);
-                settings.addImportedTag(tag);
-                if(bot.endless.getGuildSettingsById(guild).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(settings.getGuild(), settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(settings.getGuild(), settings);
                 }
             }
         }
@@ -286,99 +187,71 @@ public class TagDataManager
         }
     }
 
-    public void unimportTag(long guild, Tag tag)
+    public void unImportTag(String name, Long guild)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, imported_tags FROM GUILD_SETTINGS WHERE guild_id = %s", guild)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT tag_id, tag_name, imported FROM TAGS WHERE tag_name = \"imported-%s:%s\"", guild, name)))
             {
                 if(results.next())
                 {
-                    String importedTags = results.getString("imported_tags");
-                    JSONArray array;
-
-                    if(!(importedTags==null))
-                    {
-                        array = new JSONArray(importedTags);
-                        for(int i = 0; i<array.length(); i++)
-                        {
-                            if((array.get(i)).equals(String.valueOf(tag.getId())))
-                            {
-                                array.remove(i);
-                                if(array.length()<0)
-                                {
-                                    results.updateNull("imported_tags");
-                                    results.updateRow();
-                                }
-                                else
-                                {
-                                    results.updateString("imported_tags", array.toString());
-                                    results.updateRow();
-                                }
-                            }
-                        }
-                        GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettingsById(guild);
-                        settings.removeImportedTag(tag);
-                        if(bot.endless.getGuildSettingsById(guild).isDefault())
-                        {
-                            ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(settings.getGuild(), settings);
-                            ((EndlessShardedImpl)bot.endless).addSettings(settings.getGuild(), settings);
-                        }
-                    }
+                    results.updateInt("tag_id", 0);
+                    results.updateRow();
                 }
             }
+            statement.executeUpdate(String.format("DELETE FROM TAGS WHERE tag_name = \"imported-%s:%s\"", guild, name));
+            statement.closeOnCompletion();
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while removing a prefix for the guild "+guild, e);
+            Database.LOG.error("Error while unimporting a tag. Guild ID: "+guild, e);
         }
     }
 
-    public void updateGlobalTagContent(JDA jda, String name, String newContent)
+    public List<ImportedTag> getImportedTags()
     {
+        List<ImportedTag> tags = new LinkedList<>();
+
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GLOBAL_TAGS WHERE name = \"%s\"", name)))
+            try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name LIKE \'imported-%\'"))
             {
-                if(results.next())
-                {
-                    results.updateString("content", newContent);
-                    results.updateRow();
-                    ((GlobalTagImpl)bot.endless.getShard(jda).getGlobalTag(name)).setContent(newContent);
-                    ((GlobalTagImpl)bot.endless.getGlobalTag(name)).setContent(newContent);
-                }
+                while(results.next())
+                    tags.add(new ImportedTagImpl(results.getLong("tag_id"), results.getString("tag_name"), results.getString("tag_content"), results.getLong("tag_owner"), Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
+
+                return tags;
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while editing a global tag.", e);
+            Database.LOG.error("Error while getting a list of imported tags.", e);
+            return null;
         }
     }
 
-    public void updateLocalTagContent(JDA jda, long guild, String name, String newContent)
+    public List<ImportedTag> getImportedTagsForGuild(Long guild)
     {
+        List<ImportedTag> tags = new LinkedList<>();
+
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE name = \"%s\" AND guild = %s", name, guild)))
+            try(ResultSet results = statement.executeQuery("SELECT tag_id, tag_name, tag_content, tag_owner FROM TAGS WHERE tag_name LIKE \'imported-"+guild+":%\'"))
             {
-                if(results.next())
-                {
-                    results.updateString("content", newContent);
-                    results.updateRow();
-                    ((LocalTagImpl)bot.endless.getShard(jda).getLocalTag(guild, name)).setContent(newContent);
-                    ((LocalTagImpl)bot.endless.getLocalTag(guild, name)).setContent(newContent);
-                }
+                while(results.next())
+                    tags.add(new ImportedTagImpl(results.getLong("tag_id"), results.getString("tag_name"), results.getString("tag_content"), results.getLong("tag_owner"), Long.valueOf(results.getString("tag_name").split(":")[0].split("-")[1])));
+
+                return tags;
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while editing a local tag.", e);
+            Database.LOG.error("Error while getting a list of imported tags. Guild ID: "+guild, e);
+            return null;
         }
     }
 }

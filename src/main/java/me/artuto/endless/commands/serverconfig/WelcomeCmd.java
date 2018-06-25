@@ -22,7 +22,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -46,7 +45,7 @@ public class WelcomeCmd extends EndlessCommand
     protected void executeCommand(CommandEvent event)
     {
         Guild guild = event.getGuild();
-        String msg = GuildUtils.getWelcomeMessage(guild);
+        String msg = bot.gsdm.getWelcomeMessage(guild);
 
         if(!(msg==null))
             event.replySuccess("Welcome message at **"+guild.getName()+"**: `"+msg+"`");

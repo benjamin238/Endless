@@ -21,7 +21,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.ChecksUtil;
+import me.artuto.endless.utils.Checks;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -141,7 +141,7 @@ public class CommandHelper
                 EndlessCommand c = (EndlessCommand)preC;
                 if(event.isFromType(ChannelType.TEXT))
                 {
-                    if(ChecksUtil.hasPermission(event.getMember(), event.getTextChannel(), c.getUserPerms()))
+                    if(Checks.hasPermission(event.getMember(), event.getTextChannel(), c.getUserPerms()))
                         return true;
                     else if(event.isOwner())
                         return true;
@@ -168,7 +168,7 @@ public class CommandHelper
                     EndlessCommand c = (EndlessCommand)preCmd;
                     if(event.isFromType(ChannelType.TEXT))
                     {
-                        if(ChecksUtil.hasPermission(event.getMember(), event.getTextChannel(), c.getUserPerms()))
+                        if(Checks.hasPermission(event.getMember(), event.getTextChannel(), c.getUserPerms()))
                             return true;
                         else if(event.isOwner())
                             return true;
