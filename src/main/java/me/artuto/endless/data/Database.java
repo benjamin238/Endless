@@ -17,11 +17,8 @@
 
 package me.artuto.endless.data;
 
-import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.GuildSettings;
-import me.artuto.endless.core.entities.Tag;
-import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
-import net.dv8tion.jda.core.JDA;
+import me.artuto.endless.entities.GuildSettings;
+import me.artuto.endless.entities.impl.GuildSettingsImpl;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import org.json.JSONArray;
@@ -29,19 +26,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class Database
 {
     private final Connection connection;
     public static final Logger LOG = LoggerFactory.getLogger(Database.class);
-
-    public GuildSettings createDefault(Guild guild)
-    {
-        return new GuildSettingsImpl(true, new HashSet<>(), guild, 0, 0,
-                new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L,
-                0L, 0L, null, null);
-    }
+    private final GuildSettings DEFAULT = new GuildSettingsImpl(null, 0, 0,null,
+            0L, 0L, 0L,0L,
+            0L, 0L, null, null);
 
     public Database(String host, String user, String pass) throws SQLException
     {
@@ -63,7 +59,6 @@ public class Database
             statement.closeOnCompletion();
             GuildSettings gs;
             List<Role> roleMeRoles = new LinkedList<>();
-            List<Tag> importedTags = new LinkedList<>();
             Set<String> prefixes = new HashSet<>();
             String array;
 
@@ -92,63 +87,19 @@ public class Database
                         }
                     }
 
-                    array = results.getString("imported_tags");
-
-                    if(!(array == null))
-                    {
-                        for(Object preTag : new JSONArray(array))
-                        {
-                            Tag tag = Bot.getInstance().endless.getGlobalTags().stream()
-                                    .filter(t -> t.getId()==(Long)preTag).findFirst().orElse(null);
-                            if(tag==null)
-                                tag = Bot.getInstance().endless.getLocalTags().stream().filter(t -> t.getId()==(Long)preTag).findFirst().orElse(null);
-                            if(!(tag==null))
-                                importedTags.add(tag);
-                        }
-                    }
-
-                    gs = new GuildSettingsImpl(false, prefixes, guild, results.getInt("ban_delete_days"), results.getInt("starboard_count"), roleMeRoles,
-                            importedTags, results.getLong("leave_id"), results.getLong("modlog_id"), results.getLong("muted_role_id"), results.getLong("serverlog_id"),
+                    gs = new GuildSettingsImpl(prefixes, results.getInt("ban_delete_days"), results.getInt("starboard_count"), roleMeRoles,
+                            results.getLong("leave_id"), results.getLong("modlog_id"), results.getLong("muted_role_id"), results.getLong("serverlog_id"),
                             results.getLong("starboard_id"), results.getLong("welcome_id"), results.getString("leave_msg"), results.getString("welcome_msg"));
                 }
-                else
-                    gs = createDefault(guild);
+                else gs = DEFAULT;
             }
             return gs;
         }
         catch(SQLException e)
         {
             LOG.warn("Error while getting the settings of a guild. ID: "+guild.getId(), e);
-            return createDefault(guild);
+            return DEFAULT;
         }
-    }
-
-    public List<Guild> getGuildsThatHaveSettings(JDA jda)
-    {
-        Guild guild;
-        List<Guild> guilds = new LinkedList<>();
-
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-
-            try(ResultSet results = statement.executeQuery("SELECT * FROM GUILD_SETTINGS"))
-            {
-                while(results.next())
-                {
-                    guild = jda.getGuildById(results.getLong("guild_id"));
-                    if(!(guild==null))
-                        guilds.add(guild);
-                }
-            }
-        }
-        catch(SQLException e)
-        {
-            LOG.warn("Error while getting settings", e);
-            return guilds;
-        }
-        return guilds;
     }
 
     public boolean hasSettings(Guild guild)

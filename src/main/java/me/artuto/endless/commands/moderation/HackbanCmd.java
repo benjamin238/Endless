@@ -22,7 +22,6 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
@@ -78,7 +77,7 @@ public class HackbanCmd extends EndlessCommand
             event.replyWarning("This user is on this Guild! Please use `"+event.getClient().getPrefix()+"ban` instead.");
         else
         {
-            event.getGuild().getController().ban(user, GuildUtils.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
+            event.getGuild().getController().ban(user, bot.gsdm.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
                 event.replySuccess(Messages.HACKBAN_SUCCESS+username);
                 bot.modlog.logHackban(event.getAuthor(), user, fReason, event.getGuild(), event.getTextChannel());
             }, e -> event.replyError(Messages.HACKBAN_ERROR+username));

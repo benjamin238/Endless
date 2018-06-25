@@ -24,9 +24,8 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.ChecksUtil;
+import me.artuto.endless.utils.Checks;
 import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -59,7 +58,7 @@ public class RoleMeCmd extends EndlessCommand
     {
         String args = event.getArgs();
         Guild guild = event.getGuild();
-        List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
+        List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
         Member member = event.getMember();
         Role role;
 
@@ -98,7 +97,7 @@ public class RoleMeCmd extends EndlessCommand
 
             if(rolemeRoles.contains(role))
             {
-                if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
+                if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
                     event.replyError("I can't interact with that role!");
                 else
                 {
@@ -130,7 +129,7 @@ public class RoleMeCmd extends EndlessCommand
         protected void executeCommand(CommandEvent event)
         {
             Guild guild = event.getGuild();
-            List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
+            List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
             String args = event.getArgs();
             Role role;
 
@@ -148,13 +147,15 @@ public class RoleMeCmd extends EndlessCommand
             }
             else role = list.get(0);
 
-            if(rolemeRoles.contains(role))
+            if(rolemeRoles==null)
+                event.replyError("Something has gone wrong while getting the RoleMe roles list, please contact the bot owner.");
+            else if(rolemeRoles.contains(role))
             {
                 event.replyError("That role is already on the RoleMe roles list!");
                 return;
             }
 
-            if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
+            if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
                 event.replyError("I can't interact with that role!");
             else
             {
@@ -179,7 +180,7 @@ public class RoleMeCmd extends EndlessCommand
         protected void executeCommand(CommandEvent event)
         {
             Guild guild = event.getGuild();
-            List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
+            List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
             String args = event.getArgs();
             Role role;
 
@@ -197,8 +198,9 @@ public class RoleMeCmd extends EndlessCommand
             }
             else role = list.get(0);
 
-
-            if(!(rolemeRoles.contains(role)))
+            if(rolemeRoles==null)
+                event.replyError("Something has gone wrong while getting the RoleMe roles list, please contact the bot owner.");
+            else if(!(rolemeRoles.contains(role)))
             {
                 event.replyError("That role isn't on the RoleMe roles list!");
                 return;

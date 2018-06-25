@@ -25,10 +25,17 @@ import javax.annotation.Nullable;
 
 public class ClientGSDM implements GuildSettingsManager<ClientGSDMProvider>
 {
+    private final Database db;
+
+    public ClientGSDM(Database db)
+    {
+        this.db = db;
+    }
+
     @Nullable
     @Override
     public ClientGSDMProvider getSettings(Guild guild)
     {
-        return new ClientGSDMProvider(guild);
+        return new ClientGSDMProvider(guild, db);
     }
 }

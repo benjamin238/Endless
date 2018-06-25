@@ -19,6 +19,8 @@ package me.artuto.endless.core.entities;
 
 public interface Tag
 {
+    boolean isNSFW();
+
     long getId();
 
     long getOwnerId();

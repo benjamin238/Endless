@@ -18,8 +18,8 @@
 package me.artuto.endless.data.managers;
 
 import me.artuto.endless.data.Database;
-import me.artuto.endless.core.entities.Profile;
-import me.artuto.endless.core.entities.impl.ProfileImpl;
+import me.artuto.endless.entities.Profile;
+import me.artuto.endless.entities.impl.ProfileImpl;
 import net.dv8tion.jda.core.entities.User;
 
 import java.sql.Connection;

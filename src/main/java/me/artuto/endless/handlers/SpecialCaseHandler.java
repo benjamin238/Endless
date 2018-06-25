@@ -18,7 +18,6 @@
 package me.artuto.endless.handlers;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.command.CommandEvent;
 
 /**
  * @author Artuto

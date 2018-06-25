@@ -19,7 +19,7 @@ package me.artuto.endless.logging;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
-import me.artuto.endless.core.entities.ParsedAuditLog;
+import me.artuto.endless.entities.ParsedAuditLog;
 import me.artuto.endless.utils.*;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -46,9 +46,16 @@ import java.util.stream.Collectors;
 
 public class ModLogging
 {
+    private Bot bot;
+
+    public ModLogging(Bot bot)
+    {
+        this.bot = bot;
+    }
+
     public void logBan(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -57,7 +64,7 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Ban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
@@ -66,7 +73,7 @@ public class ModLogging
 
     public void logHackban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -75,7 +82,7 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Hackban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") hackbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"+"`[Reason]:` "+reason).queue();
@@ -84,7 +91,7 @@ public class ModLogging
 
     public void logKick(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -93,7 +100,7 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Kick]:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
@@ -102,7 +109,7 @@ public class ModLogging
 
     public void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -111,7 +118,7 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Softban]:` :banana: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") softbanned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
@@ -120,7 +127,7 @@ public class ModLogging
 
     public void logUnban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -129,7 +136,7 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Unban]:` :wrench: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"+"`[Reason]:` "+reason).queue();
@@ -138,7 +145,7 @@ public class ModLogging
 
     public void logClear(User author, TextChannel channel, String reason, Guild guild, List<Message> deleted, String args)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -148,7 +155,7 @@ public class ModLogging
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.CLEARMODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
             {
@@ -187,11 +194,11 @@ public class ModLogging
 
     public void logMute(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
             {
@@ -207,12 +214,12 @@ public class ModLogging
 
     public void logTempMute(User author, Member target, String reason, Guild guild, TextChannel channel, int time)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         String formattedTime = FormatUtil.formatTimeFromSeconds(time);
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Mute]:` :mute: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") " +
@@ -222,11 +229,11 @@ public class ModLogging
 
     public void logUnmute(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
             {
@@ -243,16 +250,16 @@ public class ModLogging
     public void onGuildBan(GuildBanEvent event)
     {
         Guild guild = event.getGuild();
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        TextChannel tc = bot.gsdm.getModlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
 
         if(!(tc == null))
         {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+            if(!(Checks.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
             {
-                if(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
+                if(Checks.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
                 {
                     guild.getAuditLogs().type(ActionType.BAN).limit(20).queue(preEntries -> {
                         List<AuditLogEntry> entries = preEntries.stream().filter(ale -> ale.getTargetIdLong()==event.getUser().getIdLong()).collect(Collectors.toList());

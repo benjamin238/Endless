@@ -18,21 +18,20 @@
 package me.artuto.endless.cmddata;
 
 import com.jagrosh.jdautilities.command.Command.Category;
-import me.artuto.endless.Bot;
 import me.artuto.endless.handlers.BlacklistHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
 
 public class Categories
 {
-    private static boolean maintenance;
     private static BlacklistHandler bHandler;
     private static SpecialCaseHandler sHandler;
+    private static boolean maintenance;
 
-    public Categories(boolean maintenance, BlacklistHandler bHandler, SpecialCaseHandler shHndler)
+    public Categories(BlacklistHandler bHandler, SpecialCaseHandler shHndler, boolean maintenance)
     {
         Categories.bHandler = bHandler;
+        sHandler = shHndler;
         Categories.maintenance = maintenance;
-        Categories.sHandler = shHndler;
     }
 
     public static final Category BOT = new Category("Bot", event ->
@@ -40,8 +39,6 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(Bot.getInstance().initialized))
-            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -64,8 +61,6 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(Bot.getInstance().initialized))
-            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -77,8 +72,6 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(Bot.getInstance().initialized))
-            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -90,8 +83,6 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(Bot.getInstance().initialized))
-            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -103,8 +94,6 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(Bot.getInstance().initialized))
-            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 
@@ -116,8 +105,6 @@ public class Categories
         if(event.isOwner())
             return true;
 
-        if(!(Bot.getInstance().initialized))
-            return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
 

@@ -21,7 +21,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.cmddata.CommandHelper;
-import me.artuto.endless.utils.ChecksUtil;
+import me.artuto.endless.utils.Checks;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Member;
@@ -73,7 +73,7 @@ public abstract class EndlessCommand extends Command
         {
             for(Permission p : botPerms)
             {
-                if(!(ChecksUtil.hasPermission(selfMember, tc, p)))
+                if(!(Checks.hasPermission(selfMember, tc, p)))
                 {
                     event.replyError(String.format("I need the %s permission in this Guild to execute this command!", p.getName()));
                     return;
@@ -89,7 +89,7 @@ public abstract class EndlessCommand extends Command
 
             for(Permission p : userPerms)
             {
-                if(!(ChecksUtil.hasPermission(member, tc, p)))
+                if(!(Checks.hasPermission(member, tc, p)))
                 {
                     event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
                     return;

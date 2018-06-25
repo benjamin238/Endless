@@ -19,8 +19,8 @@ package me.artuto.endless.data.managers;
 
 import me.artuto.endless.Const;
 import me.artuto.endless.data.Database;
-import me.artuto.endless.core.entities.Blacklist;
-import me.artuto.endless.core.entities.impl.BlacklistImpl;
+import me.artuto.endless.entities.Blacklist;
+import me.artuto.endless.entities.impl.BlacklistImpl;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
