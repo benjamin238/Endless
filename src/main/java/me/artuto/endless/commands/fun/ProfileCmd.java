@@ -19,9 +19,8 @@ package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import net.dv8tion.jda.core.Permission;
 
 public class ProfileCmd extends EndlessCommand
 {

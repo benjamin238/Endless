@@ -21,7 +21,7 @@ import com.jagrosh.jagtag.Parser;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.core.entities.ParsedAuditLog;
-import me.artuto.endless.tempdata.MessagesLogging;
+import me.artuto.endless.storage.tempdata.MessagesLogging;
 import me.artuto.endless.utils.*;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -29,7 +29,6 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.audit.ActionType;
 import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.entities.impl.TextChannelImpl;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
@@ -140,7 +139,7 @@ public class ServerLogging
 
         if(!(tc == null) && !(event.getAuthor().isBot()))
         {
-            if(IgnoreUtils.isIgnored(event.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getId(), tc.getTopic()))
+            if(MiscUtils.isIgnored(event.getAuthor().getId(), tc.getTopic()) || MiscUtils.isIgnored(event.getChannel().getId(), tc.getTopic()))
                 return;
 
             MessagesLogging.addMessage(event.getMessage().getIdLong(), event.getMessage());
@@ -160,7 +159,7 @@ public class ServerLogging
 
         if(!(event.getAuthor().isBot()) && !(message.getContentRaw().equals("No cached message")) && !(tc == null))
         {
-            if(IgnoreUtils.isIgnored(event.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
+            if(MiscUtils.isIgnored(event.getAuthor().getId(), tc.getTopic()) || MiscUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
                 return;
 
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
@@ -203,7 +202,7 @@ public class ServerLogging
 
         if(!(message.getContentRaw().equals("No cached message")) && !(tc == null) && !(message.getAuthor().isBot()))
         {
-            if(IgnoreUtils.isIgnored(message.getAuthor().getId(), tc.getTopic()) || IgnoreUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
+            if(MiscUtils.isIgnored(message.getAuthor().getId(), tc.getTopic()) || MiscUtils.isIgnored(event.getChannel().getTopic(), tc.getTopic()))
                 return;
 
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
@@ -241,7 +240,7 @@ public class ServerLogging
 
                 if(!(tc == null))
                 {
-                    if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()))
+                    if(MiscUtils.isIgnored(user.getId(), tc.getTopic()))
                         return;
 
                     if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))
@@ -252,7 +251,7 @@ public class ServerLogging
                         builder.setImage("attachment://avatarchange"+user.getId()+".png");
                         builder.setColor(guild.getSelfMember().getColor());
 
-                        File f = LogUtils.getAvatarUpdateImage(event);
+                        File f = MiscUtils.getAvatarUpdateImage(event);
                         if(f==null)
                             return;
 
@@ -273,7 +272,7 @@ public class ServerLogging
 
         if(!(tc == null) && !(user.isBot()))
         {
-            if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vc.getId(), tc.getTopic()))
+            if(MiscUtils.isIgnored(user.getId(), tc.getTopic()) || MiscUtils.isIgnored(vc.getId(), tc.getTopic()))
                 return;
 
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
@@ -294,7 +293,7 @@ public class ServerLogging
 
         if(!(tc == null) && !(user.isBot()))
         {
-            if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vcnew.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vcold.getId(), tc.getTopic()))
+            if(MiscUtils.isIgnored(user.getId(), tc.getTopic()) || MiscUtils.isIgnored(vcnew.getId(), tc.getTopic()) || MiscUtils.isIgnored(vcold.getId(), tc.getTopic()))
                 return;
 
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
@@ -314,7 +313,7 @@ public class ServerLogging
 
         if(!(tc == null) && !(user.isBot()))
         {
-            if(IgnoreUtils.isIgnored(user.getId(), tc.getTopic()) || IgnoreUtils.isIgnored(vc.getId(), tc.getTopic()))
+            if(MiscUtils.isIgnored(user.getId(), tc.getTopic()) || MiscUtils.isIgnored(vc.getId(), tc.getTopic()))
                 return;
 
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))

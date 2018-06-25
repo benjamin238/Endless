@@ -20,7 +20,7 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.cmddata.CommandHelper;
+import me.artuto.endless.commands.cmddata.CommandHelper;
 import me.artuto.endless.utils.ChecksUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;

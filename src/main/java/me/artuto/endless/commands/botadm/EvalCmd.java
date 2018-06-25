@@ -19,9 +19,8 @@ package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 
 import javax.script.ScriptEngine;
@@ -59,7 +58,7 @@ public class EvalCmd extends EndlessCommand
                     "com.jagrosh.jdautilities.menu", "com.jagrosh.jdautilities.utils",
                     "com.jagrosh.jdautilities.waiter", "java.awt", "java.io",
                     "java.lang", "java.util", "java.util.stream", "me.artuto.endless",
-                    "me.artuto.endless.cmddata", "me.artuto.endless.commands", "me.artuto.endless.data",
+                    "me.artuto.endless.commands.cmddata", "me.artuto.endless.commands", "me.artuto.endless.storage.data",
                     "me.artuto.endless.events", "me.artuto.endless.loader", "me.artuto.endless.logging",
                     "me.artuto.endless.managers", "me.artuto.endless.tools", "me.artuto.endless.utils",
                     "net.dv8tion.jda.bot", "net.dv8tion.jda.bot.entities", "net.dv8tion.jda.bot.entities.impl",

@@ -15,16 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.utils;
+package me.artuto.endless.core.exceptions;
 
 /**
  * @author Artuto
  */
 
-public class IgnoreUtils
+public class GuildException extends RuntimeException
 {
-    public static boolean isIgnored(String id, String topic)
+    public GuildException()
     {
-        return !(topic==null) && topic.contains("{ignore:"+id+"}");
+        throw new GuildException("Invalid Guilds!");
+    }
+
+    public GuildException(String message)
+    {
+        super(message);
     }
 }

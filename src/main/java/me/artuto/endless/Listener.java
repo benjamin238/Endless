@@ -20,7 +20,7 @@ package me.artuto.endless;
 import me.artuto.endless.handlers.*;
 import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.logging.ServerLogging;
-import me.artuto.endless.tempdata.AfkManager;
+import me.artuto.endless.storage.tempdata.AfkManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;

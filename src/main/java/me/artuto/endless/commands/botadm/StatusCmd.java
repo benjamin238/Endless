@@ -19,18 +19,12 @@ package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
 
-import java.awt.*;
-import java.lang.management.ManagementFactory;
-import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 

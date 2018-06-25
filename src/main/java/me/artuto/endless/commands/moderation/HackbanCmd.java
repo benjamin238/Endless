@@ -20,7 +20,7 @@ package me.artuto.endless.commands.moderation;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;

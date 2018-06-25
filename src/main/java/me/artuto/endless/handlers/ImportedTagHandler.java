@@ -22,7 +22,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.core.entities.Tag;
-import me.artuto.endless.data.managers.ClientGSDMProvider;
+import me.artuto.endless.storage.data.managers.ClientGSDMProvider;
 import me.artuto.endless.utils.TagUtil;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 

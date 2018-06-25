@@ -22,7 +22,7 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.Messages;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.ChecksUtil;

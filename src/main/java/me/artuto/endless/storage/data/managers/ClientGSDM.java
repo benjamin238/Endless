@@ -15,21 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.exceptions;
+package me.artuto.endless.storage.data.managers;
 
-/**
- * @author Artuto
- */
+import com.jagrosh.jdautilities.command.GuildSettingsManager;
+import net.dv8tion.jda.core.entities.Guild;
 
-public class ConfigException extends RuntimeException
+import javax.annotation.Nullable;
+
+public class ClientGSDM implements GuildSettingsManager<ClientGSDMProvider>
 {
-    public ConfigException()
+    @Nullable
+    @Override
+    public ClientGSDMProvider getSettings(Guild guild)
     {
-        throw new ConfigException("No valid config file found! Make sure you edited the config.yml.sample file!");
-    }
-
-    public ConfigException(String message)
-    {
-        super(message);
+        return new ClientGSDMProvider(guild);
     }
 }

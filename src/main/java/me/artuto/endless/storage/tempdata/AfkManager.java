@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.tempdata;
+package me.artuto.endless.storage.tempdata;
 
 import me.artuto.endless.Bot;
 import net.dv8tion.jda.core.EmbedBuilder;

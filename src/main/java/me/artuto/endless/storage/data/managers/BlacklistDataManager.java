@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.data.managers;
+package me.artuto.endless.storage.data.managers;
 
 import me.artuto.endless.Const;
-import me.artuto.endless.data.Database;
+import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.core.entities.Blacklist;
 import me.artuto.endless.core.entities.impl.BlacklistImpl;
 import net.dv8tion.jda.core.JDA;
