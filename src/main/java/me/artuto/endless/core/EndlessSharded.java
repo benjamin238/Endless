@@ -18,6 +18,7 @@
 package me.artuto.endless.core;
 
 import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.Blacklist;
 import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.LocalTag;
@@ -35,6 +36,8 @@ public interface EndlessSharded
 {
     Bot getBot();
 
+    Blacklist getBlacklist(long id);
+
     EndlessCore getShard(JDA jda);
 
     GlobalTag getGlobalTag(String name);
@@ -45,15 +48,17 @@ public interface EndlessSharded
 
     GuildSettings getGuildSettingsById(String id);
 
+    List<Blacklist> getBlacklists();
+
+    List<EndlessCore> getShards();
+
     List<GlobalTag> getGlobalTags();
 
     List<GuildSettings> getGuildSettings();
 
     List<LocalTag> getLocalTags();
 
-    List<EndlessCore> getShards();
+    LocalTag getLocalTag(long guildId, String name);
 
     ShardManager getShardManager();
-
-    LocalTag getLocalTag(long guildId, String name);
 }

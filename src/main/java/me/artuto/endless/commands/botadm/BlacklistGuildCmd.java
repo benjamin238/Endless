@@ -80,7 +80,7 @@ public class BlacklistGuildCmd extends EndlessCommand
                 return;
             }
 
-            if(!(bot.bdm.getBlacklist(guild.getIdLong())==null))
+            if(!(bot.endless.getBlacklist(guild.getIdLong())==null))
             {
                 event.replyError("That guild is already on the blacklist!");
                 return;
@@ -122,7 +122,7 @@ public class BlacklistGuildCmd extends EndlessCommand
                 return;
             }
 
-            if(bot.bdm.getBlacklist(guild.getIdLong())==null)
+            if(bot.endless.getBlacklist(guild.getIdLong())==null)
             {
                 event.replyError("That ID isn't in the blacklist!");
                 return;
@@ -149,7 +149,7 @@ public class BlacklistGuildCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            Map<Blacklist, Guild> map;
+            Map<Guild, Blacklist> map;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
 
@@ -165,7 +165,7 @@ public class BlacklistGuildCmd extends EndlessCommand
             else
             {
                 StringBuilder sb = new StringBuilder();
-                map.forEach((b, g) -> sb.append(g.getName()).append(" (ID: ").append(g.getId()).append(")"));
+                map.forEach((g, b) -> sb.append(g.getName()).append(" (ID: ").append(g.getId()).append(")"));
                 builder.setDescription(sb);
                 builder.setFooter(event.getSelfUser().getName()+"'s Blacklisted Guilds", event.getSelfUser().getEffectiveAvatarUrl());
                 builder.setColor(color);
@@ -189,7 +189,7 @@ public class BlacklistGuildCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            Blacklist blacklist = bot.bdm.getBlacklist(Long.valueOf(event.getArgs()));
+            Blacklist blacklist = bot.endless.getBlacklist(Long.valueOf(event.getArgs()));
             if(blacklist==null)
             {
                 Guild guild = event.getJDA().getGuildCache().getElementById(event.getArgs());

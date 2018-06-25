@@ -17,15 +17,18 @@
 
 package me.artuto.endless.core.entities.impl;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.EndlessSharded;
+import me.artuto.endless.core.entities.Blacklist;
 import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.LocalTag;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -35,10 +38,15 @@ import java.util.*;
 
 public class EndlessShardedImpl implements EndlessSharded
 {
+    private final Logger LOG = (Logger)LoggerFactory.getLogger(EndlessShardedImpl.class);
+
     private final Bot bot;
     private final List<EndlessCore> shards;
     private final Map<JDA, EndlessCore> shardMap;
     private final ShardManager shardManager;
+
+    private final List<Blacklist> blacklists;
+    private final Map<Long, Blacklist> blacklistMap;
 
     private final List<GuildSettings> guildSettings;
     private final Map<Guild, GuildSettings> guildSettingsMap;
@@ -53,31 +61,30 @@ public class EndlessShardedImpl implements EndlessSharded
         this.bot = bot;
         this.shardManager = shardManager;
         this.shards = shards;
+        this.shardMap = new HashMap<>();
+
+        this.blacklists = new LinkedList<>();
+        this.blacklistMap = new HashMap<>();
 
         this.guildSettings = new LinkedList<>();
         this.guildSettingsMap = new HashMap<>();
-        this.shardMap = new HashMap<>();
 
         this.globalTags = new LinkedList<>();
         this.globalTagMap = new HashMap<>();
         this.localTags = new LinkedList<>();
         this.localTagMap = new HashMap<>();
-
-        shards.forEach(shard -> {
-            guildSettings.addAll(shard.getGuildSettings());
-            guildSettings.forEach(gs -> guildSettingsMap.put(gs.getGuild(), gs));
-            globalTags.addAll(shard.getGlobalTags());
-            globalTags.forEach(gTag -> globalTagMap.put(gTag.getName(), gTag));
-            localTags.addAll(shard.getLocalTags());
-            localTags.forEach(lTag -> localTagMap.put(lTag.getGuildId()+":"+lTag.getName(), lTag));
-            shardMap.put(shard.getJDA(), shard);
-        });
     }
 
     @Override
     public Bot getBot()
     {
         return bot;
+    }
+
+    @Override
+    public Blacklist getBlacklist(long id)
+    {
+        return blacklistMap.get(id);
     }
 
     @Override
@@ -110,6 +117,11 @@ public class EndlessShardedImpl implements EndlessSharded
     {
         Guild guild = shardManager.getGuildById(id);
         return guildSettingsMap.getOrDefault(guild, bot.db.createDefault(guild));
+    }
+
+    public List<Blacklist> getBlacklists()
+    {
+        return Collections.unmodifiableList(blacklists);
     }
 
     @Override
@@ -164,6 +176,34 @@ public class EndlessShardedImpl implements EndlessSharded
     {
         guildSettings.add(settings);
         guildSettingsMap.put(guild, settings);
+    }
+
+    public void makeCache()
+    {
+        shards.forEach(shard -> {
+            bot.bdm.getBlacklistedGuilds(shard.getJDA()).forEach((g, b) -> {
+                blacklists.add(b);
+                blacklistMap.put(g.getIdLong(), b);
+            });
+            bot.bdm.getBlacklistedUsers(shard.getJDA()).forEach((u, b) -> {
+                blacklists.add(b);
+                blacklistMap.put(u.getIdLong(), b);
+            });
+            LOG.debug("Cached {} Blacklists", blacklists.size());
+
+            guildSettings.addAll(shard.getGuildSettings());
+            guildSettings.forEach(gs -> guildSettingsMap.put(gs.getGuild(), gs));
+
+            globalTags.addAll(shard.getGlobalTags());
+            globalTags.forEach(gTag -> globalTagMap.put(gTag.getName(), gTag));
+            localTags.addAll(shard.getLocalTags());
+            localTags.forEach(lTag -> localTagMap.put(lTag.getGuildId()+":"+lTag.getName(), lTag));
+
+            shardMap.put(shard.getJDA(), shard);
+            long totalCache = blacklists.size()+guildSettings.size()+globalTags.size()+localTags.size();
+
+            LOG.debug("Successfully cached {} across {} Shards", totalCache, shards.size());
+        });
     }
 
     public void removeGlobalTag(String name)

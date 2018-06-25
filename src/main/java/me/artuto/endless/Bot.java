@@ -145,7 +145,7 @@ public class Bot extends ListenerAdapter
         prdm = new ProfileDataManager(db);
         sdm = new StarboardDataManager(db);
         tdm = new TagDataManager(this);
-        BlacklistHandler bHandler = new BlacklistHandler(bdm);
+        BlacklistHandler bHandler = new BlacklistHandler(this);
         SpecialCaseHandler sHandler = new SpecialCaseHandler();
         new Categories(maintenance, bHandler, sHandler);
         new GuildUtils(this);
@@ -252,7 +252,8 @@ public class Bot extends ListenerAdapter
     {
         if(event.getNewStatus()==JDA.Status.CONNECTED)
         {
-            if(event.getJDA().asBot().getShardManager().getShards().stream().allMatch(shard -> shard.getStatus()==JDA.Status.CONNECTED))
+            if(event.getJDA().asBot().getShardManager().getShards().stream().allMatch(shard -> shard.getStatus()==JDA.Status.CONNECTED)
+                    && !(initialized))
                 this.endless = endlessBuilder.build();
         }
     }

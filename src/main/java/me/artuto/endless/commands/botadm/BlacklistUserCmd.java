@@ -75,7 +75,7 @@ public class BlacklistUserCmd extends EndlessCommand
             String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
 
             event.getJDA().retrieveUserById(args[0]).queue(user -> {
-                if(!(bot.bdm.getBlacklist(user.getIdLong())==null))
+                if(!(bot.endless.getBlacklist(user.getIdLong())==null))
                 {
                     event.replyError("That user is already on the blacklist!");
                     return;
@@ -104,7 +104,7 @@ public class BlacklistUserCmd extends EndlessCommand
         protected void executeCommand(CommandEvent event)
         {
             event.getJDA().retrieveUserById(event.getArgs()).queue(user -> {
-                if(bot.bdm.getBlacklist(user.getIdLong())==null)
+                if(bot.endless.getBlacklist(user.getIdLong())==null)
                 {
                     event.replyError("That ID isn't in the blacklist!");
                     return;
@@ -131,7 +131,7 @@ public class BlacklistUserCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            Map<Blacklist, User> map;
+            Map<User, Blacklist> map;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
 
@@ -147,7 +147,7 @@ public class BlacklistUserCmd extends EndlessCommand
             else
             {
                 StringBuilder sb = new StringBuilder();
-                map.forEach((b, u) -> sb.append(u.getName()).append("#").append(u.getDiscriminator()).append(" (ID: ")
+                map.forEach((u, b) -> sb.append(u.getName()).append("#").append(u.getDiscriminator()).append(" (ID: ")
                         .append(u.getId()).append(")"));
                 builder.setDescription(sb);
                 builder.setFooter(event.getSelfUser().getName()+"'s Blacklisted Users", event.getSelfUser().getEffectiveAvatarUrl());
@@ -179,7 +179,7 @@ public class BlacklistUserCmd extends EndlessCommand
             }
 
             event.getJDA().retrieveUserById(event.getArgs()).queue(user -> {
-                Blacklist blacklist = bot.bdm.getBlacklist(user.getIdLong());
+                Blacklist blacklist = bot.endless.getBlacklist(user.getIdLong());
                 if(blacklist==null)
                     event.replySuccess("**"+user.getName()+"#"+user.getDiscriminator()+"** isn't blacklisted!");
                 else

@@ -41,7 +41,7 @@ public class BlacklistDataManager
         connection = db.getConnection();
     }
 
-    public Blacklist getBlacklist(long id)
+    private Blacklist getBlacklist(long id)
     {
         try
         {
@@ -120,15 +120,15 @@ public class BlacklistDataManager
         }
     }
 
-    public Map<Blacklist, Guild> getBlacklistedGuilds(JDA jda)
+    public Map<Guild, Blacklist> getBlacklistedGuilds(JDA jda)
     {
         try
         {
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
-            Map<Blacklist, Guild> map;
+            Map<Guild, Blacklist> map;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = %s", Const.BlacklistType.GUILD.name())))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = \"%s\"", Const.BlacklistType.GUILD.name())))
             {
                 map = new HashMap<>();
                 while(results.next())
@@ -137,7 +137,7 @@ public class BlacklistDataManager
                     Guild guild = jda.getGuildCache().getElementById(id);
 
                     if(!(guild==null))
-                        map.put(getBlacklist(id), guild);
+                        map.put(guild, getBlacklist(id));
                 }
             }
             return map;
@@ -149,13 +149,13 @@ public class BlacklistDataManager
         }
     }
 
-    public Map<Blacklist, User> getBlacklistedUsers(JDA jda)
+    public Map<User, Blacklist> getBlacklistedUsers(JDA jda)
     {
         try
         {
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
-            Map<Blacklist, User> map;
+            Map<User, Blacklist> map;
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = \"%s\"", Const.BlacklistType.USER.name())))
             {
@@ -163,7 +163,7 @@ public class BlacklistDataManager
                 while(results.next())
                 {
                     long id = results.getLong("id");
-                    jda.retrieveUserById(id).queue(user -> map.put(getBlacklist(id), user), e -> removeBlacklist(id));
+                    jda.retrieveUserById(id).queue(user -> map.put(user, getBlacklist(id)), e -> removeBlacklist(id));
                 }
             }
             return map;

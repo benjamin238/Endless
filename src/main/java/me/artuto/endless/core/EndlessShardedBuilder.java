@@ -19,6 +19,7 @@ package me.artuto.endless.core;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
+import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.impl.EndlessShardedImpl;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
@@ -54,9 +55,12 @@ public class EndlessShardedBuilder
 
     public EndlessSharded build()
     {
+        EndlessShardedImpl impl = new EndlessShardedImpl(bot, shardManager, shards);
+        impl.makeCache();
         shards.forEach(shard -> updateGame(shard.getJDA()));
         bot.initialized = true;
-        return new EndlessShardedImpl(bot, shardManager, shards);
+        Endless.LOG.info("Endless is ready!");
+        return impl;
     }
 
     private void updateGame(JDA shard)
@@ -66,10 +70,10 @@ public class EndlessShardedBuilder
 
         if(!(bot.maintenance))
             presence.setPresence(bot.config.getStatus(), Game.playing("Type "+bot.config.getPrefix()+"help | Version "
-                    +Const.VERSION+" | On "
-                    +shard.getGuildCache().size()+" Guilds | "+shard.getUserCache().size()+
+                    +Const.VERSION+" | On "+shard.getGuildCache().size()+" Guilds | "+shard.getUserCache().size()+
                     " Users | Shard "+(shardInfo.getShardId()+1)));
         else
-            presence.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("Maintenance mode enabled"));
+            presence.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("Maintenance mode enabled | Shard "
+                    +(shardInfo.getShardId()+1)));
     }
 }
