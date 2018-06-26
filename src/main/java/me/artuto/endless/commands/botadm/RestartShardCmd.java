@@ -18,27 +18,22 @@
 package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.Bot;
-import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
 import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.JDA;
 
 /**
  * @author Artuto
  */
 
-public class ShutdownCmd extends EndlessCommand
+public class RestartShardCmd extends EndlessCommand
 {
-    private final Bot bot;
-
-    public ShutdownCmd(Bot bot)
+    public RestartShardCmd()
     {
-        this.bot = bot;
-        this.name = "shutdown";
-        this.aliases = new String[]{"quit", "exit", "close", "terminate"};
+        this.name = "restartshard";
+        this.aliases = new String[]{"restart"};
         this.arguments = "[shard id]";
-        this.help = "Turns Off the bot.";
+        this.help = "Restarts the specified shard.";
         this.category = Categories.BOTADM;
         this.ownerCommand = true;
         this.guildOnly = false;
@@ -53,8 +48,7 @@ public class ShutdownCmd extends EndlessCommand
         if(event.getArgs().isEmpty())
         {
             event.reactSuccess();
-            shardManager.shutdown();
-            bot.db.shutdown();
+            shardManager.restart();
         }
         else
         {
@@ -76,7 +70,7 @@ public class ShutdownCmd extends EndlessCommand
             }
 
             event.reactSuccess();
-            event.getJDA().asBot().getShardManager().shutdown(shard);
+            event.getJDA().asBot().getShardManager().restart(shard);
         }
     }
 }

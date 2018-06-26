@@ -50,6 +50,10 @@ public interface EndlessSharded
 
     List<Blacklist> getBlacklists();
 
+    List<Blacklist> getGuildBlacklists();
+
+    List<Blacklist> getUserBlacklists();
+
     List<EndlessCore> getShards();
 
     List<GlobalTag> getGlobalTags();

@@ -39,10 +39,6 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 
-
-import org.apache.commons.lang3.StringUtils;
-
-
 import java.awt.*;
 import java.io.File;
 import java.util.List;
@@ -173,12 +169,12 @@ public class ServerLogging
                 for(Message.Attachment att : newmsg.getAttachments())
                     newContent.append(att.getUrl()).append("\n");
 
-                String title = "`"+TimeUtils.getTimeAndDate()+" [Message Edited]:` :pencil2: **"+message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was edited in "+message.getTextChannel().getAsMention()+":";
-                String diff = StringUtils.difference(oldContent.toString(), newContent.toString());
-                String diffF ="["+diff+"](https://google.com)";
+                String title = "`"+TimeUtils.getTimeAndDate()+" [Message Edited]:` :pencil2: **"
+                        +message.getAuthor().getName()+"#"+message.getAuthor().getDiscriminator()+"**'s message was edited in "
+                        +message.getTextChannel().getAsMention()+":";
 
                 builder.addField("From:", oldContent.toString(), false);
-                builder.addField("To:", newContent.toString().replace(diff, diffF), false);
+                builder.addField("To:", newContent.toString(), false);
                 builder.setFooter("Message ID: "+message.getId(), null);
                 builder.setColor(Color.YELLOW);
 
