@@ -22,8 +22,10 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.managers.Presence;
 
 /**
  * @author Artuto
@@ -44,12 +46,8 @@ public class BotCPanelCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        String prefix = event.getClient().getPrefix();
-
-        if(event.getArgs().isEmpty())
-            event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n"+"- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n"+"- `"+prefix+"bot updategame`: Updates the default game.\n"+"- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
-        else if(!(event.getArgs().contains("status")) || !(event.getArgs().contains("game") || !(event.getArgs().contains("updategame"))) || !(event.getArgs().contains("optimize")))
-            event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n"+"- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n"+"- `"+prefix+"bot updategame`: Updates the default game.\n"+"- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
+        event.reply(Const.ENDLESS+" **Endless Control Panel** "+Const.ENDLESS+"\n" +
+                "Please use a subcommand.");
     }
 
     private class Status extends EndlessCommand
@@ -67,17 +65,22 @@ public class BotCPanelCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            try
-            {
-                String status = event.getArgs();
-                event.getJDA().getPresence().setStatus(OnlineStatus.valueOf(status));
-                event.replySuccess("Changed status to "+event.getJDA().getPresence().getStatus()+" without error!");
-            }
-            catch(Exception e)
-            {
-                event.replyError("Error when changing the status! Check the Bot console for more information.");
-                e.printStackTrace();
-            }
+            JDA jda = event.getJDA();
+            jda.asBot().getShardManager().getShards().forEach(shard -> {
+                try
+                {
+                    String status = event.getArgs();
+                    event.getJDA().getPresence().setStatus(OnlineStatus.valueOf(status));
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Error when changing the status of shard "+(shard.getShardInfo().getShardId()+1)+
+                            "! Check the Bot console for more information.");
+                    e.printStackTrace();
+                }
+            });
+            event.replySuccess("Changed the status to "+event.getJDA().getPresence().getStatus()+" across "
+                    +jda.asBot().getShardManager().getShardsTotal()+" shards");
         }
     }
 
@@ -86,7 +89,7 @@ public class BotCPanelCmd extends EndlessCommand
         Playing()
         {
             this.name = "game";
-            this.help = "Sets the Game (Game.of) of the bot.";
+            this.help = "Sets the Game (Game.playing) of the bot.";
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
@@ -96,32 +99,37 @@ public class BotCPanelCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                try
+            JDA jda = event.getJDA();
+            jda.asBot().getShardManager().getShards().forEach(shard -> {
+                if(event.getArgs().isEmpty())
                 {
-                    event.getJDA().getPresence().setGame(null);
-                    event.replySuccess("Game cleaned.");
+                    try
+                    {
+                        shard.getPresence().setGame(null);
+                    }
+                    catch(Exception e)
+                    {
+                        event.replyError("Error when changing the game of shard "+(shard.getShardInfo().getShardId()+1)+
+                                "! Check the Bot console for more information.");
+                        e.printStackTrace();
+                    }
                 }
-                catch(Exception e)
+                else
                 {
-                    event.replyError("Error when cleaning the game! Check the Bot console for more information.");
-                    e.printStackTrace();
+                    try
+                    {
+                        shard.getPresence().setGame(Game.playing(event.getArgs()));
+                    }
+                    catch(Exception e)
+                    {
+                        event.replyError("Error when changing the game of shard "+(shard.getShardInfo().getShardId()+1)+
+                                "! Check the Bot console for more information.");
+                        e.printStackTrace();
+                    }
                 }
-            }
-            else
-            {
-                try
-                {
-                    event.getJDA().getPresence().setGame(Game.playing(event.getArgs()));
-                    event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame().getName()+" without error!");
-                }
-                catch(Exception e)
-                {
-                    event.replyError("Error when changing the game! Check the Bot console for more information.");
-                    e.printStackTrace();
-                }
-            }
+            });
+            event.replySuccess("Changed the game to "+event.getJDA().getPresence().getGame().getName()+" across "
+                    +jda.asBot().getShardManager().getShardsTotal()+" shards");
         }
     }
 
@@ -140,16 +148,25 @@ public class BotCPanelCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            try
-            {
-                event.getJDA().getPresence().setGame(Game.playing("Type "+event.getClient().getPrefix()+"help | Version "+Const.VERSION+" | On "+event.getJDA().getGuilds().size()+" Guilds | "+event.getJDA().getUsers().size()+" Users | "+event.getJDA().getTextChannels().size()+" Channels"));
-                event.replySuccess("Game updated.");
-            }
-            catch(Exception e)
-            {
-                event.replyError("Error when updating the game! Check the Bot console for more information.");
-                e.printStackTrace();
-            }
+            JDA jda = event.getJDA();
+            jda.asBot().getShardManager().getShards().forEach(shard -> {
+                JDA.ShardInfo shardInfo = shard.getShardInfo();
+                Presence presence = shard.getPresence();
+                try
+                {
+                    presence.setGame(Game.playing("Type "+event.getClient().getPrefix()+"help | Version "
+                            +Const.VERSION+" | On "+shard.getGuildCache().size()+" Guilds | "+shard.getUserCache().size()+
+                            " Users | Shard "+(shardInfo.getShardId()+1)));
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Error when updating the game of shard "+(shard.getShardInfo().getShardId()+1)+
+                            "! Check the Bot console for more information.");
+                    e.printStackTrace();
+                }
+            });
+            event.replySuccess("Updated the game to "+event.getJDA().getPresence().getGame().getName()+" across "
+                    +jda.asBot().getShardManager().getShardsTotal()+" shards");
         }
     }
 

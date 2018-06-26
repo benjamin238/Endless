@@ -19,6 +19,7 @@ package me.artuto.endless.core.entities.impl;
 
 import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Const;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.EndlessSharded;
 import me.artuto.endless.core.entities.Blacklist;
@@ -31,6 +32,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Artuto
@@ -119,9 +121,24 @@ public class EndlessShardedImpl implements EndlessSharded
         return guildSettingsMap.getOrDefault(guild, bot.db.createDefault(guild));
     }
 
+    @Override
     public List<Blacklist> getBlacklists()
     {
         return Collections.unmodifiableList(blacklists);
+    }
+
+    @Override
+    public List<Blacklist> getGuildBlacklists()
+    {
+        return Collections.unmodifiableList(blacklists.stream().filter(b ->
+                b.getType()== Const.BlacklistType.GUILD).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<Blacklist> getUserBlacklists()
+    {
+        return Collections.unmodifiableList(blacklists.stream().filter(b ->
+                b.getType()== Const.BlacklistType.USER).collect(Collectors.toList()));
     }
 
     @Override

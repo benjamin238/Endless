@@ -32,7 +32,7 @@ import net.dv8tion.jda.core.entities.Guild;
 
 import java.awt.*;
 import java.time.OffsetDateTime;
-import java.util.Map;
+import java.util.List;
 
 public class BlacklistGuildCmd extends EndlessCommand
 {
@@ -72,7 +72,7 @@ public class BlacklistGuildCmd extends EndlessCommand
         protected void executeCommand(CommandEvent event)
         {
             String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
-            Guild guild = event.getJDA().getGuildCache().getElementById(args[0]);
+            Guild guild = event.getJDA().asBot().getShardManager().getGuildCache().getElementById(args[0]);
 
             if(guild==null)
             {
@@ -114,7 +114,7 @@ public class BlacklistGuildCmd extends EndlessCommand
                 return;
             }
 
-            Guild guild = event.getJDA().getGuildCache().getElementById(event.getArgs());
+            Guild guild = event.getJDA().asBot().getShardManager().getGuildCache().getElementById(event.getArgs());
 
             if(guild==null)
             {
@@ -149,7 +149,7 @@ public class BlacklistGuildCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            Map<Guild, Blacklist> map;
+            List<Blacklist> list;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
 
@@ -158,15 +158,19 @@ public class BlacklistGuildCmd extends EndlessCommand
             else
                 color = event.getGuild().getSelfMember().getColor();
 
-            map = bot.bdm.getBlacklistedGuilds(event.getJDA());
+            list = bot.endless.getGuildBlacklists();
 
-            if(map.isEmpty())
+            if(list.isEmpty())
                 event.reply("The list is empty!");
             else
             {
                 StringBuilder sb = new StringBuilder();
-                map.forEach((g, b) -> sb.append(g.getName()).append(" (ID: ").append(g.getId()).append(")"));
-                builder.setDescription(sb);
+                list.forEach(b -> {
+                    Guild guild = event.getJDA().asBot().getShardManager().getGuildById(b.getId());
+                    if(!(guild==null))
+                        sb.append(guild.getName()).append(" (ID: ").append(guild.getId()).append(")\n");
+                });
+                builder.setDescription(sb.toString().isEmpty()?"None":sb);
                 builder.setFooter(event.getSelfUser().getName()+"'s Blacklisted Guilds", event.getSelfUser().getEffectiveAvatarUrl());
                 builder.setColor(color);
                 event.reply(builder.build());
@@ -192,7 +196,7 @@ public class BlacklistGuildCmd extends EndlessCommand
             Blacklist blacklist = bot.endless.getBlacklist(Long.valueOf(event.getArgs()));
             if(blacklist==null)
             {
-                Guild guild = event.getJDA().getGuildCache().getElementById(event.getArgs());
+                Guild guild = event.getJDA().asBot().getShardManager().getGuildById(event.getArgs());
 
                 if(guild==null)
                     event.replySuccess("The ID "+event.getArgs()+" isn't blacklisted!");
@@ -201,11 +205,12 @@ public class BlacklistGuildCmd extends EndlessCommand
             }
             else
             {
-                Guild guild = event.getJDA().getGuildCache().getElementById(event.getArgs());
+                Guild guild = event.getJDA().asBot().getShardManager().getGuildById(event.getArgs());
                 String reason = blacklist.getReason()==null?"[no reason provided]":blacklist.getReason();
 
                 if(guild==null)
-                    event.replyWarning("The ID "+event.getArgs()+" is blacklisted!");
+                    event.replyWarning("**"+event.getArgs()+"** is blacklisted!\n" +
+                            "Reason: `"+reason+"`");
                 else
                     event.replyWarning("**"+guild.getName()+"** is blacklisted!\n" +
                             "Reason: `"+reason+"`");

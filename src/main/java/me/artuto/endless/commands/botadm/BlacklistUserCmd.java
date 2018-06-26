@@ -28,11 +28,10 @@ import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
 import java.time.OffsetDateTime;
-import java.util.Map;
+import java.util.List;
 
 public class BlacklistUserCmd extends EndlessCommand
 {
@@ -131,7 +130,7 @@ public class BlacklistUserCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            Map<User, Blacklist> map;
+            List<Blacklist> list;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
 
@@ -140,16 +139,17 @@ public class BlacklistUserCmd extends EndlessCommand
             else
                 color = event.getGuild().getSelfMember().getColor();
 
-            map = bot.bdm.getBlacklistedUsers(event.getJDA());
+            list = bot.endless.getUserBlacklists();
 
-            if(map.isEmpty())
+            if(list.isEmpty())
                 event.reply("The list is empty!");
             else
             {
                 StringBuilder sb = new StringBuilder();
-                map.forEach((u, b) -> sb.append(u.getName()).append("#").append(u.getDiscriminator()).append(" (ID: ")
-                        .append(u.getId()).append(")"));
-                builder.setDescription(sb);
+                list.forEach(b -> event.getJDA().retrieveUserById(b.getId()).queue(user ->
+                    sb.append(user.getName()).append("#").append(user.getDiscriminator()).append(" (ID: ").append(user.getId()).append(")\n"),
+                        e -> {}));
+                builder.setDescription(sb.toString().isEmpty()?"None":sb);
                 builder.setFooter(event.getSelfUser().getName()+"'s Blacklisted Users", event.getSelfUser().getEffectiveAvatarUrl());
                 builder.setColor(color);
                 event.reply(builder.build());
