@@ -34,12 +34,13 @@ public class GuildSettingsImpl implements GuildSettings
     private int banDeleteDays, starboardCount;
     private List<Role> roleMeRoles;
     private List<Tag> importedTags;
-    private long modlogId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
+    private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
     private String welcomeMsg, leaveMsg;
 
     public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
-                             List<Role> roleMeRoles, List<Tag> importedTags, long leaveId, long modlogId, long mutedRoleId,
-                             long serverlogId, long starboardId, long welcomeId, String leaveMsg, String welcomeMsg)
+                             List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId, long leaveId, long modlogId,
+                             long modRoleId, long mutedRoleId, long serverlogId, long starboardId,
+                             long welcomeId, String leaveMsg, String welcomeMsg)
     {
         this.isDefault = isDefault;
         this.prefixes = prefixes;
@@ -48,8 +49,10 @@ public class GuildSettingsImpl implements GuildSettings
         this.starboardCount = starboardCount;
         this.roleMeRoles = roleMeRoles;
         this.importedTags = importedTags;
+        this.adminRoleId = adminRoleId;
         this.leaveId = leaveId;
         this.modlogId = modlogId;
+        this.modRoleId = modRoleId;
         this.mutedRoleId = mutedRoleId;
         this.serverlogId = serverlogId;
         this.starboardId = starboardId;
@@ -68,7 +71,7 @@ public class GuildSettingsImpl implements GuildSettings
     public boolean isEmpty()
     {
         return (prefixes==null || prefixes.isEmpty()) && banDeleteDays==0 && starboardCount==0 && (roleMeRoles==null || roleMeRoles.isEmpty())
-                && (importedTags==null || importedTags.isEmpty()) && leaveId==0L && modlogId==0L && serverlogId==0L && starboardId==0L
+                && (importedTags==null || importedTags.isEmpty()) && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
                 && welcomeId==0L && (leaveMsg==null || leaveMsg.isEmpty()) && (welcomeMsg==null || welcomeMsg.isEmpty());
     }
 
@@ -102,9 +105,16 @@ public class GuildSettingsImpl implements GuildSettings
         return Collections.unmodifiableList(roleMeRoles);
     }
 
+    @Override
     public List<Tag> getImportedTags()
     {
         return Collections.unmodifiableList(importedTags);
+    }
+
+    @Override
+    public long getAdminRole()
+    {
+        return adminRoleId;
     }
 
     @Override
@@ -117,6 +127,12 @@ public class GuildSettingsImpl implements GuildSettings
     public long getModlog()
     {
         return modlogId;
+    }
+
+    @Override
+    public long getModRole()
+    {
+        return modRoleId;
     }
 
     @Override
@@ -194,6 +210,11 @@ public class GuildSettingsImpl implements GuildSettings
         roleMeRoles.remove(role);
     }
 
+    public void setAdminRoleId(long adminRoleId)
+    {
+        this.adminRoleId = adminRoleId;
+    }
+
     public void setBanDeleteDays(int banDeleteDays)
     {
         this.banDeleteDays = banDeleteDays;
@@ -217,6 +238,11 @@ public class GuildSettingsImpl implements GuildSettings
     public void setModlogId(long modlogId)
     {
         this.modlogId = modlogId;
+    }
+
+    public void setModRoleId(long modRoleId)
+    {
+        this.modRoleId = modRoleId;
     }
 
     public void setMutedRoleId(long mutedRoleId)

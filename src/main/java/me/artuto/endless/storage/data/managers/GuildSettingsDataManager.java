@@ -370,6 +370,100 @@ public class GuildSettingsDataManager
         }
     }
 
+    public void setAdminRole(Guild guild, Role role)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, admin_role_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(role==null)
+                {
+                    if(results.next())
+                    {
+                        results.updateNull("admin_role_id");
+                        results.updateRow();
+                    }
+                }
+                else
+                {
+                    if(results.next())
+                    {
+                        results.updateLong("admin_role_id", role.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("admin_role_id", role.getIdLong());
+                        results.insertRow();
+                    }
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setAdminRoleId(role==null?0L:role.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while setting the muted role for the guild "+guild.getId(), e);
+        }
+    }
+
+    public void setModRole(Guild guild, Role role)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, mod_role_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(role==null)
+                {
+                    if(results.next())
+                    {
+                        results.updateNull("mod_role_id");
+                        results.updateRow();
+                    }
+                }
+                else
+                {
+                    if(results.next())
+                    {
+                        results.updateLong("mod_role_id", role.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("mod_role_id", role.getIdLong());
+                        results.insertRow();
+                    }
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setModRoleId(role==null?0L:role.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while setting the muted role for the guild "+guild.getId(), e);
+        }
+    }
+
     public void setStarboardCount(Guild guild, int count)
     {
         try

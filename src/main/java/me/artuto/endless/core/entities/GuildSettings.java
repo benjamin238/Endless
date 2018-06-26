@@ -41,9 +41,13 @@ public interface GuildSettings
 
     List<Tag> getImportedTags();
 
+    long getAdminRole();
+
     long getLeaveChannel();
 
     long getModlog();
+
+    long getModRole();
 
     long getMutedRole();
 

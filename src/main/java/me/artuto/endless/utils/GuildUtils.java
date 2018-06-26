@@ -67,6 +67,18 @@ public class GuildUtils
         return settings.getRoleMeRoles();
     }
 
+    public static Role getAdminRole(Guild guild)
+    {
+        return guild.getRolesByName("Admin", true)
+                .stream().findFirst().orElse(guild.getRoleById(bot.endless.getGuildSettings(guild).getAdminRole()));
+    }
+
+    public static Role getModRole(Guild guild)
+    {
+        return guild.getRolesByName("Moderator", true)
+                .stream().findFirst().orElse(guild.getRoleById(bot.endless.getGuildSettings(guild).getModRole()));
+    }
+
     public static Role getMutedRole(Guild guild)
     {
         return guild.getRolesByName("Muted", true)

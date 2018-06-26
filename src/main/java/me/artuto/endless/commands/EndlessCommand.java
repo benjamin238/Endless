@@ -20,12 +20,13 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Endless;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.cmddata.CommandHelper;
 import me.artuto.endless.utils.ChecksUtil;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.*;
 
 /**
  * @author Artuto
@@ -48,24 +49,17 @@ public abstract class EndlessCommand extends Command
     @Override
     public void execute(CommandEvent event)
     {
+        boolean hasPerms = false;
         CommandClient client = event.getClient();
+        Guild guild = event.getGuild();
         Member member = event.getMember();
         Member selfMember = event.getSelfMember();
         TextChannel tc = event.getTextChannel();
+        User author = event.getAuthor();
 
         if(ownerCommand && !(event.isOwner()))
         {
-            event.replyError("This command is only for Bot Owners!");
-            return;
-        }
-
-        if(needsArguments && event.getArgs().isEmpty())
-        {
-            if(needsArgumentsMessage==null)
-                event.replyError("**Too few arguments provided!**\n" +
-                        "Try running `"+client.getPrefix()+this.name+" help` to get help.");
-            else
-                event.replyWarning(needsArgumentsMessage);
+            Endless.LOG.warn(author.getName()+"#"+author.getDiscriminator()+" ("+author.getId()+") tried to run a owner-only command!");
             return;
         }
 
@@ -87,15 +81,34 @@ public abstract class EndlessCommand extends Command
                 return;
             }
 
-            for(Permission p : userPerms)
+            if(this.category==Categories.MODERATION || this.category==Categories.SERVER_CONFIG)
             {
-                if(!(ChecksUtil.hasPermission(member, tc, p)))
-                {
-                    event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
-                    return;
-                }
-                break;
+                if(member.getRoles().contains(GuildUtils.getAdminRole(guild)) || member.getRoles().contains(GuildUtils.getModRole(guild)))
+                    hasPerms = true;
             }
+
+            if(!(hasPerms))
+            {
+                for(Permission p : userPerms)
+                {
+                    if(!(ChecksUtil.hasPermission(member, tc, p)))
+                    {
+                        event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
+                        return;
+                    }
+                    break;
+                }
+            }
+        }
+
+        if(needsArguments && event.getArgs().isEmpty())
+        {
+            if(needsArgumentsMessage==null)
+                event.replyError("**Too few arguments provided!**\n" +
+                        "Try running `"+client.getPrefix()+this.name+" help` to get help.");
+            else
+                event.replyWarning(needsArgumentsMessage);
+            return;
         }
 
         executeCommand(event);

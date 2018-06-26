@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.cmddata;
 
 import com.jagrosh.jdautilities.command.Command.Category;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.handlers.BlacklistHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
@@ -48,16 +49,7 @@ public class Categories
         return bHandler.handleBlacklist(event);
     });
 
-    public static final Category BOTADM = new Category("Bot Administration", event ->
-    {
-        if(event.isOwner())
-            return true;
-        else
-        {
-            event.replyError("Sorry, but you don't have access to this command! Only Bot owners!");
-            return false;
-        }
-    });
+    public static final Category BOTADM = new Category("Bot Administration", CommandEvent::isOwner);
 
     public static final Category MODERATION = new Category("Moderation", event ->
     {

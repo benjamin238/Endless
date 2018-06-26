@@ -39,7 +39,7 @@ public class Database
     public GuildSettings createDefault(Guild guild)
     {
         return new GuildSettingsImpl(true, new HashSet<>(), guild, 0, 0,
-                new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L,
+                new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L, 0L, 0L,
                 0L, 0L, null, null);
     }
 
@@ -107,9 +107,13 @@ public class Database
                         }
                     }
 
-                    gs = new GuildSettingsImpl(false, prefixes, guild, results.getInt("ban_delete_days"), results.getInt("starboard_count"), roleMeRoles,
-                            importedTags, results.getLong("leave_id"), results.getLong("modlog_id"), results.getLong("muted_role_id"), results.getLong("serverlog_id"),
-                            results.getLong("starboard_id"), results.getLong("welcome_id"), results.getString("leave_msg"), results.getString("welcome_msg"));
+                    gs = new GuildSettingsImpl(false, prefixes, guild, results.getInt("ban_delete_days"),
+                            results.getInt("starboard_count"), roleMeRoles, importedTags,
+                            results.getLong("leave_id"), results.getLong("modlog_id"),
+                            results.getLong("admin_role_id"), results.getLong("mod_role_id"),
+                            results.getLong("muted_role_id"), results.getLong("serverlog_id"),
+                            results.getLong("starboard_id"), results.getLong("welcome_id"),
+                            results.getString("leave_msg"), results.getString("welcome_msg"));
                 }
                 else
                     gs = createDefault(guild);

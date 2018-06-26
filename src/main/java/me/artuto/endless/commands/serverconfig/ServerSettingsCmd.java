@@ -42,9 +42,9 @@ public class ServerSettingsCmd extends EndlessCommand
     public ServerSettingsCmd(Bot bot)
     {
         this.bot = bot;
-        this.name = "config";
-        this.children = new Command[]{new Modlog(), new Serverlog(), new Welcome(), new Leave(), new MutedRole(), new BanDeleteDays()};
-        this.aliases = new String[]{"settings"};
+        this.name = "settings";
+        this.children = new Command[]{new Modlog(), new Serverlog(), new Welcome(), new Leave(),
+                new AdminRole(), new ModRole(), new MutedRole(), new BanDeleteDays()};
         this.help = "Displays the settings of the server";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -62,6 +62,8 @@ public class ServerSettingsCmd extends EndlessCommand
 
         int banDeleteDays = settings.getBanDeleteDays();
         int starboardCount = settings.getStarboardCount();
+        Role adminRole = GuildUtils.getAdminRole(guild);
+        Role modRole = GuildUtils.getModRole(guild);
         Role mutedRole = GuildUtils.getMutedRole(guild);
         String welcomeMsg = settings.getWelcomeMsg();
         String leaveMsg = settings.getLeaveMsg();
@@ -71,23 +73,33 @@ public class ServerSettingsCmd extends EndlessCommand
         TextChannel leave = guild.getTextChannelById(settings.getLeaveChannel());
         TextChannel starboard = guild.getTextChannelById(settings.getStarboard());
 
-        builder.addField("Modlog Channel:", (modlog==null?"None":modlog.getAsMention()), true);
-        builder.addField("Serverlog Channel:", (serverlog==null?"None":serverlog.getAsMention()), true);
-        builder.addBlankField(true);
-        builder.addField("Welcome Channel:", (welcome==null?"None":welcome.getAsMention()), true);
-        builder.addField("Welcome Message:", (welcomeMsg==null?"None":"```"+welcomeMsg+"```"), true);
-        builder.addBlankField(true);
-        builder.addField("Leave Channel:", (leave==null?"None":leave.getAsMention()), true);
-        builder.addField("Leave Message:", (leaveMsg==null?"None":"```"+leaveMsg+"```"), true);
-        builder.addBlankField(true);
-        builder.addField("Starboard Channel:", (starboard==null?"None":starboard.getAsMention()), true);
-        builder.addField("Starboard Count:", (starboardCount==0?"Disabled":String.valueOf(starboardCount)), true);
-        builder.addBlankField(true);
-        builder.addField("Muted Role:", (mutedRole==null?"None":mutedRole.getAsMention()), true);
-        builder.addField("Ban delete days:", String.valueOf(banDeleteDays), true);
-        builder.addBlankField(true);
-        builder.setColor(event.getSelfMember().getColor());
+        StringBuilder logsString = new StringBuilder();
+        StringBuilder messagesString = new StringBuilder();
+        StringBuilder settingsString = new StringBuilder();
+        StringBuilder starboardString = new StringBuilder();
 
+        logsString.append("Modlog Channel: ").append((modlog==null?"None":"**"+modlog.getAsMention()+"**"))
+                .append("\nServerlog Channel: ").append((serverlog==null?"None":"**"+serverlog.getAsMention()+"**"))
+                .append("\nWelcome Channel: ").append((welcome==null?"None":"**"+welcome.getAsMention()+"**"))
+                .append("\nLeave Channel: ").append((leave==null?"None":"**"+leave.getAsMention()+"**"));
+
+        messagesString.append("Welcome Message: ").append((welcomeMsg==null?"None":"```"+welcomeMsg+"```"))
+            .append("\nLeave Message: ").append((leaveMsg==null?"None":"```"+leaveMsg+"```"));
+
+        settingsString.append("Admin Role: ").append((adminRole==null?"None":"**"+adminRole.getAsMention()+"**"))
+                .append("\nMod Role: ").append((modRole==null?"None":"**"+modRole.getAsMention()+"**"))
+                .append("\nMuted Role: ").append((mutedRole==null?"None":"**"+mutedRole.getAsMention()+"**"))
+                .append("\nBan delete days: ").append((banDeleteDays==0?"Don't delete":String.valueOf("**"+banDeleteDays+"**")));
+
+        starboardString.append("Starboard Channel: ").append((starboard==null?"None":"**"+starboard.getAsMention()+"**"))
+                .append("\nStar Count: ").append((starboardCount==0?"Disabled":String.valueOf("**"+starboardCount+"**")));
+
+        builder.addField(":mag: Logs", logsString.toString(), true);
+        builder.addField(":speech_balloon: Messages", messagesString.toString(), true);
+        builder.addField(":bar_chart: Server Settings", settingsString.toString(), true);
+        builder.addField(":star: Starboard", starboardString.toString(), true);
+
+        builder.setColor(event.getSelfMember().getColor());
         event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
     }
 
@@ -232,6 +244,90 @@ public class ServerSettingsCmd extends EndlessCommand
                 {
                     bot.gsdm.setLeaveChannel(event.getGuild(), list.get(0));
                     event.replySuccess("The message configured will be sent in "+list.get(0).getAsMention());
+                }
+            }
+        }
+    }
+
+    private class AdminRole extends EndlessCommand
+    {
+        AdminRole()
+        {
+            this.name = "adminrole";
+            this.help = "Sets the admin role";
+            this.arguments = "<@Role|Role ID|Role name>";
+            this.category = Categories.SERVER_CONFIG;
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a role or NONE";
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            if(event.getArgs().equalsIgnoreCase("none"))
+            {
+                bot.gsdm.setAdminRole(event.getGuild(), null);
+                event.replySuccess("Admin role disabled");
+            }
+            else
+            {
+                List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
+                if(list.isEmpty())
+                    event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
+                else if(list.size()>1)
+                    event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
+                else
+                {
+                    if(!(GuildUtils.getAdminRole(event.getGuild())==null))
+                    {
+                        event.replyError("You already have an Admin role!");
+                        return;
+                    }
+
+                    bot.gsdm.setAdminRole(event.getGuild(), list.get(0));
+                    event.replySuccess("The admin role is now "+list.get(0).getAsMention());
+                }
+            }
+        }
+    }
+
+    private class ModRole extends EndlessCommand
+    {
+        ModRole()
+        {
+            this.name = "modrole";
+            this.help = "Sets the mod role";
+            this.arguments = "<@Role|Role ID|Role name>";
+            this.category = Categories.SERVER_CONFIG;
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please include a role or NONE";
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            if(event.getArgs().equalsIgnoreCase("none"))
+            {
+                bot.gsdm.setModRole(event.getGuild(), null);
+                event.replySuccess("Mod role disabled");
+            }
+            else
+            {
+                List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
+                if(list.isEmpty())
+                    event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
+                else if(list.size()>1)
+                    event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
+                else
+                {
+                    if(!(GuildUtils.getModRole(event.getGuild())==null))
+                    {
+                        event.replyError("You already have a Mod role!");
+                        return;
+                    }
+
+                    bot.gsdm.setModRole(event.getGuild(), list.get(0));
+                    event.replySuccess("The mod role is now "+list.get(0).getAsMention());
                 }
             }
         }
