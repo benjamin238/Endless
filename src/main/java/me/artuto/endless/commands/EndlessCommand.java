@@ -81,9 +81,14 @@ public abstract class EndlessCommand extends Command
                 return;
             }
 
-            if(this.category==Categories.MODERATION || this.category==Categories.SERVER_CONFIG)
+            if(this.category==Categories.MODERATION)
             {
                 if(member.getRoles().contains(GuildUtils.getAdminRole(guild)) || member.getRoles().contains(GuildUtils.getModRole(guild)))
+                    hasPerms = true;
+            }
+            else if(this.category==Categories.SERVER_CONFIG)
+            {
+                if(member.getRoles().contains(GuildUtils.getAdminRole(guild)))
                     hasPerms = true;
             }
 
