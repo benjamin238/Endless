@@ -86,11 +86,8 @@ public abstract class EndlessCommand extends Command
                 if(member.getRoles().contains(GuildUtils.getAdminRole(guild)) || member.getRoles().contains(GuildUtils.getModRole(guild)))
                     hasPerms = true;
             }
-            else if(this.category==Categories.SERVER_CONFIG)
-            {
-                if(member.getRoles().contains(GuildUtils.getAdminRole(guild)))
-                    hasPerms = true;
-            }
+            else if(member.getRoles().contains(GuildUtils.getAdminRole(guild)))
+                hasPerms = true;
 
             if(!(hasPerms))
             {

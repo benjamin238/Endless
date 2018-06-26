@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.utils;
+package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
@@ -34,7 +34,7 @@ public class EmoteCmd extends EndlessCommand
         this.aliases = new String[]{"emoji", "charinfo"};
         this.help = "Get the info of a specified emote.";
         this.arguments = "<emote>";
-        this.category = Categories.UTILS;
+        this.category = Categories.TOOLS;
         this.guildOnly = false;
     }
 
