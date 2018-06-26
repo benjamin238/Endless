@@ -90,9 +90,6 @@ public class Bot extends ListenerAdapter
     // EventWaiter
     public EventWaiter waiter;
 
-    // Listeners
-    public Listener listener;
-
     // Logging
     public BotLogging botlog;
     public ModLogging modlog;
@@ -102,15 +99,15 @@ public class Bot extends ListenerAdapter
     private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
 
     // Schedulers;
-    public ScheduledExecutorService muteScheduler;
-    public ScheduledExecutorService optimizerScheduler;
+    ScheduledExecutorService muteScheduler;
+    ScheduledExecutorService optimizerScheduler;
 
     // Threads
     public ScheduledExecutorService clearThread;
     public ScheduledExecutorService starboardThread;
 
     // Webhooks
-    public WebhookClient logWebhook;
+    WebhookClient logWebhook;
 
     public static Bot getInstance()
     {
@@ -162,7 +159,8 @@ public class Bot extends ListenerAdapter
         starboardThread = ThreadLoader.createThread("Starboard");
 
         waiter = new EventWaiter();
-        listener = new Listener(this);
+
+        Listener listener = new Listener(this);
 
         CommandClientBuilder clientBuilder = new CommandClientBuilder();
         Long[] coOwners = config.getCoOwnerIds();
@@ -197,7 +195,7 @@ public class Bot extends ListenerAdapter
 
                 // Bot Administration
                 new BashCmd(), new BlacklistGuildCmd(this), new BlacklistUserCmd(this),
-                new BotCPanelCmd(), new EvalCmd(this), new ShutdownCmd(this), new StatusCmd(),
+                new BotCPanelCmd(), new EvalCmd(this), new RestartShardCmd(), new ShutdownCmd(this), new StatusCmd(),
 
                 // Fun
                 new CatCmd(this), new ChooseCmd(), new DogCmd(this),
@@ -242,9 +240,10 @@ public class Bot extends ListenerAdapter
     @Override
     public void onReady(ReadyEvent event)
     {
-        endlessBuilder.addShard(new EndlessCoreBuilder(this, event.getJDA())
-                .setCommandClient(client)
-                .build());
+        if(endless==null && !(initialized))
+            endlessBuilder.addShard(new EndlessCoreBuilder(this, event.getJDA())
+                    .setCommandClient(client)
+                    .build());
     }
 
     @Override
