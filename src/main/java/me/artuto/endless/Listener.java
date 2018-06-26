@@ -68,10 +68,6 @@ public class Listener implements EventListener
                 webhook.send(":radio_button: Connected to shard `"+shardInfo.getShardString()+"` Guilds: `"+jda.getGuildCache().size()+"` " +
                         "Users: `"+jda.getUserCache().size()+"`");
 
-            bot.muteScheduler.scheduleWithFixedDelay(() -> bot.pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, event.getJDA()),
-                    0, 10, TimeUnit.SECONDS);
-            bot.optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
-
             Endless.LOG.info("Shard "+shardInfo.getShardString()+" ready!");
         }
         else if(preEvent instanceof GuildJoinEvent)

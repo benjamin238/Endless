@@ -24,6 +24,7 @@ import me.artuto.endless.core.entities.TempPunishment;
 import me.artuto.endless.core.entities.impl.PunishmentImpl;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.GuildUtils;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
@@ -218,20 +219,21 @@ public class PunishmentsDataManager
         }
     }
 
-    public void updateTempPunishments(Const.PunishmentType type, JDA jda)
+    public void updateTempPunishments(Const.PunishmentType type, ShardManager shardManager)
     {
         for(TempPunishment p : getTempPunishments(type))
         {
             if(OffsetDateTime.now().isAfter(p.getExpiryTime()))
             {
                 removePunishment(p.getUserId(), p.getGuildId(), p.getType());
-                Guild guild = jda.getGuildById(p.getGuildId());
+                Guild guild = shardManager.getGuildById(p.getGuildId());
 
                 if(!(guild==null))
                 {
                      Member member = guild.getMemberById(p.getUserId());
                      Role mutedRole = GuildUtils.getMutedRole(guild);
-                     if(!(member==null) && guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES) && ChecksUtil.canMemberInteract(guild.getSelfMember(), mutedRole))
+                     if(!(member==null) && guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES) &&
+                             ChecksUtil.canMemberInteract(guild.getSelfMember(), mutedRole))
                          guild.getController().removeSingleRoleFromMember(member, mutedRole).reason("[Tempumute finished]").queue();
                 }
             }

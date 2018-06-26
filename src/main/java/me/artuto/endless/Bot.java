@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.login.LoginException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Artuto
@@ -100,7 +101,7 @@ public class Bot extends ListenerAdapter
 
     // Schedulers;
     ScheduledExecutorService muteScheduler;
-    ScheduledExecutorService optimizerScheduler;
+    private ScheduledExecutorService optimizerScheduler;
 
     // Threads
     public ScheduledExecutorService clearThread;
@@ -226,8 +227,7 @@ public class Bot extends ListenerAdapter
                 .setGame(Game.playing("[ENDLESS] Loading..."))
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
-                .setEnableShutdownHook(true)
-                .setShardsTotal(2);
+                .setEnableShutdownHook(true);
         if(maintenance)
             builder.addEventListeners(this, client);
         else
@@ -253,7 +253,13 @@ public class Bot extends ListenerAdapter
         {
             if(event.getJDA().asBot().getShardManager().getShards().stream().allMatch(shard -> shard.getStatus()==JDA.Status.CONNECTED)
                     && !(initialized))
+            {
                 this.endless = endlessBuilder.build();
+                logWebhook.close();
+                muteScheduler.scheduleWithFixedDelay(() -> pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, shardManager),
+                        0, 10, TimeUnit.SECONDS);
+                optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
+            }
         }
     }
 }
