@@ -19,7 +19,6 @@ package me.artuto.endless.handlers;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.Ignore;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -43,6 +42,8 @@ public class IgnoreHandler
     public boolean handleIgnore(CommandEvent event)
     {
         Guild guild = event.getGuild();
+        if(guild==null)
+            return true;
         List<Role> roles = event.getMember().getRoles();
         TextChannel tc = event.getTextChannel();
         User user = event.getAuthor();

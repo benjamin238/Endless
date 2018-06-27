@@ -69,6 +69,7 @@ public class BlacklistHandler
         {
             Blacklist guildBlacklist = bot.endless.getBlacklist(guild.getIdLong());
             EmbedBuilder builder = new EmbedBuilder().setColor(Color.RED);
+            builder.setTitle("This guild has been blacklisted!");
             builder.setDescription("I'm sorry, but the owner of this bot has blocked this guild from using **"+event.getSelfUser().getName()+"**' commands.\n\n" +
                     "Reason: `"+guildBlacklist.getReason()+"`\n\n" +
                     "*If you think this is an error, please join the support guild.*");

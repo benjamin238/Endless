@@ -64,7 +64,9 @@ public class Categories
             return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
-        if(bHandler.isBlacklisted(event.getAuthor()) || bHandler.isBlacklisted(event.getGuild()))
+        if(!(event.getGuild()==null) &&  bHandler.isBlacklisted(event.getGuild()))
+            return bHandler.handleBlacklist(event);
+        if(bHandler.isBlacklisted(event.getAuthor()))
             return bHandler.handleBlacklist(event);
 
         return iHandler.handleIgnore(event);
