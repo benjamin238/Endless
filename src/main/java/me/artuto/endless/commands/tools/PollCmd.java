@@ -17,10 +17,33 @@
 
 package me.artuto.endless.commands.tools;
 
-public class PollCmd
-{
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
+import net.dv8tion.jda.core.Permission;
+
 /**
- *
  * @author Artuto
  */
+
+public class PollCmd extends EndlessCommand
+{
+    private final Bot bot;
+
+    public PollCmd(Bot bot)
+    {
+        this.bot = bot;
+        this.name = "poll";
+        this.help = "Run a poll with options";
+        this.category = Categories.TOOLS;
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+    }
+
+    @Override
+    protected void executeCommand(CommandEvent event)
+    {
+        
+    }
 }

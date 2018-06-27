@@ -103,6 +103,7 @@ public class Bot extends ListenerAdapter
     // Schedulers;
     private ScheduledExecutorService muteScheduler;
     private ScheduledExecutorService optimizerScheduler;
+    private ScheduledExecutorService pollScheduler;
 
     // Threads
     public ScheduledExecutorService clearThread;
@@ -159,6 +160,7 @@ public class Bot extends ListenerAdapter
         clearThread = ThreadLoader.createThread("Clear Command");
         muteScheduler = ThreadLoader.createThread("Mute");
         optimizerScheduler = ThreadLoader.createThread("Optimizer");
+        pollScheduler = ThreadLoader.createThread("Polls");
         starboardThread = ThreadLoader.createThread("Starboard");
 
         waiter = new EventWaiter();
