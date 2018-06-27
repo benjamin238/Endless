@@ -19,6 +19,7 @@ package me.artuto.endless.utils;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.core.entities.ParsedAuditLog;
 import me.artuto.endless.core.entities.impl.ParsedAuditLogImpl;
 import net.dv8tion.jda.core.JDA;
@@ -59,6 +60,12 @@ public class GuildUtils
     {
         GuildSettings settings = bot.endless.getGuildSettings(guild);
         return settings.getStarboardCount();
+    }
+
+    public static List<Ignore> getIgnoredEntities(Guild guild)
+    {
+        GuildSettings settings = bot.endless.getGuildSettings(guild);
+        return settings.getIgnoredEntities();
     }
 
     public static List<Role> getRoleMeRoles(Guild guild)

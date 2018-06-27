@@ -17,49 +17,13 @@
 
 package me.artuto.endless.core.entities;
 
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Role;
+/**
+ * @author Artuto
+ */
 
-import java.util.Collection;
-import java.util.List;
-
-public interface GuildSettings
+public interface Ignore
 {
-    boolean isDefault();
+    long getEntityId();
 
-    boolean isEmpty();
-
-    Collection<String> getPrefixes();
-
-    Guild getGuild();
-
-    int getBanDeleteDays();
-
-    int getStarboardCount();
-
-    List<Ignore> getIgnoredEntities();
-
-    List<Role> getRoleMeRoles();
-
-    List<Tag> getImportedTags();
-
-    long getAdminRole();
-
-    long getLeaveChannel();
-
-    long getModlog();
-
-    long getModRole();
-
-    long getMutedRole();
-
-    long getServerlog();
-
-    long getStarboard();
-
-    long getWelcomeChannel();
-
-    String getLeaveMsg();
-
-    String getWelcomeMsg();
+    long getGuildId();
 }

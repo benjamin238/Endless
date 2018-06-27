@@ -18,9 +18,11 @@
 package me.artuto.endless.storage.data.managers;
 
 import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.core.entities.impl.EndlessShardedImpl;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
+import me.artuto.endless.core.entities.impl.IgnoreImpl;
 import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
@@ -581,11 +583,6 @@ public class GuildSettingsDataManager
                         }
                         GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                         settings.removePrefix(prefix);
-                        if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                        {
-                            ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                            ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                        }
                     }
                 }
             }
@@ -678,11 +675,6 @@ public class GuildSettingsDataManager
                         }
                         GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                         settings.removeRoleMeRole(role);
-                        if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                        {
-                            ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                            ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                        }
                     }
                 }
             }
@@ -784,6 +776,56 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while settings the ban delete days number for the guild "+guild.getId(), e);
+        }
+    }
+
+    public void addIgnore(Guild guild, long entity)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM IGNORES WHERE guild_id = %s", guild.getId())))
+            {
+                results.moveToInsertRow();
+                results.updateLong("guild_id", guild.getIdLong());
+                results.updateLong("entity_id", entity);
+                results.insertRow();
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.addIgnoredEntity(new IgnoreImpl(entity, guild.getIdLong()));
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                {
+                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
+                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while adding a ignore for the guild "+guild.getId(), e);
+        }
+    }
+
+    public void removeIgnore(Guild guild, long entity)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM IGNORES WHERE guild_id = %s", guild.getId())))
+            {
+                if(results.next())
+                    results.deleteRow();
+                Ignore ignore = bot.endless.getIgnore(guild, entity);
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.removeIgnoredEntity(ignore);
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while removing a ignore for the guild "+guild.getId(), e);
         }
     }
 }

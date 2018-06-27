@@ -21,37 +21,41 @@ import com.jagrosh.jdautilities.command.Command.Category;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.handlers.BlacklistHandler;
+import me.artuto.endless.handlers.IgnoreHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
 
 public class Categories
 {
     private static boolean maintenance;
     private static BlacklistHandler bHandler;
+    private static IgnoreHandler iHandler;
     private static SpecialCaseHandler sHandler;
 
-    public Categories(boolean maintenance, BlacklistHandler bHandler, SpecialCaseHandler shHndler)
+    public Categories(boolean maintenance, BlacklistHandler bHandler, IgnoreHandler iHandler, SpecialCaseHandler shHndler)
     {
-        Categories.bHandler = bHandler;
         Categories.maintenance = maintenance;
+        Categories.bHandler = bHandler;
+        Categories.iHandler = iHandler;
         Categories.sHandler = shHndler;
     }
 
-    public static final Category BOT = new Category("Bot", event ->
-    {
-        if(event.isOwner())
-            return true;
-
-        if(!(Bot.getInstance().initialized))
-            return false;
-        if(maintenance)
-            return sHandler.handleCommandInMaintenance(event);
-
-        return bHandler.handleBlacklist(event);
-    });
+    public static final Category BOT = new Category("Bot", Categories::doCheck);
 
     public static final Category BOTADM = new Category("Bot Administration", CommandEvent::isOwner);
 
-    public static final Category MODERATION = new Category("Moderation", event ->
+    public static final Category MODERATION = new Category("Moderation", Categories::doCheck);
+
+    public static final Category SERVER_CONFIG = new Category("Guild Settings", Categories::doCheck);
+
+    public static final Category TOOLS = new Category("Tools", Categories::doCheck);
+
+    public static final Category UTILS = new Category("Utilities", Categories::doCheck);
+
+    public static final Category FUN = new Category("Fun", Categories::doCheck);
+
+    // public static final Category OTHERS = new Category("Others", Categories::doCheck);
+
+    private static boolean doCheck(CommandEvent event)
     {
         if(event.isOwner())
             return true;
@@ -60,70 +64,9 @@ public class Categories
             return false;
         if(maintenance)
             return sHandler.handleCommandInMaintenance(event);
+        if(bHandler.isBlacklisted(event.getAuthor()) || bHandler.isBlacklisted(event.getGuild()))
+            return bHandler.handleBlacklist(event);
 
-        return bHandler.handleBlacklist(event);
-    });
-
-    public static final Category SERVER_CONFIG = new Category("Guild Settings", event ->
-    {
-        if(event.isOwner())
-            return true;
-
-        if(!(Bot.getInstance().initialized))
-            return false;
-        if(maintenance)
-            return sHandler.handleCommandInMaintenance(event);
-
-        return bHandler.handleBlacklist(event);
-    });
-
-    public static final Category TOOLS = new Category("Tools", event ->
-    {
-        if(event.isOwner())
-            return true;
-
-        if(!(Bot.getInstance().initialized))
-            return false;
-        if(maintenance)
-            return sHandler.handleCommandInMaintenance(event);
-
-        return bHandler.handleBlacklist(event);
-    });
-
-    public static final Category UTILS = new Category("Utilities", event ->
-    {
-        if(event.isOwner())
-            return true;
-
-        if(!(Bot.getInstance().initialized))
-            return false;
-        if(maintenance)
-            return sHandler.handleCommandInMaintenance(event);
-
-        return bHandler.handleBlacklist(event);
-    });
-
-    public static final Category FUN = new Category("Fun", event ->
-    {
-        if(event.isOwner())
-            return true;
-
-        if(!(Bot.getInstance().initialized))
-            return false;
-        if(maintenance)
-            return sHandler.handleCommandInMaintenance(event);
-
-        return bHandler.handleBlacklist(event);
-    });
-
-    /*public static final Category OTHERS = new Category("Others", event ->
-    {
-        if(event.isOwner())
-            return true;
-
-        if(maintenance)
-            return sHandler.handleCommandInMaintenance(event);
-
-        return bHandler.handleBlacklist(event);
-    });*/
+        return iHandler.handleIgnore(event);
+    }
 }

@@ -22,10 +22,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.EndlessSharded;
-import me.artuto.endless.core.entities.Blacklist;
-import me.artuto.endless.core.entities.GlobalTag;
-import me.artuto.endless.core.entities.GuildSettings;
-import me.artuto.endless.core.entities.LocalTag;
+import me.artuto.endless.core.entities.*;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
@@ -40,7 +37,7 @@ import java.util.stream.Collectors;
 
 public class EndlessShardedImpl implements EndlessSharded
 {
-    private final Logger LOG = (Logger)LoggerFactory.getLogger(EndlessShardedImpl.class);
+    private final Logger LOG = (Logger)LoggerFactory.getLogger(EndlessSharded.class);
 
     private final Bot bot;
     private final List<EndlessCore> shards;
@@ -122,6 +119,13 @@ public class EndlessShardedImpl implements EndlessSharded
     }
 
     @Override
+    public Ignore getIgnore(Guild guild, long entity)
+    {
+        return getGuildSettings(guild).getIgnoredEntities().stream().filter(ignore ->
+                ignore.getEntityId()==entity).findFirst().orElse(null);
+    }
+
+    @Override
     public List<Blacklist> getBlacklists()
     {
         return Collections.unmodifiableList(blacklists);
@@ -131,14 +135,14 @@ public class EndlessShardedImpl implements EndlessSharded
     public List<Blacklist> getGuildBlacklists()
     {
         return Collections.unmodifiableList(blacklists.stream().filter(b ->
-                b.getType()== Const.BlacklistType.GUILD).collect(Collectors.toList()));
+                b.getType()==Const.BlacklistType.GUILD).collect(Collectors.toList()));
     }
 
     @Override
     public List<Blacklist> getUserBlacklists()
     {
         return Collections.unmodifiableList(blacklists.stream().filter(b ->
-                b.getType()== Const.BlacklistType.USER).collect(Collectors.toList()));
+                b.getType()==Const.BlacklistType.USER).collect(Collectors.toList()));
     }
 
     @Override

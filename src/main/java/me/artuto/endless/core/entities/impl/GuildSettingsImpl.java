@@ -18,6 +18,7 @@
 package me.artuto.endless.core.entities.impl;
 
 import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.core.entities.Tag;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
@@ -32,21 +33,23 @@ public class GuildSettingsImpl implements GuildSettings
     private Collection<String> prefixes;
     private Guild guild;
     private int banDeleteDays, starboardCount;
+    private List<Ignore> ignoredEntities;
     private List<Role> roleMeRoles;
     private List<Tag> importedTags;
     private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
     private String welcomeMsg, leaveMsg;
 
     public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
-                             List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId, long leaveId, long modlogId,
-                             long modRoleId, long mutedRoleId, long serverlogId, long starboardId,
-                             long welcomeId, String leaveMsg, String welcomeMsg)
+                             List<Ignore> ignoredEntities, List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId,
+                             long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
+                             long starboardId, long welcomeId, String leaveMsg, String welcomeMsg)
     {
         this.isDefault = isDefault;
         this.prefixes = prefixes;
         this.guild = guild;
         this.banDeleteDays = banDeleteDays;
         this.starboardCount = starboardCount;
+        this.ignoredEntities = ignoredEntities;
         this.roleMeRoles = roleMeRoles;
         this.importedTags = importedTags;
         this.adminRoleId = adminRoleId;
@@ -70,9 +73,9 @@ public class GuildSettingsImpl implements GuildSettings
     @Override
     public boolean isEmpty()
     {
-        return (prefixes==null || prefixes.isEmpty()) && banDeleteDays==0 && starboardCount==0 && (roleMeRoles==null || roleMeRoles.isEmpty())
-                && (importedTags==null || importedTags.isEmpty()) && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
-                && welcomeId==0L && (leaveMsg==null || leaveMsg.isEmpty()) && (welcomeMsg==null || welcomeMsg.isEmpty());
+        return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && roleMeRoles.isEmpty() && ignoredEntities.isEmpty()
+                && importedTags.isEmpty() && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
+                && welcomeId==0L && leaveMsg==null && welcomeMsg==null;
     }
 
     @Override
@@ -97,6 +100,12 @@ public class GuildSettingsImpl implements GuildSettings
     public int getStarboardCount()
     {
         return starboardCount;
+    }
+
+    @Override
+    public List<Ignore> getIgnoredEntities()
+    {
+        return Collections.unmodifiableList(ignoredEntities);
     }
 
     @Override
@@ -180,6 +189,11 @@ public class GuildSettingsImpl implements GuildSettings
             return String.format("GS:%s(%s)", guild.getName(), guild.getId());
     }
 
+    public void addIgnoredEntity(Ignore ignore)
+    {
+        ignoredEntities.add(ignore);
+    }
+
     public void addImportedTag(Tag tag)
     {
         importedTags.add(tag);
@@ -193,6 +207,11 @@ public class GuildSettingsImpl implements GuildSettings
     public void addRoleMeRole(Role role)
     {
         roleMeRoles.add(role);
+    }
+
+    public void removeIgnoredEntity(Ignore ignore)
+    {
+        ignoredEntities.remove(ignore);
     }
 
     public void removeImportedTag(Tag tag)

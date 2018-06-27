@@ -18,10 +18,7 @@
 package me.artuto.endless.core;
 
 import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.Blacklist;
-import me.artuto.endless.core.entities.GlobalTag;
-import me.artuto.endless.core.entities.GuildSettings;
-import me.artuto.endless.core.entities.LocalTag;
+import me.artuto.endless.core.entities.*;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
@@ -47,6 +44,8 @@ public interface EndlessSharded
     GuildSettings getGuildSettingsById(long id);
 
     GuildSettings getGuildSettingsById(String id);
+
+    Ignore getIgnore(Guild guild, long entity);
 
     List<Blacklist> getBlacklists();
 

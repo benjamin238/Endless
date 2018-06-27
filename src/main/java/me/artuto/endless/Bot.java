@@ -35,6 +35,7 @@ import me.artuto.endless.commands.utils.*;
 import me.artuto.endless.core.EndlessCoreBuilder;
 import me.artuto.endless.core.EndlessSharded;
 import me.artuto.endless.core.EndlessShardedBuilder;
+import me.artuto.endless.handlers.IgnoreHandler;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.storage.data.managers.*;
 import me.artuto.endless.core.exceptions.ConfigException;
@@ -100,7 +101,7 @@ public class Bot extends ListenerAdapter
     private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
 
     // Schedulers;
-    ScheduledExecutorService muteScheduler;
+    private ScheduledExecutorService muteScheduler;
     private ScheduledExecutorService optimizerScheduler;
 
     // Threads
@@ -144,8 +145,9 @@ public class Bot extends ListenerAdapter
         sdm = new StarboardDataManager(db);
         tdm = new TagDataManager(this);
         BlacklistHandler bHandler = new BlacklistHandler(this);
+        IgnoreHandler iHandler = new IgnoreHandler(this);
         SpecialCaseHandler sHandler = new SpecialCaseHandler();
-        new Categories(maintenance, bHandler, sHandler);
+        new Categories(maintenance, bHandler, iHandler, sHandler);
         new GuildUtils(this);
 
         botlog = new BotLogging(this);
@@ -207,7 +209,7 @@ public class Bot extends ListenerAdapter
                 new HackbanCmd(this), new MuteCmd(this), new SoftbanCmd(this), new UnbanCmd(this),
 
                 // Server Settings
-                new LeaveCmd(this), new PrefixCmd(this), new ServerSettingsCmd(this),
+                new IgnoreCmd(this), new LeaveCmd(this), new PrefixCmd(this), new ServerSettingsCmd(this),
                 new SetupCmd(this), new StarboardCmd(this), new WelcomeCmd(this),
 
                 // Tools

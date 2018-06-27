@@ -48,13 +48,15 @@ public class BlacklistHandler
         Guild guild = event.getGuild();
         User user = event.getAuthor();
 
-        if(event.isOwner()) return true;
+        if(event.isOwner())
+            return true;
 
         Blacklist userBlacklist = bot.endless.getBlacklist(user.getIdLong());
 
         if(!(userBlacklist==null))
         {
             EmbedBuilder builder = new EmbedBuilder().setColor(Color.RED);
+            builder.setTitle("You have been blacklisted!");
             builder.setDescription("I'm sorry, but the owner of this bot has blocked you from using **"+event.getSelfUser().getName()+"**' commands.\n\n" +
                     "Reason: `"+userBlacklist.getReason()+"`\n\n" +
                     "*If you think this is an error, please join the support guild.*");
@@ -77,5 +79,15 @@ public class BlacklistHandler
         }
 
         return true;
+    }
+
+    public boolean isBlacklisted(Guild guild)
+    {
+        return !(bot.endless.getBlacklist(guild.getIdLong())==null);
+    }
+
+    public boolean isBlacklisted(User user)
+    {
+        return !(bot.endless.getBlacklist(user.getIdLong())==null);
     }
 }

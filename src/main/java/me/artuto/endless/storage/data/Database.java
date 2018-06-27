@@ -19,8 +19,10 @@ package me.artuto.endless.storage.data;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
+import me.artuto.endless.core.entities.impl.IgnoreImpl;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
@@ -38,7 +40,7 @@ public class Database
 
     public GuildSettings createDefault(Guild guild)
     {
-        return new GuildSettingsImpl(true, new HashSet<>(), guild, 0, 0,
+        return new GuildSettingsImpl(true, new HashSet<>(), guild, 0, 0, new LinkedList<>(),
                 new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L, 0L, 0L,
                 0L, 0L, null, null);
     }
@@ -108,7 +110,7 @@ public class Database
                     }
 
                     gs = new GuildSettingsImpl(false, prefixes, guild, results.getInt("ban_delete_days"),
-                            results.getInt("starboard_count"), roleMeRoles, importedTags,
+                            results.getInt("starboard_count"), getIgnoresForGuild(guild), roleMeRoles, importedTags,
                             results.getLong("leave_id"), results.getLong("modlog_id"),
                             results.getLong("admin_role_id"), results.getLong("mod_role_id"),
                             results.getLong("muted_role_id"), results.getLong("serverlog_id"),
@@ -153,6 +155,28 @@ public class Database
             return guilds;
         }
         return guilds;
+    }
+
+    public List<Ignore> getIgnoresForGuild(Guild guild)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM IGNORES WHERE GUILD_ID = %s", guild.getIdLong())))
+            {
+                List<Ignore> ignores = new LinkedList<>();
+                while(results.next())
+                    ignores.add(new IgnoreImpl(results.getLong("entity_id"), results.getLong("guild_id")));
+                return ignores;
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn("Error while getting the list of ignored entities of a guild. ID: "+guild.getIdLong(), e);
+            return Collections.emptyList();
+        }
     }
 
     public boolean hasSettings(Guild guild)
