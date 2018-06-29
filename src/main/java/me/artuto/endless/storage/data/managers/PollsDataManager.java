@@ -68,14 +68,15 @@ public class PollsDataManager
         }
     }
 
-    public void deletePoll(long msgId, long tcId)
+    private void deletePoll(Poll poll)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM POLLS WHERE channel_id = %s AND msg_id = %s", tcId, msgId)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM POLLS WHERE channel_id = %s AND msg_id = %s",
+                    poll.getTextChannelId(), poll.getMessageId())))
             {
                 if(results.next())
                     results.deleteRow();
@@ -87,7 +88,7 @@ public class PollsDataManager
         }
     }
 
-    public List<Poll> getPolls()
+    private List<Poll> getPolls()
     {
         try
         {
@@ -116,7 +117,7 @@ public class PollsDataManager
         {
             if(OffsetDateTime.now().isAfter(poll.getEndTime()))
             {
-                deletePoll(poll.getMessageId(), poll.getTextChannelId());
+                deletePoll(poll);
                 PollHandler.sendResults(poll, shardManager);
             }
         }

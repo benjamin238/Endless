@@ -80,6 +80,7 @@ public class Bot extends ListenerAdapter
     public Database db;
     public DonatorsDataManager ddm;
     public GuildSettingsDataManager gsdm;
+    public PollsDataManager pldm;
     public PunishmentsDataManager pdm;
     public ProfileDataManager prdm;
     public StarboardDataManager sdm;
@@ -141,6 +142,7 @@ public class Bot extends ListenerAdapter
         bdm = new BlacklistDataManager(this);
         ddm = new DonatorsDataManager(db);
         gsdm = new GuildSettingsDataManager(this);
+        pldm = new PollsDataManager(db);
         pdm = new PunishmentsDataManager(db);
         prdm = new ProfileDataManager(db);
         sdm = new StarboardDataManager(db);
@@ -216,7 +218,7 @@ public class Bot extends ListenerAdapter
 
                 // Tools
                 new AfkCmd(), new AnnouncementCmd(), new AvatarCmd(), new GuildInfoCmd(),
-                new LookupCmd(), new QuoteCmd(), new RoleCmd(), new UserInfoCmd(),
+                new LookupCmd(), new PollCmd(this), new QuoteCmd(), new RoleCmd(), new UserInfoCmd(),
 
                 // Utils
                 /*new EmoteCmd(),*/ new GoogleSearchCmd(), new RoleMeCmd(this),
@@ -261,8 +263,9 @@ public class Bot extends ListenerAdapter
                 this.endless = endlessBuilder.build();
                 logWebhook.close();
                 muteScheduler.scheduleWithFixedDelay(() -> pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, shardManager),
-                        0, 10, TimeUnit.SECONDS);
+                        5, 10, TimeUnit.SECONDS);
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
+                pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 5, 10, TimeUnit.SECONDS);
             }
         }
     }

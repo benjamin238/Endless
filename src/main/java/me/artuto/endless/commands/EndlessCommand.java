@@ -63,6 +63,16 @@ public abstract class EndlessCommand extends Command
             return;
         }
 
+        if(needsArguments && event.getArgs().isEmpty())
+        {
+            if(needsArgumentsMessage==null)
+                event.replyError("**Too few arguments provided!**\n" +
+                        "Try running `"+client.getPrefix()+this.name+" help` to get help.");
+            else
+                event.replyWarning(needsArgumentsMessage);
+            return;
+        }
+
         if(event.isFromType(ChannelType.TEXT))
         {
             for(Permission p : botPerms)
@@ -101,16 +111,6 @@ public abstract class EndlessCommand extends Command
                     break;
                 }
             }
-        }
-
-        if(needsArguments && event.getArgs().isEmpty())
-        {
-            if(needsArgumentsMessage==null)
-                event.replyError("**Too few arguments provided!**\n" +
-                        "Try running `"+client.getPrefix()+this.name+" help` to get help.");
-            else
-                event.replyWarning(needsArgumentsMessage);
-            return;
         }
 
         executeCommand(event);
