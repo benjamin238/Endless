@@ -42,7 +42,8 @@ public class PollHandler
         TextChannel tc = shardManager.getTextChannelById(poll.getTextChannelId());
         if(tc==null)
             return;
-        if(!(ChecksUtil.hasPermission(tc.getGuild().getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_EMBED_LINKS)))
+        if(!(ChecksUtil.hasPermission(tc.getGuild().getSelfMember(), tc, Permission.MESSAGE_READ,
+                Permission.MESSAGE_HISTORY, Permission.MESSAGE_EMBED_LINKS)))
             return;
         if(!(tc.canTalk()))
             return;
@@ -50,6 +51,7 @@ public class PollHandler
             EmbedBuilder builder = new EmbedBuilder();
             MessageEmbed embed = msg.getEmbeds().get(0);
             StringBuilder sb = new StringBuilder();
+            builder.setColor(embed.getColor());
 
             builder.setTitle(embed.getTitle());
             if(msg.getReactions().isEmpty())
@@ -57,8 +59,9 @@ public class PollHandler
             else
             {
                 List<Integer> counts = new LinkedList<>();
-                msg.getReactions().forEach(t -> counts.add(t.isSelf()?(t.getCount()-1):t.getCount()));
-                List<MessageReaction> winners = msg.getReactions().stream().filter(re -> re.getCount()==Collections.max(counts)).collect(Collectors.toList());
+                msg.getReactions().forEach(r -> counts.add(r.isSelf()?(r.getCount()-1):r.getCount()));
+                List<MessageReaction> winners = msg.getReactions().stream()
+                        .filter(r -> r.getCount()==Collections.max(counts)).collect(Collectors.toList());
                 if(winners.size()>1)
                 {
                     sb.append("There was a tie between **").append(winners.size()).append("** options!\n\n");
@@ -71,7 +74,7 @@ public class PollHandler
                 {
                     MessageReaction re = winners.get(0);
                     MessageReaction.ReactionEmote reactionEmote = re.getReactionEmote();
-                    sb.append("The winner, with **").append(re.getCount()).append("** votes, is...\n\n");
+                    sb.append("The winner, with **").append(re.getCount()).append("** votes, is...\n\n\n");
                     sb.append(reactionEmote.isEmote()?reactionEmote.getEmote().getAsMention():reactionEmote.getName());
                 }
             }

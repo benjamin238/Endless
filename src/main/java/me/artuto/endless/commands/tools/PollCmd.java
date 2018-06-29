@@ -24,8 +24,12 @@ import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Emote;
+import net.dv8tion.jda.core.entities.IFakeable;
 
 import java.awt.*;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,7 +49,7 @@ public class PollCmd extends EndlessCommand
         this.help = "Run a poll with options. Execute `e!"+
                 "poll flags` to get a list of all the supported flags.";
         this.category = Categories.TOOLS;
-        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ADD_REACTION};
     }
 
     @Override
@@ -68,6 +72,8 @@ public class PollCmd extends EndlessCommand
         {
             int color;
             int time;
+            List<Emote> emotes = event.getMessage().getEmotes().stream().filter(e -> !(e.isFake()))
+                    .collect(Collectors.toList());
             String[] args = splitArgs(event.getArgs());
             if(args[0].isEmpty())
             {
@@ -76,11 +82,32 @@ public class PollCmd extends EndlessCommand
             }
             color = getColor(args[1]);
             time = ArgsUtils.parseTime(args[3]);
+            int minutes = time/60;
+            Instant endTime = Instant.now().plus(minutes, ChronoUnit.MINUTES);
+            if(time<0)
+            {
+                event.replyError("The time cannot be negative!");
+                return;
+            }
 
             builder.setTitle(args[0]);
             builder.setColor(color==0?event.getMember().getColorRaw():color);
             if(!(args[2].isEmpty()))
                 builder.setDescription(args[2]);
+            builder.setFooter("This poll will expire in", null);
+            builder.setTimestamp(endTime);
+            event.reply(builder.build(), msg -> {
+                bot.pldm.createPoll(endTime.toEpochMilli(), event.getGuild().getIdLong(),
+                        msg.getIdLong(), event.getTextChannel().getIdLong());
+
+                if(emotes.isEmpty())
+                {
+                    msg.addReaction("\uD83D\uDC4D").queue();
+                    msg.addReaction("\uD83D\uDC4E").queue();
+                }
+                else
+                    emotes.forEach(e -> msg.addReaction(e).queue());
+            });
         }
     }
 
@@ -102,7 +129,7 @@ public class PollCmd extends EndlessCommand
         String color = "";
         String description = "";
         String emotes = "";
-        String time = "60s";
+        String time = "10s";
         String question = "";
 
         for(String part : args)

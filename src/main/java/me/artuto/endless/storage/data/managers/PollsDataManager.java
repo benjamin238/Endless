@@ -100,7 +100,7 @@ public class PollsDataManager
             {
                 while(results.next())
                     polls.add(new PollImpl(results.getLong("end_time"), results.getLong("guild_id"),
-                            results.getLong("msg_id"), results.getLong("tc_id")));
+                            results.getLong("msg_id"), results.getLong("channel_id")));
                 return polls;
             }
         }
