@@ -44,7 +44,7 @@ public class Const
     public static String GITHUB = "<:github:326118305062584321>";
     public static String GOOGLE = "<:google:447911997783277569>";
     public static String INFO = "<:endlessInfo:444203939303522305>";
-    public static String LINE_START = ":white_medium_small_square:";
+    public static String LINE_START = ":white_small_square:";
     public static String LOADING = "<a:endlessLoading:444198122965434399>";
     public static String PEOPLE = ":bust_in_silhouette:";
     public static String SERVER_SETTINGS = ":wrench:";

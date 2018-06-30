@@ -30,7 +30,9 @@ import java.sql.Statement;
 public class ProfileDataManager
 {
     private final Connection connection;
-    private final Profile DEFAULT = new ProfileImpl(0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
+    private final Profile DEFAULT = new ProfileImpl(0, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null,
+            null, null, null,null, null, null);
 
     public ProfileDataManager(Database db)
     {
@@ -85,6 +87,35 @@ public class ProfileDataManager
         {
             Database.LOG.error("Error while checking if the specified user has a profile. ID: "+user.getId(), e);
             return false;
+        }
+    }
+
+    public void setValue(User user, String field, String value)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PROFILES WHERE user_id = %s", user.getId())))
+            {
+                if(results.next())
+                {
+                    results.updateString(field, value);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("user_id", user.getIdLong());
+                    results.updateString(field, value);
+                    results.insertRow();
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while setting the "+field+" of the specified user. ID: "+user.getId(), e);
         }
     }
 

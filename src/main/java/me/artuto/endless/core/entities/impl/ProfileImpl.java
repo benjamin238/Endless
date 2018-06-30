@@ -19,14 +19,18 @@ package me.artuto.endless.core.entities.impl;
 
 import me.artuto.endless.core.entities.Profile;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Artuto
  */
 
 public class ProfileImpl implements Profile
 {
-    private final String timezone;
+    public final Map<String, String> fields;
     private final int donatedAmount;
+    private final String timezone;
     private final String twitter;
     private final String steam;
     private final String wii;
@@ -47,9 +51,12 @@ public class ProfileImpl implements Profile
     private final String mkwii;
     private final String reddit;
 
-    public ProfileImpl(int donatedAmount, String timezone, String twitter, String steam, String wii, String nnid, String xboxLive, String psn, String threeds, String skype, String youtube, String about, String twitch, String minecraft, String email, String lol, String wow, String battle, String splatoon, String mkwii, String reddit)
+    public ProfileImpl(int donatedAmount, String timezone, String twitter, String steam, String wii, String nnid,
+                       String xboxLive, String psn, String threeds, String skype, String youtube, String about, String twitch, String minecraft, String email,
+                       String lol, String wow, String battle, String splatoon, String mkwii, String reddit)
     {
         this.donatedAmount = donatedAmount;
+        this.fields = new HashMap<>();
         this.timezone = timezone;
         this.twitter = twitter;
         this.steam = steam;
@@ -70,6 +77,19 @@ public class ProfileImpl implements Profile
         this.splatoon = splatoon;
         this.mkwii = mkwii;
         this.reddit = reddit;
+
+        fields.put("Timezone", timezone); fields.put("Twitter", twitter); fields.put("Steam", steam); fields.put("Wii", wii); fields.put("NNID", nnid);
+        fields.put("Xbox Live", xboxLive); fields.put("PSN", psn); fields.put("3DS", threeds); fields.put("Skype", skype); fields.put("YouTube", youtube);
+        fields.put("About", about); fields.put("Twitch", twitch); fields.put("Minecraft", minecraft); fields.put("Email", email); fields.put("LOL", lol);
+        fields.put("WOW", wow); fields.put("Battle.Net", battle); fields.put("Splatoon", splatoon); fields.put("MKWii", mkwii); fields.put("Reddit", reddit);
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return donatedAmount==0 && timezone==null && twitter==null && steam==null && wii==null && nnid==null && xboxLive==null && psn==null
+                && threeds==null && skype==null && youtube==null && about==null && twitch==null && minecraft==null && email==null
+                && lol==null && wow==null && battle==null && splatoon==null && mkwii==null && reddit==null;
     }
 
     @Override

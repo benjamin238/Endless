@@ -70,7 +70,7 @@ public class TimeForCmd extends EndlessCommand
             p = bot.prdm.getProfile(user);
             name = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
 
-            if(bot.prdm.getProfile(user).getTimezone()==null)
+            if(p.getTimezone()==null)
                 event.replyWarning("You don't have a timezone configured!");
             else
             {
@@ -110,7 +110,8 @@ public class TimeForCmd extends EndlessCommand
             p = bot.prdm.getProfile(user);
             name = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
 
-            if(!(bot.prdm.hasProfile(user))) event.replyError(name+" doesn't has a timezone configured!");
+            if(!(bot.prdm.hasProfile(user)))
+                event.replyError(name+" doesn't has a timezone configured!");
             else
             {
                 try

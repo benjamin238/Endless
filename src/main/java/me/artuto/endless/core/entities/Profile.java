@@ -23,9 +23,11 @@ package me.artuto.endless.core.entities;
 
 public interface Profile
 {
-    String getTimezone();
+    boolean isEmpty();
 
     int getDonatedAmount();
+
+    String getTimezone();
 
     String getTwitter();
 
