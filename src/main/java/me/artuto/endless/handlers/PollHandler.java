@@ -17,6 +17,7 @@
 
 package me.artuto.endless.handlers;
 
+import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.Poll;
 import me.artuto.endless.utils.ChecksUtil;
 import net.dv8tion.jda.bot.sharding.ShardManager;
@@ -60,25 +61,32 @@ public class PollHandler
             {
                 List<Integer> counts = new LinkedList<>();
                 msg.getReactions().forEach(r -> counts.add(r.isSelf()?(r.getCount()-1):r.getCount()));
+                int max = Collections.max(counts);
+                int totalCount = 0;
+                for(int re : counts)
+                    totalCount += re;
                 List<MessageReaction> winners = msg.getReactions().stream()
-                        .filter(r -> r.getCount()==Collections.max(counts)).collect(Collectors.toList());
+                        .filter(r -> (r.isSelf()?(r.getCount()-1)==max:r.getCount()==max)).collect(Collectors.toList());
+                sb.append("Time is over! ");
                 if(winners.size()>1)
                 {
-                    sb.append("There was a tie between **").append(winners.size()).append("** options!\n\n");
+                    sb.append("\nThere was a tie between **").append(winners.size()).append("** options!\n_ _\n");
                     winners.forEach(re -> {
                         MessageReaction.ReactionEmote reactionEmote = re.getReactionEmote();
-                        sb.append(reactionEmote.isEmote()?reactionEmote.getEmote().getAsMention():reactionEmote.getName());
+                        sb.append(reactionEmote.isEmote()?reactionEmote.getEmote().getAsMention():reactionEmote.getName()).append("  ");
                     });
                 }
                 else
                 {
+                    sb.append("A total of **").append(totalCount).append("** people voted!\n");
                     MessageReaction re = winners.get(0);
                     MessageReaction.ReactionEmote reactionEmote = re.getReactionEmote();
-                    sb.append("The winner, with **").append(re.getCount()).append("** votes, is...\n\n\n");
+                    sb.append("The winner, with **").append(re.getCount()).append("** votes, is...\n_ _\n");
                     sb.append(reactionEmote.isEmote()?reactionEmote.getEmote().getAsMention():reactionEmote.getName());
                 }
             }
             tc.sendMessage(builder.setDescription(sb).build()).queue();
-        }, e -> tc.sendMessageFormat("Poll with Message ID %s was deleted from this channel!", poll.getMessageId()).queue());
+        }, e -> tc.sendMessageFormat("%s Poll with Message ID %s was deleted from this channel!",
+                Bot.getInstance().client.getWarning(), poll.getMessageId()).queue());
     }
 }

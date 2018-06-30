@@ -25,12 +25,10 @@ import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.IFakeable;
 
 import java.awt.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,7 +68,7 @@ public class PollCmd extends EndlessCommand
         }
         else
         {
-            int color;
+            Color color;
             int time;
             List<Emote> emotes = event.getMessage().getEmotes().stream().filter(e -> !(e.isFake()))
                     .collect(Collectors.toList());
@@ -91,10 +89,10 @@ public class PollCmd extends EndlessCommand
             }
 
             builder.setTitle(args[0]);
-            builder.setColor(color==0?event.getMember().getColorRaw():color);
+            builder.setColor(color==null?event.getMember().getColor():color);
             if(!(args[2].isEmpty()))
                 builder.setDescription(args[2]);
-            builder.setFooter("This poll will expire in", null);
+            builder.setFooter("This poll will expire", event.getAuthor().getEffectiveAvatarUrl());
             builder.setTimestamp(endTime);
             event.reply(builder.build(), msg -> {
                 bot.pldm.createPoll(endTime.toEpochMilli(), event.getGuild().getIdLong(),
@@ -111,22 +109,24 @@ public class PollCmd extends EndlessCommand
         }
     }
 
-    private int getColor(String color)
+    private Color getColor(String color)
     {
         try
         {
-            return Integer.parseInt(color);
+            if(!(color.startsWith("#")))
+                color = "#"+color;
+            return Color.decode(color);
         }
         catch(NumberFormatException e)
         {
-            return 0;
+            return null;
         }
     }
 
     private String[] splitArgs(String preArgs)
     {
         String[] args = preArgs.split(" \\| ");
-        String color = "";
+        String color = "#ffffff";
         String description = "";
         String emotes = "";
         String time = "10s";
@@ -136,16 +136,16 @@ public class PollCmd extends EndlessCommand
         {
             if(!(part.startsWith("-")))
                 question = part;
-            else if(part.startsWith("-c "))
-                color = part.replace("-c", "");
-            else if(part.startsWith("-d "))
-                description = part.replace("-d", "");
-            else if(part.startsWith("-e "))
-                emotes = part.replace("-e", "");
-            else if(part.startsWith("-t "))
-                time = part.replaceAll("-t", "");
+            else if(part.startsWith("-c"))
+                color = part.replace("-c ", "");
+            else if(part.startsWith("-d"))
+                description = part.replace("-d ", "");
+            else if(part.startsWith("-e"))
+                emotes = part.replace("-e ", "");
+            else if(part.startsWith("-t"))
+                time = part.replaceAll("-t ", "");
         }
 
-        return new String[]{question, color, description, time, emotes};
+        return new String[]{question.trim(), color.trim(), description.trim(), time.trim(), emotes.trim()};
     }
 }
