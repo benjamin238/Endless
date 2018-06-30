@@ -126,7 +126,7 @@ public class PollCmd extends EndlessCommand
     private String[] splitArgs(String preArgs)
     {
         String[] args = preArgs.split(" \\| ");
-        String color = "#ffffff";
+        String color = "";
         String description = "";
         String emotes = "";
         String time = "10s";
