@@ -81,7 +81,7 @@ public class PollHandler
                     sb.append("A total of **").append(totalCount).append("** people voted!\n");
                     MessageReaction re = winners.get(0);
                     MessageReaction.ReactionEmote reactionEmote = re.getReactionEmote();
-                    sb.append("The winner, with **").append(re.getCount()).append("** votes, is...\n_ _\n");
+                    sb.append("The winner, with **").append(r.isSelf()?(r.getCount()-1):r.getCount()).append("** votes, is...\n_ _\n");
                     sb.append(reactionEmote.isEmote()?reactionEmote.getEmote().getAsMention():reactionEmote.getName());
                 }
             }
