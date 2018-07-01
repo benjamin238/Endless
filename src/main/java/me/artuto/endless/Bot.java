@@ -221,7 +221,7 @@ public class Bot extends ListenerAdapter
                 new LookupCmd(), new PollCmd(this), new QuoteCmd(), new RoleCmd(), new UserInfoCmd(),
 
                 // Utils
-                /*new EmoteCmd(),*/ new GoogleSearchCmd(), new RoleMeCmd(this),
+                new EmoteCmd(), new GoogleSearchCmd(), new RoleMeCmd(this),
                 new TimeForCmd(this), new TranslateCmd(this));
 
         client = clientBuilder.build();

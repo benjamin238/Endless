@@ -43,7 +43,7 @@ public class RoleCmd extends EndlessCommand
         this.name = "role";
         this.help = "Displays info about the specified role";
         this.arguments = "<role>";
-        this.children = new Command[]{new GiveRole(), new TakeRole()};
+        this.children = new Command[]{new GiveRole(), new Ping(), new TakeRole()};
         this.category = Categories.TOOLS;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
@@ -59,7 +59,7 @@ public class RoleCmd extends EndlessCommand
         String permissions;
         String membersInRole;
 
-        List<net.dv8tion.jda.core.entities.Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
+        List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
 
         if(list.isEmpty())
         {
@@ -71,7 +71,8 @@ public class RoleCmd extends EndlessCommand
             event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
             return;
         }
-        else rol = list.get(0);
+        else
+            rol = list.get(0);
 
         color = rol.getColor();
         members = event.getGuild().getMembersWithRoles(rol);
@@ -184,6 +185,61 @@ public class RoleCmd extends EndlessCommand
             event.getGuild().getController().addSingleRoleToMember(m, role).reason("["+author.getUser().getName()+"#"+author.getUser().getDiscriminator()+"]").queue(s ->
                     event.replySuccess("Successfully given the role **"+role.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"),
                     e -> event.replyError("An error happened when giving the role **"+role.getName()+"** to **"+m.getUser().getName()+"#"+m.getUser().getDiscriminator()+"**"));
+        }
+    }
+
+    private class Ping extends EndlessCommand
+    {
+        Ping()
+        {
+            this.name = "ping";
+            this.aliases = new String[]{"notify"};
+            this.help = "Pings the specified role";
+            this.arguments = "<role>";
+            this.category = Categories.TOOLS;
+            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            Role role;
+            List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
+
+            if(list.isEmpty())
+            {
+                event.replyWarning("I was not able to found a role with the provided arguments: '"+event.getArgs()+"'");
+                return;
+            }
+            else if(list.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
+                return;
+            }
+            else
+                role = list.get(0);
+
+            if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
+            {
+                event.replyError("I can't interact with that role!");
+                return;
+            }
+            if(!(ChecksUtil.canMemberInteract(event.getMember(), role)))
+            {
+                event.replyError("You can't interact with that role!");
+                return;
+            }
+
+            if(role.isMentionable())
+                event.reply(role.getAsMention());
+            else
+            {
+                role.getManager().setMentionable(true).queue(s -> event.reply(role.getAsMention(), s2 -> role.getManager().setMentionable(false).queue(s3 ->
+                                event.reactSuccess(),
+                        e -> event.replyError("Error while setting the role back to no mentionable!")),
+                        e -> event.replyError("Error while setting the role to mentionable!")));
+            }
         }
     }
 
