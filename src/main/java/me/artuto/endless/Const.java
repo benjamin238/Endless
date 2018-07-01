@@ -38,6 +38,7 @@ public class Const
 
     // Emotes
     public static String BAN = ":hammer:";
+    public static String BOT = "<:bot:334859813915983872>";
     public static String BOTADM = "<:stafftools:334859814700187650>";
     public static String ENDLESS = "<:endless:447899790727053324>";
     public static String GIPHY = "<:giphy:373675520099090436>";
@@ -46,6 +47,10 @@ public class Const
     public static String INFO = "<:endlessInfo:444203939303522305>";
     public static String LINE_START = ":white_small_square:";
     public static String LOADING = "<a:endlessLoading:444198122965434399>";
+    public static String NITRO = "<:nitro:334859814566101004>";
+    public static String OFFLINE = "<:offline:334859814423232514>";
+    public static String ONLINE = "<:online:334859814410911745>";
+    public static String PARTNER = "<:partner:334859814561775616>";
     public static String PEOPLE = ":bust_in_silhouette:";
     public static String SERVER_SETTINGS = ":wrench:";
 
