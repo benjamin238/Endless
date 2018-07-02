@@ -30,6 +30,7 @@ public class ConfigFormat
     public String discordBansToken;
     public String giphyKey;
     public String yandexTranslateKey;
+    public String youtubeKey;
     public String doneEmote;
     public String warnEmote;
     public String errorEmote;

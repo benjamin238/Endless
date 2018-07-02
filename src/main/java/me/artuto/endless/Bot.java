@@ -222,7 +222,7 @@ public class Bot extends ListenerAdapter
 
                 // Utils
                 new EmoteCmd(), new GoogleSearchCmd(), new RoleMeCmd(this),
-                new TimeForCmd(this), new TranslateCmd(this));
+                new TimeForCmd(this), new TranslateCmd(this), new YouTubeCmd(this));
 
         client = clientBuilder.build();
         Endless.LOG.info("Starting JDA...");

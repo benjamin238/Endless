@@ -91,6 +91,11 @@ public class Config
         return format.yandexTranslateKey;
     }
 
+    public String getYouTubeKey()
+    {
+        return format.youtubeKey;
+    }
+
     public String getDoneEmote()
     {
         return format.doneEmote;
