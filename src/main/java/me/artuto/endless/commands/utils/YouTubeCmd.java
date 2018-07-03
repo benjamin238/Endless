@@ -77,7 +77,7 @@ public class YouTubeCmd extends EndlessCommand
             search.setQ(query);
             search.setType("video,playlist");
             search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url)");
-            search.setMaxResults(1L);
+            search.setMaxResults(25L);
             SearchListResponse searchResponse = search.execute();
             List<SearchResult> searchResultList = searchResponse.getItems();
 
@@ -88,7 +88,15 @@ public class YouTubeCmd extends EndlessCommand
                 StringBuilder sb = new StringBuilder();
                 SearchResult result = searchResultList.get(0);
                 ResourceId rId = result.getId();
-                
+
+                if(rId.getKind()==null)
+                    event.reactError();
+
+                if(rId.getKind().equals("youtube#playlist"))
+                    sb.append(":file_folder: **https://youtube.com/playlist?list=").append(rId.getPlaylistId()).append("**");
+                else if(rId.getKind().equals("youtube#video"))
+                    sb.append(":video_camera: **https://youtube.com/watch?v=").append(rId.getVideoId()).append("**");
+
                 event.reply(sb.toString());
             }
         }
