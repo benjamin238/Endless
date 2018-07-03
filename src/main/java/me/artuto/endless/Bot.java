@@ -83,6 +83,7 @@ public class Bot extends ListenerAdapter
     public PollsDataManager pldm;
     public PunishmentsDataManager pdm;
     public ProfileDataManager prdm;
+    public RemindersDataManager rdm;
     public StarboardDataManager sdm;
     public TagDataManager tdm;
 
@@ -105,6 +106,7 @@ public class Bot extends ListenerAdapter
     private ScheduledExecutorService muteScheduler;
     private ScheduledExecutorService optimizerScheduler;
     private ScheduledExecutorService pollScheduler;
+    private ScheduledExecutorService reminderScheduler;
 
     // Threads
     public ScheduledExecutorService clearThread;
@@ -145,6 +147,7 @@ public class Bot extends ListenerAdapter
         pldm = new PollsDataManager(db);
         pdm = new PunishmentsDataManager(db);
         prdm = new ProfileDataManager(db);
+        rdm = new RemindersDataManager(db);
         sdm = new StarboardDataManager(db);
         tdm = new TagDataManager(this);
         BlacklistHandler bHandler = new BlacklistHandler(this);
@@ -160,9 +163,10 @@ public class Bot extends ListenerAdapter
         serverlog = new ServerLogging(this);
 
         clearThread = ThreadLoader.createThread("Clear Command");
-        muteScheduler = ThreadLoader.createThread("Mute");
+        muteScheduler = ThreadLoader.createThread("Mutes");
         optimizerScheduler = ThreadLoader.createThread("Optimizer");
         pollScheduler = ThreadLoader.createThread("Polls");
+        reminderScheduler = ThreadLoader.createThread("Reminders");
         starboardThread = ThreadLoader.createThread("Starboard");
 
         waiter = new EventWaiter();
@@ -191,9 +195,9 @@ public class Bot extends ListenerAdapter
 
         if(!(owners.length==0))
             clientBuilder.setCoOwnerIds(owners);
-        if(!(config.getDBotsToken().isEmpty() || config.getDBotsToken()==null))
+        if(!(config.getDBotsToken().isEmpty()))
             clientBuilder.setDiscordBotsKey(config.getDBotsToken());
-        if(!(config.getDBotsListToken().isEmpty() || config.getDBotsListToken()==null))
+        if(!(config.getDBotsListToken().isEmpty()))
             clientBuilder.setDiscordBotListKey(config.getDBotsListToken());
 
         clientBuilder.addCommands(
@@ -266,6 +270,7 @@ public class Bot extends ListenerAdapter
                         5, 10, TimeUnit.SECONDS);
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
                 pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 5, 10, TimeUnit.SECONDS);
+                reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 5, 10, TimeUnit.SECONDS);
             }
         }
     }
