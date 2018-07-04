@@ -25,9 +25,9 @@ import java.time.OffsetDateTime;
 
 public interface Reminder
 {
-    long getChannelId();
+    long getId();
 
-    long getReminderUserId();
+    long getChannelId();
 
     long getUserId();
 

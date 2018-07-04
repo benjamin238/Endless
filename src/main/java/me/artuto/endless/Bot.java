@@ -221,11 +221,11 @@ public class Bot extends ListenerAdapter
                 new SetupCmd(this), new StarboardCmd(this), new WelcomeCmd(this),
 
                 // Tools
-                new AfkCmd(), new AnnouncementCmd(), new AvatarCmd(), new GuildInfoCmd(),
+                new AfkCmd(), new AnnouncementCmd(), new AvatarCmd(), new EmoteCmd(), new GuildInfoCmd(),
                 new LookupCmd(), new PollCmd(this), new QuoteCmd(), new RoleCmd(), new UserInfoCmd(),
 
                 // Utils
-                new EmoteCmd(), new GoogleSearchCmd(), new RoleMeCmd(this),
+                new GoogleSearchCmd(), new ReminderCmd(this), new RoleMeCmd(this),
                 new TimeForCmd(this), new TranslateCmd(this), new YouTubeCmd(this));
 
         client = clientBuilder.build();
@@ -267,10 +267,10 @@ public class Bot extends ListenerAdapter
                 this.endless = endlessBuilder.build();
                 logWebhook.close();
                 muteScheduler.scheduleWithFixedDelay(() -> pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, shardManager),
-                        5, 10, TimeUnit.SECONDS);
+                        0, 10, TimeUnit.SECONDS);
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
-                pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 5, 10, TimeUnit.SECONDS);
-                reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 5, 10, TimeUnit.SECONDS);
+                pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 0, 10, TimeUnit.SECONDS);
+                reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 10, TimeUnit.SECONDS);
             }
         }
     }

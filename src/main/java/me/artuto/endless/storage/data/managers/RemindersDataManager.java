@@ -20,12 +20,10 @@ package me.artuto.endless.storage.data.managers;
 import me.artuto.endless.core.entities.Reminder;
 import me.artuto.endless.core.entities.impl.ReminderImpl;
 import me.artuto.endless.storage.data.Database;
-import me.artuto.endless.utils.ChecksUtil;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.sql.Connection;
@@ -33,6 +31,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -57,12 +56,10 @@ public class RemindersDataManager
 
             try(ResultSet results = statement.executeQuery("SELECT * FROM REMINDERS"))
             {
-                long reminderUserId = getReminderUserId(getRemindersByUser(userId));
                 results.moveToInsertRow();
                 results.updateLong("user_id", userId);
                 results.updateLong("channel_id", channelId);
                 results.updateLong("expiry_time", expiryTime);
-                results.updateLong("reminder_user_id", reminderUserId);
                 results.updateString("msg", msg);
                 results.insertRow();
             }
@@ -73,15 +70,14 @@ public class RemindersDataManager
         }
     }
 
-    public void deleteReminder(long reminderUserId, long userId)
+    public void deleteReminder(long id, long userId)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM REMINDERS WHERE user_id = %s AND reminder_user_id = %s",
-                    userId, reminderUserId)))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM REMINDERS WHERE user_id = %s AND id = %s", userId, id)))
             {
                 if(results.next())
                     results.deleteRow();
@@ -107,10 +103,9 @@ public class RemindersDataManager
                 while(results.next())
                 {
                     Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    gmt.setTimeInMillis(results.getLong("time"));
-                    list.add(new ReminderImpl(results.getLong("channel_id"), results.getLong("reminder_user_id"),
-                            results.getLong("user_id"), OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()),
-                            results.getString("msg")));
+                    gmt.setTimeInMillis(results.getLong("expiry_time"));
+                    list.add(new ReminderImpl(results.getLong("id"), results.getLong("channel_id"), results.getLong("user_id"),
+                            OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()), results.getString("msg")));
                 }
                 return list;
             }
@@ -136,8 +131,8 @@ public class RemindersDataManager
                 while(results.next())
                 {
                     Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    gmt.setTimeInMillis(results.getLong("time"));
-                    list.add(new ReminderImpl(results.getLong("channel_id"), results.getLong("reminder_user_id"),
+                    gmt.setTimeInMillis(results.getLong("expiry_time"));
+                    list.add(new ReminderImpl(results.getLong("id"), results.getLong("channel_id"),
                             results.getLong("user_id"), OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()),
                             results.getString("msg")));
                 }
@@ -151,67 +146,27 @@ public class RemindersDataManager
         }
     }
 
-    public long getReminderUserId(List<Reminder> reminders)
-    {
-        List<Long> ids = new LinkedList<>();
-        reminders.forEach(r -> ids.add(r.getReminderUserId()));
-        return Collections.max(ids);
-    }
-
-    public Reminder getReminder(long reminderUserId, long userId)
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM REMINDERS WHERE user_id = %s AND reminder_user_id = %s",
-                    userId, reminderUserId)))
-            {
-                if(results.next())
-                {
-                    Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    gmt.setTimeInMillis(results.getLong("time"));
-                    return new ReminderImpl(results.getLong("channel_id"), results.getLong("reminder_user_id"),
-                            results.getLong("user_id"), OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()),
-                            results.getString("msg"));
-                }
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while adding a list of reminders of a specified user. User ID: "+userId, e);
-            return null;
-        }
-        return null;
-    }
-
     public void updateReminders(ShardManager shardManager)
     {
         for(Reminder reminder : getReminders())
         {
             if(OffsetDateTime.now().isAfter(reminder.getExpiryTime()))
             {
-                deleteReminder(reminder.getReminderUserId(), reminder.getUserId());
-                TextChannel tc = shardManager.getTextChannelById(reminder.getChannelId());
-                if(tc==null)
-                    return;
+                deleteReminder(reminder.getId(), reminder.getUserId());
                 User user = shardManager.getUserById(reminder.getUserId());
                 if(user==null)
                     return;
-                EmbedBuilder builder = new EmbedBuilder();
-                MessageBuilder mb = new MessageBuilder();
-                builder.setDescription(reminder.getMessage());
-                if(!(ChecksUtil.hasPermission(tc.getGuild().getSelfMember(), tc, Permission.MESSAGE_EMBED_LINKS)))
-                {
-                    mb.setContent(":alarm_clock: You asked me to remind you about this.").setEmbed(builder.build());
-                    user.openPrivateChannel().queue(c -> c.sendMessage(mb.build()).queue(null, e -> {}));
-                }
-                else if(tc.canTalk())
-                {
-                    mb.setContent(user.getAsMention()+" :alarm_clock: You asked me to remind you about this.").setEmbed(builder.build());
-                    tc.sendMessage(mb.build()).queue();
-                }
+                MessageChannel channel = shardManager.getTextChannelById(reminder.getChannelId());
+                if(channel==null)
+                    channel = user.openPrivateChannel().complete();
+                String toSend;
+                String formattedTime = FormatUtil.formatTimeFromSeconds(reminder.getExpiryTime().until(OffsetDateTime.now(), ChronoUnit.SECONDS));
+                if(channel instanceof PrivateChannel)
+                    toSend = ":alarm_clock: "+reminder.getMessage()+" ~set "+formattedTime+" ago";
+                else
+                    toSend = user.getAsMention()+" :alarm_clock: "+reminder.getMessage()+" ~set "+formattedTime+" ago";
+
+                channel.sendMessage(toSend).queue(null, e -> {});
             }
         }
     }

@@ -40,6 +40,12 @@ public class ArgsUtils
                     num*=60*60;
                 else if(vals[j+1].toLowerCase().startsWith("d"))
                     num*=60*60*24;
+                else if(vals[j+1].toLowerCase().startsWith("w"))
+                    return -1;
+                else if(vals[j+1].toLowerCase().startsWith("m"))
+                    num*=60*60*24*30;
+                else if(vals[j+1].toLowerCase().startsWith("y"))
+                    num*=60*60*24*365;
                 timeinseconds+=num;
             }
         }

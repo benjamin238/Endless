@@ -27,29 +27,29 @@ import java.time.OffsetDateTime;
 
 public class ReminderImpl implements Reminder
 {
-    private final long channelId, reminderUserId, userId;
+    private final long id, channelId, userId;
     private final OffsetDateTime expiryTime;
     private final String message;
 
-    public ReminderImpl(long channelId, long reminderUserId, long userId, OffsetDateTime expiryTime, String message)
+    public ReminderImpl(long id, long channelId, long userId, OffsetDateTime expiryTime, String message)
     {
+        this.id = id;
         this.channelId = channelId;
-        this.reminderUserId = reminderUserId;
         this.userId = userId;
         this.expiryTime = expiryTime;
         this.message = message;
     }
 
     @Override
-    public long getChannelId()
+    public long getId()
     {
-        return channelId;
+        return id;
     }
 
     @Override
-    public long getReminderUserId()
+    public long getChannelId()
     {
-        return reminderUserId;
+        return channelId;
     }
 
     @Override
