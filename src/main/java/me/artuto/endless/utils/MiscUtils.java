@@ -22,6 +22,7 @@ import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import me.artuto.endless.Const;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import okhttp3.OkHttpClient;
@@ -43,6 +44,16 @@ import java.util.Objects;
 
 public class MiscUtils
 {
+    public static int isCase(Message m, int caseNum)
+    {
+        if(!(m.getAuthor().getIdLong()==m.getJDA().getSelfUser().getIdLong()))
+            return 0;
+        String match = "(?is)`\\[.{8}\\]` `\\["+(caseNum==-1?"(\\d+)":caseNum)+"\\]` .+";
+        if(m.getContentRaw().matches(match))
+            return caseNum==-1?Integer.parseInt(m.getContentRaw().replaceAll(match, "$1")):caseNum;
+        return 0;
+    }
+
     public static boolean isIgnored(String id, String topic)
     {
         return !(topic==null) && topic.contains("{ignore:"+id+"}");

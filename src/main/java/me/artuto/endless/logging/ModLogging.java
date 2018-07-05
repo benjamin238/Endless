@@ -46,6 +46,16 @@ import java.util.stream.Collectors;
 
 public class ModLogging
 {
+    // WIP
+    private String BAN_FORMAT = "";
+    private String CLEAR_FORMAT = "";
+    private String HACKBAN_FORMAT = "";
+    private String KICK_FORMAT = "";
+    private String MUTE_FORMAT = "";
+    private String SOFTBAN_FORMAT = "";
+    private String TEMPMUTE_FORMAT = "";
+    private String UNBAN_FORMAT = "";
+
     public void logBan(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
         TextChannel tc = GuildUtils.getModlogChannel(guild);
@@ -278,5 +288,30 @@ public class ModLogging
                 }
             }
         }
+    }
+
+    public int updateCase(Guild guild, int num, String reason)
+    {
+        TextChannel modlog = GuildUtils.getModlogChannel(guild);
+        if(modlog==null)
+            return -1;
+        else if(!(modlog.canTalk()) || !(ChecksUtil.hasPermission(guild.getSelfMember(), modlog, Permission.MESSAGE_HISTORY)))
+            return -2;
+        List<Message> list = modlog.getHistory().retrievePast(100).complete();
+        Message m = null;
+        int thisCase = 0;
+        for(Message msg: list)
+        {
+            thisCase = MiscUtils.isCase(msg, num);
+            if(!(thisCase==0))
+            {
+                m = msg;
+                break;
+            }
+        }
+        if(m==null)
+            return num==-1?-4:-3;
+        m.editMessage(m.getContentRaw().replaceAll("(?is)\n`\\[Reason\\]` .+", "\n`[Reason]` "+reason)).queue();
+        return thisCase;
     }
 }
