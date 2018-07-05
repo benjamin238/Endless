@@ -20,6 +20,7 @@ package me.artuto.endless.commands.fun;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import com.jagrosh.jdautilities.menu.Paginator;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.cmddata.Categories;
@@ -29,10 +30,14 @@ import me.artuto.endless.core.entities.impl.ProfileImpl;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.exceptions.PermissionException;
 
+import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ProfileCmd extends EndlessCommand
 {
@@ -42,10 +47,11 @@ public class ProfileCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "profile";
-        this.children = new Command[]{new Set()};
+        this.children = new Command[]{new Fields(), new Set()};
         this.aliases = new String[]{"p"};
         this.help = "Displays or edits the profile of the specified user";
         this.arguments = "<user>";
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.category = Categories.FUN;
         this.needsArguments = false;
     }
@@ -72,7 +78,7 @@ public class ProfileCmd extends EndlessCommand
                 return;
             }
             builder.setColor(event.getMember().getColor());
-            builder.setDescription(buildProfile(p));
+            builder.setDescription(buildProfile(p, user));
             messageBuilder.setContent(Const.INFO+" **"+user.getName()+"#"+user.getDiscriminator()+"**'s profile:");
             event.reply(messageBuilder.setEmbed(builder.build()).build());
         }
@@ -93,7 +99,7 @@ public class ProfileCmd extends EndlessCommand
                 user = list.get(0).getUser();
             if(!(bot.prdm.hasProfile(user)))
             {
-                event.replyError("You don't have a profile!");
+                event.replyError("**"+user.getName()+"#"+user.getDiscriminator()+"** doesn't has a profile!");
                 return;
             }
             p = bot.prdm.getProfile(user);
@@ -103,9 +109,50 @@ public class ProfileCmd extends EndlessCommand
                 return;
             }
             builder.setColor(event.getMember().getColor());
-            builder.setDescription(buildProfile(p));
+            builder.setDescription(buildProfile(p, user));
             messageBuilder.setContent(Const.INFO+" **"+user.getName()+"#"+user.getDiscriminator()+"**'s profile:");
             event.reply(messageBuilder.setEmbed(builder.build()).build());
+        }
+    }
+
+    private class Fields extends EndlessCommand
+    {
+        private final Paginator.Builder menu;
+
+        Fields()
+        {
+            this.name = "fields";
+            this.help = "List of valid profile fields";
+            this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+            this.needsArguments = false;
+            this.menu = new Paginator.Builder().setColumns(1)
+                    .setItemsPerPage(10)
+                    .showPageNumbers(true)
+                    .waitOnSinglePage(false)
+                    .useNumberedItems(false)
+                    .setFinalAction(m -> {
+                        try
+                        {
+                            m.clearReactions().queue();
+                        } catch(PermissionException ex)
+                        {
+                            m.delete().queue();
+                        }
+                    })
+                    .setEventWaiter(bot.waiter)
+                    .setTimeout(1, TimeUnit.MINUTES);
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            menu.clearItems();
+            Arrays.stream(Const.PROFILE_FIELDS).forEach(menu::addItems);
+            Paginator p = menu.setColor(event.isFromType(ChannelType.TEXT)?event.getSelfMember().getColor():Color.decode("#33ff00"))
+                    .setText(event.getClient().getSuccess()+" Valid profile fields")
+                    .setUsers(event.getAuthor())
+                    .build();
+            p.paginate(event.getChannel(), 1);
         }
     }
 
@@ -153,59 +200,72 @@ public class ProfileCmd extends EndlessCommand
         }
     }
 
-    private String buildProfile(Profile p)
+    private String buildProfile(Profile p, User user)
     {
         StringBuilder sb = new StringBuilder();
         ((ProfileImpl)p).fields.forEach((f, v) -> {
             if(!(v==null))
                 sb.append(Const.LINE_START).append(" **").append(f).append("**: ").append(v.trim()).append("\n");
         });
+        Guild guild = bot.shardManager.getGuildById(Const.MAIN_GUILD);
+        if(!(guild.getMember(user)==null))
+        {
+            Member m = guild.getMember(user);
+            Role role = m.getRoles().stream().filter(r -> r.getIdLong()==318524910894841857L).findFirst().orElse(null);
+            if(!(role==null))
+                sb.append("\n_ _\n:money_mouth: Donator");
+        }
+        if(user.getIdLong()==Const.ARTUTO_ID || user.getIdLong()==Const.ARTUTO_ALT_ID)
+            sb.append("\n_ _\n").append(Const.BOTADM).append(" Endless Developer");
         return sb.toString();
     }
 
-    private String getField(String preField)
+    private String getField(String field)
     {
-        if(preField.equals("timezone"))
-            return "timezone";
-        else if(preField.equals("twitter"))
-            return "twitter";
-        else if(preField.equals("steam"))
-            return "steam";
-        else if(preField.equals("wii"))
-            return "wii";
-        else if(preField.equals("nnid"))
-            return "nnid";
-        else if(preField.equals("xboxlive"))
-            return "xboxlive";
-        else if(preField.equals("psn"))
-            return "psn";
-        else if(preField.equals("3ds"))
-            return "threeds";
-        else if(preField.equals("skype"))
-            return "skype";
-        else if(preField.equals("youtube"))
-            return "youtube";
-        else if(preField.equals("about"))
-            return "about";
-        else if(preField.equals("twitch"))
-            return "twitch";
-        else if(preField.equals("minecraft"))
-            return "minecraft";
-        else if(preField.equals("email"))
-            return "email";
-        else if(preField.equals( "lol"))
-            return "lol";
-        else if(preField.equals("wow"))
-            return "wow";
-        else if(preField.equals("battle"))
-            return "battle";
-        else if(preField.equals("splatoon"))
-            return "splatoon";
-        else if(preField.equals("mkwii"))
-            return "mkwii";
-        else if(preField.equals("reddit"))
-           return "reddit";
-        else
-            return null;
+        switch(field)
+        {
+            case "timezone":
+                return "timezone";
+            case "twitter":
+                return "twitter";
+            case "steam":
+                return "steam";
+            case "wii":
+                return "wii";
+            case "nnid":
+                return "nnid";
+            case "xboxlive":
+                return "xboxlive";
+            case "psn":
+                return "psn";
+            case "3ds":
+                return "threeds";
+            case "skype":
+                return "skype";
+            case "youtube":
+                return "youtube";
+            case "about":
+                return "about";
+            case "twitch":
+                return "twitch";
+            case "minecraft":
+                return "minecraft";
+            case "email":
+                return "email";
+            case "lol":
+                return "lol";
+            case "wow":
+                return "wow";
+            case "battle":
+                return "battle";
+            case "splatoon":
+                return "splatoon";
+            case "mkwii":
+                return "mkwii";
+            case "reddit":
+                return "reddit";
+            default:
+                return null;
+        }
     }
 }

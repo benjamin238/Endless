@@ -28,6 +28,8 @@ public class ConfigFormat
     public String discordBotsToken;
     public String discordBotListToken;
     public String discordBansToken;
+    public String bingMapsKey;
+    public String darkskyKey;
     public String giphyKey;
     public String yandexTranslateKey;
     public String youtubeKey;

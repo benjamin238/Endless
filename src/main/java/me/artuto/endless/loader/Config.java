@@ -81,6 +81,16 @@ public class Config
         return format.discordBansToken;
     }
 
+    public String getBingMapsKey()
+    {
+        return format.bingMapsKey;
+    }
+
+    public String getDarkSkyKey()
+    {
+        return format.darkskyKey;
+    }
+
     public String getGihpyKey()
     {
         return format.giphyKey;

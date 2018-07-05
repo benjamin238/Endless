@@ -29,6 +29,9 @@ public class Const
     public static String INVITE = "https://discord.gg/CXKfYW3";
     public static String DEV = "`@Artuto#0424 | 264499432538505217`";
     public static String USER_AGENT = "Endless "+VERSION+" (Discord Bot/JDA "+JDAInfo.VERSION+")";
+    public static String[] PROFILE_FIELDS = new String[]{"donatedAmount", "timezone", "twitter", "steam", "wii", "nnid",
+            "xboxLive", "psn", "threeds", "skype", "youtube", "about", "twitch", "minecraft", "email",
+            "lol", "wow", "battle", "splatoon", "mkwii", "reddit"};
 
     // IDs
     public static long ARTUTO_ID = 264499432538505217L;
@@ -53,6 +56,9 @@ public class Const
     public static String PARTNER = "<:partner:334859814561775616>";
     public static String PEOPLE = ":bust_in_silhouette:";
     public static String SERVER_SETTINGS = ":wrench:";
+
+    // URLs
+    public static String BING_MAPS = "https://dev.virtualearth.net/REST/v1/Locations/?query=%s&maxResults=1&key=%s";
 
     // Enums
     public enum BlacklistType

@@ -65,7 +65,7 @@ public class YouTubeCmd extends EndlessCommand
     {
         if(bot.config.getYouTubeKey().isEmpty())
         {
-            event.replyError("YouTube API Key not configured!");
+            event.replyError("YouTube API Key is not configured!");
             return;
         }
 
