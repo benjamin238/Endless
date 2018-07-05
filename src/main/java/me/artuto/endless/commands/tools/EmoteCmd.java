@@ -49,7 +49,7 @@ public class EmoteCmd extends EndlessCommand
         this.help = "Get the info of a specified emote, emoji or character.";
         this.arguments = "<emote>";
         this.category = Categories.TOOLS;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
     }
 
@@ -110,7 +110,7 @@ public class EmoteCmd extends EndlessCommand
             this.aliases = new String[]{"add"};
             this.help = "Uploads the specified URL and creates an emote.";
             this.arguments = "<emote> <name>";
-            this.botPermissions = new Permission[]{Permission.MANAGE_EMOTES};
+            this.botPerms = new Permission[]{Permission.MANAGE_EMOTES};
             this.userPermissions = new Permission[]{Permission.MANAGE_EMOTES};
         }
 
@@ -181,7 +181,7 @@ public class EmoteCmd extends EndlessCommand
             this.aliases = new String[]{"upload"};
             this.help = "Uploads the specified emote to the current server.";
             this.arguments = "<emote> [name]";
-            this.botPermissions = new Permission[]{Permission.MANAGE_EMOTES};
+            this.botPerms = new Permission[]{Permission.MANAGE_EMOTES};
             this.userPermissions = new Permission[]{Permission.MANAGE_EMOTES};
         }
 
@@ -251,7 +251,7 @@ public class EmoteCmd extends EndlessCommand
             this.aliases = new String[]{"delete"};
             this.help = "Deletes the specified emote.";
             this.arguments = "<emote>";
-            this.botPermissions = new Permission[]{Permission.MANAGE_EMOTES};
+            this.botPerms = new Permission[]{Permission.MANAGE_EMOTES};
             this.userPermissions = new Permission[]{Permission.MANAGE_EMOTES};
         }
 
