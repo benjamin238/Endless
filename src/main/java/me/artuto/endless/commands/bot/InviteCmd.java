@@ -40,6 +40,7 @@ public class InviteCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        event.reply("So you want invite Endless to your server? Here you have it:\n"+":link: **<"+event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR)+"**");
+        event.reply("So you want invite Endless to your server? Here you have it:\n:link: **<"+
+                event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR)+">**");
     }
 }
