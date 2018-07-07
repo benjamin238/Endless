@@ -20,6 +20,7 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.cmddata.CommandHelper;
@@ -91,13 +92,16 @@ public abstract class EndlessCommand extends Command
                 return;
             }
 
-            if(this.category==Categories.MODERATION)
+            if(Bot.getInstance().dataEnabled)
             {
-                if(member.getRoles().contains(GuildUtils.getAdminRole(guild)) || member.getRoles().contains(GuildUtils.getModRole(guild)))
+                if(this.category==Categories.MODERATION)
+                {
+                    if(member.getRoles().contains(GuildUtils.getAdminRole(guild)) || member.getRoles().contains(GuildUtils.getModRole(guild)))
+                        hasPerms = true;
+                }
+                else if(member.getRoles().contains(GuildUtils.getAdminRole(guild)))
                     hasPerms = true;
             }
-            else if(member.getRoles().contains(GuildUtils.getAdminRole(guild)))
-                hasPerms = true;
 
             if(!(hasPerms))
             {

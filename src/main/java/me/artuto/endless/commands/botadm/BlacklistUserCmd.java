@@ -71,6 +71,12 @@ public class BlacklistUserCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
 
             event.getJDA().retrieveUserById(args[0]).queue(user -> {
@@ -102,6 +108,12 @@ public class BlacklistUserCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             event.getJDA().retrieveUserById(event.getArgs()).queue(user -> {
                 if(bot.endless.getBlacklist(user.getIdLong())==null)
                 {
@@ -130,6 +142,12 @@ public class BlacklistUserCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             List<Blacklist> list;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
@@ -172,6 +190,12 @@ public class BlacklistUserCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(event.getArgs().isEmpty())
             {
                 event.replyWarning("Please specify a user ID!");

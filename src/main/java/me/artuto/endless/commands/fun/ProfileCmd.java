@@ -59,6 +59,12 @@ public class ProfileCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         EmbedBuilder builder = new EmbedBuilder();
         MessageBuilder messageBuilder = new MessageBuilder();
         Profile p;
@@ -169,6 +175,12 @@ public class ProfileCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String[] args = splitArgs(event.getArgs());
             String field = getField(args[0]);
             String value = args[1];

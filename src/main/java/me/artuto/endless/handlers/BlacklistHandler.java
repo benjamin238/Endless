@@ -48,11 +48,12 @@ public class BlacklistHandler
         Guild guild = event.getGuild();
         User user = event.getAuthor();
 
+        if(!(bot.dataEnabled))
+            return true;
         if(event.isOwner())
             return true;
 
         Blacklist userBlacklist = bot.endless.getBlacklist(user.getIdLong());
-
         if(!(userBlacklist==null))
         {
             EmbedBuilder builder = new EmbedBuilder().setColor(Color.RED);
@@ -84,11 +85,15 @@ public class BlacklistHandler
 
     public boolean isBlacklisted(Guild guild)
     {
+        if(!(bot.dataEnabled))
+            return false;
         return !(bot.endless.getBlacklist(guild.getIdLong())==null);
     }
 
     public boolean isBlacklisted(User user)
     {
+        if(!(bot.dataEnabled))
+            return false;
         return !(bot.endless.getBlacklist(user.getIdLong())==null);
     }
 }

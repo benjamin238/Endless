@@ -58,6 +58,9 @@ public class ServerLogging
 
     public void onGuildMemberJoin(GuildMemberJoinEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         Guild guild = event.getGuild();
         TextChannel serverlog = GuildUtils.getServerlogChannel(guild);
         TextChannel welcome = GuildUtils.getWelcomeChannel(guild);
@@ -84,6 +87,9 @@ public class ServerLogging
 
     public void onGuildMemberLeave(GuildMemberLeaveEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         Guild guild = event.getGuild();
         TextChannel serverlog = GuildUtils.getServerlogChannel(guild);
         TextChannel leave = GuildUtils.getLeaveChannel(guild);
@@ -131,8 +137,10 @@ public class ServerLogging
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event)
     {
-        TextChannel tc = GuildUtils.getServerlogChannel(event.getGuild());
+        if(!(bot.dataEnabled))
+            return;
 
+        TextChannel tc = GuildUtils.getServerlogChannel(event.getGuild());
         if(!(tc == null) && !(event.getAuthor().isBot()))
         {
             if(MiscUtils.isIgnored(event.getAuthor().getId(), tc.getTopic()) || MiscUtils.isIgnored(event.getChannel().getId(), tc.getTopic()))
@@ -144,6 +152,9 @@ public class ServerLogging
 
     public void onGuildMessageUpdate(GuildMessageUpdateEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
         TextChannel tc = GuildUtils.getServerlogChannel(guild);
@@ -189,6 +200,9 @@ public class ServerLogging
 
     public void onGuildMessageDelete(GuildMessageDeleteEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
         TextChannel tc = GuildUtils.getServerlogChannel(guild);
@@ -222,6 +236,9 @@ public class ServerLogging
 
     public void onUserUpdateAvatar(UserUpdateAvatarEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         List<Guild> guilds = event.getUser().getMutualGuilds();
         EmbedBuilder builder = new EmbedBuilder();
         User user = event.getUser();
@@ -260,6 +277,9 @@ public class ServerLogging
 
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         Guild guild = event.getGuild();
         TextChannel tc = GuildUtils.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
@@ -280,6 +300,9 @@ public class ServerLogging
 
     public void onGuildVoiceMove(GuildVoiceMoveEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         Guild guild = event.getGuild();
         TextChannel tc = GuildUtils.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
@@ -301,6 +324,9 @@ public class ServerLogging
 
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         Guild guild = event.getGuild();
         TextChannel tc = GuildUtils.getServerlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());

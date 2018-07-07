@@ -47,6 +47,9 @@ public class MutedRoleHandler
 {
     public static void checkRoleAdd(GuildMemberRoleAddEvent event)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         Guild guild = event.getGuild();
         Role mutedRole = GuildUtils.getMutedRole(guild);
 
@@ -80,6 +83,9 @@ public class MutedRoleHandler
 
     public static void checkRoleRemove(GuildMemberRoleRemoveEvent event)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         Guild guild = event.getGuild();
         Role mutedRole = GuildUtils.getMutedRole(guild);
 
@@ -108,6 +114,9 @@ public class MutedRoleHandler
 
     public static void checkJoin(GuildMemberJoinEvent event)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         Guild guild = event.getGuild();
         Punishment punishment = Bot.getInstance().pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE);
         TempPunishment tempPunishment = (TempPunishment)Bot.getInstance().pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE);

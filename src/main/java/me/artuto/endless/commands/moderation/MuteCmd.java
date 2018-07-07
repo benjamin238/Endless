@@ -59,6 +59,12 @@ public class MuteCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         Member member;
         User author = event.getAuthor();
         Role mutedRole;

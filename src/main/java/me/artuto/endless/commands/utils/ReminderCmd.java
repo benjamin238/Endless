@@ -56,6 +56,12 @@ public class ReminderCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         User author = event.getAuthor();
         List<Reminder> reminders = bot.rdm.getRemindersByUser(author.getIdLong());
         if(reminders.isEmpty())
@@ -90,6 +96,12 @@ public class ReminderCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             User author = event.getAuthor();
             List<Reminder> reminders = bot.rdm.getRemindersByUser(author.getIdLong());
             if(reminders.size()>100)
@@ -137,6 +149,12 @@ public class ReminderCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             User author = event.getAuthor();
             List<Reminder> reminders = bot.rdm.getRemindersByUser(author.getIdLong());
             if(reminders.isEmpty())

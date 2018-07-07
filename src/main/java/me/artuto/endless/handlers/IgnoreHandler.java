@@ -48,6 +48,8 @@ public class IgnoreHandler
         TextChannel tc = event.getTextChannel();
         User user = event.getAuthor();
 
+        if(!(bot.dataEnabled))
+            return true;
         for(Role role : roles)
         {
             if(!(bot.endless.getIgnore(guild, role.getIdLong())==null) && !(role.isPublicRole()))

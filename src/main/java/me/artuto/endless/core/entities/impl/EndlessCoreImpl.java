@@ -143,6 +143,9 @@ public class EndlessCoreImpl implements EndlessCore
 
     public void makeCache()
     {
+        if(!(bot.dataEnabled))
+            return;
+
         LOG.debug("Starting cache creation for shard "+jda.getShardInfo().getShardId()+"...");
 
         for(Guild guild : bot.db.getGuildsThatHaveSettings(jda))

@@ -53,6 +53,12 @@ public class PollCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         EmbedBuilder builder = new EmbedBuilder();
 
         if(event.getArgs().equalsIgnoreCase("flags"))

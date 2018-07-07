@@ -45,7 +45,15 @@ public class Categories
 
     public static final Category MODERATION = new Category("Moderation", Categories::doCheck);
 
-    public static final Category SERVER_CONFIG = new Category("Guild Settings", Categories::doCheck);
+    public static final Category SERVER_CONFIG = new Category("Guild Settings", event -> {
+        if(!(Bot.getInstance().dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return false;
+        }
+
+        return doCheck(event);
+    });
 
     public static final Category TOOLS = new Category("Tools", Categories::doCheck);
 

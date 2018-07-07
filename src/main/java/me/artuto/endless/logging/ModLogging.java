@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 public class ModLogging
 {
-    // WIP
+    private Bot bot;
     private String BAN_FORMAT = "";
     private String CLEAR_FORMAT = "";
     private String HACKBAN_FORMAT = "";
@@ -56,8 +56,16 @@ public class ModLogging
     private String TEMPMUTE_FORMAT = "";
     private String UNBAN_FORMAT = "";
 
+    public ModLogging(Bot bot)
+    {
+        this.bot = bot;
+    }
+
     public void logBan(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
@@ -76,6 +84,9 @@ public class ModLogging
 
     public void logHackban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
@@ -94,6 +105,9 @@ public class ModLogging
 
     public void logKick(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
@@ -112,6 +126,9 @@ public class ModLogging
 
     public void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
@@ -130,6 +147,9 @@ public class ModLogging
 
     public void logUnban(User author, User target, String reason, Guild guild, TextChannel channel)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
@@ -148,6 +168,9 @@ public class ModLogging
 
     public void logClear(User author, TextChannel channel, String reason, Guild guild, List<Message> deleted, String args)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
@@ -197,8 +220,10 @@ public class ModLogging
 
     public void logMute(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        if(!(bot.dataEnabled))
+            return;
 
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         if(!(tc == null))
         {
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
@@ -217,9 +242,11 @@ public class ModLogging
 
     public void logTempMute(User author, Member target, String reason, Guild guild, TextChannel channel, int time)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         TextChannel tc = GuildUtils.getModlogChannel(guild);
         String formattedTime = FormatUtil.formatTimeFromSeconds(time);
-
         if(!(tc == null))
         {
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
@@ -232,8 +259,10 @@ public class ModLogging
 
     public void logUnmute(User author, Member target, String reason, Guild guild, TextChannel channel)
     {
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        if(!(bot.dataEnabled))
+            return;
 
+        TextChannel tc = GuildUtils.getModlogChannel(guild);
         if(!(tc == null))
         {
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
@@ -252,10 +281,12 @@ public class ModLogging
 
     public void onGuildBan(GuildBanEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         Guild guild = event.getGuild();
         TextChannel tc = GuildUtils.getModlogChannel(guild);
         TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-
         if(!(tc == null))
         {
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
@@ -292,6 +323,9 @@ public class ModLogging
 
     public int updateCase(Guild guild, int num, String reason)
     {
+        if(!(bot.dataEnabled))
+            return -1;
+
         TextChannel modlog = GuildUtils.getModlogChannel(guild);
         if(modlog==null)
             return -1;

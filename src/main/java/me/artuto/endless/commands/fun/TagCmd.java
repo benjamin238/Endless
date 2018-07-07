@@ -52,6 +52,12 @@ public class TagCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         String[] args = splitArgs(event.getArgs());
         String tagName;
         String tagArgs;
@@ -115,6 +121,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String[] args = splitArgs(event.getArgs());
             String name;
             String content;
@@ -156,6 +168,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String[] args = splitArgs(event.getArgs());
             String name;
             String content;
@@ -199,6 +217,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(event.isFromType(ChannelType.TEXT))
             {
                 Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
@@ -258,6 +282,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String[] args = splitArgs(event.getArgs());
             String name;
             String content;
@@ -351,6 +381,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(event.isFromType(ChannelType.TEXT))
             {
                 Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
@@ -398,6 +434,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(event.isFromType(ChannelType.TEXT))
             {
                 Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
@@ -438,6 +480,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(event.isFromType(ChannelType.TEXT))
             {
                 Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
@@ -484,6 +532,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(event.isFromType(ChannelType.TEXT))
             {
                 Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
@@ -530,6 +584,12 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(event.isFromType(ChannelType.TEXT))
             {
                 Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());

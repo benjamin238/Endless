@@ -41,10 +41,22 @@ public class Endless
             switch(args[0])
             {
                 case "normalBoot":
-                    bot.boot(false);
+                    if(args.length>1)
+                        if(args[1].equals("dataDisabled"))
+                        {
+                            bot.boot(false, false);
+                            break;
+                        }
+                    bot.boot(true, false);
                     break;
                 case "maintenance":
-                    bot.boot(true);
+                    if(args.length>1)
+                        if(args[1].equals("dataDisabled"))
+                        {
+                            bot.boot(false, true);
+                            break;
+                        }
+                    bot.boot(true, true);
                     break;
                 case "none":
                     LOG.info("Goodbye! :wave:");

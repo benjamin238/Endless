@@ -59,6 +59,12 @@ public class DonateCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         Color color;
         EmbedBuilder builder = new EmbedBuilder();
         StringBuilder sb = new StringBuilder();
@@ -94,6 +100,11 @@ public class DonateCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
                 event.replyError("This command is not available on a selfhosted instance!");
@@ -151,6 +162,12 @@ public class DonateCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
                 event.replyError("This command is not available on a selfhosted instance!");

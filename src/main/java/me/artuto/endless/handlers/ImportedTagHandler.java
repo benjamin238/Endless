@@ -37,6 +37,9 @@ public class ImportedTagHandler
 {
     public static void runTag(Bot bot, MessageReceivedEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         CommandClient client = bot.client;
         EndlessCommand tagCommand = (EndlessCommand)client.getCommands().stream()
                 .filter(c -> c.getName().equals("tag")).findFirst().orElse(null);

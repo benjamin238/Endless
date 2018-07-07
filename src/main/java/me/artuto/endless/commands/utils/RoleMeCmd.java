@@ -57,6 +57,12 @@ public class RoleMeCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         String args = event.getArgs();
         Guild guild = event.getGuild();
         List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
@@ -129,6 +135,12 @@ public class RoleMeCmd extends EndlessCommand
 
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             Guild guild = event.getGuild();
             List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
             String args = event.getArgs();
@@ -178,6 +190,12 @@ public class RoleMeCmd extends EndlessCommand
 
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             Guild guild = event.getGuild();
             List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
             String args = event.getArgs();

@@ -56,6 +56,12 @@ public class TimeForCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         Profile p;
         ZonedDateTime t;
         ZoneId zone;
@@ -148,6 +154,12 @@ public class TimeForCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String args = event.getArgs();
 
             if(args.isEmpty())
@@ -196,6 +208,4 @@ public class TimeForCmd extends EndlessCommand
             }
         }
     }
-
-
 }

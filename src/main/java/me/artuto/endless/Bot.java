@@ -67,9 +67,10 @@ import java.util.concurrent.TimeUnit;
 
 public class Bot extends ListenerAdapter
 {
-    public EndlessSharded endless;
+    public boolean dataEnabled;
     public boolean maintenance;
     public boolean initialized = false;
+    public EndlessSharded endless;
     private EndlessShardedBuilder endlessBuilder;
 
     // Config
@@ -120,10 +121,13 @@ public class Bot extends ListenerAdapter
         return Endless.bot;
     }
 
-    void boot(boolean maintenance) throws LoginException, SQLException
+    void boot(boolean dataEnabled, boolean maintenance) throws LoginException, SQLException
     {
+        this.dataEnabled = dataEnabled;
         this.maintenance = maintenance;
         Endless.LOG.info("Starting Endless "+Const.VERSION+"...");
+        if(!(dataEnabled))
+            Endless.LOG.warn("WARNING - Starting on No-data Mode - WARNING");
         if(maintenance)
             Endless.LOG.warn("WARNING - Starting on Maintenance Mode - WARNING");
 
@@ -140,16 +144,19 @@ public class Bot extends ListenerAdapter
             throw new ConfigException(e.getMessage());
         }
 
-        db = new Database(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
-        bdm = new BlacklistDataManager(this);
-        ddm = new DonatorsDataManager(db);
-        gsdm = new GuildSettingsDataManager(this);
-        pldm = new PollsDataManager(db);
-        pdm = new PunishmentsDataManager(db);
-        prdm = new ProfileDataManager(db);
-        rdm = new RemindersDataManager(db);
-        sdm = new StarboardDataManager(db);
-        tdm = new TagDataManager(this);
+        if(dataEnabled)
+        {
+            db = new Database(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
+            bdm = new BlacklistDataManager(this);
+            ddm = new DonatorsDataManager(db);
+            gsdm = new GuildSettingsDataManager(this);
+            pldm = new PollsDataManager(db);
+            pdm = new PunishmentsDataManager(db);
+            prdm = new ProfileDataManager(db);
+            rdm = new RemindersDataManager(db);
+            sdm = new StarboardDataManager(db);
+            tdm = new TagDataManager(this);
+        }
         BlacklistHandler bHandler = new BlacklistHandler(this);
         IgnoreHandler iHandler = new IgnoreHandler(this);
         SpecialCaseHandler sHandler = new SpecialCaseHandler();
@@ -159,18 +166,20 @@ public class Bot extends ListenerAdapter
         botlog = new BotLogging(this);
         logWebhook = new WebhookClientBuilder(config.getBotlogWebhook())
                 .setExecutorService(ThreadLoader.createThread("Botlog")).setDaemon(true).build();
-        modlog = new ModLogging();
+        modlog = new ModLogging(this);
         serverlog = new ServerLogging(this);
 
-        clearThread = ThreadLoader.createThread("Clear Command");
-        muteScheduler = ThreadLoader.createThread("Mutes");
+        if(dataEnabled)
+        {
+            clearThread = ThreadLoader.createThread("Clear Command");
+            muteScheduler = ThreadLoader.createThread("Mutes");
+            pollScheduler = ThreadLoader.createThread("Polls");
+            reminderScheduler = ThreadLoader.createThread("Reminders");
+            starboardThread = ThreadLoader.createThread("Starboard");
+        }
         optimizerScheduler = ThreadLoader.createThread("Optimizer");
-        pollScheduler = ThreadLoader.createThread("Polls");
-        reminderScheduler = ThreadLoader.createThread("Reminders");
-        starboardThread = ThreadLoader.createThread("Starboard");
 
         waiter = new EventWaiter();
-
         Listener listener = new Listener(this);
 
         CommandClientBuilder clientBuilder = new CommandClientBuilder();
@@ -186,9 +195,10 @@ public class Bot extends ListenerAdapter
                 .setGame(null)
                 .setStatus(null)
                 .setPrefix(config.getPrefix())
-                .setAlternativePrefix("@mention")
-                .setGuildSettingsManager(new ClientGSDM())
-                .setScheduleExecutor(ThreadLoader.createThread("Commands"))
+                .setAlternativePrefix("@mention");
+        if(dataEnabled)
+            clientBuilder.setGuildSettingsManager(new ClientGSDM());
+        clientBuilder.setScheduleExecutor(ThreadLoader.createThread("Commands"))
                 .setListener(new CommandLogging(this))
                 .setLinkedCacheSize(6)
                 .setHelpConsumer(CommandHelper::getHelp);
@@ -266,11 +276,14 @@ public class Bot extends ListenerAdapter
             {
                 this.endless = endlessBuilder.build();
                 logWebhook.close();
-                muteScheduler.scheduleWithFixedDelay(() -> pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, shardManager),
-                        0, 10, TimeUnit.SECONDS);
+                if(dataEnabled)
+                {
+                    muteScheduler.scheduleWithFixedDelay(() -> pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, shardManager),
+                            0, 10, TimeUnit.SECONDS);
+                    pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 0, 10, TimeUnit.SECONDS);
+                    reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 10, TimeUnit.SECONDS);
+                }
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
-                pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 0, 10, TimeUnit.SECONDS);
-                reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 10, TimeUnit.SECONDS);
             }
         }
     }

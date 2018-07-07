@@ -71,6 +71,12 @@ public class BlacklistGuildCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
             Guild guild = event.getJDA().asBot().getShardManager().getGuildCache().getElementById(args[0]);
 
@@ -108,6 +114,11 @@ public class BlacklistGuildCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
             if(event.getArgs().isEmpty())
             {
                 event.replyWarning("Please specify a user ID!");
@@ -149,6 +160,12 @@ public class BlacklistGuildCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             List<Blacklist> list;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
@@ -193,6 +210,12 @@ public class BlacklistGuildCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             Blacklist blacklist = bot.endless.getBlacklist(Long.valueOf(event.getArgs()));
             if(blacklist==null)
             {

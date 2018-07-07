@@ -207,6 +207,9 @@ public class EndlessShardedImpl implements EndlessSharded
 
     public void makeCache()
     {
+        if(!(bot.dataEnabled))
+            return;
+
         shards.forEach(shard -> {
             bot.bdm.getBlacklistedGuilds(shard.getJDA()).forEach((g, b) -> {
                 blacklists.add(b);

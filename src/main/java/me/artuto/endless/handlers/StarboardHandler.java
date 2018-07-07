@@ -52,6 +52,9 @@ public class StarboardHandler
 
     public static void checkAddReaction(GuildMessageReactionAddEvent event)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         thread.submit(() -> {
             Guild guild = event.getGuild();
             EmbedBuilder eb = new EmbedBuilder();
@@ -116,6 +119,9 @@ public class StarboardHandler
 
     public static void checkRemoveReaction(GuildMessageReactionRemoveEvent event)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         thread.submit(() -> {
             if(!(isConfigured(event.getGuild()))) return;
 
@@ -149,6 +155,9 @@ public class StarboardHandler
 
     public static void checkDeleteMessage(GuildMessageDeleteEvent event)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         thread.submit(() -> check(event.getGuild(), event.getMessageIdLong()));
     }
 
@@ -159,6 +168,9 @@ public class StarboardHandler
 
     private static boolean isConfigured(Guild guild)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return false;
+
         return !(GuildUtils.getStarboardChannel(guild) == null) && !(GuildUtils.getStarboardCount(guild) == 0);
     }
 
@@ -169,6 +181,9 @@ public class StarboardHandler
 
     private static int getStarCount(Message msg)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return 0;
+
         List<MessageReaction> reactions = msg.getReactions().stream().filter(r -> r.getReactionEmote().getName().equals("\u2B50")).collect(Collectors.toList());
         if(reactions.isEmpty()) return 0;
 
@@ -180,11 +195,17 @@ public class StarboardHandler
 
     private static boolean existsOnStarboard(Long id)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return false;
+
         return !(sdm.getStarboardMessage(id)==null);
     }
 
     private static void updateCount(Message msg, Long starboardMsg, Integer amount)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         TextChannel tc = GuildUtils.getStarboardChannel(msg.getGuild());
         tc.getMessageById(starboardMsg).queue(s -> s.editMessage(getEmote(amount)+" **"+amount+"** "+msg.getTextChannel().getAsMention()+" ID: "+msg.getId()).queue(null, null), null);
     }
@@ -215,6 +236,9 @@ public class StarboardHandler
 
     private static void check(Guild guild, long msg)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         TextChannel starboard = GuildUtils.getStarboardChannel(guild);
         StarboardMessage starboardMsg = sdm.getStarboardMessage(msg);
 
