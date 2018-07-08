@@ -199,18 +199,13 @@ public class Bot extends ListenerAdapter
         if(dataEnabled)
             clientBuilder.setGuildSettingsManager(new ClientGSDM());
         clientBuilder.setScheduleExecutor(ThreadLoader.createThread("Commands"))
-                .setListener(new CommandLogging(this))
+                .setListener(listener)
                 .setLinkedCacheSize(6)
-                .setHelpConsumer(CommandHelper::getHelp);
-
-        if(!(owners.length==0))
-            clientBuilder.setCoOwnerIds(owners);
-        if(!(config.getDBotsToken().isEmpty()))
-            clientBuilder.setDiscordBotsKey(config.getDBotsToken());
-        if(!(config.getDBotsListToken().isEmpty()))
-            clientBuilder.setDiscordBotListKey(config.getDBotsListToken());
-
-        clientBuilder.addCommands(
+                .setHelpConsumer(CommandHelper::getHelp)
+                .setCoOwnerIds(owners)
+                .setDiscordBotsKey(config.getDBotsToken())
+                .setDiscordBotListKey(config.getDBotsListToken())
+                .addCommands(
                 // Bot
                 new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(),
 

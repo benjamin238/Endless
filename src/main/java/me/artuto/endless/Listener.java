@@ -17,11 +17,18 @@
 
 package me.artuto.endless;
 
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.CommandListener;
 import me.artuto.endless.handlers.*;
 import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.storage.tempdata.AfkManager;
+import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.guild.*;
@@ -40,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  * @author Artuto
  */
 
-public class Listener implements EventListener
+public class Listener implements CommandListener, EventListener
 {
     protected Bot bot;
     private final ModLogging modlog;
@@ -195,6 +202,47 @@ public class Listener implements EventListener
                 return;
             GuildBanEvent event = (GuildBanEvent)preEvent;
             modlog.onGuildBan(event);
+        }
+    }
+
+    @Override
+    public void onCommand(CommandEvent event, Command command)
+    {
+        TextChannel commandLog = bot.shardManager.getTextChannelById(bot.config.getCommandslogChannelId());
+        User author = event.getAuthor();
+        Guild guild = event.getGuild();
+
+        // If is the help command is null
+        if(command==null) return;
+
+        if(event.isOwner()) return;
+
+        if(guild==null)
+        {
+            commandLog.sendMessage("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
+                    "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped()+"`) in a **Direct message**").queue();
+        }
+        else
+        {
+            commandLog.sendMessage("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
+                    "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped()+"`) in **"+guild.getName()+"** (ID: "+guild.getId()+")").queue();
+        }
+    }
+
+    @Override
+    public void onCommandException(CommandEvent event, Command command, Throwable throwable)
+    {
+        event.replyError("An error occurred while executing this command. Please join the support server by doing `e!help support`.");
+
+        if(event.getGuild()==null)
+        {
+            Endless.LOG.error(String.format("Command Error: %s | Message ID: %s | Executed in: Direct Message %s",
+                    command.getName(), event.getMessage().getIdLong(), event.getPrivateChannel().getIdLong()), throwable);
+        }
+        else
+        {
+            Endless.LOG.error(String.format("Command Error: %s | Message ID: %s | Executed in: Text Channel %s",
+                    command.getName(), event.getMessage().getIdLong(), event.getTextChannel().getIdLong()), throwable);
         }
     }
 }
