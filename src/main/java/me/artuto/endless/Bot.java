@@ -44,7 +44,6 @@ import me.artuto.endless.handlers.SpecialCaseHandler;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.*;
 import me.artuto.endless.utils.GuildUtils;
-import net.dv8tion.jda.bot.sharding.DefaultShardManager;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
@@ -58,14 +57,12 @@ import net.dv8tion.jda.core.requests.Requester;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
 import okhttp3.*;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.io.Reader;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -204,10 +201,8 @@ public class Bot extends ListenerAdapter
                 .setGame(null)
                 .setStatus(null)
                 .setPrefix(config.getPrefix())
-                .setAlternativePrefix("@mention");
-        if(dataEnabled)
-            clientBuilder.setGuildSettingsManager(new ClientGSDM());
-        clientBuilder.setScheduleExecutor(ThreadLoader.createThread("Commands"))
+                .setAlternativePrefix("@mention")
+                .setScheduleExecutor(ThreadLoader.createThread("Commands"))
                 .setListener(listener)
                 .setLinkedCacheSize(6)
                 .setHelpConsumer(CommandHelper::getHelp)
@@ -239,6 +234,8 @@ public class Bot extends ListenerAdapter
                 // Utils
                 new GoogleSearchCmd(), new ReminderCmd(this), new RoleMeCmd(this),
                 new TimeForCmd(this), new TranslateCmd(this), new WeatherCmd(this), new YouTubeCmd(this));
+        if(dataEnabled)
+            clientBuilder.setGuildSettingsManager(new ClientGSDM());
 
         client = clientBuilder.build();
         Endless.LOG.info("Starting JDA...");
@@ -291,7 +288,7 @@ public class Bot extends ListenerAdapter
         }
     }
 
-    public void sendStats(JDA jda)
+    void sendStats(JDA jda)
     {
         JSONObject body;
         OkHttpClient client = ((JDAImpl)jda).getHttpClientBuilder().build();
@@ -314,6 +311,7 @@ public class Bot extends ListenerAdapter
 
             client.newCall(builder.build()).enqueue(new Callback()
             {
+                @ParametersAreNonnullByDefault
                 @Override
                 public void onResponse(Call call, Response response)
                 {
@@ -321,6 +319,7 @@ public class Bot extends ListenerAdapter
                     response.close();
                 }
 
+                @ParametersAreNonnullByDefault
                 @Override
                 public void onFailure(Call call, IOException e)
                 {
@@ -332,10 +331,15 @@ public class Bot extends ListenerAdapter
         // Send to bots.discord.pw
         if(!(config.getDBotsToken().isEmpty()))
         {
-            Request.Builder builder = new Request.Builder().post(RequestBody.create(Requester.MEDIA_TYPE_JSON, body.toString())).url("https://bots.discord.pw/api/bots/"+jda.getSelfUser().getId()+"/stats").header("Authorization", config.getDBotsToken()).header("Content-Type", "application/json");
+            Request.Builder builder = new Request.Builder()
+                    .post(RequestBody.create(Requester.MEDIA_TYPE_JSON, body.toString()))
+                    .url("https://bots.discord.pw/api/bots/"+jda.getSelfUser().getId()+"/stats")
+                    .header("Authorization", config.getDBotsToken())
+                    .header("Content-Type", "application/json");
 
             client.newCall(builder.build()).enqueue(new Callback()
             {
+                @ParametersAreNonnullByDefault
                 @Override
                 public void onResponse(Call call, Response response)
                 {
@@ -343,6 +347,7 @@ public class Bot extends ListenerAdapter
                     response.close();
                 }
 
+                @ParametersAreNonnullByDefault
                 @Override
                 public void onFailure(Call call, IOException e)
                 {
