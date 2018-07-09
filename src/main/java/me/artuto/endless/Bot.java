@@ -44,19 +44,28 @@ import me.artuto.endless.handlers.SpecialCaseHandler;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.*;
 import me.artuto.endless.utils.GuildUtils;
+import net.dv8tion.jda.bot.sharding.DefaultShardManager;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.impl.JDAImpl;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.requests.Requester;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
+import okhttp3.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.io.Reader;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -203,8 +212,6 @@ public class Bot extends ListenerAdapter
                 .setLinkedCacheSize(6)
                 .setHelpConsumer(CommandHelper::getHelp)
                 .setCoOwnerIds(owners)
-                .setDiscordBotsKey(config.getDBotsToken())
-                .setDiscordBotListKey(config.getDBotsListToken())
                 .addCommands(
                 // Bot
                 new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(),
@@ -279,7 +286,69 @@ public class Bot extends ListenerAdapter
                     reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 10, TimeUnit.SECONDS);
                 }
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
+                sendStats(event.getJDA());
             }
+        }
+    }
+
+    public void sendStats(JDA jda)
+    {
+        JSONObject body;
+        OkHttpClient client = ((JDAImpl)jda).getHttpClientBuilder().build();
+
+        // Send to DiscordBots.org
+        body = new JSONObject().put("server_count", shardManager.getGuildCache().size());
+        if(!(jda.getShardInfo()==null))
+        {
+            body.put("shard_id", jda.getShardInfo().getShardId())
+                    .put("shard_count", jda.getShardInfo().getShardTotal());
+        }
+
+        if(!(config.getDBotsListToken().isEmpty()))
+        {
+            Request.Builder builder = new Request.Builder()
+                    .post(RequestBody.create(Requester.MEDIA_TYPE_JSON, body.toString()))
+                    .url("https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats")
+                    .header("Authorization", config.getDBotsListToken())
+                    .header("Content-Type", "application/json");
+
+            client.newCall(builder.build()).enqueue(new Callback()
+            {
+                @Override
+                public void onResponse(Call call, Response response)
+                {
+                    Endless.LOG.info("Successfully send information to discordbots.org");
+                    response.close();
+                }
+
+                @Override
+                public void onFailure(Call call, IOException e)
+                {
+                    Endless.LOG.error("Failed to send information to discordbots.org ", e);
+                }
+            });
+        }
+
+        // Send to bots.discord.pw
+        if(!(config.getDBotsToken().isEmpty()))
+        {
+            Request.Builder builder = new Request.Builder().post(RequestBody.create(Requester.MEDIA_TYPE_JSON, body.toString())).url("https://bots.discord.pw/api/bots/"+jda.getSelfUser().getId()+"/stats").header("Authorization", config.getDBotsToken()).header("Content-Type", "application/json");
+
+            client.newCall(builder.build()).enqueue(new Callback()
+            {
+                @Override
+                public void onResponse(Call call, Response response)
+                {
+                    Endless.LOG.info("Successfully send information to bots.discord.pw");
+                    response.close();
+                }
+
+                @Override
+                public void onFailure(Call call, IOException e)
+                {
+                    Endless.LOG.error("Failed to send information to bots.discord.pw ", e);
+                }
+            });
         }
     }
 }
