@@ -56,6 +56,7 @@ public class Const
     public static String PARTNER = "<:partner:334859814561775616>";
     public static String PEOPLE = ":bust_in_silhouette:";
     public static String SERVER_SETTINGS = ":wrench:";
+    public static String VERIFIED = "<:verified:465670198775644161>";
 
     // URLs
     public static String BING_MAPS = "https://dev.virtualearth.net/REST/v1/Locations/?query=%s&maxResults=1&key=%s";

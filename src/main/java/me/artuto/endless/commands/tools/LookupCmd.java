@@ -102,6 +102,7 @@ public class LookupCmd extends EndlessCommand
                     }
                     catch(ErrorResponseException ignored) {}
                 }
+                boolean verified = false;
                 int memberCount = invite==null?0:invite.getGuild().getMemberCount();
                 int onlineCount = invite==null?0:invite.getGuild().getOnlineCount();
                 int offlineCount;
@@ -119,6 +120,7 @@ public class LookupCmd extends EndlessCommand
                             .append(Const.OFFLINE).append(" **").append(offlineCount==0?"N/A":offlineCount).append("**\n");
                 if(!(invite==null))
                 {
+                    verified = invite.getGuild().getFeatures().contains("VERIFIED");
                     String inviteLink = "["+invite.getCode()+"]("+invite.getURL()+")";
                     sb.append(Const.LINE_START).append(" Invite: **").append(inviteLink).append("** #").append(invite.getChannel().getName())
                             .append(" (ID: ").append(invite.getChannel().getId()).append(")");
@@ -129,7 +131,7 @@ public class LookupCmd extends EndlessCommand
                     }
                 }
                 builder.setDescription(sb).setThumbnail(invite==null?null:invite.getGuild().getIconUrl()).setColor(event.getMember().getColor());
-                event.reply(mb.setContent(":computer: Info about **"+widget.getName()+"**").setEmbed(builder.build()).build());
+                event.reply(mb.setContent(":computer: Info about **"+widget.getName()+"**"+(verified?Const.VERIFIED:"")).setEmbed(builder.build()).build());
                 return;
             }
             catch(NumberFormatException ignored) {}
@@ -159,7 +161,8 @@ public class LookupCmd extends EndlessCommand
             Invite.Channel channel = invite.getChannel();
             Invite.Guild guild = invite.getGuild();
             User inviter = invite.getInviter();
-            sb.append(Const.LINE_START).append(" Guild: **").append(guild.getName()).append("**\n");
+            boolean verified = guild.getFeatures().contains("VERIFIED");
+            sb.append(Const.LINE_START).append(" Guild: **").append(guild.getName()).append("** ").append(verified?Const.VERIFIED:"").append("\n");
             sb.append(Const.LINE_START).append(" Channel: **#").append(channel.getName()).append("** (ID: ").append(channel.getId()).append(")\n");
             sb.append(Const.LINE_START).append(" Inviter: ");
             if(inviter==null)
