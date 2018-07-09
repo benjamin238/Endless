@@ -139,10 +139,7 @@ public class StarboardDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM STARBOARD WHERE msg_id = \"%s\"", msg)))
             {
                 if(results.next())
-                {
-                    results.updateLong("msg_id", 0);
-                    results.updateRow();
-                }
+                    results.deleteRow();
             }
             statement.executeUpdate(String.format("DELETE FROM STARBOARD WHERE starboard_msg_id = \"%s\"", starboardMsg));
             statement.closeOnCompletion();

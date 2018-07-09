@@ -84,10 +84,7 @@ public class PunishmentsDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE user_id = %s AND guild_id = %s AND type = \"%s\"", user, guild, type.name())))
             {
                 if(results.next())
-                {
-                    results.updateInt("user_id", 0);
-                    results.updateRow();
-                }
+                    results.deleteRow();
             }
             statement.executeUpdate(String.format("DELETE FROM PUNISHMENTS WHERE user_id = %s AND guild_id = %s AND type = \"%s\"", user, guild, type.name()));
             statement.closeOnCompletion();
