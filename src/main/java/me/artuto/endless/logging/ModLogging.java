@@ -47,14 +47,25 @@ import java.util.stream.Collectors;
 public class ModLogging
 {
     private Bot bot;
-    private String BAN_FORMAT = "";
-    private String CLEAR_FORMAT = "";
-    private String HACKBAN_FORMAT = "";
-    private String KICK_FORMAT = "";
-    private String MUTE_FORMAT = "";
-    private String SOFTBAN_FORMAT = "";
-    private String TEMPMUTE_FORMAT = "";
-    private String UNBAN_FORMAT = "";
+    // Parts
+    private String TIME = "`[%s]";
+    private String CASE = " [%d]`";
+    private String EMOTE = " %s";
+    private String AUTHOR = " **%s**#%d";
+    private String TARGET = " **%s**#%d (ID: %d)";
+    private String REASON = " \n`[ Reason ]` %s";
+    private String CRITERIA = " \n`[ Criteria ]` %s";
+    private String EXPIRY_TIME = " \n`[ Duration ]` %s";
+
+    // Formats
+    private String BAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+" banned"+TARGET+REASON;
+    private String CLEAR_FORMAT = TIME+CASE+EMOTE+AUTHOR+" cleaned `%d` messages in %s"+CRITERIA+REASON;
+    private String HACKBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+" hackbanned"+TARGET+REASON;
+    private String KICK_FORMAT = TIME+CASE+EMOTE+AUTHOR+" kicked"+TARGET+REASON;
+    private String MUTE_FORMAT = TIME+CASE+EMOTE+AUTHOR+" muted"+TARGET+REASON;
+    private String SOFTBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+" softbanned"+TARGET+REASON;
+    private String TEMPMUTE_FORMAT = TIME+CASE+EMOTE+AUTHOR+" tempmuted"+TARGET+REASON+EXPIRY_TIME;
+    private String UNBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+" unbanned"+TARGET+REASON;
 
     public ModLogging(Bot bot)
     {
