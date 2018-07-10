@@ -134,7 +134,7 @@ public class LookupCmd extends EndlessCommand
                 }
                 builder.setDescription(sb).setThumbnail(invite==null?null:MiscUtils.getImageUrl("png", null, invite.getGuild().getIconUrl()))
                         .setColor(event.getMember().getColor());
-                event.reply(mb.setContent(":computer: Info about **"+widget.getName()+"**"+(verified?Const.VERIFIED:"")).setEmbed(builder.build()).build());
+                event.reply(mb.setContent(":computer: Info about **"+widget.getName()+"** "+(verified?Const.VERIFIED:"")).setEmbed(builder.build()).build());
                 return;
             }
             catch(NumberFormatException ignored) {}

@@ -67,7 +67,7 @@ public class PollCmd extends EndlessCommand
             builder.setDescription("`-t` - Sets how long the poll will be.\n" +
                     "`-e` - Emotes to apply to the poll.\n" +
                     "`-d` - Sets the description of the poll.\n" +
-                    "`-c` The color of the poll.\n");
+                    "`-c` - The color of the poll.\n");
             builder.setColor(Color.YELLOW);
             event.replyInDm(builder.build(), s -> event.reactSuccess(),
                     e -> event.replyWarning("Help cannot be sent because you are blocking Drect Messages."));
