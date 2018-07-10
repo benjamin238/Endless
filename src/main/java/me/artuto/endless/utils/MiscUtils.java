@@ -139,4 +139,17 @@ public class MiscUtils
 
         return stacktrace;
     }
+
+    public static String getImageUrl(String format, String size, String url)
+    {
+        if(url==null)
+            return null;
+
+        if(!(format==null))
+            url = url.replace(url.substring(url.length()-3), format);
+        if(!(size==null))
+            url = url+"?size="+size;
+
+        return url;
+    }
 }

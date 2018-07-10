@@ -21,10 +21,11 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.tools.InfoTools;
+import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.exceptions.ErrorResponseException;
@@ -47,7 +48,6 @@ public class LookupCmd extends EndlessCommand
         this.arguments = "<User ID | Invite code | Invite URL | Guild ID>";
         this.category = Categories.TOOLS;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.guildOnly = false;
     }
 
     @Override
@@ -63,6 +63,7 @@ public class LookupCmd extends EndlessCommand
         event.async(() -> {
             try
             {
+                // User
                 long id = Long.parseLong(event.getArgs());
                 User user = shardManager.getUserById(id);
                 if(user==null)
@@ -73,15 +74,18 @@ public class LookupCmd extends EndlessCommand
                     catch(ErrorResponseException ignored) {}
                 if(!(user==null))
                 {
+                    boolean nitro = !(user.getAvatarId()==null) && user.getAvatarId().startsWith("a_");
                     sb.append(Const.LINE_START).append(" ID: **").append(user.getId()).append("**\n");
                     sb.append(Const.LINE_START).append(" Account Creation: **").append(user.getCreationTime()
                             .format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
-                    builder.setDescription(sb).setThumbnail(user.getEffectiveAvatarUrl()).setColor(event.getMember().getColor());
+                    builder.setDescription(sb).setThumbnail(MiscUtils.getImageUrl("png", null, user.getEffectiveAvatarUrl()))
+                            .setColor(event.getMember().getColor());
                     event.reply(mb.setContent((user.isBot()?Const.BOT:Const.PEOPLE)+" Info about **"+user.getName()+"#"+user.getDiscriminator()+"**"
-                            +(InfoTools.nitroCheck(user)?Const.NITRO:"")).setEmbed(builder.build()).build());
+                            +(nitro?Const.NITRO:"")).setEmbed(builder.build()).build());
                     return;
                 }
 
+                // Widget
                 WidgetUtil.Widget widget = WidgetUtil.getWidget(id);
                 if(widget==null)
                 {
@@ -93,6 +97,7 @@ public class LookupCmd extends EndlessCommand
                     event.replySuccess("Guild with ID `"+id+"` found. No further information found.");
                     return;
                 }
+                // Widget Invite
                 Invite invite = null;
                 if(!(widget.getInviteCode()==null))
                 {
@@ -103,21 +108,18 @@ public class LookupCmd extends EndlessCommand
                     catch(ErrorResponseException ignored) {}
                 }
                 boolean verified = false;
-                int memberCount = invite==null?0:invite.getGuild().getMemberCount();
-                int onlineCount = invite==null?0:invite.getGuild().getOnlineCount();
-                int offlineCount;
+                int memberCount = widget.getMembers().size();
+                int onlineCount = (int)widget.getMembers().stream().filter(m -> m.getOnlineStatus()==OnlineStatus.ONLINE).count();
+                int idleCount = (int)widget.getMembers().stream().filter(m -> m.getOnlineStatus()==OnlineStatus.IDLE).count();
+                int dndCount = (int)widget.getMembers().stream().filter(m -> m.getOnlineStatus()==OnlineStatus.DO_NOT_DISTURB).count();
                 int vcCount = widget.getVoiceChannels().size();
-                if(memberCount>onlineCount)
-                    offlineCount = memberCount-onlineCount;
-                else
-                    offlineCount = onlineCount-memberCount;
                 sb.append(Const.LINE_START).append(" ID: **").append(widget.getId()).append("**\n");
                 sb.append(Const.LINE_START).append(" Creation: **").append(widget.getCreationTime()
                         .format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
                 sb.append(Const.LINE_START).append(" Voice Channels: **").append(vcCount).append("**\n");
-                if(!(onlineCount==0 && offlineCount==0))
-                    sb.append(Const.LINE_START).append(" Members: ").append(Const.ONLINE).append(" **").append(onlineCount==0?"N/A":onlineCount).append("** ")
-                            .append(Const.OFFLINE).append(" **").append(offlineCount==0?"N/A":offlineCount).append("**\n");
+                sb.append(Const.LINE_START).append(" Members: ").append(Const.ONLINE).append(" **").append(onlineCount).append("** - ")
+                        .append(Const.IDLE).append(" **").append(idleCount).append("** - ").append(Const.DND).append(" **").append(dndCount)
+                        .append("** ").append("(**").append(memberCount).append("**)\n");
                 if(!(invite==null))
                 {
                     verified = invite.getGuild().getFeatures().contains("VERIFIED");
@@ -130,7 +132,8 @@ public class LookupCmd extends EndlessCommand
                         builder.setImage(invite.getGuild().getSplashUrl()+"?size=2048");
                     }
                 }
-                builder.setDescription(sb).setThumbnail(invite==null?null:invite.getGuild().getIconUrl()).setColor(event.getMember().getColor());
+                builder.setDescription(sb).setThumbnail(invite==null?null:MiscUtils.getImageUrl("png", null, invite.getGuild().getIconUrl()))
+                        .setColor(event.getMember().getColor());
                 event.reply(mb.setContent(":computer: Info about **"+widget.getName()+"**"+(verified?Const.VERIFIED:"")).setEmbed(builder.build()).build());
                 return;
             }
@@ -140,6 +143,7 @@ public class LookupCmd extends EndlessCommand
                 event.reactWarning();
             }
 
+            // Invite
             List<String> invites = event.getMessage().getInvites();
             String code;
             if(invites.isEmpty())
@@ -162,7 +166,10 @@ public class LookupCmd extends EndlessCommand
             Invite.Guild guild = invite.getGuild();
             User inviter = invite.getInviter();
             boolean verified = guild.getFeatures().contains("VERIFIED");
-            sb.append(Const.LINE_START).append(" Guild: **").append(guild.getName()).append("** ").append(verified?Const.VERIFIED:"").append("\n");
+            int memberCount = invite.getGuild().getMemberCount();
+            int onlineCount = invite.getGuild().getOnlineCount();
+            String guildName = "["+guild.getName()+"]("+invite.getURL()+")";
+            sb.append(Const.LINE_START).append(" Guild: **").append(guildName).append("** ").append(verified?Const.VERIFIED:"").append("\n");
             sb.append(Const.LINE_START).append(" Channel: **#").append(channel.getName()).append("** (ID: ").append(channel.getId()).append(")\n");
             sb.append(Const.LINE_START).append(" Inviter: ");
             if(inviter==null)
@@ -173,13 +180,16 @@ public class LookupCmd extends EndlessCommand
 
             StringBuilder gInfo = new StringBuilder();
             gInfo.append(Const.LINE_START).append(" ID: **").append(guild.getId()).append("**\n");
-            gInfo.append(Const.LINE_START).append(" Creation: **").append(guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**");
+            gInfo.append(Const.LINE_START).append(" Creation: **").append(guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
+            gInfo.append(Const.LINE_START).append(" Members: ").append(Const.ONLINE).append(" **").append(onlineCount==0?"N/A":onlineCount).append("** - ")
+                    .append(Const.OFFLINE).append(" **").append(memberCount==0?"N/A":memberCount).append("**");
             if(!(guild.getSplashUrl()==null))
             {
                 gInfo.append("\n_ _\n").append(Const.PARTNER).append(" **Discord Partner** ").append(Const.PARTNER);
-                builder.setImage(guild.getSplashUrl()+"?size=2048");
+                builder.setImage(MiscUtils.getImageUrl("png", "2048", guild.getSplashUrl()));
             }
-            builder.setThumbnail(guild.getIconUrl()).setDescription(sb).setColor(event.getMember().getColor());
+            builder.setThumbnail(MiscUtils.getImageUrl("png", null, guild.getIconUrl()))
+                    .setDescription(sb).setColor(event.getMember().getColor());
             builder.addField("Guild Info", gInfo.toString(), false);
             event.reply(mb.setContent(":link: Info about invite code **"+code+"**").setEmbed(builder.build()).build());
         });

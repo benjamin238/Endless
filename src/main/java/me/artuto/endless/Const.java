@@ -43,10 +43,12 @@ public class Const
     public static String BAN = ":hammer:";
     public static String BOT = "<:bot:334859813915983872>";
     public static String BOTADM = "<:stafftools:334859814700187650>";
+    public static String DND = "<:dnd:334859814029099008>";
     public static String ENDLESS = "<:endless:447899790727053324>";
     public static String GIPHY = "<:giphy:373675520099090436>";
     public static String GITHUB = "<:github:326118305062584321>";
     public static String GOOGLE = "<:google:447911997783277569>";
+    public static String IDLE = "<:idle:334859813869584384>";
     public static String INFO = "<:endlessInfo:444203939303522305>";
     public static String LINE_START = ":white_small_square:";
     public static String LOADING = "<a:endlessLoading:444198122965434399>";
