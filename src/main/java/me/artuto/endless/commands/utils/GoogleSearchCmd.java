@@ -134,7 +134,7 @@ public class GoogleSearchCmd extends EndlessCommand
             builder.setColor(event.getMessage().getMember().getColor());
             builder.setFooter("Results from Google Search API", null);
 
-            event.reply(builder.build());*/
-        }
+            event.reply(builder.build());
+        }*/
     }
 }
