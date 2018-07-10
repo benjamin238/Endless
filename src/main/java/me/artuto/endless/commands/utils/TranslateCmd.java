@@ -87,20 +87,21 @@ public class TranslateCmd extends EndlessCommand
         {
             Color color;
 
-            if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
-            else color = event.getMember().getColor();
+            if(event.isFromType(ChannelType.PRIVATE))
+                color = Color.decode("#33ff00");
+            else
+                color = event.getMember().getColor();
 
-            String title = "<:yandexTranslate:374422013437149186> Text Translated successfully: ";
             EmbedBuilder builder = new EmbedBuilder();
             YTranslateApi api = new YTranslateApiImpl(bot.config.getTranslateKey());
             Language target = Language.of(language);
             Translation translated = api.translationApi().translate(text, target);
-            Language lang = api.detectionApi().detect(text).get();
+            String title = "<:yandexTranslate:374422013437149186> Text Translated successfully in `"+target.code()+"`";
 
             builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getEffectiveAvatarUrl());
-            builder.addField("Text in `"+lang.code()+"`", "```"+text+"```", false);
-            builder.addField("Text Translated in `"+target.code()+"`", "```"+translated.text()+"```", false);
-            builder.setFooter("Translation provided by Yandex Translate API", "https://cdn.discordapp.com/emojis/374422013437149186.png");
+            builder.setDescription("```"+translated.text()+"```");
+            builder.setFooter("Translation provided by Yandex Translate API",
+                    "https://cdn.discordapp.com/emojis/374422013437149186.png");
             builder.setColor(color);
 
             event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
