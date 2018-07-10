@@ -69,6 +69,11 @@
         </dependency>
         <dependency>
             <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-customsearch</artifactId>
+            <version>v1-rev63-1.23.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-youtube</artifactId>
             <version>v3-rev182-1.22.0</version>
         </dependency>
