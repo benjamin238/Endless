@@ -28,7 +28,7 @@ public class AfkCmd extends EndlessCommand
     public AfkCmd()
     {
         this.name = "afk";
-        this.help = "Mark yourself ask afk with a message";
+        this.help = "Mark yourself as afk with a message";
         this.arguments = "[message]";
         this.category = Categories.TOOLS;
         this.guildOnly = false;
@@ -39,7 +39,7 @@ public class AfkCmd extends EndlessCommand
     {
         User user = event.getAuthor();
 
-        AfkManager.setAfk(user.getIdLong(), event.getArgs().isEmpty() ? null : event.getArgs());
+        AfkManager.setAfk(user.getIdLong(), event.getArgs().isEmpty()?null:event.getArgs());
         event.replySuccess("**"+user.getName()+"** is now AFK!");
     }
 }

@@ -22,11 +22,15 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -39,20 +43,22 @@ public class AvatarCmd extends EndlessCommand
     {
         this.name = "avatar";
         this.help = "Displays the avatar of the specified user.";
-        this.arguments = "<user>";
+        this.aliases = new String[]{"avy", "pfp"};
+        this.arguments = "[user]";
         this.category = Categories.TOOLS;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.guildOnly = false;
         this.needsArguments = false;
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        Member target;
         EmbedBuilder builder = new EmbedBuilder();
+        User target;
 
-        if(event.getArgs().isEmpty())
-            target = event.getMessage().getMember();
+        if(event.getArgs().isEmpty() || !(event.isFromType(ChannelType.TEXT)))
+            target = event.getAuthor();
         else
         {
             List<Member> list = FinderUtil.findMembers(event.getArgs(), event.getGuild());
@@ -68,13 +74,13 @@ public class AvatarCmd extends EndlessCommand
                 return;
             }
             else
-                target = list.get(0);
+                target = list.get(0).getUser();
         }
 
-        String title = ":frame_photo: Avatar of **"+target.getUser().getName()+"**"+"#"+"**"+target.getUser().getDiscriminator()+"**";
+        String title = ":frame_photo: Avatar of **"+target.getName()+"**#**"+target.getDiscriminator()+"**";
 
-        builder.setImage(target.getUser().getEffectiveAvatarUrl()+"?size=512");
-        builder.setColor(target.getColor());
-        event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+        builder.setImage(MiscUtils.getImageUrl("png", "512", target.getEffectiveAvatarUrl()));
+        builder.setColor(event.isFromType(ChannelType.TEXT)?event.getGuild().getMember(target).getColor():Color.decode("#33ff00"));
+        event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
     }
 }
