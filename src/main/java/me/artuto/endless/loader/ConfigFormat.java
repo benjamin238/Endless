@@ -31,6 +31,8 @@ public class ConfigFormat
     public String bingMapsKey;
     public String darkskyKey;
     public String giphyKey;
+    public String googleKey;
+    public String googleSearcherId;
     public String yandexTranslateKey;
     public String youtubeKey;
     public String doneEmote;

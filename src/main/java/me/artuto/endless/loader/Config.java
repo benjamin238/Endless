@@ -96,6 +96,16 @@ public class Config
         return format.giphyKey;
     }
 
+    public String getGoogleKey()
+    {
+        return format.googleKey;
+    }
+
+    public String getGoogleSearcherId()
+    {
+        return format.googleSearcherId;
+    }
+
     public String getTranslateKey()
     {
         return format.yandexTranslateKey;

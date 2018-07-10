@@ -17,22 +17,32 @@
 
 package me.artuto.endless.commands.utils;
 
+import com.google.api.services.customsearch.Customsearch;
+import com.google.api.services.customsearch.model.Result;
+import com.google.api.services.customsearch.model.Search;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Bot;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.managers.GoogleAPIAuth;
 import me.artuto.endless.managers.GoogleSearcher;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GoogleSearchCmd extends EndlessCommand
 {
-    private final GoogleSearcher searcher;
+    private final Bot bot;
+    private final Customsearch searcher;
 
-    public GoogleSearchCmd()
+    public GoogleSearchCmd(Bot bot)
     {
-        searcher = new GoogleSearcher();
+        this.bot = bot;
+        this.searcher = new Customsearch.Builder(GoogleAPIAuth.HTTP_TRANSPORT, GoogleAPIAuth.JSON_FACTORY, GoogleAPIAuth.HTTP_REQUEST)
+                .setApplicationName("EndlessBot").build();
         this.name = "google";
         this.aliases = new String[]{"g", "search", "googlesearch"};
         this.help = "Search something on Google!";
@@ -40,17 +50,23 @@ public class GoogleSearchCmd extends EndlessCommand
         this.category = Categories.UTILS;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
-        this.cooldown = 10;
+        this.cooldown = 15;
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(bot.config.getGoogleKey().isEmpty())
+        {
+            event.replyError("Google Search API Key is not configured!");
+            return;
+        }
+        if(bot.config.getGoogleSearcherId().isEmpty())
+        {
+            event.replyError("Google Searcher ID is not configured!");
+            return;
+        }
 
-
-
-
-        /*EmbedBuilder builder = new EmbedBuilder();
         String[] inputs = event.getArgs().split("\\s+", 2);
         int num = 1;
         String query;
@@ -70,6 +86,28 @@ public class GoogleSearchCmd extends EndlessCommand
             event.replyWarning("I can only get 1 to 10 results at once!");
             return;
         }
+
+        try
+        {
+            Customsearch.Cse.List list = searcher.cse().list(query);
+            list.setKey(bot.config.getGoogleKey());
+            list.setCx(bot.config.getGoogleSearcherId());
+            list.setNum((long)num);
+            Search searchResponse = list.execute();
+            List<Result> resultList = searchResponse.getItems();
+
+            if(resultList==null)
+                event.replyWarning("Nothing found with the provided arguments!");
+            else
+            {
+                StringBuilder sb = new StringBuilder();
+            }
+        }
+        catch(IOException ignored) {}
+
+        /*EmbedBuilder builder = new EmbedBuilder();
+
+
 
         ArrayList<String> results = searcher.getGoogleData(query);
 
