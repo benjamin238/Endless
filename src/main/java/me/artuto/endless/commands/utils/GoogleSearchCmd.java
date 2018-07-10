@@ -46,7 +46,11 @@ public class GoogleSearchCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        EmbedBuilder builder = new EmbedBuilder();
+
+
+
+
+        /*EmbedBuilder builder = new EmbedBuilder();
         String[] inputs = event.getArgs().split("\\s+", 2);
         int num = 1;
         String query;
@@ -92,7 +96,7 @@ public class GoogleSearchCmd extends EndlessCommand
             builder.setColor(event.getMessage().getMember().getColor());
             builder.setFooter("Results from Google Search API", null);
 
-            event.reply(builder.build());
+            event.reply(builder.build());*/
         }
     }
 }
