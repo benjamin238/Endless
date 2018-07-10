@@ -50,6 +50,7 @@ public class Const
     public static String GOOGLE = "<:google:447911997783277569>";
     public static String IDLE = "<:idle:334859813869584384>";
     public static String INFO = "<:endlessInfo:444203939303522305>";
+    public static String INVISIBLE = "<:invisible:334859814410649601>";
     public static String LINE_START = ":white_small_square:";
     public static String LOADING = "<a:endlessLoading:444198122965434399>";
     public static String NITRO = "<:nitro:334859814566101004>";
@@ -58,6 +59,7 @@ public class Const
     public static String PARTNER = "<:partner:334859814561775616>";
     public static String PEOPLE = ":bust_in_silhouette:";
     public static String SERVER_SETTINGS = ":wrench:";
+    public static String STREAMING = "<:streaming:334859814771359744>";
     public static String VERIFIED = "<:verified:465670198775644161>";
 
     // URLs

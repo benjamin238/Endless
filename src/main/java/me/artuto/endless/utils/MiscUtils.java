@@ -145,7 +145,7 @@ public class MiscUtils
         if(url==null)
             return null;
 
-        if(!(format==null))
+        if(!(format==null) && !(url.endsWith("gif")))
             url = url.replace(url.substring(url.length()-3), format);
         if(!(size==null))
             url = url+"?size="+size;
