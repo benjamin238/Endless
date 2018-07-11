@@ -19,15 +19,19 @@ package me.artuto.endless.utils;
 
 import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Const;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
@@ -55,14 +59,33 @@ public class IOUtils
             if(response.body()==null)
                 return null;
             else
-                return new JSONObject(response.body().string());
+                return new JSONObject(new JSONTokener(response.body().byteStream()));
         }
         catch(UnsupportedEncodingException ignored) {}
         catch(IOException e)
         {
             LOG.error("Error while making a REST request to {}", url, e);
-            return null;
         }
         return null;
+    }
+
+    public static void makePOSTRequest(FormBody body, @Nullable Map<String, String> headers, @Nonnull String url)
+    {
+        try
+        {
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            Request.Builder requestBuilder = new Request.Builder();
+            requestBuilder.url(url).method("POST", body)
+                    .header("User-Agent", Const.USER_AGENT);
+            if(!(headers==null))
+                headers.forEach(requestBuilder::header);
+            Request request = requestBuilder.build();
+            client.newCall(request).execute();
+        }
+        catch(UnsupportedEncodingException ignored) {}
+        catch(IOException e)
+        {
+            LOG.error("Error while making a REST request to {}", url, e);
+        }
     }
 }
