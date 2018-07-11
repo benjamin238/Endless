@@ -21,6 +21,8 @@ public interface Tag
 {
     boolean isNSFW();
 
+    boolean isOverriden();
+
     long getId();
 
     long getOwnerId();

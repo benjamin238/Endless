@@ -76,7 +76,8 @@ public class TagDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE name = \"%s\" AND guild = %s", name, guild)))
             {
                 if(results.next())
-                    return new LocalTagImpl(results.getLong("guild"), results.getLong("owner"), results.getInt("id"),
+                    return new LocalTagImpl(results.getBoolean("overriden"), results.getLong("guild"),
+                            results.getLong("owner"), results.getInt("id"),
                             results.getString("content"), results.getString("name"));
             }
         }
@@ -149,7 +150,8 @@ public class TagDataManager
                 List<LocalTag> list = new LinkedList<>();
                 while(results.next())
                 {
-                    list.add(new LocalTagImpl(results.getLong("guild"), results.getLong("owner"), results.getInt("id"),
+                    list.add(new LocalTagImpl(results.getBoolean("overriden"), results.getLong("guild"),
+                            results.getLong("owner"), results.getInt("id"),
                             results.getString("content"), results.getString("name")));
                 }
                 return list;
@@ -188,6 +190,11 @@ public class TagDataManager
 
     public void createLocalTag(long guild, long owner, String content, String name)
     {
+        createLocalTag(false, guild, owner, content, name);
+    }
+
+    public void createLocalTag(boolean overriden, long guild, long owner, String content, String name)
+    {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
@@ -199,6 +206,7 @@ public class TagDataManager
                 results.updateString("content", content);
                 results.updateLong("guild", guild);
                 results.updateLong("owner", owner);
+                results.updateBoolean("overriden", overriden);
                 results.insertRow();
                 Tag tag = getLocalTag(guild, name);
                 ((EndlessCoreImpl)bot.endless.getShard(bot.shardManager.getGuildById(guild).getJDA())).addLocalTag((LocalTag)tag);

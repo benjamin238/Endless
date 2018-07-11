@@ -43,6 +43,12 @@ public class GlobalTagImpl implements GlobalTag
     }
 
     @Override
+    public boolean isOverriden()
+    {
+        return false;
+    }
+
+    @Override
     public long getId()
     {
         return tagId;

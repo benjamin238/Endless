@@ -25,11 +25,13 @@ import me.artuto.endless.core.entities.LocalTag;
 
 public class LocalTagImpl implements LocalTag
 {
+    private boolean overriden;
     private long guildId, ownerId, tagId;
     private String content, name;
 
-    public LocalTagImpl(long guildId, long ownerId, long tagId, String content, String name)
+    public LocalTagImpl(boolean overriden, long guildId, long ownerId, long tagId, String content, String name)
     {
+        this.overriden = overriden;
         this.guildId = guildId;
         this.ownerId = ownerId;
         this.tagId = tagId;
@@ -41,6 +43,12 @@ public class LocalTagImpl implements LocalTag
     public boolean isNSFW()
     {
         return content.toLowerCase().contains("{nsfw}");
+    }
+
+    @Override
+    public boolean isOverriden()
+    {
+        return overriden;
     }
 
     @Override
