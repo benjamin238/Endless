@@ -21,22 +21,26 @@ import com.google.api.services.customsearch.Customsearch;
 import com.google.api.services.customsearch.model.Result;
 import com.google.api.services.customsearch.model.Search;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.menu.OrderedMenu;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.managers.GoogleAPIAuth;
-import me.artuto.endless.managers.GoogleSearcher;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.ChannelType;
 
+import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class GoogleSearchCmd extends EndlessCommand
 {
     private final Bot bot;
     private final Customsearch searcher;
+    private final OrderedMenu.Builder oBuilder;
 
     public GoogleSearchCmd(Bot bot)
     {
@@ -51,6 +55,10 @@ public class GoogleSearchCmd extends EndlessCommand
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.guildOnly = false;
         this.cooldown = 15;
+        this.oBuilder = new OrderedMenu.Builder().setDescription("Pick a result:\n")
+                .setTimeout(2, TimeUnit.MINUTES).useCancelButton(true)
+                .setCancel(m -> {})
+                .setEventWaiter(bot.waiter);
     }
 
     @Override
@@ -100,41 +108,39 @@ public class GoogleSearchCmd extends EndlessCommand
                 event.replyWarning("Nothing found with the provided arguments!");
             else
             {
-                StringBuilder sb = new StringBuilder();
+                if(resultList.size()==1)
+                    handleSelection(event, resultList.get(0), query);
+                else
+                {
+                    oBuilder.clearChoices();
+                    int option = 0;
+                    oBuilder.setUsers(event.getAuthor()).setColor(event.isFromType(ChannelType.TEXT)?event.getSelfMember().getColor():Color.decode("#33ff00"))
+                            .setSelection((m, o) -> handleSelection(event, resultList.get(o-1), query));
+                    oBuilder.setText(":mag: Results for `"+query+"`");
+                    for(Result rslt : resultList)
+                    {
+                        if(option>9)
+                            break;
+                        String resultString = " **["+rslt.getTitle()+"]("+rslt.getLink()+")**\n";
+                        oBuilder.addChoice(resultString);
+                        option += 1;
+                    }
+                    oBuilder.build().display(event.getChannel());
+                }
             }
         }
         catch(IOException ignored) {}
+    }
 
-        /*EmbedBuilder builder = new EmbedBuilder();
+    private void handleSelection(CommandEvent event, Result result, String query)
+    {
+        EmbedBuilder builder = new EmbedBuilder();
+        MessageBuilder mb = new MessageBuilder();
+        String link = "**["+result.getTitle()+"]("+result.getLink()+")**\n";
+        String descrip = result.getSnippet();
 
-
-
-        ArrayList<String> results = searcher.getGoogleData(query);
-
-        if(results == null)
-            event.replyWarning("An error ocurred when using Google Search. Ask the bot owner to see the console.");
-        else if(results.isEmpty())
-            event.replyWarning("Any results found for `"+query+"`!");
-        else
-        {
-            StringBuilder output = new StringBuilder("`"+query+"` \uD83D\uDD0E "+results.get(0));
-
-            if(num>1 && results.size()>1)
-            {
-                output.append("\n See also:");
-
-                for(int i = 1; i<num && i<results.size(); i++)
-                {
-                    output.append("\n<").append(results.get(i)).append(">");
-                }
-            }
-
-            builder.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getEffectiveAvatarUrl());
-            builder.setDescription(output.toString());
-            builder.setColor(event.getMessage().getMember().getColor());
-            builder.setFooter("Results from Google Search API", null);
-
-            event.reply(builder.build());
-        }*/
+        builder.setColor(event.isFromType(ChannelType.TEXT)?event.getSelfMember().getColor():Color.decode("#33ff00")).setDescription(link+descrip);
+        builder.setFooter("Results from Google Search API", "https://cdn.discordapp.com/emojis/447911997783277569.png");
+        event.reply(mb.setContent(":mag: Results for `"+query+"`").setEmbed(builder.build()).build());
     }
 }
