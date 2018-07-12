@@ -67,7 +67,7 @@ public class RoomCmd extends EndlessCommand
 
         if(rooms.isEmpty())
         {
-            event.replyWarning("This guild doesn't have any rooms created! Create one by doing `"+prefix+"`room create`");
+            event.replyWarning("This guild doesn't have any rooms created! Create one by doing `"+prefix+"room create`");
             return;
         }
 
