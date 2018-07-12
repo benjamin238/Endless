@@ -29,7 +29,7 @@ public class Const
     public static String INVITE = "https://discord.gg/CXKfYW3";
     public static String DEV = "`@Artuto#0424 | 264499432538505217`";
     public static String USER_AGENT = "Endless "+VERSION+" (Discord Bot/JDA "+JDAInfo.VERSION+")";
-    public static String[] PROFILE_FIELDS = new String[]{"donatedAmount", "timezone", "twitter", "steam", "wii", "nnid",
+    public static String[] PROFILE_FIELDS = new String[]{"timezone", "twitter", "steam", "wii", "nnid",
             "xboxLive", "psn", "threeds", "skype", "youtube", "about", "twitch", "minecraft", "email",
             "lol", "wow", "battle", "splatoon", "mkwii", "reddit"};
 
