@@ -45,8 +45,8 @@ public class IgnoreCmd extends EndlessCommand
         this.bot = bot;
         this.name = "ignore";
         this.arguments = "<addX|list|removeX>";
-        this.children = new Command[]{new AddChannel(), new AddRole(), new AddUser(),
-                new ListIgnores(), new RemoveChannel(), new RemoveRole(), new RemoveUser()};
+        this.children = new Command[]{new AddChannelCmd(), new AddRoleCmd(), new AddUserCmd(),
+                new ListIgnoresCmd(), new RemoveChannelCmd(), new RemoveRoleCmd(), new RemoveUserCmd()};
         this.help = "Ignores the specified channel, role or user. Endless won't respond to commands in those channels," +
                 " these users or by users with those roles. Admins won't be ignored.";
         this.category = Categories.SERVER_CONFIG;
@@ -60,9 +60,9 @@ public class IgnoreCmd extends EndlessCommand
         event.replyError("Please choose a valid subcommand!");
     }
 
-    private class AddChannel extends EndlessCommand
+    private class AddChannelCmd extends EndlessCommand
     {
-        AddChannel()
+        AddChannelCmd()
         {
             this.name = "addchannel";
             this.arguments = "<channel>";
@@ -70,6 +70,7 @@ public class IgnoreCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.guildOnly = true;
+            this.parent = IgnoreCmd.this;
         }
 
         @Override
@@ -102,9 +103,9 @@ public class IgnoreCmd extends EndlessCommand
         }
     }
 
-    private class AddRole extends EndlessCommand
+    private class AddRoleCmd extends EndlessCommand
     {
-        AddRole()
+        AddRoleCmd()
         {
             this.name = "addrole";
             this.arguments = "<role>";
@@ -112,6 +113,7 @@ public class IgnoreCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.guildOnly = true;
+            this.parent = IgnoreCmd.this;
         }
 
         @Override
@@ -144,9 +146,9 @@ public class IgnoreCmd extends EndlessCommand
         }
     }
 
-    private class AddUser extends EndlessCommand
+    private class AddUserCmd extends EndlessCommand
     {
-        AddUser()
+        AddUserCmd()
         {
             this.name = "adduser";
             this.arguments = "<user>";
@@ -154,6 +156,7 @@ public class IgnoreCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.guildOnly = true;
+            this.parent = IgnoreCmd.this;
         }
 
         @Override
@@ -186,9 +189,9 @@ public class IgnoreCmd extends EndlessCommand
         }
     }
 
-    private class ListIgnores extends EndlessCommand
+    private class ListIgnoresCmd extends EndlessCommand
     {
-        ListIgnores()
+        ListIgnoresCmd()
         {
             this.name = "list";
             this.help = "Shows the list of ignored entities.";
@@ -196,6 +199,7 @@ public class IgnoreCmd extends EndlessCommand
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.guildOnly = true;
             this.needsArguments = false;
+            this.parent = IgnoreCmd.this;
         }
 
         @Override
@@ -229,9 +233,9 @@ public class IgnoreCmd extends EndlessCommand
         }
     }
 
-    private class RemoveChannel extends EndlessCommand
+    private class RemoveChannelCmd extends EndlessCommand
     {
-        RemoveChannel()
+        RemoveChannelCmd()
         {
             this.name = "removechannel";
             this.arguments = "<channel>";
@@ -239,6 +243,7 @@ public class IgnoreCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.guildOnly = true;
+            this.parent = IgnoreCmd.this;
         }
 
         @Override
@@ -271,9 +276,9 @@ public class IgnoreCmd extends EndlessCommand
         }
     }
 
-    private class RemoveRole extends EndlessCommand
+    private class RemoveRoleCmd extends EndlessCommand
     {
-        RemoveRole()
+        RemoveRoleCmd()
         {
             this.name = "removerole";
             this.arguments = "<role>";
@@ -281,6 +286,7 @@ public class IgnoreCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.guildOnly = true;
+            this.parent = IgnoreCmd.this;
         }
 
         @Override
@@ -313,9 +319,9 @@ public class IgnoreCmd extends EndlessCommand
         }
     }
 
-    private class RemoveUser extends EndlessCommand
+    private class RemoveUserCmd extends EndlessCommand
     {
-        RemoveUser()
+        RemoveUserCmd()
         {
             this.name = "removeuser";
             this.arguments = "<user>";
@@ -323,6 +329,7 @@ public class IgnoreCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.guildOnly = true;
+            this.parent = IgnoreCmd.this;
         }
 
         @Override

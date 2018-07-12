@@ -43,7 +43,7 @@ public class BlacklistUserCmd extends EndlessCommand
         this.name = "blacklistuser";
         this.help = "Adds, removes or displays the list with blacklisted users.";
         this.category = Categories.BOTADM;
-        this.children = new Command[]{new Add(), new Remove(), new Check(), new BlacklistList()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd(), new CheckCmd(), new BlacklistListCmd()};
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.ownerCommand = true;
         this.guildOnly = false;
@@ -55,9 +55,9 @@ public class BlacklistUserCmd extends EndlessCommand
         event.replyWarning("Please specify a subcommand!");
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a user ID to the blacklisted users list.";
@@ -66,6 +66,7 @@ public class BlacklistUserCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a user ID and a reason!";
+            this.parent = BlacklistUserCmd.this;
         }
 
         @Override
@@ -92,9 +93,9 @@ public class BlacklistUserCmd extends EndlessCommand
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a user ID to the blacklisted users list.";
@@ -103,6 +104,7 @@ public class BlacklistUserCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a user ID!";
+            this.parent = BlacklistUserCmd.this;
         }
 
         @Override
@@ -127,9 +129,9 @@ public class BlacklistUserCmd extends EndlessCommand
         }
     }
 
-    private class BlacklistList extends EndlessCommand
+    private class BlacklistListCmd extends EndlessCommand
     {
-        BlacklistList()
+        BlacklistListCmd()
         {
             this.name = "list";
             this.help = "Displays blacklisted users.";
@@ -137,6 +139,7 @@ public class BlacklistUserCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BlacklistUserCmd.this;
         }
 
         @Override
@@ -175,9 +178,9 @@ public class BlacklistUserCmd extends EndlessCommand
         }
     }
 
-    private class Check extends EndlessCommand
+    private class CheckCmd extends EndlessCommand
     {
-        Check()
+        CheckCmd()
         {
             this.name = "check";
             this.help = "Checks if a user ID is blacklisted.";
@@ -185,6 +188,7 @@ public class BlacklistUserCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a user ID!";
+            this.parent = BlacklistUserCmd.this;
         }
 
         @Override

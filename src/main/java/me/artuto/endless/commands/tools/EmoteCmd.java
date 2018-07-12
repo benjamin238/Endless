@@ -45,7 +45,7 @@ public class EmoteCmd extends EndlessCommand
     {
         this.name = "emote";
         this.aliases = new String[]{"emoji", "charinfo"};
-        this.children = new Command[]{new Create(), new Steal(), new Remove()};
+        this.children = new Command[]{new CreateCmd(), new StealCmd(), new RemoveCmd()};
         this.help = "Get the info of a specified emote, emoji or character.";
         this.arguments = "<emote>";
         this.category = Categories.TOOLS;
@@ -102,9 +102,9 @@ public class EmoteCmd extends EndlessCommand
         }
     }
 
-    private class Create extends EndlessCommand
+    private class CreateCmd extends EndlessCommand
     {
-        Create()
+        CreateCmd()
         {
             this.name = "create";
             this.aliases = new String[]{"add"};
@@ -112,6 +112,7 @@ public class EmoteCmd extends EndlessCommand
             this.arguments = "<emote> <name>";
             this.botPerms = new Permission[]{Permission.MANAGE_EMOTES};
             this.userPermissions = new Permission[]{Permission.MANAGE_EMOTES};
+            this.parent = EmoteCmd.this;
         }
 
         @Override
@@ -173,9 +174,9 @@ public class EmoteCmd extends EndlessCommand
         }
     }
 
-    private class Steal extends EndlessCommand
+    private class StealCmd extends EndlessCommand
     {
-        Steal()
+        StealCmd()
         {
             this.name = "steal";
             this.aliases = new String[]{"upload"};
@@ -183,6 +184,7 @@ public class EmoteCmd extends EndlessCommand
             this.arguments = "<emote> [name]";
             this.botPerms = new Permission[]{Permission.MANAGE_EMOTES};
             this.userPermissions = new Permission[]{Permission.MANAGE_EMOTES};
+            this.parent = EmoteCmd.this;
         }
 
         @Override
@@ -243,9 +245,9 @@ public class EmoteCmd extends EndlessCommand
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.aliases = new String[]{"delete"};
@@ -253,6 +255,7 @@ public class EmoteCmd extends EndlessCommand
             this.arguments = "<emote>";
             this.botPerms = new Permission[]{Permission.MANAGE_EMOTES};
             this.userPermissions = new Permission[]{Permission.MANAGE_EMOTES};
+            this.parent = EmoteCmd.this;
         }
 
         @Override

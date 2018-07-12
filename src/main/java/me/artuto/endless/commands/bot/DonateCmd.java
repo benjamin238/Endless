@@ -48,7 +48,7 @@ public class DonateCmd extends EndlessCommand
         this.bot = bot;
         this.name = "donate";
         this.aliases = new String[]{"donators"};
-        this.children = new Command[]{new Add(), new Remove()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd()};
         this.help = "Info about donations";
         this.category = Categories.BOT;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
@@ -86,15 +86,16 @@ public class DonateCmd extends EndlessCommand
         event.reply(new MessageBuilder().append(":information_source: List of donators:").setEmbed(builder.build()).build());
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a donator to the list";
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.parent = DonateCmd.this;
         }
 
         @Override
@@ -148,15 +149,16 @@ public class DonateCmd extends EndlessCommand
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a donator from the list";
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.parent = DonateCmd.this;
         }
 
         @Override

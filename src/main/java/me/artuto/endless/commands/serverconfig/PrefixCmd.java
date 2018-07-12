@@ -37,7 +37,7 @@ public class PrefixCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "prefix";
-        this.children = new Command[]{new Add(), new Remove()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd()};
         this.help = "Displays or adds a prefix";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -64,15 +64,16 @@ public class PrefixCmd extends EndlessCommand
         }
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a custom prefix";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "You didn't provided me a prefix!";
+            this.parent = PrefixCmd.this;
         }
 
         @Override
@@ -92,15 +93,16 @@ public class PrefixCmd extends EndlessCommand
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a custom prefix";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "You didn't provided me a prefix!";
+            this.parent = PrefixCmd.this;
         }
 
         @Override

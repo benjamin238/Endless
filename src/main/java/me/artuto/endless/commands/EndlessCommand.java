@@ -37,6 +37,7 @@ public abstract class EndlessCommand extends Command
 {
     protected boolean needsArguments = true;
     protected boolean ownerCommand = false;
+    protected EndlessCommand parent = null;
     protected Permission[] botPerms = new Permission[0];
     protected Permission[] userPerms = new Permission[0];
     protected String needsArgumentsMessage = null;
@@ -68,7 +69,7 @@ public abstract class EndlessCommand extends Command
         {
             if(needsArgumentsMessage==null)
                 event.replyError("**Too few arguments provided!**\n" +
-                        "Try running `"+client.getPrefix()+this.name+" help` to get help.");
+                        "Try running `"+client.getPrefix()+(parent==null?"":parent.getName()+" ")+this.name+" help` to get help.");
             else
                 event.replyWarning(needsArgumentsMessage);
             return;
@@ -125,6 +126,11 @@ public abstract class EndlessCommand extends Command
     public boolean isOwnerCommand()
     {
         return ownerCommand;
+    }
+
+    public EndlessCommand getParent()
+    {
+        return parent;
     }
 
     public Permission[] getBotPerms()

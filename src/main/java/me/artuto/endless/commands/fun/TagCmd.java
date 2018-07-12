@@ -50,8 +50,8 @@ public class TagCmd extends EndlessCommand
         this.aliases = new String[]{"t"};
         this.help = "Retrieves a tag with the specified name";
         this.arguments = "<name>";
-        this.children = new Command[]{new CreateGlobal(), new CreateLocal(), new Delete(), new Edit(), new Exec(),
-                new Import(), new ListCmd(), new OverrideCmd(), new Owner(), new Raw(), new Raw2(), new UnImport()};
+        this.children = new Command[]{new CreateGlobalCmd(), new CreateLocalCmd(), new DeleteCmd(), new EditCmd(), new ExecCmd(),
+                new ImportCmd(), new ListCmd(), new OverrideCmd(), new OwnerCmd(), new RawCmd(), new Raw2Cmd(), new UnImportCmd()};
         this.category = Categories.FUN;
         this.guildOnly = false;
         this.needsArgumentsMessage = "Specify a tag name!";
@@ -120,15 +120,16 @@ public class TagCmd extends EndlessCommand
         event.reply(parser.parse(tag.getContent()));
     }
 
-    private class CreateGlobal extends EndlessCommand
+    private class CreateGlobalCmd extends EndlessCommand
     {
-        CreateGlobal()
+        CreateGlobalCmd()
         {
             this.name = "createglobal";
             this.help = "Creates a new global tag";
             this.arguments = "<name> <content>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -167,15 +168,16 @@ public class TagCmd extends EndlessCommand
         }
     }
 
-    private class CreateLocal extends EndlessCommand
+    private class CreateLocalCmd extends EndlessCommand
     {
-        CreateLocal()
+        CreateLocalCmd()
         {
             this.name = "createlocal";
             this.aliases = new String[]{"create"};
             this.help = "Creates a new local tag";
             this.arguments = "<name> <content>";
             this.category = Categories.FUN;
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -214,9 +216,9 @@ public class TagCmd extends EndlessCommand
         }
     }
 
-    private class Delete extends EndlessCommand
+    private class DeleteCmd extends EndlessCommand
     {
-        Delete()
+        DeleteCmd()
         {
             this.name = "delete";
             this.aliases = new String[]{"remove"};
@@ -225,6 +227,7 @@ public class TagCmd extends EndlessCommand
             this.category = Categories.FUN;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Specify a tag name!";
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -281,15 +284,16 @@ public class TagCmd extends EndlessCommand
         }
     }
 
-    private class Edit extends EndlessCommand
+    private class EditCmd extends EndlessCommand
     {
-        Edit()
+        EditCmd()
         {
             this.name = "edit";
             this.help = "Edits an existant tag";
             this.arguments = "<name> <new content>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -360,15 +364,16 @@ public class TagCmd extends EndlessCommand
         }
     }
 
-    private class Exec extends EndlessCommand
+    private class ExecCmd extends EndlessCommand
     {
-        Exec()
+        ExecCmd()
         {
             this.name = "exec";
             this.help = "Parses the specified content";
             this.arguments = "<content>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -379,9 +384,9 @@ public class TagCmd extends EndlessCommand
         }
     }
 
-    private class Import extends EndlessCommand
+    private class ImportCmd extends EndlessCommand
     {
-        Import()
+        ImportCmd()
         {
             this.name = "import";
             this.help = "Imports a tag";
@@ -389,6 +394,7 @@ public class TagCmd extends EndlessCommand
             this.category = Categories.FUN;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Specify a tag name!";
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -435,6 +441,7 @@ public class TagCmd extends EndlessCommand
             this.category = Categories.FUN;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -569,6 +576,7 @@ public class TagCmd extends EndlessCommand
             this.arguments = "<tag> [new content]";
             this.category = Categories.FUN;
             this.needsArgumentsMessage = "Specify a tag name!";
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -636,9 +644,9 @@ public class TagCmd extends EndlessCommand
         }
     }
 
-    private class Owner extends EndlessCommand
+    private class OwnerCmd extends EndlessCommand
     {
-        Owner()
+        OwnerCmd()
         {
             this.name = "owner";
             this.help = "Gets the owner of a existant tag";
@@ -646,6 +654,7 @@ public class TagCmd extends EndlessCommand
             this.category = Categories.FUN;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Specify a tag name!";
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -694,9 +703,9 @@ public class TagCmd extends EndlessCommand
         }
     }
 
-    private class Raw extends EndlessCommand
+    private class RawCmd extends EndlessCommand
     {
-        Raw()
+        RawCmd()
         {
             this.name = "raw";
             this.help = "Shows the content of a tag without parsing the args";
@@ -704,6 +713,7 @@ public class TagCmd extends EndlessCommand
             this.category = Categories.FUN;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Specify a tag name!";
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -746,9 +756,9 @@ public class TagCmd extends EndlessCommand
         }
     }
 
-    private class Raw2 extends EndlessCommand
+    private class Raw2Cmd extends EndlessCommand
     {
-        Raw2()
+        Raw2Cmd()
         {
             this.name = "raw2";
             this.help = "Shows the content of a tag without parsing the args on a codeblock";
@@ -756,6 +766,7 @@ public class TagCmd extends EndlessCommand
             this.category = Categories.FUN;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Specify a tag name!";
+            this.parent = TagCmd.this;
         }
 
         @Override
@@ -798,9 +809,9 @@ public class TagCmd extends EndlessCommand
         }
     }
 
-    private class UnImport extends EndlessCommand
+    private class UnImportCmd extends EndlessCommand
     {
-        UnImport()
+        UnImportCmd()
         {
             this.name = "unimport";
             this.help = "Unimports a tag";
@@ -808,6 +819,7 @@ public class TagCmd extends EndlessCommand
             this.category = Categories.FUN;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Specify a tag name!";
+            this.parent = TagCmd.this;
         }
 
         @Override

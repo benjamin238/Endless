@@ -40,7 +40,7 @@ public class StarboardCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "starboard";
-        this.children = new Command[]{new SetChannel(), new SetCount()};
+        this.children = new Command[]{new SetChannelCmd(), new SetCountCmd()};
         this.aliases = new String[]{"sb"};
         this.help = "If no valid arguments are given the setup to install the starboard is launched.";
         this.category = Categories.SERVER_CONFIG;
@@ -162,9 +162,9 @@ public class StarboardCmd extends EndlessCommand
         event.replySuccess("The starboard has been installed successfully! Thanks for using Endless' starboard!");
     }
 
-    private class SetChannel extends EndlessCommand
+    private class SetChannelCmd extends EndlessCommand
     {
-        SetChannel()
+        SetChannelCmd()
         {
             this.name = "setchannel";
             this.aliases = new String[]{"channel"};
@@ -172,6 +172,7 @@ public class StarboardCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Please include a text channel or NONE";
+            this.parent = StarboardCmd.this;
         }
 
         @Override
@@ -198,9 +199,9 @@ public class StarboardCmd extends EndlessCommand
         }
     }
 
-    private class SetCount extends EndlessCommand
+    private class SetCountCmd extends EndlessCommand
     {
-        SetCount()
+        SetCountCmd()
         {
             this.name = "setcount";
             this.aliases = new String[]{"count", "amount", "setamount"};
@@ -208,6 +209,7 @@ public class StarboardCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Please include a number between 1 and 20";
+            this.parent = StarboardCmd.this;
         }
 
         @Override

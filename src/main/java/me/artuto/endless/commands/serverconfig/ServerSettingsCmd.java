@@ -43,8 +43,8 @@ public class ServerSettingsCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "settings";
-        this.children = new Command[]{new Modlog(), new Serverlog(), new Welcome(), new Leave(),
-                new AdminRole(), new ModRole(), new MutedRole(), new BanDeleteDays()};
+        this.children = new Command[]{new ModlogCmd(), new ServerlogCmd(), new WelcomeCmd(), new LeaveCmd(),
+                new AdminRoleCmd(), new ModRoleCmd(), new MutedRoleCmd(), new BanDeleteDaysCmd()};
         this.help = "Displays the settings of the server";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -103,9 +103,9 @@ public class ServerSettingsCmd extends EndlessCommand
         event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
     }
 
-    private class Modlog extends EndlessCommand
+    private class ModlogCmd extends EndlessCommand
     {
-        Modlog()
+        ModlogCmd()
         {
             this.name = "modlog";
             this.help = "Sets the modlog channel";
@@ -113,6 +113,7 @@ public class ServerSettingsCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Please include a text channel or NONE";
+            this.parent = ServerSettingsCmd.this;
         }
 
         @Override
@@ -139,9 +140,9 @@ public class ServerSettingsCmd extends EndlessCommand
         }
     }
 
-    private class Serverlog extends EndlessCommand
+    private class ServerlogCmd extends EndlessCommand
     {
-        Serverlog()
+        ServerlogCmd()
         {
             this.name = "serverlog";
             this.help = "Sets the serverlog channel";
@@ -149,6 +150,7 @@ public class ServerSettingsCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Please include a text channel or NONE";
+            this.parent = ServerSettingsCmd.this;
         }
 
         @Override
@@ -175,9 +177,9 @@ public class ServerSettingsCmd extends EndlessCommand
         }
     }
 
-    private class Welcome extends EndlessCommand
+    private class WelcomeCmd extends EndlessCommand
     {
-        Welcome()
+        WelcomeCmd()
         {
             this.name = "welcome";
             this.aliases = new String[]{"joinschannel", "joinslog", "joins"};
@@ -186,6 +188,7 @@ public class ServerSettingsCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Please include a text channel or NONE";
+            this.parent = ServerSettingsCmd.this;
         }
 
         @Override
@@ -212,9 +215,9 @@ public class ServerSettingsCmd extends EndlessCommand
         }
     }
 
-    private class Leave extends EndlessCommand
+    private class LeaveCmd extends EndlessCommand
     {
-        Leave()
+        LeaveCmd()
         {
             this.name = "leave";
             this.aliases = new String[]{"leaveschannel", "leaveslog", "leaves"};
@@ -223,6 +226,7 @@ public class ServerSettingsCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Please include a text channel or NONE";
+            this.parent = ServerSettingsCmd.this;
         }
 
         @Override
@@ -249,9 +253,9 @@ public class ServerSettingsCmd extends EndlessCommand
         }
     }
 
-    private class AdminRole extends EndlessCommand
+    private class AdminRoleCmd extends EndlessCommand
     {
-        AdminRole()
+        AdminRoleCmd()
         {
             this.name = "adminrole";
             this.help = "Sets the admin role";
@@ -259,6 +263,7 @@ public class ServerSettingsCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Please include a role or NONE";
+            this.parent = ServerSettingsCmd.this;
         }
 
         @Override
@@ -291,9 +296,9 @@ public class ServerSettingsCmd extends EndlessCommand
         }
     }
 
-    private class ModRole extends EndlessCommand
+    private class ModRoleCmd extends EndlessCommand
     {
-        ModRole()
+        ModRoleCmd()
         {
             this.name = "modrole";
             this.help = "Sets the mod role";
@@ -301,6 +306,7 @@ public class ServerSettingsCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Please include a role or NONE";
+            this.parent = ServerSettingsCmd.this;
         }
 
         @Override
@@ -333,9 +339,9 @@ public class ServerSettingsCmd extends EndlessCommand
         }
     }
 
-    private class MutedRole extends EndlessCommand
+    private class MutedRoleCmd extends EndlessCommand
     {
-        MutedRole()
+        MutedRoleCmd()
         {
             this.name = "mutedrole";
             this.help = "Sets the muted role";
@@ -375,9 +381,9 @@ public class ServerSettingsCmd extends EndlessCommand
         }
     }
 
-    private class BanDeleteDays extends EndlessCommand
+    private class BanDeleteDaysCmd extends EndlessCommand
     {
-        BanDeleteDays()
+        BanDeleteDaysCmd()
         {
             this.name = "bandeletedays";
             this.help = "Sets the amount of messages to delete when banning";
@@ -385,6 +391,7 @@ public class ServerSettingsCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Please include a number or 0";
+            this.parent = ServerSettingsCmd.this;
         }
 
         @Override

@@ -46,7 +46,7 @@ public class TimeForCmd extends EndlessCommand
         this.bot = bot;
         this.name = "timefor";
         this.aliases = new String[]{"tf"};
-        this.children = new Command[]{new Change(), new TList()};
+        this.children = new Command[]{new ChangeCmd(), new ListCmd()};
         this.help = "Shows the timezone for the specified user";
         this.arguments = "<user>";
         this.category = Categories.UTILS;
@@ -139,9 +139,9 @@ public class TimeForCmd extends EndlessCommand
         }
     }
 
-    private class Change extends EndlessCommand
+    private class ChangeCmd extends EndlessCommand
     {
-        Change()
+        ChangeCmd()
         {
             this.name = "change";
             this.aliases = new String[]{"set"};
@@ -149,6 +149,7 @@ public class TimeForCmd extends EndlessCommand
             this.arguments = "<timezone>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.parent = TimeForCmd.this;
         }
 
         @Override
@@ -183,15 +184,16 @@ public class TimeForCmd extends EndlessCommand
         }
     }
 
-    private class TList extends EndlessCommand
+    private class ListCmd extends EndlessCommand
     {
-        TList()
+        ListCmd()
         {
             this.name = "list";
             this.aliases = new String[]{"timezones"};
             this.help = "Shows the list with valid timezones";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.parent = TimeForCmd.this;
         }
 
         @Override

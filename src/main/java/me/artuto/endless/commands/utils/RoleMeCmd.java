@@ -49,7 +49,7 @@ public class RoleMeCmd extends EndlessCommand
         this.help = "Self-assignable roles.";
         this.arguments = "[roleme role]";
         this.category = Categories.UTILS;
-        this.children = new Command[]{new Add(), new Remove()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd()};
         this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
         this.needsArguments = false;
     }
@@ -121,9 +121,9 @@ public class RoleMeCmd extends EndlessCommand
         }
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a role to the list of available RoleMe roles.";
@@ -131,6 +131,7 @@ public class RoleMeCmd extends EndlessCommand
             this.category = Categories.UTILS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.parent = RoleMeCmd.this;
         }
 
         protected void executeCommand(CommandEvent event)
@@ -176,9 +177,9 @@ public class RoleMeCmd extends EndlessCommand
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a role from the list of available RoleMe roles.";
@@ -186,6 +187,7 @@ public class RoleMeCmd extends EndlessCommand
             this.category = Categories.UTILS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.parent = RoleMeCmd.this;
         }
 
         protected void executeCommand(CommandEvent event)

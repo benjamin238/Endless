@@ -34,7 +34,7 @@ public class LeaveCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "leave";
-        this.children = new Command[]{new Change()};
+        this.children = new Command[]{new ChangeCmd()};
         this.aliases = new String[]{"leavemessage", "leavemsg"};
         this.help = "Changes or shows the welcome message";
         this.category = Categories.SERVER_CONFIG;
@@ -54,9 +54,9 @@ public class LeaveCmd extends EndlessCommand
             event.replyError("No message configured!");
     }
 
-    private class Change extends EndlessCommand
+    private class ChangeCmd extends EndlessCommand
     {
-        Change()
+        ChangeCmd()
         {
             this.name = "change";
             this.help = "Changes the welcome message";
@@ -64,6 +64,7 @@ public class LeaveCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Specify a new leave message!";
+            this.parent = LeaveCmd.this;
         }
 
         @Override

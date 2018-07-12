@@ -47,7 +47,7 @@ public class ProfileCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "profile";
-        this.children = new Command[]{new Fields(), new Set()};
+        this.children = new Command[]{new FieldsCmd(), new SetCmd()};
         this.aliases = new String[]{"p"};
         this.help = "Displays or edits the profile of the specified user";
         this.arguments = "<user>";
@@ -121,16 +121,17 @@ public class ProfileCmd extends EndlessCommand
         }
     }
 
-    private class Fields extends EndlessCommand
+    private class FieldsCmd extends EndlessCommand
     {
         private final Paginator.Builder menu;
 
-        Fields()
+        FieldsCmd()
         {
             this.name = "fields";
             this.help = "List of valid profile fields";
             this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.needsArguments = false;
+            this.parent = ProfileCmd.this;
             this.menu = new Paginator.Builder().setColumns(1)
                     .setItemsPerPage(10)
                     .showPageNumbers(true)
@@ -162,14 +163,15 @@ public class ProfileCmd extends EndlessCommand
         }
     }
 
-    private class Set extends EndlessCommand
+    private class SetCmd extends EndlessCommand
     {
-        Set()
+        SetCmd()
         {
             this.name = "set";
             this.aliases = new String[]{"change"};
             this.help = "sets the specified value";
             this.arguments = "<field> <value|NONE>";
+            this.parent = ProfileCmd.this;
         }
 
         @Override

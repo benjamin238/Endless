@@ -46,7 +46,7 @@ public class ReminderCmd extends EndlessCommand
         this.bot = bot;
         this.name = "reminder";
         this.aliases = new String[]{"remindme", "remind"};
-        this.children = new Command[]{new Create(), new Delete()};
+        this.children = new Command[]{new CreateCmd(), new DeleteCmd()};
         this.help = "Shows the list of reminders.";
         this.category = Categories.UTILS;
         this.needsArguments = false;
@@ -82,15 +82,16 @@ public class ReminderCmd extends EndlessCommand
         event.replySuccess(sb.toString());
     }
 
-    private class Create extends EndlessCommand
+    private class CreateCmd extends EndlessCommand
     {
-        Create()
+        CreateCmd()
         {
             this.name = "create";
             this.aliases = new String[]{"add"};
             this.help = "Creates a reminder.";
             this.arguments = "<time> <message>";
             this.guildOnly = false;
+            this.parent = ReminderCmd.this;
         }
 
         @Override
@@ -135,15 +136,16 @@ public class ReminderCmd extends EndlessCommand
         }
     }
 
-    private class Delete extends EndlessCommand
+    private class DeleteCmd extends EndlessCommand
     {
-        Delete()
+        DeleteCmd()
         {
             this.name = "delete";
             this.aliases = new String[]{"remove"};
             this.arguments = "<reminder id>";
             this.help = "Deletes a reminder.";
             this.guildOnly = false;
+            this.parent = ReminderCmd.this;
         }
 
         @Override

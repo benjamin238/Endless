@@ -23,7 +23,7 @@ public class SetupCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "setup";
-        this.children = new Command[]{new MutedRole()};
+        this.children = new Command[]{new MutedRoleCmd()};
         this.help = "Server setup";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -38,9 +38,9 @@ public class SetupCmd extends EndlessCommand
                 Const.LINE_START+" Starboard (not available yet with this command)");
     }
 
-    private class MutedRole extends EndlessCommand
+    private class MutedRoleCmd extends EndlessCommand
     {
-        MutedRole()
+        MutedRoleCmd()
         {
             this.name = "mutedrole";;
             this.help = "Setup the muted role";
@@ -48,6 +48,7 @@ public class SetupCmd extends EndlessCommand
             this.botPerms = new Permission[]{Permission.ADMINISTRATOR};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArguments = false;
+            this.parent = SetupCmd.this;
         }
 
         @Override

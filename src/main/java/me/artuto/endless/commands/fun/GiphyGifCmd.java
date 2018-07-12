@@ -48,7 +48,7 @@ public class GiphyGifCmd extends EndlessCommand
         this.bot = bot;
         this.name = "giphy";
         this.aliases = new String[]{"gif"};
-        this.children = new Command[]{new RandomGif()};
+        this.children = new Command[]{new RandomGifCmd()};
         this.help = "Searches a gif on Giphy using the specified serarch terms.";
         this.arguments = "[keyword]";
         this.category = Categories.FUN;
@@ -126,9 +126,9 @@ public class GiphyGifCmd extends EndlessCommand
         }
     }
 
-    private class RandomGif extends EndlessCommand
+    private class RandomGifCmd extends EndlessCommand
     {
-        RandomGif()
+        RandomGifCmd()
         {
             this.name = "random";
             this.help = "Retrieves a random GIF from Giphy.";
@@ -137,6 +137,7 @@ public class GiphyGifCmd extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.guildOnly = false;
             this.needsArgumentsMessage = "No search terms specified!";
+            this.parent = GiphyGifCmd.this;
         }
 
         protected void executeCommand(CommandEvent event)

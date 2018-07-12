@@ -44,7 +44,7 @@ public class BlacklistGuildCmd extends EndlessCommand
         this.name = "blacklistguild";
         this.help = "Adds, removes or displays the list with blacklisted guilds.";
         this.category = Categories.BOTADM;
-        this.children = new Command[]{new Add(), new Remove(), new Check(), new BlacklistList()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd(), new CheckCmd(), new BlacklistListCmd()};
         this.ownerCommand = true;
         this.guildOnly = false;
     }
@@ -55,9 +55,9 @@ public class BlacklistGuildCmd extends EndlessCommand
         event.replyWarning("Please specify a subcommand!");
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a guild ID to the blacklisted guilds list.";
@@ -66,6 +66,7 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a Guild ID and a reason!";
+            this.parent = BlacklistGuildCmd.this;
         }
 
         @Override
@@ -98,9 +99,9 @@ public class BlacklistGuildCmd extends EndlessCommand
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a guild ID to the blacklisted guilds list.";
@@ -109,6 +110,7 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a Guild ID!";
+            this.parent = BlacklistGuildCmd.this;
         }
 
         @Override
@@ -144,9 +146,9 @@ public class BlacklistGuildCmd extends EndlessCommand
         }
     }
 
-    private class BlacklistList extends EndlessCommand
+    private class BlacklistListCmd extends EndlessCommand
     {
-        BlacklistList()
+        BlacklistListCmd()
         {
             this.name = "list";
             this.help = "Displays blacklisted guilds.";
@@ -155,6 +157,7 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BlacklistGuildCmd.this;
         }
 
         @Override
@@ -195,9 +198,9 @@ public class BlacklistGuildCmd extends EndlessCommand
         }
     }
 
-    private class Check extends EndlessCommand
+    private class CheckCmd extends EndlessCommand
     {
-        Check()
+        CheckCmd()
         {
             this.name = "check";
             this.help = "Checks if a guild ID is blacklisted.";
@@ -205,6 +208,7 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a guild ID!";
+            this.parent = BlacklistGuildCmd.this;
         }
 
         @Override

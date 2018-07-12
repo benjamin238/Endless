@@ -43,20 +43,21 @@ public class CommandHelper
         EmbedBuilder eBuilder = new EmbedBuilder();
         eBuilder.setColor(Color.decode("#33ff00"));
         String args = event.getArgs().trim();
+        String prefix = event.getClient().getPrefix();
 
         if(args.isEmpty())
         {
-            eBuilder.addField(Const.ENDLESS+" Bot Commands:", "e!help bot", false);
+            eBuilder.addField(Const.ENDLESS+" Bot Commands:", prefix+"help bot", false);
             if(event.isOwner())
-                eBuilder.addField(Const.BOTADM+" Bot Administrator Commands:", "e!help botadm", false);
-            eBuilder.addField(Const.GIPHY+" Fun Commands:", "e!help fun", false);
+                eBuilder.addField(Const.BOTADM+" Bot Administrator Commands:", prefix+"help botadm", false);
+            eBuilder.addField(Const.GIPHY+" Fun Commands:", prefix+"help fun", false);
             if(event.isFromType(ChannelType.TEXT))
             {
-                eBuilder.addField(Const.BAN+" Moderation Commands:", "e!help moderation", false);
-                eBuilder.addField(Const.SERVER_SETTINGS+" Server Settings Commands:", "e!help settings", false);
+                eBuilder.addField(Const.BAN+" Moderation Commands:", prefix+"help moderation", false);
+                eBuilder.addField(Const.SERVER_SETTINGS+" Server Settings Commands:", prefix+"help settings", false);
             }
-            eBuilder.addField(Const.PEOPLE+" Tool Commands:", "e!help tools", false);
-            eBuilder.addField(Const.GOOGLE+" Util Commands:", "e!help utils", false);
+            eBuilder.addField(Const.PEOPLE+" Tool Commands:", prefix+"help tools", false);
+            eBuilder.addField(Const.GOOGLE+" Util Commands:", prefix+"help utils", false);
         }
         else
         {
@@ -113,6 +114,7 @@ public class CommandHelper
     public static void getHelpBiConsumer(CommandEvent event, Command preCmd)
     {
         EndlessCommand command = (EndlessCommand)preCmd;
+        String prefix = event.getClient().getPrefix();
         StringBuilder sb = new StringBuilder("**Help for `");
         String[] aliases = command.getAliases();
         Command[] children = command.getChildren();
@@ -123,7 +125,8 @@ public class CommandHelper
         else
             sb.append("Direct Message):**\n");
 
-        sb.append("**Usage:** `e!").append(command.getName()).append(" ").append(command.getArguments()==null?"":command.getArguments()).append("`\n");
+        sb.append("**Usage:** `").append(prefix).append(command.getParent()==null?"":command.getParent().getName()+" ")
+                .append(command.getName()).append(" ").append(command.getArguments()==null? "":command.getArguments()).append("`\n");
 
         if(!(aliases.length==0))
         {
@@ -151,8 +154,10 @@ public class CommandHelper
                 else if(c.isGuildOnly())
                     return false;
                 return true;
-            }).forEach(c -> childrenBuilder.append("\n`e!").append(command.getName()).append(" ")
-                    .append(c.getName()).append(" ").append(c.getArguments()==null?"":c.getArguments()).append("` - *").append(c.getHelp()).append("*"));
+            }).forEach(c -> {
+                childrenBuilder.append("\n`").append(prefix).append(command.getName()).append(" "
+                ).append(c.getName()).append(" ").append(c.getArguments()==null?"":c.getArguments()).append("` - *").append(c.getHelp()).append("*");
+            });
             if(!(childrenBuilder.toString().replace("**Subcommands:**", "").length()==0))
                 sb.append(childrenBuilder).append("\n");
         }
@@ -180,11 +185,12 @@ public class CommandHelper
                     return true;
                 }).collect(Collectors.toList());
 
+        String prefix = event.getClient().getPrefix();
         for(Command cmd : cmds)
-            eBuilder.addField("e!"+cmd.getName()+" "+(cmd.getArguments()==null?"":cmd.getArguments()), cmd.getHelp(), false);
+            eBuilder.addField(prefix+cmd.getName()+" "+(cmd.getArguments()==null?"":cmd.getArguments()), cmd.getHelp(), false);
 
         if(!(eBuilder.isEmpty()))
-            eBuilder.setFooter("For support type e!help support", null);
+            eBuilder.setFooter("For support type "+prefix+"help support", null);
     }
 
     private static void getSupport(CommandEvent event, EmbedBuilder eBuilder)

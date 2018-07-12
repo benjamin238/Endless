@@ -42,7 +42,7 @@ public class RoleCmd extends EndlessCommand
         this.name = "role";
         this.help = "Displays info about the specified role";
         this.arguments = "<role>";
-        this.children = new Command[]{new GiveRole(), new Ping(), new TakeRole()};
+        this.children = new Command[]{new GiveRoleCmd(), new PingCmd(), new TakeRoleCmd()};
         this.category = Categories.TOOLS;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
@@ -97,9 +97,9 @@ public class RoleCmd extends EndlessCommand
         event.reply(mb.setContent(title).setEmbed(builder.build()).build());
     }
 
-    private class GiveRole extends EndlessCommand
+    private class GiveRoleCmd extends EndlessCommand
     {
-        GiveRole()
+        GiveRoleCmd()
         {
             this.name = "give";
             this.help = "Gives the specified role to the specified member";
@@ -107,6 +107,7 @@ public class RoleCmd extends EndlessCommand
             this.category = Categories.TOOLS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.parent = RoleCmd.this;
         }
 
         @Override
@@ -176,9 +177,9 @@ public class RoleCmd extends EndlessCommand
         }
     }
 
-    private class Ping extends EndlessCommand
+    private class PingCmd extends EndlessCommand
     {
-        Ping()
+        PingCmd()
         {
             this.name = "ping";
             this.aliases = new String[]{"notify"};
@@ -187,6 +188,7 @@ public class RoleCmd extends EndlessCommand
             this.category = Categories.TOOLS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.parent = RoleCmd.this;
         }
 
         @Override
@@ -231,9 +233,9 @@ public class RoleCmd extends EndlessCommand
         }
     }
 
-    private class TakeRole extends EndlessCommand
+    private class TakeRoleCmd extends EndlessCommand
     {
-        TakeRole()
+        TakeRoleCmd()
         {
             this.name = "take";
             this.help = "Takes the specified role from the specified member";
@@ -241,6 +243,7 @@ public class RoleCmd extends EndlessCommand
             this.category = Categories.TOOLS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.parent = RoleCmd.this;
         }
 
         @Override

@@ -38,7 +38,7 @@ public class BotCPanelCmd extends EndlessCommand
         this.name = "bot";
         this.help = "Controls the status, game, optimized the bot and other useful things.";
         this.category = Categories.BOTADM;
-        this.children = new Command[]{new Status(), new Playing(), new DefaultGameUpdate(), new Optimize()};
+        this.children = new Command[]{new StatusCmd(), new PlayingCmd(), new DefaultGameUpdateCmd(), new OptimizeCmd()};
         this.ownerCommand = true;
         this.guildOnly = false;
     }
@@ -50,9 +50,9 @@ public class BotCPanelCmd extends EndlessCommand
                 "Please use a subcommand.");
     }
 
-    private class Status extends EndlessCommand
+    private class StatusCmd extends EndlessCommand
     {
-        Status()
+        StatusCmd()
         {
             this.name = "status";
             this.help = "Sets the Online Status (OnlineStatus) of the bot.";
@@ -60,6 +60,7 @@ public class BotCPanelCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please provide me a valid OnlineStatus!";
+            this.parent = BotCPanelCmd.this;
         }
 
         @Override
@@ -84,9 +85,9 @@ public class BotCPanelCmd extends EndlessCommand
         }
     }
 
-    private class Playing extends EndlessCommand
+    private class PlayingCmd extends EndlessCommand
     {
-        Playing()
+        PlayingCmd()
         {
             this.name = "game";
             this.help = "Sets the Game (Game.playing) of the bot.";
@@ -94,6 +95,7 @@ public class BotCPanelCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BotCPanelCmd.this;
         }
 
         @Override
@@ -133,9 +135,9 @@ public class BotCPanelCmd extends EndlessCommand
         }
     }
 
-    private class DefaultGameUpdate extends EndlessCommand
+    private class DefaultGameUpdateCmd extends EndlessCommand
     {
-        DefaultGameUpdate()
+        DefaultGameUpdateCmd()
         {
             this.name = "updategame";
             this.help = "Updates the default game.";
@@ -143,6 +145,7 @@ public class BotCPanelCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BotCPanelCmd.this;
         }
 
         @Override
@@ -170,9 +173,9 @@ public class BotCPanelCmd extends EndlessCommand
         }
     }
 
-    private class Optimize extends EndlessCommand
+    private class OptimizeCmd extends EndlessCommand
     {
-        Optimize()
+        OptimizeCmd()
         {
             this.name = "optimize";
             this.help = "Optimizes the Bot's RAM usage. Use with caution.";
@@ -180,6 +183,7 @@ public class BotCPanelCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BotCPanelCmd.this;
         }
 
         @Override
