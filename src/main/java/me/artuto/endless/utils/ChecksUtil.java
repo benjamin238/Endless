@@ -18,12 +18,8 @@
 package me.artuto.endless.utils;
 
 import me.artuto.endless.Const;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.*;
 
 
 /**
@@ -52,14 +48,14 @@ public class ChecksUtil
         return issuer.canInteract(target);
     }
 
-    public static boolean hasPermission(Member target, TextChannel tc, Permission... perms)
+    public static boolean hasPermission(Member target, Channel channel, Permission... perms)
     {
         User user = target.getUser();
 
         if(user.getIdLong()==Const.ARTUTO_ID || user.getIdLong()==Const.ARTUTO_ALT_ID)
             return true;
-        else if(!(tc==null))
-            return target.hasPermission(tc, perms);
+        else if(!(channel==null))
+            return target.hasPermission(channel, perms);
         else
             return target.hasPermission(perms);
     }

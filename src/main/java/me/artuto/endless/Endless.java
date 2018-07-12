@@ -17,7 +17,6 @@
 
 package me.artuto.endless;
 
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +27,12 @@ import org.slf4j.LoggerFactory;
 public class Endless
 {
     public static Bot bot;
-    public static Logger LOG = (Logger) LoggerFactory.getLogger("Endless");
+    public static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
+
+    public static Logger getLog(Class c)
+    {
+        return (Logger)LoggerFactory.getLogger(c);
+    }
 
     public static void main(String[] args)
     {

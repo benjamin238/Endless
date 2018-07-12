@@ -91,6 +91,7 @@ public class Bot extends ListenerAdapter
     public PunishmentsDataManager pdm;
     public ProfileDataManager prdm;
     public RemindersDataManager rdm;
+    public RoomsDataManager rsdm;
     public StarboardDataManager sdm;
     public TagDataManager tdm;
 
@@ -114,6 +115,7 @@ public class Bot extends ListenerAdapter
     private ScheduledExecutorService optimizerScheduler;
     private ScheduledExecutorService pollScheduler;
     private ScheduledExecutorService reminderScheduler;
+    private ScheduledExecutorService roomScheduler;
 
     // Threads
     public ScheduledExecutorService clearThread;
@@ -160,6 +162,7 @@ public class Bot extends ListenerAdapter
             pdm = new PunishmentsDataManager(db);
             prdm = new ProfileDataManager(db);
             rdm = new RemindersDataManager(db);
+            rsdm = new RoomsDataManager(db);
             sdm = new StarboardDataManager(db);
             tdm = new TagDataManager(this);
         }
@@ -181,6 +184,7 @@ public class Bot extends ListenerAdapter
             muteScheduler = ThreadLoader.createThread("Mutes");
             pollScheduler = ThreadLoader.createThread("Polls");
             reminderScheduler = ThreadLoader.createThread("Reminders");
+            roomScheduler = ThreadLoader.createThread("Rooms");
             starboardThread = ThreadLoader.createThread("Starboard");
         }
         optimizerScheduler = ThreadLoader.createThread("Optimizer");
@@ -224,8 +228,8 @@ public class Bot extends ListenerAdapter
                 new HackbanCmd(this), new MuteCmd(this), new SoftbanCmd(this), new UnbanCmd(this),
 
                 // Server Settings
-                new IgnoreCmd(this), new LeaveCmd(this), new PrefixCmd(this), new ServerSettingsCmd(this),
-                new SetupCmd(this), new StarboardCmd(this), new WelcomeCmd(this),
+                new IgnoreCmd(this), new LeaveCmd(this), new PrefixCmd(this), new RoomCmd(this),
+                new ServerSettingsCmd(this), new SetupCmd(this), new StarboardCmd(this), new WelcomeCmd(this),
 
                 // Tools
                 new AfkCmd(), new AnnouncementCmd(), new AvatarCmd(), new EmoteCmd(), new GuildInfoCmd(),
@@ -281,6 +285,7 @@ public class Bot extends ListenerAdapter
                             0, 10, TimeUnit.SECONDS);
                     pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 0, 10, TimeUnit.SECONDS);
                     reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 10, TimeUnit.SECONDS);
+                    roomScheduler.scheduleWithFixedDelay(() -> rsdm.updateRooms(shardManager), 0, 30, TimeUnit.SECONDS);
                 }
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
                 sendStats(event.getJDA());

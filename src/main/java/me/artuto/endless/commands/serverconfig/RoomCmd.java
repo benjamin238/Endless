@@ -18,11 +18,14 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.core.entities.Room;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,25 +36,72 @@ import java.util.stream.Collectors;
 
 public class RoomCmd extends EndlessCommand
 {
-    public RoomCmd()
+    private final Bot bot;
+
+    public RoomCmd(Bot bot)
     {
+        this.bot = bot;
         this.name = "room";
         this.help = "Rooms are private text or voice channels that can be created by normal users.";
         this.category = Categories.SERVER_CONFIG;
-        this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+        this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
         this.needsArguments = false;
     }
 
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        Guild guild = event.getGuild();
-        net.dv8tion.jda.core.entities.Category cat = guild.getCategoriesByName("Endless Rooms", true).stream().findFirst()
-                .orElse(null);
+        String prefix = event.getClient().getPrefix();
 
-        if(cat==null)
+        if(event.getArgs().equalsIgnoreCase("create"))
         {
-
+            event.replyWarning("You can create three types of rooms:\n" +
+                    "- *Text Rooms:* `"+prefix+"room text` Creates a private text room\n" +
+                    "- *Voice Rooms:* `"+prefix+"room voice` Creates a private voice room\n" +
+                    "- *Combo Rooms:* `"+prefix+"room combo` Creates a private text and voice rooms. They are also linked");
+            return;
         }
+
+        Guild guild = event.getGuild();
+        List<Room> rooms = bot.rsdm.getRoomsForGuild(guild.getIdLong());
+
+        if(rooms.isEmpty())
+        {
+            event.replyWarning("This guild doesn't have any rooms created! Create one by doing `"+prefix+"`room create`");
+            return;
+        }
+
+        List<Room> comboRooms = rooms.stream().filter(Room::isCombo).filter(r -> r.canAccess(event)).collect(Collectors.toList());
+        List<Room> textRooms = rooms.stream().filter(Room::isText).filter(r -> r.canAccess(event)).collect(Collectors.toList());
+        List<Room> voiceRooms = rooms.stream().filter(Room::isVoice).filter(r -> r.canAccess(event)).collect(Collectors.toList());
+        StringBuilder sb = new StringBuilder("Rooms in **").append(guild.getName()).append("**\n");
+
+        if(!(comboRooms.isEmpty()))
+        {
+            sb.append("**Combo Rooms: **").append(comboRooms.size()).append("**\n");
+            comboRooms.forEach(r -> {
+                TextChannel tc = guild.getTextChannelById(r.getTextChannelId());
+                VoiceChannel vc = guild.getVoiceChannelById(r.getVoiceChannelId());
+                sb.append("- ").append(tc.getAsMention()).append(": ").append(vc.getName()).append("\n");
+            });
+        }
+        if(!(textRooms.isEmpty()))
+        {
+            sb.append("**Text Rooms: **").append(comboRooms.size()).append("**\n");
+            comboRooms.forEach(r -> {
+                TextChannel tc = guild.getTextChannelById(r.getTextChannelId());
+                sb.append("- ").append(tc.getAsMention()).append("\n");
+            });
+        }
+        if(!(voiceRooms.isEmpty()))
+        {
+            sb.append("**Voice Rooms: **").append(comboRooms.size()).append("**\n");
+            comboRooms.forEach(r -> {
+                VoiceChannel vc = guild.getVoiceChannelById(r.getVoiceChannelId());
+                sb.append("- ").append(vc.getName()).append("\n");
+            });
+        }
+
+        event.replySuccess(sb.toString());
     }
 }
