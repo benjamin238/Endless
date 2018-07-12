@@ -24,7 +24,6 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.LocalTag;
 import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.utils.FormatUtil;
@@ -255,7 +254,7 @@ public class TagCmd extends EndlessCommand
 
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
-                    if(tag instanceof GlobalTag)
+                    if(tag.isGlobal())
                         bot.tdm.deleteGlobalTag(event.getJDA(), event.getArgs().trim().toLowerCase());
                     else
                         bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
@@ -335,7 +334,7 @@ public class TagCmd extends EndlessCommand
 
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
-                    if(tag instanceof GlobalTag)
+                    if(tag.isGlobal())
                         bot.tdm.updateGlobalTagContent(event.getJDA(), name, content);
                     else
                         bot.tdm.updateLocalTagContent(event.getJDA(), event.getGuild().getIdLong(), name, content);
@@ -467,7 +466,7 @@ public class TagCmd extends EndlessCommand
                         return;
                 }
 
-                List<GlobalTag> globalTags = bot.endless.getGlobalTags().stream().filter(t -> t.getOwnerId()==user.getIdLong()).collect(Collectors.toList());
+                List<Tag> globalTags = bot.endless.getGlobalTags().stream().filter(t -> t.getOwnerId()==user.getIdLong()).collect(Collectors.toList());
                 List<LocalTag> localTags = bot.endless.getLocalTags().stream().filter(t -> t.getOwnerId()==user.getIdLong() &&
                         t.getGuildId()==event.getGuild().getIdLong()).collect(Collectors.toList());
 
@@ -498,7 +497,7 @@ public class TagCmd extends EndlessCommand
             {
                 user = event.getAuthor();
 
-                List<GlobalTag> globalTags = bot.endless.getGlobalTags().stream().filter(t -> t.getOwnerId()==user.getIdLong()).collect(Collectors.toList());
+                List<Tag> globalTags = bot.endless.getGlobalTags().stream().filter(t -> t.getOwnerId()==user.getIdLong()).collect(Collectors.toList());
 
                 if(!(globalTags.isEmpty()))
                 {
@@ -621,7 +620,7 @@ public class TagCmd extends EndlessCommand
             }
             else
             {
-                if(tag instanceof GlobalTag)
+                if(tag.isGlobal())
                 {
                     if(tagContent.isEmpty())
                         bot.tdm.createLocalTag(true, event.getGuild().getIdLong(), event.getGuild().getIdLong(), "", tagName);

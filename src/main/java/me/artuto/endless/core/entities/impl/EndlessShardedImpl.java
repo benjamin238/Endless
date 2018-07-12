@@ -50,9 +50,9 @@ public class EndlessShardedImpl implements EndlessSharded
     private final List<GuildSettings> guildSettings;
     private final Map<Guild, GuildSettings> guildSettingsMap;
 
-    private final List<GlobalTag> globalTags;
+    private final List<Tag> globalTags;
     private final List<LocalTag> localTags;
-    private final Map<String, GlobalTag> globalTagMap;
+    private final Map<String, Tag> globalTagMap;
     private final Map<String, LocalTag> localTagMap;
 
     public EndlessShardedImpl(Bot bot, ShardManager shardManager, List<EndlessCore> shards)
@@ -93,7 +93,7 @@ public class EndlessShardedImpl implements EndlessSharded
     }
 
     @Override
-    public GlobalTag getGlobalTag(String name)
+    public Tag getGlobalTag(String name)
     {
         return globalTagMap.get(name);
     }
@@ -152,7 +152,7 @@ public class EndlessShardedImpl implements EndlessSharded
     }
 
     @Override
-    public List<GlobalTag> getGlobalTags()
+    public List<Tag> getGlobalTags()
     {
         return Collections.unmodifiableList(globalTags);
     }
@@ -187,7 +187,7 @@ public class EndlessShardedImpl implements EndlessSharded
         blacklistMap.put(blacklist.getId(), blacklist);
     }
 
-    public void addGlobalTag(GlobalTag tag)
+    public void addGlobalTag(Tag tag)
     {
         globalTags.add(tag);
         globalTagMap.put(tag.getName(), tag);

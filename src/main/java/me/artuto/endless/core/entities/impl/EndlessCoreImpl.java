@@ -21,9 +21,9 @@ import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.EndlessCore;
-import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.LocalTag;
+import me.artuto.endless.core.entities.Tag;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import org.slf4j.LoggerFactory;
@@ -45,9 +45,9 @@ public class EndlessCoreImpl implements EndlessCore
     private final List<GuildSettings> guildSettings;
     private final Map<Guild, GuildSettings> guildSettingsMap;
 
-    private final List<GlobalTag> globalTags;
+    private final List<Tag> globalTags;
     private final List<LocalTag> localTags;
-    private final Map<String, GlobalTag> globalTagMap;
+    private final Map<String, Tag> globalTagMap;
     private final Map<String, LocalTag> localTagMap;
 
     public EndlessCoreImpl(Bot bot, CommandClient client, JDA jda)
@@ -80,7 +80,7 @@ public class EndlessCoreImpl implements EndlessCore
     }
 
     @Override
-    public GlobalTag getGlobalTag(String name)
+    public Tag getGlobalTag(String name)
     {
         return globalTagMap.get(name);
     }
@@ -112,7 +112,7 @@ public class EndlessCoreImpl implements EndlessCore
     }
 
     @Override
-    public List<GlobalTag> getGlobalTags()
+    public List<Tag> getGlobalTags()
     {
         return Collections.unmodifiableList(globalTags);
     }
@@ -155,7 +155,7 @@ public class EndlessCoreImpl implements EndlessCore
         }
         LOG.debug("Cached {} Guild Settings", guildSettings.size());
 
-        for(GlobalTag tag : bot.tdm.getGlobalTags())
+        for(Tag tag : bot.tdm.getGlobalTags())
             addGlobalTag(tag);
         LOG.debug("Cached {} Global tags", globalTags.size());
 
@@ -168,7 +168,7 @@ public class EndlessCoreImpl implements EndlessCore
         LOG.debug("Successfully cached all needed entities for shard "+jda.getShardInfo().getShardId()+".");
     }
 
-    public void addGlobalTag(GlobalTag tag)
+    public void addGlobalTag(Tag tag)
     {
         globalTags.add(tag);
         globalTagMap.put(tag.getName(), tag);

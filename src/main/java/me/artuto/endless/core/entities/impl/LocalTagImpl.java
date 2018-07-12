@@ -40,6 +40,12 @@ public class LocalTagImpl implements LocalTag
     }
 
     @Override
+    public boolean isGlobal()
+    {
+        return false;
+    }
+
+    @Override
     public boolean isNSFW()
     {
         return content.toLowerCase().contains("{nsfw}");

@@ -17,13 +17,13 @@
 
 package me.artuto.endless.core.entities.impl;
 
-import me.artuto.endless.core.entities.GlobalTag;
+import me.artuto.endless.core.entities.Tag;
 
 /**
  * @author Artuto
  */
 
-public class GlobalTagImpl implements GlobalTag
+public class GlobalTagImpl implements Tag
 {
     private long ownerId, tagId;
     private String content, name;
@@ -34,6 +34,12 @@ public class GlobalTagImpl implements GlobalTag
         this.tagId = tagId;
         this.content = content;
         this.name = name;
+    }
+
+    @Override
+    public boolean isGlobal()
+    {
+        return true;
     }
 
     @Override
@@ -75,7 +81,7 @@ public class GlobalTagImpl implements GlobalTag
     @Override
     public String toString()
     {
-        return String.format("GlobalTag: %s(%s)", name, tagId);
+        return String.format("Tag: %s(%s)", name, tagId);
     }
 
     public void setContent(String newContent)

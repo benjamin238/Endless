@@ -19,6 +19,8 @@ package me.artuto.endless.core.entities;
 
 public interface Tag
 {
+    boolean isGlobal();
+
     boolean isNSFW();
 
     boolean isOverriden();

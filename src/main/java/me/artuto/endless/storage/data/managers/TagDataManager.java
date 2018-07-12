@@ -18,7 +18,6 @@
 package me.artuto.endless.storage.data.managers;
 
 import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.GlobalTag;
 import me.artuto.endless.core.entities.LocalTag;
 import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.core.entities.impl.*;
@@ -46,7 +45,7 @@ public class TagDataManager
         this.connection = bot.db.getConnection();
     }
 
-    private GlobalTag getGlobalTag(String name)
+    private Tag getGlobalTag(String name)
     {
         try
         {
@@ -115,7 +114,7 @@ public class TagDataManager
         return false;
     }
 
-    public List<GlobalTag> getGlobalTags()
+    public List<Tag> getGlobalTags()
     {
         try
         {
@@ -123,7 +122,7 @@ public class TagDataManager
             statement.closeOnCompletion();
             try(ResultSet results = statement.executeQuery("SELECT * FROM GLOBAL_TAGS"))
             {
-                List<GlobalTag> list = new LinkedList<>();
+                List<Tag> list = new LinkedList<>();
                 while(results.next())
                 {
                     list.add(new GlobalTagImpl(results.getLong("owner"), results.getInt("id"),
@@ -178,8 +177,8 @@ public class TagDataManager
                 results.updateLong("owner", owner);
                 results.insertRow();
                 Tag tag = getGlobalTag(name);
-                ((EndlessCoreImpl)bot.endless.getShard(bot.shardManager.getGuildById(guild).getJDA())).addGlobalTag((GlobalTag)tag);
-                ((EndlessShardedImpl)bot.endless).addGlobalTag((GlobalTag)tag);
+                ((EndlessCoreImpl)bot.endless.getShard(bot.shardManager.getGuildById(guild).getJDA())).addGlobalTag(tag);
+                ((EndlessShardedImpl)bot.endless).addGlobalTag(tag);
             }
         }
         catch(SQLException e)

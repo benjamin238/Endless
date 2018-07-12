@@ -37,7 +37,7 @@ public interface EndlessSharded
 
     EndlessCore getShard(JDA jda);
 
-    GlobalTag getGlobalTag(String name);
+    Tag getGlobalTag(String name);
 
     GuildSettings getGuildSettings(Guild guild);
 
@@ -55,7 +55,7 @@ public interface EndlessSharded
 
     List<EndlessCore> getShards();
 
-    List<GlobalTag> getGlobalTags();
+    List<Tag> getGlobalTags();
 
     List<GuildSettings> getGuildSettings();
 
