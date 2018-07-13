@@ -27,4 +27,24 @@ public interface Room
     long getVoiceChannelId();
 
     OffsetDateTime getExpiryTime();
+
+    enum Mode
+    {
+        COMBO_ONLY("Combo Only"),
+        NO_CREATION("No Creation"),
+        TEXT_ONLY("Text Only"),
+        VOICE_ONLY("Voice Only");
+
+        private String name;
+
+        Mode(String name)
+        {
+            this.name = name;
+        }
+
+        public String getName()
+        {
+            return this.name;
+        }
+    }
 }

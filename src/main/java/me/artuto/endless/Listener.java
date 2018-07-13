@@ -29,8 +29,11 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.core.events.guild.*;
 import net.dv8tion.jda.core.events.guild.member.*;
 import net.dv8tion.jda.core.events.guild.voice.*;
@@ -204,6 +207,42 @@ public class Listener implements CommandListener, EventListener
                 return;
             GuildBanEvent event = (GuildBanEvent)preEvent;
             modlog.onGuildBan(event);
+        }
+        else if(preEvent instanceof TextChannelDeleteEvent)
+        {
+            if(bot.maintenance || !(bot.initialized))
+                return;
+            TextChannelDeleteEvent event = (TextChannelDeleteEvent)preEvent;
+            TextChannel tc = event.getChannel();
+            bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getTextChannelId()==tc.getIdLong()).forEach(r -> {
+                if(r.isCombo())
+                {
+                    VoiceChannel vc = event.getGuild().getVoiceChannelById(r.getVoiceChannelId());
+                    if(!(vc==null))
+                        vc.delete().reason("[Text Channel Deleted (Combo)]").queue(null, e -> {});
+                    bot.rsdm.deleteComboRoom(tc.getIdLong(), r.getVoiceChannelId());
+                }
+                else
+                    bot.rsdm.deleteTextRoom(tc.getIdLong());
+            });
+        }
+        else if(preEvent instanceof VoiceChannelDeleteEvent)
+        {
+            if(bot.maintenance || !(bot.initialized))
+                return;
+            VoiceChannelDeleteEvent event = (VoiceChannelDeleteEvent)preEvent;
+            VoiceChannel vc = event.getChannel();
+            bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getVoiceChannelId()==vc.getIdLong()).forEach(r -> {
+                if(r.isCombo())
+                {
+                    TextChannel tc = event.getGuild().getTextChannelById(r.getTextChannelId());
+                    if(!(tc==null))
+                        tc.delete().reason("[Voice Channel Deleted (Combo)]").queue(null, e -> {});
+                    bot.rsdm.deleteComboRoom(r.getTextChannelId(), vc.getIdLong());
+                }
+                else
+                    bot.rsdm.deleteVoiceRoom(vc.getIdLong());
+            });
         }
     }
 

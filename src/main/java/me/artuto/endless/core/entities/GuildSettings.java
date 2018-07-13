@@ -59,6 +59,8 @@ public interface GuildSettings
 
     long getWelcomeChannel();
 
+    Room.Mode getRoomMode();
+
     String getLeaveMsg();
 
     String getWelcomeMsg();

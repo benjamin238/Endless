@@ -37,7 +37,7 @@ public class RoomImpl implements Room
     @Override
     public boolean isCombo()
     {
-        return !(tcId==0L && vcId==0L);
+        return !(tcId==0L) && !(vcId==0L);
     }
 
     @Override
@@ -55,13 +55,13 @@ public class RoomImpl implements Room
     @Override
     public boolean isText()
     {
-        return !(tcId==0L);
+        return !(tcId==0) && vcId==0L;
     }
 
     @Override
     public boolean isVoice()
     {
-        return !(vcId==0L);
+        return !(vcId==0) && tcId==0L;
     }
 
     @Override
@@ -92,5 +92,16 @@ public class RoomImpl implements Room
     public OffsetDateTime getExpiryTime()
     {
         return expiryTime;
+    }
+
+    @Override
+    public String toString()
+    {
+        if(isCombo())
+            return "ROOM:Combo("+tcId+"-"+vcId+")";
+        else if(isText())
+            return "ROOM:Text("+tcId+")";
+        else
+            return "ROOM:Voice("+vcId+")";
     }
 }

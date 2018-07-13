@@ -180,11 +180,11 @@ public class RoomsDataManager
                         Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
                         gmt.setTimeInMillis(results.getLong("expiry_time"));
                         list.add(new RoomImpl(results.getBoolean("restricted"), guildId, results.getLong("tc_id"),
-                                results.getLong("vc_id"), results.getLong("owner_id"), OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId())));
+                                results.getLong("owner_id"), results.getLong("vc_id"), OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId())));
                     }
                     else
                         list.add(new RoomImpl(results.getBoolean("restricted"), guildId, results.getLong("tc_id"),
-                                results.getLong("vc_id"), results.getLong("owner_id"), null));
+                                results.getLong("owner_id"), results.getLong("vc_id"), null));
                 }
                 return list;
             }
@@ -204,7 +204,7 @@ public class RoomsDataManager
             statement.closeOnCompletion();
             List<Room> list;
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM ROOMS WHERE expiry_time != null"))
+            try(ResultSet results = statement.executeQuery("SELECT * FROM ROOMS WHERE expiry_time IS NOT null"))
             {
                 list = new LinkedList<>();
                 while(results.next())
@@ -212,7 +212,7 @@ public class RoomsDataManager
                     Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
                     gmt.setTimeInMillis(results.getLong("expiry_time"));
                     list.add(new RoomImpl(results.getBoolean("restricted"), results.getLong("guild_id"), results.getLong("tc_id"),
-                            results.getLong("vc_id"), results.getLong("owner_id"),
+                            results.getLong("owner_id"), results.getLong("vc_id"),
                             OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId())));
                 }
                 return list;

@@ -67,6 +67,7 @@ public abstract class EndlessCommand extends Command
 
         if(needsArguments && event.getArgs().isEmpty())
         {
+            event.getClient().applyCooldown(getCooldownKey(event), 0);
             if(needsArgumentsMessage==null)
                 event.replyError("**Too few arguments provided!**\n" +
                         "Try running `"+client.getPrefix()+(parent==null?"":parent.getName()+" ")+this.name+" help` to get help.");
@@ -81,6 +82,7 @@ public abstract class EndlessCommand extends Command
             {
                 if(!(ChecksUtil.hasPermission(selfMember, tc, p)))
                 {
+                    event.getClient().applyCooldown(getCooldownKey(event), 0);
                     event.replyError(String.format("I need the %s permission in this Guild to execute this command!", p.getName()));
                     return;
                 }
@@ -110,6 +112,7 @@ public abstract class EndlessCommand extends Command
                 {
                     if(!(ChecksUtil.hasPermission(member, tc, p)))
                     {
+                        event.getClient().applyCooldown(getCooldownKey(event), 0);
                         event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
                         return;
                     }

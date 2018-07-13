@@ -285,7 +285,7 @@ public class Bot extends ListenerAdapter
                             0, 10, TimeUnit.SECONDS);
                     pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 0, 10, TimeUnit.SECONDS);
                     reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 10, TimeUnit.SECONDS);
-                    roomScheduler.scheduleWithFixedDelay(() -> rsdm.updateRooms(shardManager), 0, 30, TimeUnit.SECONDS);
+                    roomScheduler.scheduleWithFixedDelay(() -> rsdm.updateRooms(shardManager), 0, 10, TimeUnit.SECONDS);
                 }
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
                 sendStats(event.getJDA());

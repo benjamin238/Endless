@@ -19,6 +19,7 @@ package me.artuto.endless.core.entities.impl;
 
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Ignore;
+import me.artuto.endless.core.entities.Room;
 import me.artuto.endless.core.entities.Tag;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
@@ -37,12 +38,13 @@ public class GuildSettingsImpl implements GuildSettings
     private List<Role> roleMeRoles;
     private List<Tag> importedTags;
     private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
+    private Room.Mode roomMode;
     private String welcomeMsg, leaveMsg;
 
     public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
                              List<Ignore> ignoredEntities, List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId,
                              long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
-                             long starboardId, long welcomeId, String leaveMsg, String welcomeMsg)
+                             long starboardId, long welcomeId, Room.Mode roomMode, String leaveMsg, String welcomeMsg)
     {
         this.isDefault = isDefault;
         this.prefixes = prefixes;
@@ -60,6 +62,7 @@ public class GuildSettingsImpl implements GuildSettings
         this.serverlogId = serverlogId;
         this.starboardId = starboardId;
         this.welcomeId = welcomeId;
+        this.roomMode = roomMode;
         this.leaveMsg = leaveMsg;
         this.welcomeMsg = welcomeMsg;
     }
@@ -75,7 +78,7 @@ public class GuildSettingsImpl implements GuildSettings
     {
         return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && roleMeRoles.isEmpty() && ignoredEntities.isEmpty()
                 && importedTags.isEmpty() && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
-                && welcomeId==0L && leaveMsg==null && welcomeMsg==null;
+                && welcomeId==0L && roomMode==null &&leaveMsg==null && welcomeMsg==null;
     }
 
     @Override
@@ -166,6 +169,12 @@ public class GuildSettingsImpl implements GuildSettings
     public long getWelcomeChannel()
     {
         return welcomeId;
+    }
+
+    @Override
+    public Room.Mode getRoomMode()
+    {
+        return roomMode;
     }
 
     @Override
@@ -267,6 +276,11 @@ public class GuildSettingsImpl implements GuildSettings
     public void setMutedRoleId(long mutedRoleId)
     {
         this.mutedRoleId = mutedRoleId;
+    }
+
+    public void setRoomMode(Room.Mode mode)
+    {
+        this.roomMode = mode;
     }
 
     public void setServerlogId(long serverlogId)

@@ -20,6 +20,7 @@ package me.artuto.endless.storage.data;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Ignore;
+import me.artuto.endless.core.entities.Room;
 import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import me.artuto.endless.core.entities.impl.IgnoreImpl;
@@ -42,7 +43,7 @@ public class Database
     {
         return new GuildSettingsImpl(true, new HashSet<>(), guild, 0, 0, new LinkedList<>(),
                 new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L, 0L, 0L,
-                0L, 0L, null, null);
+                0L, 0L, null, null, null);
     }
 
     public Database(String host, String user, String pass) throws SQLException
@@ -115,6 +116,7 @@ public class Database
                             results.getLong("admin_role_id"), results.getLong("mod_role_id"),
                             results.getLong("muted_role_id"), results.getLong("serverlog_id"),
                             results.getLong("starboard_id"), results.getLong("welcome_id"),
+                            results.getString("room_mode")==null?null:Room.Mode.valueOf(results.getString("room_mode")),
                             results.getString("leave_msg"), results.getString("welcome_msg"));
                 }
                 else

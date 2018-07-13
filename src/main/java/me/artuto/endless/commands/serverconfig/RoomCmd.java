@@ -17,16 +17,27 @@
 
 package me.artuto.endless.commands.serverconfig;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Room;
+import me.artuto.endless.utils.ArgsUtils;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,8 +54,8 @@ public class RoomCmd extends EndlessCommand
         this.bot = bot;
         this.name = "room";
         this.help = "Rooms are private text or voice channels that can be created by normal users.";
+        this.children = new Command[]{new CreateComboCmd(), new CreateTextCmd(), new CreateVoiceCmd()};
         this.category = Categories.SERVER_CONFIG;
-        this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
         this.needsArguments = false;
     }
 
@@ -74,34 +85,333 @@ public class RoomCmd extends EndlessCommand
         List<Room> comboRooms = rooms.stream().filter(Room::isCombo).filter(r -> r.canAccess(event)).collect(Collectors.toList());
         List<Room> textRooms = rooms.stream().filter(Room::isText).filter(r -> r.canAccess(event)).collect(Collectors.toList());
         List<Room> voiceRooms = rooms.stream().filter(Room::isVoice).filter(r -> r.canAccess(event)).collect(Collectors.toList());
-        StringBuilder sb = new StringBuilder("Rooms in **").append(guild.getName()).append("**\n");
+        StringBuilder sb = new StringBuilder("Rooms in **").append(guild.getName()).append("**:\n");
 
         if(!(comboRooms.isEmpty()))
         {
-            sb.append("**Combo Rooms: **").append(comboRooms.size()).append("**\n");
+            sb.append("**Combo Rooms**: *").append(comboRooms.size()).append("*\n");
             comboRooms.forEach(r -> {
                 TextChannel tc = guild.getTextChannelById(r.getTextChannelId());
                 VoiceChannel vc = guild.getVoiceChannelById(r.getVoiceChannelId());
-                sb.append("- ").append(tc.getAsMention()).append(": ").append(vc.getName()).append("\n");
+                sb.append(Const.LINE_START).append(" ").append(tc.getAsMention()).append(": ").append(vc.getName())
+                        .append(r.getExpiryTime()==null?"":" - Expires in "+FormatUtil.formatTimeFromSeconds(OffsetDateTime.now().until(r.getExpiryTime(),
+                                ChronoUnit.SECONDS))).append("\n");
             });
         }
         if(!(textRooms.isEmpty()))
         {
-            sb.append("**Text Rooms: **").append(comboRooms.size()).append("**\n");
-            comboRooms.forEach(r -> {
+            sb.append("**Text Rooms**: *").append(textRooms.size()).append("*\n");
+            textRooms.forEach(r -> {
                 TextChannel tc = guild.getTextChannelById(r.getTextChannelId());
-                sb.append("- ").append(tc.getAsMention()).append("\n");
+                sb.append(Const.LINE_START).append(" ").append(tc.getAsMention()).append(r.getExpiryTime()==null?"":" - Expires in "+
+                        FormatUtil.formatTimeFromSeconds(OffsetDateTime.now().until(r.getExpiryTime(), ChronoUnit.SECONDS))).append("\n");
             });
         }
         if(!(voiceRooms.isEmpty()))
         {
-            sb.append("**Voice Rooms: **").append(comboRooms.size()).append("**\n");
-            comboRooms.forEach(r -> {
+            sb.append("**Voice Rooms**: *").append(voiceRooms.size()).append("*\n");
+            voiceRooms.forEach(r -> {
                 VoiceChannel vc = guild.getVoiceChannelById(r.getVoiceChannelId());
-                sb.append("- ").append(vc.getName()).append("\n");
+                sb.append(Const.LINE_START).append(" ").append(vc.getName()).append(r.getExpiryTime()==null?"":" - Expires in "+
+                        FormatUtil.formatTimeFromSeconds(OffsetDateTime.now().until(r.getExpiryTime(), ChronoUnit.SECONDS))).append("\n");
             });
         }
 
         event.replySuccess(sb.toString());
+    }
+
+    private class CreateComboCmd extends EndlessCommand
+    {
+        CreateComboCmd()
+        {
+            this.name = "combo";
+            this.help = "Creates a text and a voice private room";
+            this.arguments = "<rooms name> | [expiry time]";
+            this.botPerms = new Permission[]{Permission.MANAGE_CHANNEL};
+            this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
+            //this.cooldown = 1000;
+            this.cooldownScope = CooldownScope.GUILD;
+            this.parent = RoomCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            boolean expiry = false;
+            Instant expiryTime = null;
+            String formattedTime = "";
+            String[] args = splitArgs(event.getArgs());
+
+            Guild guild = event.getGuild();
+            String p = event.getClient().getPrefix();
+            String tcName = args[0].replace(" ", "_");
+            String vcName = args[0];
+            User owner = event.getAuthor();
+
+            GuildSettings settings = bot.endless.getGuildSettings(guild);
+            Room.Mode roomMode = settings.getRoomMode();
+
+            if(roomMode==Room.Mode.NO_CREATION || roomMode==Room.Mode.TEXT_ONLY || roomMode==Room.Mode.VOICE_ONLY)
+            {
+                event.replyError("This guild room mode is set to `"+roomMode.getName()+"`!");
+                return;
+            }
+
+            if(tcName.length()<2 || tcName.length()>100)
+            {
+                event.replyError("The channel name can't be longer than 100 characters and shorter than 2 characters!");
+                return;
+            }
+            if(!(args[1].isEmpty()))
+            {
+                expiry = true;
+                int time = Integer.valueOf(args[1]);
+                int minutes = time/60;
+                expiryTime = Instant.now().plus(minutes, ChronoUnit.MINUTES);
+                formattedTime = FormatUtil.formatTimeFromSeconds(time);
+                if(time<0)
+                {
+                    event.replyError("The time cannot be negative!");
+                    return;
+                }
+            }
+
+            for(TextChannel tc : guild.getTextChannels())
+            {
+                if(tc.getName().equalsIgnoreCase(tcName))
+                {
+                    event.replyError("A Text Channel with that name already exists!");
+                    return;
+                }
+            }
+            for(VoiceChannel vc : guild.getVoiceChannels())
+            {
+                if(vc.getName().equalsIgnoreCase(vcName))
+                {
+                    event.replyError("A Voice Channel with that name already exists!");
+                    return;
+                }
+            }
+
+            boolean fExpiry = expiry;
+            Instant fExpiryTime = expiryTime;
+            String fFormattedTime = formattedTime;
+            guild.getController().createTextChannel(tcName).setTopic("Room Owner: "+owner.getAsMention()+"\nUse `"+p+"room leave` to leave this room")
+                    .addPermissionOverride(guild.getPublicRole(), null, Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.MESSAGE_READ))
+                    .addPermissionOverride(event.getSelfMember(), Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS,
+                            Permission.MESSAGE_READ),null).addPermissionOverride(event.getMember(), Collections.singletonList(Permission.MESSAGE_READ),
+                    null).reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").queue(tcP -> {
+                guild.getController().createVoiceChannel(vcName).addPermissionOverride(guild.getPublicRole(), null,
+                        Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.VIEW_CHANNEL)).addPermissionOverride(event.getSelfMember(),
+                        Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.VIEW_CHANNEL),null)
+                        .addPermissionOverride(event.getMember(), Collections.singletonList(Permission.VIEW_CHANNEL),null)
+                        .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").queue(vcP -> {
+                    TextChannel tc = (TextChannel)tcP;
+                    VoiceChannel vc = (VoiceChannel)vcP;
+                    if(fExpiry)
+                    {
+                        tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                        bot.rsdm.createComboRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
+                        event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**) that will expire in "
+                                +fFormattedTime);
+                    }
+                    else
+                    {
+                        tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                        bot.rsdm.createComboRoom(false, 0L, guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
+                        event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**)");
+                    }
+                }, e -> event.replyError("Error while creating the voice room."));
+            }, e -> event.replyError("Error while creating the text room."));
+        }
+    }
+
+    private class CreateTextCmd extends EndlessCommand
+    {
+        CreateTextCmd()
+        {
+            this.name = "text";
+            this.help = "Creates a text private room";
+            this.arguments = "<room name> | [expiry time]";
+            this.botPerms = new Permission[]{Permission.MANAGE_CHANNEL};
+            this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
+            //this.cooldown = 1000;
+            this.cooldownScope = CooldownScope.GUILD;
+            this.parent = RoomCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            boolean expiry = false;
+            Instant expiryTime = null;
+            String formattedTime = "";
+            String[] args = splitArgs(event.getArgs());
+
+            Guild guild = event.getGuild();
+            String p = event.getClient().getPrefix();
+            String tcName = args[0].replace(" ", "_");
+            User owner = event.getAuthor();
+
+            GuildSettings settings = bot.endless.getGuildSettings(guild);
+            Room.Mode roomMode = settings.getRoomMode();
+
+            if(roomMode==Room.Mode.COMBO_ONLY || roomMode==Room.Mode.NO_CREATION || roomMode==Room.Mode.VOICE_ONLY)
+            {
+                event.replyError("This guild room mode is set to `"+roomMode.getName()+"`!");
+                return;
+            }
+
+            if(tcName.length()<2 || tcName.length()>100)
+            {
+                event.replyError("The channel name can't be longer than 100 characters and shorter than 2 characters!");
+                return;
+            }
+            if(!(args[1].isEmpty()))
+            {
+                expiry = true;
+                int time = Integer.valueOf(args[1]);
+                int minutes = time/60;
+                expiryTime = Instant.now().plus(minutes, ChronoUnit.MINUTES);
+                formattedTime = FormatUtil.formatTimeFromSeconds(time);
+                if(time<0)
+                {
+                    event.replyError("The time cannot be negative!");
+                    return;
+                }
+            }
+
+            for(TextChannel tc : guild.getTextChannels())
+            {
+                if(tc.getName().equalsIgnoreCase(tcName))
+                {
+                    event.replyError("A Text Channel with that name already exists!");
+                    return;
+                }
+            }
+
+            boolean fExpiry = expiry;
+            Instant fExpiryTime = expiryTime;
+            String fFormattedTime = formattedTime;
+            guild.getController().createTextChannel(tcName).setTopic("Room Owner: "+owner.getAsMention()+"\nUse `"+p+"room leave` to leave this room")
+                    .addPermissionOverride(guild.getPublicRole(), null, Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.MESSAGE_READ))
+                    .addPermissionOverride(event.getSelfMember(), Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS,
+                            Permission.MESSAGE_READ),null).addPermissionOverride(event.getMember(), Collections.singletonList(Permission.MESSAGE_READ),
+                    null).reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Text Room Creation").queue(created -> {
+                        TextChannel tc = (TextChannel)created;
+                        if(fExpiry)
+                        {
+                            tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                            bot.rsdm.createTextRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), created.getIdLong(), owner.getIdLong());
+                            event.replySuccess("Successfully created Text Room **"+tc.getAsMention()+"** that will expire in "+fFormattedTime);
+                        }
+                        else
+                        {
+                            tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                            bot.rsdm.createTextRoom(false, 0L, guild.getIdLong(), created.getIdLong(), owner.getIdLong());
+                            event.replySuccess("Successfully created Text Room **"+tc.getAsMention()+"**");
+                        }
+            }, e -> event.replyError("Error while creating a room."));
+        }
+    }
+
+    private class CreateVoiceCmd extends EndlessCommand
+    {
+        CreateVoiceCmd()
+        {
+            this.name = "voice";
+            this.help = "Creates a voice private room";
+            this.arguments = "<room name> | [expiry time]";
+            this.botPerms = new Permission[]{Permission.MANAGE_CHANNEL};
+            this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
+            //this.cooldown = 1000;
+            this.cooldownScope = CooldownScope.GUILD;
+            this.parent = RoomCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            boolean expiry = false;
+            Instant expiryTime = null;
+            String formattedTime = "";
+            String[] args = splitArgs(event.getArgs());
+
+            Guild guild = event.getGuild();
+            String p = event.getClient().getPrefix();
+            String vcName = args[0];
+            User owner = event.getAuthor();
+
+            GuildSettings settings = bot.endless.getGuildSettings(guild);
+            Room.Mode roomMode = settings.getRoomMode();
+
+            if(roomMode==Room.Mode.COMBO_ONLY || roomMode==Room.Mode.NO_CREATION || roomMode==Room.Mode.TEXT_ONLY)
+            {
+                event.replyError("This guild room mode is set to `"+roomMode.getName()+"`!");
+                return;
+            }
+
+            if(vcName.length()<2 || vcName.length()>100)
+            {
+                event.replyError("The channel name can't be longer than 100 characters and shorter than 2 characters!");
+                return;
+            }
+            if(!(args[1].isEmpty()))
+            {
+                expiry = true;
+                int time = Integer.valueOf(args[1]);
+                int minutes = time/60;
+                expiryTime = Instant.now().plus(minutes, ChronoUnit.MINUTES);
+                formattedTime = FormatUtil.formatTimeFromSeconds(time);
+                if(time<0)
+                {
+                    event.replyError("The time cannot be negative!");
+                    return;
+                }
+            }
+
+            for(VoiceChannel vc : guild.getVoiceChannels())
+            {
+                if(vc.getName().equalsIgnoreCase(vcName))
+                {
+                    event.replyError("A Voice Channel with that name already exists!");
+                    return;
+                }
+            }
+
+            boolean fExpiry = expiry;
+            Instant fExpiryTime = expiryTime;
+            String fFormattedTime = formattedTime;
+            guild.getController().createVoiceChannel(vcName).addPermissionOverride(guild.getPublicRole(), null,
+                    Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.VIEW_CHANNEL)).addPermissionOverride(event.getSelfMember(),
+                    Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.VIEW_CHANNEL),null)
+                    .addPermissionOverride(event.getMember(), Collections.singletonList(Permission.VIEW_CHANNEL),null)
+                    .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Voice Room Creation").queue(created -> {
+                VoiceChannel vc = (VoiceChannel)created;
+                if(fExpiry)
+                {
+                    bot.rsdm.createVoiceRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), owner.getIdLong(), created.getIdLong());
+                    event.replySuccess("Successfully created Voice Room **"+vc.getName()+"** that will expire in "+fFormattedTime);
+                }
+                else
+                {
+                    bot.rsdm.createVoiceRoom(false, 0L, guild.getIdLong(), owner.getIdLong(), created.getIdLong());
+                    event.replySuccess("Successfully created Voice Room **"+vc.getName()+"**");
+                }
+            }, e -> event.replyError("Error while creating a voice room."));
+        }
+    }
+
+    private String[] splitArgs(String preArgs)
+    {
+        try
+        {
+            String[] args = preArgs.split(" \\| ", 2);
+            return new String[]{args[0], String.valueOf(ArgsUtils.parseTime(args[1]))};
+        }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            return new String[]{preArgs, ""};
+        }
     }
 }
