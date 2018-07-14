@@ -19,8 +19,10 @@ package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
+import me.artuto.endless.PermLevel;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.GuildSettings;
@@ -28,10 +30,7 @@ import me.artuto.endless.core.entities.Room;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.entities.*;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -54,7 +53,7 @@ public class RoomCmd extends EndlessCommand
         this.bot = bot;
         this.name = "room";
         this.help = "Rooms are private text or voice channels that can be created by normal users.";
-        this.children = new Command[]{new CreateComboCmd(), new CreateTextCmd(), new CreateVoiceCmd()};
+        this.children = new Command[]{new CreateComboCmd(), new CreateTextCmd(), new CreateVoiceCmd(), new InviteCmd()};
         this.category = Categories.SERVER_CONFIG;
         this.needsArguments = false;
     }
@@ -140,7 +139,7 @@ public class RoomCmd extends EndlessCommand
             boolean expiry = false;
             Instant expiryTime = null;
             String formattedTime = "";
-            String[] args = splitArgs(event.getArgs());
+            String[] args = splitArgsWithTime(event.getArgs());
 
             Guild guild = event.getGuild();
             String p = event.getClient().getPrefix();
@@ -246,7 +245,7 @@ public class RoomCmd extends EndlessCommand
             boolean expiry = false;
             Instant expiryTime = null;
             String formattedTime = "";
-            String[] args = splitArgs(event.getArgs());
+            String[] args = splitArgsWithTime(event.getArgs());
 
             Guild guild = event.getGuild();
             String p = event.getClient().getPrefix();
@@ -335,7 +334,7 @@ public class RoomCmd extends EndlessCommand
             boolean expiry = false;
             Instant expiryTime = null;
             String formattedTime = "";
-            String[] args = splitArgs(event.getArgs());
+            String[] args = splitArgsWithTime(event.getArgs());
 
             Guild guild = event.getGuild();
             String p = event.getClient().getPrefix();
@@ -402,7 +401,106 @@ public class RoomCmd extends EndlessCommand
         }
     }
 
-    private String[] splitArgs(String preArgs)
+    private class InviteCmd extends EndlessCommand
+    {
+        InviteCmd()
+        {
+            this.name = "invite";
+            this.help = "Invites the specified user to the current room";
+            this.arguments = "<user> to [room]";
+            this.parent = RoomCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            String[] args = splitArgs(event.getArgs(), " to ");
+            Member member = findMember(event, args[0]);
+            TextChannel tc;
+            if(args[1].isEmpty())
+                tc = event.getTextChannel();
+            else
+                tc = findTextChannel(event, args[1]);
+            if(member==null)
+                return;
+            if(tc==null)
+                return;
+
+            Room room = bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getTextChannelId()==tc.getIdLong()).findFirst().orElse(null);
+            if(room==null)
+            {
+                event.replyError(tc.getAsMention()+" is not an Endless room!");
+                return;
+            }
+            PermLevel permLevel = PermLevel.getLevel(bot.endless.getGuildSettings(event.getGuild()), event.getMember());
+            if(room.isRestricted() && !(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))
+            {
+                event.replyError("You can't invite someone to a room you don't own if its locked!");
+                return;
+            }
+            if(!(tc.getMembers().contains(event.getMember()) && !(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR))))
+            {
+                event.replyError("You must be on the room to invite someone!");
+                return;
+            }
+
+            tc.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).queue(s -> {
+                event.reactSuccess();
+                tc.sendMessageFormat("Welcome, %s to the room!", member.getUser()).queue();
+            }, e -> event.replyError("Could not add **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** to the room!"));
+        }
+    }
+
+    private Member findMember(CommandEvent event, String query)
+    {
+        List<Member> list = FinderUtil.findMembers(query, event.getGuild());
+
+        if(list.isEmpty())
+        {
+            event.replyWarning("I was not able to found a user with the provided arguments: '"+query+"'");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfMembers(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
+    private TextChannel findTextChannel(CommandEvent event, String query)
+    {
+        List<TextChannel> list = FinderUtil.findTextChannels(query, event.getGuild());
+
+        if(list.isEmpty())
+        {
+            event.replyWarning("I was not able to found a text channel with the provided arguments: '"+query+"'");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfTcChannels(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
+    private String[] splitArgs(String preArgs, String separator)
+    {
+        try
+        {
+            String[] args = preArgs.split(separator, 2);
+            return new String[]{args[0], args[1]};
+        }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            return new String[]{preArgs, ""};
+        }
+    }
+
+    private String[] splitArgsWithTime(String preArgs)
     {
         try
         {
