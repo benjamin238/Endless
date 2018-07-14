@@ -438,7 +438,7 @@ public class RoomCmd extends EndlessCommand
                 event.replyError("You can't invite someone to a room you don't own if its locked!");
                 return;
             }
-            if(!(tc.getMembers().contains(event.getMember() && !(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))))
+            if(!(tc.getMembers().contains(event.getMember()) && !(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))
             {
                 event.replyError("You must be on the room to invite someone!");
                 return;
