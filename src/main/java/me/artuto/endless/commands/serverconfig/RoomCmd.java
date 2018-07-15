@@ -53,7 +53,8 @@ public class RoomCmd extends EndlessCommand
         this.bot = bot;
         this.name = "room";
         this.help = "Rooms are private text or voice channels that can be created by normal users.";
-        this.children = new Command[]{new CreateComboCmd(), new CreateTextCmd(), new CreateVoiceCmd(), new InviteCmd()};
+        this.children = new Command[]{new CreateComboCmd(), new CreateTextCmd(), new CreateVoiceCmd(), new InviteCmd(), new JoinCmd(), new KickCmd(),
+                new LeaveCmd(), new LockCmd(), new UnLockCmd()};
         this.category = Categories.SERVER_CONFIG;
         this.needsArguments = false;
     }
@@ -84,7 +85,7 @@ public class RoomCmd extends EndlessCommand
         List<Room> comboRooms = rooms.stream().filter(Room::isCombo).filter(r -> r.canAccess(event)).collect(Collectors.toList());
         List<Room> textRooms = rooms.stream().filter(Room::isText).filter(r -> r.canAccess(event)).collect(Collectors.toList());
         List<Room> voiceRooms = rooms.stream().filter(Room::isVoice).filter(r -> r.canAccess(event)).collect(Collectors.toList());
-        StringBuilder sb = new StringBuilder("Rooms in **").append(guild.getName()).append("**:\n");
+        StringBuilder sb = new StringBuilder("Rooms in **").append(guild.getName()).append("** you can join:\n");
 
         if(!(comboRooms.isEmpty()))
         {
@@ -199,29 +200,28 @@ public class RoomCmd extends EndlessCommand
                     .addPermissionOverride(guild.getPublicRole(), null, Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.MESSAGE_READ))
                     .addPermissionOverride(event.getSelfMember(), Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS,
                             Permission.MESSAGE_READ),null).addPermissionOverride(event.getMember(), Collections.singletonList(Permission.MESSAGE_READ),
-                    null).reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").queue(tcP -> {
-                guild.getController().createVoiceChannel(vcName).addPermissionOverride(guild.getPublicRole(), null,
-                        Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.VIEW_CHANNEL)).addPermissionOverride(event.getSelfMember(),
-                        Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.VIEW_CHANNEL),null)
-                        .addPermissionOverride(event.getMember(), Collections.singletonList(Permission.VIEW_CHANNEL),null)
-                        .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").queue(vcP -> {
-                    TextChannel tc = (TextChannel)tcP;
-                    VoiceChannel vc = (VoiceChannel)vcP;
-                    if(fExpiry)
-                    {
-                        tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
-                        bot.rsdm.createComboRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
-                        event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**) that will expire in "
-                                +fFormattedTime);
-                    }
-                    else
-                    {
-                        tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
-                        bot.rsdm.createComboRoom(false, 0L, guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
-                        event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**)");
-                    }
-                }, e -> event.replyError("Error while creating the voice room."));
-            }, e -> event.replyError("Error while creating the text room."));
+                    null).reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").queue(tcP -> guild.getController()
+                    .createVoiceChannel(vcName).addPermissionOverride(guild.getPublicRole(), null,
+                            Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.VIEW_CHANNEL)).addPermissionOverride(event.getSelfMember(),
+                            Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.VIEW_CHANNEL),null)
+                            .addPermissionOverride(event.getMember(), Collections.singletonList(Permission.VIEW_CHANNEL),null)
+                            .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").queue(vcP -> {
+                        TextChannel tc = (TextChannel)tcP;
+                        VoiceChannel vc = (VoiceChannel)vcP;
+                        if(fExpiry)
+                        {
+                            tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                            bot.rsdm.createComboRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
+                            event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**) that will expire in "
+                                    +fFormattedTime);
+                        }
+                        else
+                        {
+                            tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                            bot.rsdm.createComboRoom(false, 0L, guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
+                            event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**)");
+                        }
+                    }, e -> event.replyError("Error while creating the voice room.")), e -> event.replyError("Error while creating the text room."));
         }
     }
 
@@ -337,7 +337,6 @@ public class RoomCmd extends EndlessCommand
             String[] args = splitArgsWithTime(event.getArgs());
 
             Guild guild = event.getGuild();
-            String p = event.getClient().getPrefix();
             String vcName = args[0];
             User owner = event.getAuthor();
 
@@ -438,9 +437,14 @@ public class RoomCmd extends EndlessCommand
                 event.replyError("You can't invite someone to a room you don't own if its locked!");
                 return;
             }
-            if(!(tc.getMembers().contains(event.getMember()) && !(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR))))
+            if(!(tc.getMembers().contains(event.getMember())) && !(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))
             {
                 event.replyError("You must be on the room to invite someone!");
+                return;
+            }
+            if(tc.getMembers().contains(member))
+            {
+                event.replyError("The specified user is already on that room!");
                 return;
             }
 
@@ -448,6 +452,232 @@ public class RoomCmd extends EndlessCommand
                 event.reactSuccess();
                 tc.sendMessageFormat("Welcome, %s to the room!", member.getUser()).queue();
             }, e -> event.replyError("Could not add **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** to the room!"));
+        }
+    }
+
+    private class JoinCmd extends EndlessCommand
+    {
+        JoinCmd()
+        {
+            this.name = "join";
+            this.help = "Joins the specified room";
+            this.arguments = "<room>";
+            this.parent = RoomCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            TextChannel tc = findTextChannel(event, event.getArgs());
+            if(tc==null)
+                return;
+
+            Room room = bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getTextChannelId()==tc.getIdLong()).findFirst().orElse(null);
+            if(room==null)
+            {
+                event.replyError(tc.getAsMention()+" is not an Endless room!");
+                return;
+            }
+            PermLevel permLevel = PermLevel.getLevel(bot.endless.getGuildSettings(event.getGuild()), event.getMember());
+            if(room.isRestricted() && !(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))
+            {
+                event.replyError("You can't join a room if its locked!");
+                return;
+            }
+            if(tc.getMembers().contains(event.getMember()))
+            {
+                event.replyError("You are already on that room!");
+                return;
+            }
+
+            tc.putPermissionOverride(event.getMember()).setAllow(Permission.MESSAGE_READ).queue(s -> {
+                event.reactSuccess();
+                tc.sendMessageFormat("Welcome, %s to the room!", event.getMember().getUser()).queue();
+            }, e -> event.replyError("Could not add you to the room!"));
+        }
+    }
+
+    private class KickCmd extends EndlessCommand
+    {
+        KickCmd()
+        {
+            this.name = "kick";
+            this.help = "Kicks the specified user from the current room";
+            this.arguments = "<user>";
+            this.userPerms = new Permission[]{Permission.KICK_MEMBERS};
+            this.parent = RoomCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            Member member = findMember(event, event.getArgs());
+            TextChannel tc = event.getTextChannel();
+            if(member==null)
+                return;
+
+            Room room = bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getTextChannelId()==tc.getIdLong()).findFirst().orElse(null);
+            if(room==null)
+            {
+                event.replyError(tc.getAsMention()+" is not an Endless room!");
+                return;
+            }
+            if(!(tc.getMembers().contains(member)))
+            {
+                event.replyError("The specified member isn't on this room!");
+                return;
+            }
+            PermLevel permLevel = PermLevel.getLevel(bot.endless.getGuildSettings(event.getGuild()), event.getMember());
+            if(!(room.getOwnerId()==member.getUser().getIdLong()) || !(permLevel.isAtLeast(PermLevel.MODERATOR)))
+            {
+                event.replyError("You can't kick users from this room!");
+                return;
+            }
+            if(room.getOwnerId()==member.getUser().getIdLong() && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))
+            {
+                event.replyError("You can't kick the room owner! Use `"+event.getClient().getPrefix()+"room transfer` to transfer the property.");
+                return;
+            }
+
+            if(!(tc.getPermissionOverride(event.getMember())==null))
+            {
+                if(room.getOwnerId()==member.getUser().getIdLong())
+                    bot.rsdm.transferProperty(event.getAuthor().getIdLong(), tc.getIdLong());
+                tc.getPermissionOverride(member).delete().reason("[Room Kick]").queue(s -> event.reactSuccess(),
+                        e -> event.replyError("Could not remove permission override for the specified user!"));
+            }
+            else
+                event.replyError("Could not find a permission override for the specified user!");
+        }
+    }
+
+    private class LeaveCmd extends EndlessCommand
+    {
+        LeaveCmd()
+        {
+            this.name = "leave";
+            this.help = "Leaves current room";
+            this.needsArguments = false;
+            this.parent = RoomCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            TextChannel tc = event.getTextChannel();
+
+            Room room = bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getTextChannelId()==tc.getIdLong()).findFirst().orElse(null);
+            if(room==null)
+            {
+                event.replyError(tc.getAsMention()+" is not an Endless room!");
+                return;
+            }
+            if(!(tc.getMembers().contains(event.getMember())))
+            {
+                event.replyError("You aren't on this room!");
+                return;
+            }
+            if(room.getOwnerId()==event.getAuthor().getIdLong())
+            {
+                event.replyError("You can't leave a room you own! Use `"+event.getClient().getPrefix()+"room transfer` to transfer the property.");
+                return;
+            }
+
+            if(!(tc.getPermissionOverride(event.getMember())==null))
+            {
+                tc.getPermissionOverride(event.getMember()).delete().reason("[Room Leave]").queue(s -> event.reactSuccess(),
+                        e -> event.replyError("Could not remove permission override for you!"));
+            }
+            else
+                event.replyError("Could not find a permission override for you!");
+        }
+    }
+
+    private class LockCmd extends EndlessCommand
+    {
+        LockCmd()
+        {
+            this.name = "lock";
+            this.help = "Locks the specified or current room";
+            this.arguments = "[room]";
+            this.needsArguments = false;
+            this.parent = RoomCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            TextChannel tc;
+            if(event.getArgs().isEmpty())
+                tc = event.getTextChannel();
+            else
+                tc = findTextChannel(event, event.getArgs());
+            if(tc==null)
+                return;
+
+            Room room = bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getTextChannelId()==tc.getIdLong()).findFirst().orElse(null);
+            if(room==null)
+            {
+                event.replyError(tc.getAsMention()+" is not an Endless room!");
+                return;
+            }
+            PermLevel permLevel = PermLevel.getLevel(bot.endless.getGuildSettings(event.getGuild()), event.getMember());
+            if(!(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))
+            {
+                event.replyError("You can't lock this room if you aren't the owner!");
+                return;
+            }
+            if(room.isRestricted())
+            {
+                event.replyError("This room is locked already!");
+                return;
+            }
+            bot.rsdm.lockRoom(true, tc.getIdLong());
+            event.replySuccess("Successfully locked room.");
+        }
+    }
+
+    private class UnLockCmd extends EndlessCommand
+    {
+        UnLockCmd()
+        {
+            this.name = "unlock";
+            this.help = "Unlocks the specified or current room";
+            this.arguments = "[room]";
+            this.needsArguments = false;
+            this.parent = RoomCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            TextChannel tc;
+            if(event.getArgs().isEmpty())
+                tc = event.getTextChannel();
+            else
+                tc = findTextChannel(event, event.getArgs());
+            if(tc==null)
+                return;
+
+            Room room = bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getTextChannelId()==tc.getIdLong()).findFirst().orElse(null);
+            if(room==null)
+            {
+                event.replyError(tc.getAsMention()+" is not an Endless room!");
+                return;
+            }
+            PermLevel permLevel = PermLevel.getLevel(bot.endless.getGuildSettings(event.getGuild()), event.getMember());
+            if(!(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))
+            {
+                event.replyError("You can't unlock this room if you aren't the owner!");
+                return;
+            }
+            if(!(room.isRestricted()))
+            {
+                event.replyError("This room isn't locked!");
+                return;
+            }
+            bot.rsdm.lockRoom(false, tc.getIdLong());
+            event.replySuccess("Successfully unlocked room.");
         }
     }
 

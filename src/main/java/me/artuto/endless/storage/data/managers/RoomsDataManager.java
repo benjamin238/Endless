@@ -162,6 +162,50 @@ public class RoomsDataManager
         }
     }
 
+    public void lockRoom(boolean status, long roomId)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE tc_id = %s OR vc_id = %s", roomId, roomId)))
+            {
+                if(results.next())
+                {
+                    results.updateBoolean("restricted", status);
+                    results.updateRow();
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while locking a room.", e);
+        }
+    }
+
+    public void transferProperty(long newOwnerId, long roomId)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE tc_id = %s OR vc_id = %s", roomId, roomId)))
+            {
+                if(results.next())
+                {
+                    results.updateLong("owner_id", newOwnerId);
+                    results.updateRow();
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while transferring the property of a room.", e);
+        }
+    }
+
     public List<Room> getRoomsForGuild(long guildId)
     {
         try
