@@ -20,9 +20,11 @@ package me.artuto.endless.storage.data.managers;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.LocalTag;
 import me.artuto.endless.core.entities.Tag;
-import me.artuto.endless.core.entities.impl.*;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
+import me.artuto.endless.core.entities.impl.GlobalTagImpl;
+import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
+import me.artuto.endless.core.entities.impl.LocalTagImpl;
 import me.artuto.endless.storage.data.Database;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import org.json.JSONArray;
 
@@ -54,8 +56,7 @@ public class TagDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GLOBAL_TAGS WHERE name = \"%s\"", name)))
             {
                 if(results.next())
-                    return new GlobalTagImpl(results.getLong("owner"), results.getInt("id"),
-                            results.getString("content"), results.getString("name"));
+                    return bot.endlessBuilder.entityBuilder.createTag(results);
             }
         }
         catch(SQLException e)
@@ -75,9 +76,7 @@ public class TagDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE name = \"%s\" AND guild = %s", name, guild)))
             {
                 if(results.next())
-                    return new LocalTagImpl(results.getBoolean("overriden"), results.getLong("guild"),
-                            results.getLong("owner"), results.getInt("id"),
-                            results.getString("content"), results.getString("name"));
+                    return bot.endlessBuilder.entityBuilder.createLocalTag(results);
             }
         }
         catch(SQLException e)
@@ -124,10 +123,7 @@ public class TagDataManager
             {
                 List<Tag> list = new LinkedList<>();
                 while(results.next())
-                {
-                    list.add(new GlobalTagImpl(results.getLong("owner"), results.getInt("id"),
-                        results.getString("content"), results.getString("name")));
-                }
+                    list.add(bot.endlessBuilder.entityBuilder.createTag(results));
                 return list;
             }
         }
@@ -148,11 +144,7 @@ public class TagDataManager
             {
                 List<LocalTag> list = new LinkedList<>();
                 while(results.next())
-                {
-                    list.add(new LocalTagImpl(results.getBoolean("overriden"), results.getLong("guild"),
-                            results.getLong("owner"), results.getInt("id"),
-                            results.getString("content"), results.getString("name")));
-                }
+                    list.add(bot.endlessBuilder.entityBuilder.createLocalTag(results));
                 return list;
             }
         }
@@ -163,7 +155,7 @@ public class TagDataManager
         }
     }
 
-    public void createGlobalTag(long guild, long owner, String content, String name)
+    public void createGlobalTag(long owner, String content, String name)
     {
         try
         {
@@ -177,8 +169,7 @@ public class TagDataManager
                 results.updateLong("owner", owner);
                 results.insertRow();
                 Tag tag = getGlobalTag(name);
-                ((EndlessCoreImpl)bot.endless.getShard(bot.shardManager.getGuildById(guild).getJDA())).addGlobalTag(tag);
-                ((EndlessShardedImpl)bot.endless).addGlobalTag(tag);
+                ((EndlessCoreImpl)bot.endless).addGlobalTag(tag);
             }
         }
         catch(SQLException e)
@@ -208,8 +199,7 @@ public class TagDataManager
                 results.updateBoolean("overriden", overriden);
                 results.insertRow();
                 Tag tag = getLocalTag(guild, name);
-                ((EndlessCoreImpl)bot.endless.getShard(bot.shardManager.getGuildById(guild).getJDA())).addLocalTag((LocalTag)tag);
-                ((EndlessShardedImpl)bot.endless).addLocalTag((LocalTag)tag);
+                ((EndlessCoreImpl)bot.endless).addLocalTag((LocalTag)tag);
             }
         }
         catch(SQLException e)
@@ -218,15 +208,14 @@ public class TagDataManager
         }
     }
 
-    public void deleteGlobalTag(JDA jda, String name)
+    public void deleteGlobalTag(String name)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
             statement.executeUpdate(String.format("DELETE FROM GLOBAL_TAGS WHERE name = \"%s\"", name));
-            ((EndlessCoreImpl)bot.endless.getShard(jda)).removeGlobalTag(name);
-            ((EndlessShardedImpl)bot.endless).removeGlobalTag(name);
+            ((EndlessCoreImpl)bot.endless).removeGlobalTag(name);
         }
         catch(SQLException e)
         {
@@ -241,8 +230,7 @@ public class TagDataManager
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
             statement.executeUpdate(String.format("DELETE FROM LOCAL_TAGS WHERE name = \"%s\" AND guild = %s", name, guild));
-            ((EndlessCoreImpl)bot.endless.getShard(bot.shardManager.getGuildById(guild).getJDA())).removeLocalTag(guild, name);
-            ((EndlessShardedImpl)bot.endless).removeLocalTag(guild, name);
+            ((EndlessCoreImpl)bot.endless).removeLocalTag(guild, name);
         }
         catch(SQLException e)
         {
@@ -281,10 +269,7 @@ public class TagDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettingsById(guild);
                 settings.addImportedTag(tag);
                 if(bot.endless.getGuildSettingsById(guild).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(settings.getGuild(), settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(settings.getGuild(), settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(settings.getGuild(), settings);
             }
         }
         catch(SQLException e)
@@ -293,7 +278,7 @@ public class TagDataManager
         }
     }
 
-    public void unimportTag(long guild, Tag tag)
+    public void unImportTag(long guild, Tag tag)
     {
         try
         {
@@ -329,10 +314,7 @@ public class TagDataManager
                         GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettingsById(guild);
                         settings.removeImportedTag(tag);
                         if(bot.endless.getGuildSettingsById(guild).isDefault())
-                        {
-                            ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(settings.getGuild(), settings);
-                            ((EndlessShardedImpl)bot.endless).addSettings(settings.getGuild(), settings);
-                        }
+                            ((EndlessCoreImpl)bot.endless).addSettings(settings.getGuild(), settings);
                     }
                 }
             }
@@ -343,7 +325,7 @@ public class TagDataManager
         }
     }
 
-    public void updateGlobalTagContent(JDA jda, String name, String newContent)
+    public void updateGlobalTagContent(String name, String newContent)
     {
         try
         {
@@ -355,7 +337,6 @@ public class TagDataManager
                 {
                     results.updateString("content", newContent);
                     results.updateRow();
-                    ((GlobalTagImpl)bot.endless.getShard(jda).getGlobalTag(name)).setContent(newContent);
                     ((GlobalTagImpl)bot.endless.getGlobalTag(name)).setContent(newContent);
                 }
             }
@@ -366,7 +347,7 @@ public class TagDataManager
         }
     }
 
-    public void updateLocalTagContent(JDA jda, long guild, String name, String newContent)
+    public void updateLocalTagContent(long guild, String name, String newContent)
     {
         try
         {
@@ -378,7 +359,6 @@ public class TagDataManager
                 {
                     results.updateString("content", newContent);
                     results.updateRow();
-                    ((LocalTagImpl)bot.endless.getShard(jda).getLocalTag(guild, name)).setContent(newContent);
                     ((LocalTagImpl)bot.endless.getLocalTag(guild, name)).setContent(newContent);
                 }
             }

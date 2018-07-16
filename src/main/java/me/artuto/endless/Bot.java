@@ -32,9 +32,8 @@ import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.serverconfig.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
+import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.EndlessCoreBuilder;
-import me.artuto.endless.core.EndlessSharded;
-import me.artuto.endless.core.EndlessShardedBuilder;
 import me.artuto.endless.handlers.IgnoreHandler;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.storage.data.managers.*;
@@ -50,7 +49,6 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.impl.JDAImpl;
-import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.requests.Requester;
@@ -76,8 +74,8 @@ public class Bot extends ListenerAdapter
     public boolean dataEnabled;
     public boolean maintenance;
     public boolean initialized = false;
-    public EndlessSharded endless;
-    private EndlessShardedBuilder endlessBuilder;
+    public EndlessCore endless;
+    public EndlessCoreBuilder endlessBuilder;
 
     // Config
     public Config config;
@@ -154,16 +152,16 @@ public class Bot extends ListenerAdapter
 
         if(dataEnabled)
         {
-            db = new Database(config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
+            db = new Database(this, config.getDatabaseUrl(), config.getDatabaseUsername(), config.getDatabasePassword());
             bdm = new BlacklistDataManager(this);
             ddm = new DonatorsDataManager(db);
             gsdm = new GuildSettingsDataManager(this);
-            pldm = new PollsDataManager(db);
-            pdm = new PunishmentsDataManager(db);
-            prdm = new ProfileDataManager(db);
-            rdm = new RemindersDataManager(db);
-            rsdm = new RoomsDataManager(db);
-            sdm = new StarboardDataManager(db);
+            pldm = new PollsDataManager(this);
+            pdm = new PunishmentsDataManager(this);
+            prdm = new ProfileDataManager(this);
+            rdm = new RemindersDataManager(this);
+            rsdm = new RoomsDataManager(this);
+            sdm = new StarboardDataManager(this);
             tdm = new TagDataManager(this);
         }
         BlacklistHandler bHandler = new BlacklistHandler(this);
@@ -257,16 +255,7 @@ public class Bot extends ListenerAdapter
             builder.addEventListeners(this, client, listener, waiter);
         shardManager = builder.build();
 
-        endlessBuilder = new EndlessShardedBuilder(this, shardManager);
-    }
-
-    @Override
-    public void onReady(ReadyEvent event)
-    {
-        if(endless==null && !(initialized))
-            endlessBuilder.addShard(new EndlessCoreBuilder(this, event.getJDA())
-                    .setCommandClient(client)
-                    .build());
+        endlessBuilder = new EndlessCoreBuilder(this, client, shardManager);
     }
 
     @Override

@@ -21,6 +21,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.core.entities.ParsedAuditLog;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.core.entities.impl.ParsedAuditLogImpl;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audit.AuditLogChange;
@@ -136,19 +137,6 @@ public class GuildUtils
 
     public static ParsedAuditLog getAuditLog(AuditLogEntry entry, AuditLogKey key)
     {
-        JDA jda = entry.getJDA();
-        User author = entry.getUser();
-        User target = jda.getUserById(entry.getTargetIdLong());
-
-        if(!(key==null))
-        {
-            AuditLogChange change = entry.getChangeByKey(key);
-            if(!(change==null))
-                return new ParsedAuditLogImpl(key, change.getNewValue(), change.getOldValue(), entry.getReason(), author, target);
-            else
-                return null;
-        }
-        else
-            return new ParsedAuditLogImpl(null, null, null, entry.getReason(), author, target);
+        return bot.endlessBuilder.entityBuilder.createParsedAuditLog(entry, key);
     }
 }

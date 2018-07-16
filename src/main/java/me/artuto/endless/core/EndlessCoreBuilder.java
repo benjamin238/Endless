@@ -19,8 +19,17 @@ package me.artuto.endless.core;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Const;
+import me.artuto.endless.Endless;
+import me.artuto.endless.core.entities.EntityBuilder;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.OnlineStatus;
+import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.managers.Presence;
+
+import java.util.List;
 
 /**
  * @author Artuto
@@ -28,27 +37,43 @@ import net.dv8tion.jda.core.JDA;
 
 public class EndlessCoreBuilder
 {
-    protected final Bot bot;
-    protected CommandClient client;
-    protected final JDA jda;
+    private final Bot bot;
+    private final CommandClient client;
+    public final EntityBuilder entityBuilder;
+    private final ShardManager shardManager;
 
-    public EndlessCoreBuilder(Bot bot, JDA jda)
+    private final List<JDA> shards;
+
+    public EndlessCoreBuilder(Bot bot, CommandClient client, ShardManager shardManager)
     {
         this.bot = bot;
-        this.jda = jda;
-    }
-
-    public EndlessCoreBuilder setCommandClient(CommandClient client)
-    {
         this.client = client;
-        return this;
+        this.entityBuilder = new EntityBuilder(bot);
+        this.shardManager = shardManager;
+        this.shards = shardManager.getShards();
     }
 
     public EndlessCore build()
     {
-        EndlessCoreImpl impl = new EndlessCoreImpl(bot, client, jda);
+        EndlessCoreImpl impl = new EndlessCoreImpl(bot, entityBuilder, shards, shardManager);
         impl.makeCache();
-
+        shards.forEach(this::updateGame);
+        bot.initialized = true;
+        Endless.LOG.info("Endless is ready!");
         return impl;
+    }
+
+    private void updateGame(JDA shard)
+    {
+        JDA.ShardInfo shardInfo = shard.getShardInfo();
+        Presence presence = shard.getPresence();
+
+        if(!(bot.maintenance))
+            presence.setPresence(bot.config.getStatus(), Game.playing("Type "+bot.config.getPrefix()+"help | Version "
+                    +Const.VERSION+" | On "+shard.getGuildCache().size()+" Guilds | "+shard.getUserCache().size()+
+                    " Users | Shard "+(shardInfo.getShardId()+1)));
+        else
+            presence.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("Maintenance mode enabled | Shard "
+                    +(shardInfo.getShardId()+1)));
     }
 }

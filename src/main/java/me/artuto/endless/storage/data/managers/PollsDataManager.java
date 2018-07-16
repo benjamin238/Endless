@@ -17,8 +17,9 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.Poll;
-import me.artuto.endless.core.entities.impl.PollImpl;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.handlers.PollHandler;
 import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.bot.sharding.ShardManager;
@@ -38,11 +39,13 @@ import java.util.List;
 
 public class PollsDataManager
 {
+    private final Bot bot;
     private final Connection connection;
 
-    public PollsDataManager(Database db)
+    public PollsDataManager(Bot bot)
     {
-        this.connection = db.getConnection();
+        this.bot = bot;
+        this.connection = bot.db.getConnection();
     }
 
     public void createPoll(long endTime, long guildId, long msgId, long tcId)
@@ -88,6 +91,18 @@ public class PollsDataManager
         }
     }
 
+    public void updatePolls(ShardManager shardManager)
+    {
+        for(Poll poll : getPolls())
+        {
+            if(OffsetDateTime.now().isAfter(poll.getEndTime()))
+            {
+                deletePoll(poll);
+                PollHandler.sendResults(poll, shardManager);
+            }
+        }
+    }
+
     private List<Poll> getPolls()
     {
         try
@@ -99,8 +114,7 @@ public class PollsDataManager
             try(ResultSet results = statement.executeQuery("SELECT * FROM POLLS"))
             {
                 while(results.next())
-                    polls.add(new PollImpl(results.getLong("end_time"), results.getLong("guild_id"),
-                            results.getLong("msg_id"), results.getLong("channel_id")));
+                    polls.add(bot.endlessBuilder.entityBuilder.createPoll(results));
                 return polls;
             }
         }
@@ -108,18 +122,6 @@ public class PollsDataManager
         {
             Database.LOG.error("Error while deleting a poll.", e);
             return Collections.emptyList();
-        }
-    }
-
-    public void updatePolls(ShardManager shardManager)
-    {
-        for(Poll poll : getPolls())
-        {
-            if(OffsetDateTime.now().isAfter(poll.getEndTime()))
-            {
-                deletePoll(poll);
-                PollHandler.sendResults(poll, shardManager);
-            }
         }
     }
 }

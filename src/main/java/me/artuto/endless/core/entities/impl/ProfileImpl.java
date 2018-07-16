@@ -18,6 +18,7 @@
 package me.artuto.endless.core.entities.impl;
 
 import me.artuto.endless.core.entities.Profile;
+import net.dv8tion.jda.core.entities.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Map;
 public class ProfileImpl implements Profile
 {
     public final Map<String, String> fields;
+
     private final int donatedAmount;
     private final String timezone;
     private final String twitter;
@@ -50,10 +52,11 @@ public class ProfileImpl implements Profile
     private final String splatoon;
     private final String mkwii;
     private final String reddit;
+    private final User user;
 
     public ProfileImpl(int donatedAmount, String timezone, String twitter, String steam, String wii, String nnid,
-                       String xboxLive, String psn, String threeds, String skype, String youtube, String about, String twitch, String minecraft, String email,
-                       String lol, String wow, String battle, String splatoon, String mkwii, String reddit)
+                       String xboxLive, String psn, String threeds, String skype, String youtube, String about, String twitch, String minecraft,
+                       String email, String lol, String wow, String battle, String splatoon, String mkwii, String reddit, User user)
     {
         this.donatedAmount = donatedAmount;
         this.fields = new HashMap<>();
@@ -77,6 +80,7 @@ public class ProfileImpl implements Profile
         this.splatoon = splatoon;
         this.mkwii = mkwii;
         this.reddit = reddit;
+        this.user = user;
 
         fields.put("Timezone", timezone); fields.put("Twitter", twitter); fields.put("Steam", steam); fields.put("Wii", wii); fields.put("NNID", nnid);
         fields.put("Xbox Live", xboxLive); fields.put("PSN", psn); fields.put("3DS", threeds); fields.put("Skype", skype); fields.put("YouTube", youtube);
@@ -216,5 +220,11 @@ public class ProfileImpl implements Profile
     public String getYouTube()
     {
         return youtube;
+    }
+
+    @Override
+    public User getUser()
+    {
+        return user;
     }
 }

@@ -17,9 +17,10 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.core.entities.StarboardMessage;
-import me.artuto.endless.core.entities.impl.StarboardMessageImpl;
 import net.dv8tion.jda.core.entities.Message;
 
 import java.sql.Connection;
@@ -29,11 +30,13 @@ import java.sql.Statement;
 
 public class StarboardDataManager
 {
+    private final Bot bot;
     private final Connection connection;
 
-    public StarboardDataManager(Database db)
+    public StarboardDataManager(Bot bot)
     {
-        connection = db.getConnection();
+        this.bot = bot;
+        this.connection = bot.db.getConnection();
     }
 
     public boolean addMessage(Message msg, Integer amount)
@@ -120,8 +123,9 @@ public class StarboardDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT msg_id, tc_id, guild_id, star_amount, starboard_msg_id FROM STARBOARD WHERE msg_id = %s", message)))
             {
                 if(results.next())
-                    return new StarboardMessageImpl(results.getLong("msg_id"), results.getLong("tc_id"), results.getLong("guild_id"), results.getInt("star_amount"), results.getLong("starboard_msg_id"));
-                else return null;
+                    return bot.endlessBuilder.entityBuilder.createStarboardMessage(results);
+                else
+                    return null;
             }
         }
         catch(SQLException e)

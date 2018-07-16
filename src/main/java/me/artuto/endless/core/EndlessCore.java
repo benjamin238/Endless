@@ -19,9 +19,8 @@ package me.artuto.endless.core;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.GuildSettings;
-import me.artuto.endless.core.entities.LocalTag;
-import me.artuto.endless.core.entities.Tag;
+import me.artuto.endless.core.entities.*;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -35,7 +34,9 @@ public interface EndlessCore
 {
     Bot getBot();
 
-    CommandClient getClient();
+    Blacklist getBlacklist(long id);
+
+    JDA getShard(int id);
 
     Tag getGlobalTag(String name);
 
@@ -45,7 +46,15 @@ public interface EndlessCore
 
     GuildSettings getGuildSettingsById(String id);
 
-    JDA getJDA();
+    Ignore getIgnore(Guild guild, long entity);
+
+    List<Blacklist> getBlacklists();
+
+    List<Blacklist> getGuildBlacklists();
+
+    List<Blacklist> getUserBlacklists();
+
+    List<JDA> getShards();
 
     List<Tag> getGlobalTags();
 
@@ -54,4 +63,6 @@ public interface EndlessCore
     List<LocalTag> getLocalTags();
 
     LocalTag getLocalTag(long guildId, String name);
+
+    ShardManager getShardManager();
 }

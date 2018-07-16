@@ -17,9 +17,10 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.core.entities.Profile;
-import me.artuto.endless.core.entities.impl.ProfileImpl;
 import net.dv8tion.jda.core.entities.User;
 
 import java.sql.Connection;
@@ -29,14 +30,13 @@ import java.sql.Statement;
 
 public class ProfileDataManager
 {
+    private final Bot bot;
     private final Connection connection;
-    private final Profile DEFAULT = new ProfileImpl(0, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null,
-            null, null, null,null, null, null);
 
-    public ProfileDataManager(Database db)
+    public ProfileDataManager(Bot bot)
     {
-        this.connection = db.getConnection();
+        this.bot = bot;
+        this.connection = bot.db.getConnection();
     }
 
     public Profile getProfile(User user)
@@ -51,23 +51,17 @@ public class ProfileDataManager
             {
                 if(results.next())
                 {
-                    p = new ProfileImpl(results.getInt("donation"), results.getString("timezone"), results.getString("twitter"),
-                            results.getString("steam"), results.getString("wii"), results.getString("nnid"),
-                            results.getString("xboxlive"), results.getString("psn"), results.getString("3ds"),
-                            results.getString("skype"), results.getString("youtube"), results.getString("about"),
-                            results.getString("twitch"), results.getString("minecraft"), results.getString("email"),
-                            results.getString("lol"), results.getString("wow"), results.getString("battle"),
-                            results.getString("splatoon"), results.getString("mkwii"), results.getString("reddit"));
+                    p = bot.endlessBuilder.entityBuilder.createProfile(results, user);
                 }
                 else
-                    p = DEFAULT;
+                    p = bot.db.createDefaultProfile(user);
             }
             return p;
         }
         catch(SQLException e)
         {
             Database.LOG.error("Error while getting the profile of the specified user. ID: "+user.getId(), e);
-            return DEFAULT;
+            return bot.db.createDefaultProfile(user);
         }
     }
 

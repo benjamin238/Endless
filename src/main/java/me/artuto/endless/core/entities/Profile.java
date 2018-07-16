@@ -17,6 +17,8 @@
 
 package me.artuto.endless.core.entities;
 
+import net.dv8tion.jda.core.entities.User;
+
 /**
  * @author Artuto
  */
@@ -66,4 +68,6 @@ public interface Profile
     String getTwitch();
 
     String getYouTube();
+
+    User getUser();
 }

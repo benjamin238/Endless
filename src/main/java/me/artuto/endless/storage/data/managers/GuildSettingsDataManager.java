@@ -20,7 +20,6 @@ package me.artuto.endless.storage.data.managers;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.core.entities.impl.EndlessShardedImpl;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import me.artuto.endless.core.entities.impl.IgnoreImpl;
 import me.artuto.endless.storage.data.Database;
@@ -77,10 +76,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setModlogId(tc==null?0L:tc.getIdLong());
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -124,10 +120,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl) bot.endless.getGuildSettings(guild);
                 settings.setServerlogId(tc == null ? 0L : tc.getIdLong());
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -171,10 +164,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setWelcomeId(tc==null?0L:tc.getIdLong());
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -218,10 +208,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setLeaveId(tc==null?0L:tc.getIdLong());
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -265,10 +252,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setWelcomeMsg(message);
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -312,10 +296,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setLeaveMsg(message);
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -359,11 +340,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setStarboardId(tc==null?0L:tc.getIdLong());
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    settings.setGuild(guild);
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -407,10 +384,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setAdminRoleId(role==null?0L:role.getIdLong());
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -454,10 +428,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setModRoleId(role==null?0L:role.getIdLong());
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -490,10 +461,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setStarboardCount(count);
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -533,10 +501,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.addPrefix(prefix);
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -625,10 +590,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.addRoleMeRole(role);
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -720,10 +682,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setMutedRoleId(role==null?0L:role.getIdLong());
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -767,10 +726,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setBanDeleteDays(days);
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)
@@ -795,10 +751,7 @@ public class GuildSettingsDataManager
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.addIgnoredEntity(new IgnoreImpl(entity, guild.getIdLong()));
                 if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
-                {
-                    ((EndlessCoreImpl)bot.endless.getShard(settings.getGuild().getJDA())).addSettings(guild, settings);
-                    ((EndlessShardedImpl)bot.endless).addSettings(guild, settings);
-                }
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
             }
         }
         catch(SQLException e)

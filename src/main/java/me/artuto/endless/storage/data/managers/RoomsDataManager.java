@@ -1,9 +1,10 @@
 package me.artuto.endless.storage.data.managers;
 
 import ch.qos.logback.classic.Logger;
+import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.Room;
-import me.artuto.endless.core.entities.impl.RoomImpl;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.utils.ChecksUtil;
 import net.dv8tion.jda.bot.sharding.ShardManager;
@@ -21,12 +22,14 @@ import java.util.*;
 
 public class RoomsDataManager
 {
+    private Bot bot;
     private Connection connection;
     private Logger LOG = Endless.getLog(RoomsDataManager.class);
 
-    public RoomsDataManager(Database db)
+    public RoomsDataManager(Bot bot)
     {
-        connection = db.getConnection();
+        this.bot = bot;
+        this.connection = bot.db.getConnection();
     }
 
     public void createComboRoom(boolean restricted, long expiryTime, long guildId, long tcId, long ownerId, long vcId)
@@ -218,18 +221,7 @@ public class RoomsDataManager
             {
                 list = new LinkedList<>();
                 while(results.next())
-                {
-                    if(!(results.getLong("expiry_time")==0L))
-                    {
-                        Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                        gmt.setTimeInMillis(results.getLong("expiry_time"));
-                        list.add(new RoomImpl(results.getBoolean("restricted"), guildId, results.getLong("tc_id"),
-                                results.getLong("owner_id"), results.getLong("vc_id"), OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId())));
-                    }
-                    else
-                        list.add(new RoomImpl(results.getBoolean("restricted"), guildId, results.getLong("tc_id"),
-                                results.getLong("owner_id"), results.getLong("vc_id"), null));
-                }
+                    list.add(bot.endlessBuilder.entityBuilder.createRoom(results));
                 return list;
             }
         }
@@ -240,32 +232,25 @@ public class RoomsDataManager
         }
     }
 
-    public List<Room> getTempRooms()
+    public Room getRoom(long id)
     {
         try
         {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            List<Room> list;
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM ROOMS WHERE expiry_time IS NOT null"))
+            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE tc_id = %s OR vc_id = %s", id, id)))
             {
-                list = new LinkedList<>();
-                while(results.next())
-                {
-                    Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    gmt.setTimeInMillis(results.getLong("expiry_time"));
-                    list.add(new RoomImpl(results.getBoolean("restricted"), results.getLong("guild_id"), results.getLong("tc_id"),
-                            results.getLong("owner_id"), results.getLong("vc_id"),
-                            OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId())));
-                }
-                return list;
+                if(results.next())
+                    return bot.endlessBuilder.entityBuilder.createRoom(results);
+                else
+                    return null;
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting a list of temporal rooms.", e);
-            return Collections.emptyList();
+            Database.LOG.error("Error while locking a room.", e);
+            return null;
         }
     }
 
@@ -320,6 +305,29 @@ public class RoomsDataManager
                                 e -> LOG.error("Could not delete Voice Room with ID {}", vc.getId()));
                 }
             }
+        }
+    }
+
+    private List<Room> getTempRooms()
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            List<Room> list;
+
+            try(ResultSet results = statement.executeQuery("SELECT * FROM ROOMS WHERE expiry_time IS NOT null"))
+            {
+                list = new LinkedList<>();
+                while(results.next())
+                    list.add(bot.endlessBuilder.entityBuilder.createRoom(results));
+                return list;
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while getting a list of temporal rooms.", e);
+            return Collections.emptyList();
         }
     }
 }

@@ -18,15 +18,15 @@
 package me.artuto.endless.storage.data;
 
 import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.GuildSettings;
-import me.artuto.endless.core.entities.Ignore;
-import me.artuto.endless.core.entities.Room;
-import me.artuto.endless.core.entities.Tag;
+import me.artuto.endless.core.entities.*;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import me.artuto.endless.core.entities.impl.IgnoreImpl;
+import me.artuto.endless.core.entities.impl.ProfileImpl;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.User;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,28 +36,38 @@ import java.util.*;
 
 public class Database
 {
+    private final Bot bot;
     private final Connection connection;
+
     public static final Logger LOG = LoggerFactory.getLogger(Database.class);
 
-    public GuildSettings createDefault(Guild guild)
+    public GuildSettings createDefaultSettings(Guild guild)
     {
         return new GuildSettingsImpl(true, new HashSet<>(), guild, 0, 0, new LinkedList<>(),
                 new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L, 0L, 0L,
                 0L, 0L, null, null, null);
     }
 
-    public Database(String host, String user, String pass) throws SQLException
+    public Profile createDefaultProfile(User user)
     {
-        connection = DriverManager.getConnection(host, user, pass);
+        return new ProfileImpl(0, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null,
+                null, null, null, user);
     }
 
-    //Connection getter
+    public Database(Bot bot, String host, String user, String pass) throws SQLException
+    {
+        this.bot = bot;
+        this.connection = DriverManager.getConnection(host, user, pass);
+    }
+
+    // Connection getter
     public Connection getConnection()
     {
         return connection;
     }
 
-    //Guild settings
+    // Guild settings
     public GuildSettings getSettings(Guild guild)
     {
         try
@@ -65,69 +75,20 @@ public class Database
             Statement statement = connection.createStatement();
             statement.closeOnCompletion();
             GuildSettings gs;
-            List<Role> roleMeRoles = new LinkedList<>();
-            List<Tag> importedTags = new LinkedList<>();
-            Set<String> prefixes = new HashSet<>();
-            String array;
 
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getIdLong())))
             {
                 if(results.next())
-                {
-                    array = results.getString("prefixes");
-
-                    if(!(array == null))
-                    {
-                        for(Object prefix : new JSONArray(array))
-                            prefixes.add(prefix.toString());
-                    }
-
-                    array = results.getString("roleme_roles");
-
-                    if(!(array == null))
-                    {
-                        for(Object preRole : new JSONArray(array))
-                        {
-                            Role role = guild.getRoleById(preRole.toString());
-
-                            if(!(role==null))
-                                roleMeRoles.add(role);
-                        }
-                    }
-
-                    array = results.getString("imported_tags");
-
-                    if(!(array == null))
-                    {
-                        for(Object preTag : new JSONArray(array))
-                        {
-                            Tag tag = Bot.getInstance().endless.getGlobalTags().stream()
-                                    .filter(t -> t.getId()==(Long)preTag).findFirst().orElse(null);
-                            if(tag==null)
-                                tag = Bot.getInstance().endless.getLocalTags().stream().filter(t -> t.getId()==(Long)preTag).findFirst().orElse(null);
-                            if(!(tag==null))
-                                importedTags.add(tag);
-                        }
-                    }
-
-                    gs = new GuildSettingsImpl(false, prefixes, guild, results.getInt("ban_delete_days"),
-                            results.getInt("starboard_count"), getIgnoresForGuild(guild), roleMeRoles, importedTags,
-                            results.getLong("leave_id"), results.getLong("modlog_id"),
-                            results.getLong("admin_role_id"), results.getLong("mod_role_id"),
-                            results.getLong("muted_role_id"), results.getLong("serverlog_id"),
-                            results.getLong("starboard_id"), results.getLong("welcome_id"),
-                            results.getString("room_mode")==null?null:Room.Mode.valueOf(results.getString("room_mode")),
-                            results.getString("leave_msg"), results.getString("welcome_msg"));
-                }
+                    return bot.endlessBuilder.entityBuilder.createGuildSettings(guild, results);
                 else
-                    gs = createDefault(guild);
+                    gs = createDefaultSettings(guild);
             }
             return gs;
         }
         catch(SQLException e)
         {
             LOG.warn("Error while getting the settings of a guild. ID: "+guild.getId(), e);
-            return createDefault(guild);
+            return createDefaultSettings(guild);
         }
     }
 
@@ -170,7 +131,7 @@ public class Database
             {
                 List<Ignore> ignores = new LinkedList<>();
                 while(results.next())
-                    ignores.add(new IgnoreImpl(results.getLong("entity_id"), results.getLong("guild_id")));
+                    ignores.add(bot.endlessBuilder.entityBuilder.createIgnore(results));
                 return ignores;
             }
         }

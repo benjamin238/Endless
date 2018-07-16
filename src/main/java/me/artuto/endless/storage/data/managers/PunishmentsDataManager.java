@@ -17,15 +17,15 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.core.entities.Punishment;
 import me.artuto.endless.core.entities.TempPunishment;
-import me.artuto.endless.core.entities.impl.PunishmentImpl;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -36,10 +36,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.OffsetDateTime;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * @author Artuto
@@ -47,11 +45,13 @@ import java.util.TimeZone;
 
 public class PunishmentsDataManager
 {
+    private final Bot bot;
     private final Connection connection;
 
-    public PunishmentsDataManager(Database db)
+    public PunishmentsDataManager(Bot bot)
     {
-        this.connection = db.getConnection();
+        this.bot = bot;
+        this.connection = bot.db.getConnection();
     }
 
     public void addPunishment(long user, long guild, Const.PunishmentType type)
@@ -128,7 +128,7 @@ public class PunishmentsDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE user_id = %s AND guild_id = %s AND type = \"%s\"", user, guild, type.name())))
             {
                 if(results.next())
-                    return new PunishmentImpl(type, guild, user, null);
+                    return bot.endlessBuilder.entityBuilder.createPunishment(results);
                 else
                     return null;
             }
@@ -140,7 +140,7 @@ public class PunishmentsDataManager
         }
     }
 
-    public Punishment getTempPunishment(long user, long guild, Const.PunishmentType type)
+    public TempPunishment getTempPunishment(long user, long guild, Const.PunishmentType type)
     {
         try
         {
@@ -150,12 +150,9 @@ public class PunishmentsDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE user_id = %s AND guild_id = %s AND type = \"%s\"", user, guild, type.name())))
             {
                 if(results.next())
-                {
-                    Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    gmt.setTimeInMillis(results.getLong("time"));
-                    return new PunishmentImpl(type, guild, user, OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()));
-                }
-                else return null;
+                    return bot.endlessBuilder.entityBuilder.createTempPunishment(results);
+                else
+                    return null;
             }
         }
         catch(SQLException e)
@@ -177,7 +174,7 @@ public class PunishmentsDataManager
                 List<Punishment> list = new LinkedList<>();
 
                 while(results.next())
-                    list.add(new PunishmentImpl(type, results.getLong("guild_id"), results.getLong("user_id"), null));
+                    list.add(bot.endlessBuilder.entityBuilder.createPunishment(results));
                 return list;
             }
         }
@@ -200,12 +197,7 @@ public class PunishmentsDataManager
                 List<TempPunishment> list = new LinkedList<>();
 
                 while(results.next())
-                {
-                    Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    gmt.setTimeInMillis(results.getLong("time"));
-                    list.add(new PunishmentImpl(type, results.getLong("guild_id"), results.getLong("user_id"),
-                           OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId())));
-                }
+                    list.add(bot.endlessBuilder.entityBuilder.createTempPunishment(results));
                 return list;
             }
         }

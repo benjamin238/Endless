@@ -159,7 +159,7 @@ public class TagCmd extends EndlessCommand
 
             if(tag==null)
             {
-                bot.tdm.createGlobalTag(event.getGuild().getIdLong(), event.getAuthor().getIdLong(), content, name);
+                bot.tdm.createGlobalTag(event.getAuthor().getIdLong(), content, name);
                 event.replySuccess("Tag \""+name+"\" was created successfully!");
             }
             else
@@ -255,7 +255,7 @@ public class TagCmd extends EndlessCommand
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
                     if(tag.isGlobal())
-                        bot.tdm.deleteGlobalTag(event.getJDA(), event.getArgs().trim().toLowerCase());
+                        bot.tdm.deleteGlobalTag(event.getArgs().trim().toLowerCase());
                     else
                         bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
                     event.replySuccess("Tag successfully deleted");
@@ -274,7 +274,7 @@ public class TagCmd extends EndlessCommand
 
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
-                    bot.tdm.deleteGlobalTag(event.getJDA(), event.getArgs().trim().toLowerCase());
+                    bot.tdm.deleteGlobalTag(event.getArgs().trim().toLowerCase());
                     event.replySuccess("Tag successfully deleted");
                 }
                 else
@@ -335,9 +335,9 @@ public class TagCmd extends EndlessCommand
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
                     if(tag.isGlobal())
-                        bot.tdm.updateGlobalTagContent(event.getJDA(), name, content);
+                        bot.tdm.updateGlobalTagContent(name, content);
                     else
-                        bot.tdm.updateLocalTagContent(event.getJDA(), event.getGuild().getIdLong(), name, content);
+                        bot.tdm.updateLocalTagContent(event.getGuild().getIdLong(), name, content);
                     event.replySuccess("Tag successfully edited!");
                 }
                 else
@@ -354,7 +354,7 @@ public class TagCmd extends EndlessCommand
 
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
-                    bot.tdm.updateGlobalTagContent(event.getJDA(), name, content);
+                    bot.tdm.updateGlobalTagContent(name, content);
                     event.replySuccess("Tag successfully edited!");
                 }
                 else
@@ -848,7 +848,7 @@ public class TagCmd extends EndlessCommand
                     event.replyError("This tag isn't imported!");
                 else
                 {
-                    bot.tdm.unimportTag(event.getGuild().getIdLong(), tag);
+                    bot.tdm.unImportTag(event.getGuild().getIdLong(), tag);
                     event.replySuccess("Successfully unimported tag!");
                 }
             }

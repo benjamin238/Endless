@@ -17,7 +17,9 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.Reminder;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.core.entities.impl.ReminderImpl;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.utils.FormatUtil;
@@ -40,11 +42,13 @@ import java.util.*;
 
 public class RemindersDataManager
 {
+    private final Bot bot;
     private final Connection connection;
 
-    public RemindersDataManager(Database db)
+    public RemindersDataManager(Bot bot)
     {
-        this.connection = db.getConnection();
+        this.bot = bot;
+        this.connection = bot.db.getConnection();
     }
 
     public void createReminder(long channelId, long expiryTime, long userId, String msg)
@@ -89,34 +93,6 @@ public class RemindersDataManager
         }
     }
 
-    public List<Reminder> getReminders()
-    {
-        try
-        {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.closeOnCompletion();
-            List<Reminder> list;
-
-            try(ResultSet results = statement.executeQuery("SELECT * FROM REMINDERS"))
-            {
-                list = new LinkedList<>();
-                while(results.next())
-                {
-                    Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    gmt.setTimeInMillis(results.getLong("expiry_time"));
-                    list.add(new ReminderImpl(results.getLong("id"), results.getLong("channel_id"), results.getLong("user_id"),
-                            OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()), results.getString("msg")));
-                }
-                return list;
-            }
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while adding a list of reminders", e);
-            return Collections.emptyList();
-        }
-    }
-
     public List<Reminder> getRemindersByUser(long userId)
     {
         try
@@ -129,13 +105,7 @@ public class RemindersDataManager
             {
                 list = new LinkedList<>();
                 while(results.next())
-                {
-                    Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    gmt.setTimeInMillis(results.getLong("expiry_time"));
-                    list.add(new ReminderImpl(results.getLong("id"), results.getLong("channel_id"),
-                            results.getLong("user_id"), OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()),
-                            results.getString("msg")));
-                }
+                    list.add(bot.endlessBuilder.entityBuilder.createReminder(results));
                 return list;
             }
         }
@@ -168,6 +138,29 @@ public class RemindersDataManager
 
                 channel.sendMessage(toSend).queue(null, e -> {});
             }
+        }
+    }
+
+    private List<Reminder> getReminders()
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+            List<Reminder> list;
+
+            try(ResultSet results = statement.executeQuery("SELECT * FROM REMINDERS"))
+            {
+                list = new LinkedList<>();
+                while(results.next())
+                    list.add(bot.endlessBuilder.entityBuilder.createReminder(results));
+                return list;
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while adding a list of reminders", e);
+            return Collections.emptyList();
         }
     }
 }

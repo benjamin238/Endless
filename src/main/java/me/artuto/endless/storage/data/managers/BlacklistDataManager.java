@@ -19,7 +19,7 @@ package me.artuto.endless.storage.data.managers;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
-import me.artuto.endless.core.entities.impl.EndlessShardedImpl;
+import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.core.entities.Blacklist;
 import me.artuto.endless.core.entities.impl.BlacklistImpl;
@@ -55,13 +55,9 @@ public class BlacklistDataManager
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE id = %s", id)))
             {
                 if(results.next())
-                {
-                    Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    gmt.setTimeInMillis(results.getLong("time"));
-                    return new BlacklistImpl(Const.BlacklistType.valueOf(results.getString("type")), results.getLong("id"),
-                            OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()), results.getString("reason"));
-                }
-                else return null;
+                    return bot.endlessBuilder.entityBuilder.createBlacklist(results);
+                else
+                    return null;
             }
         }
         catch(SQLException e)
@@ -99,7 +95,7 @@ public class BlacklistDataManager
                 }
                 Blacklist blacklist = bot.endless.getBlacklist(id);
                 if(blacklist==null)
-                    ((EndlessShardedImpl)bot.endless).addBlacklist(getBlacklist(id));
+                    ((EndlessCoreImpl)bot.endless).addBlacklist(getBlacklist(id));
             }
         }
         catch(SQLException e)
@@ -121,7 +117,7 @@ public class BlacklistDataManager
                     results.deleteRow();
                 Blacklist blacklist = bot.endless.getBlacklist(id);
                 if(!(blacklist==null))
-                    ((EndlessShardedImpl)bot.endless).removeBlacklist(blacklist);
+                    ((EndlessCoreImpl)bot.endless).removeBlacklist(blacklist);
             }
         }
         catch(SQLException e)
@@ -154,7 +150,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error whiile getting the blacklisted guilds map.", e);
+            Database.LOG.error("Error while getting the blacklisted guilds map.", e);
             return null;
         }
     }
@@ -206,7 +202,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error whiile getting the raw blacklisted guilds map.", e);
+            Database.LOG.error("Error while getting the raw blacklisted guilds map.", e);
             return null;
         }
     }
