@@ -37,6 +37,7 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -129,7 +130,7 @@ public class RoomCmd extends EndlessCommand
             this.arguments = "<rooms name> | [expiry time]";
             this.botPerms = new Permission[]{Permission.MANAGE_CHANNEL};
             this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
-            //this.cooldown = 1000;
+            this.cooldown = 1000;
             this.cooldownScope = CooldownScope.GUILD;
             this.parent = RoomCmd.this;
         }
@@ -196,32 +197,44 @@ public class RoomCmd extends EndlessCommand
             boolean fExpiry = expiry;
             Instant fExpiryTime = expiryTime;
             String fFormattedTime = formattedTime;
-            guild.getController().createTextChannel(tcName).setTopic("Room Owner: "+owner.getAsMention()+"\nUse `"+p+"room leave` to leave this room")
-                    .addPermissionOverride(guild.getPublicRole(), null, Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.MESSAGE_READ))
-                    .addPermissionOverride(event.getSelfMember(), Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS,
-                            Permission.MESSAGE_READ),null).addPermissionOverride(event.getMember(), Collections.singletonList(Permission.MESSAGE_READ),
-                    null).reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").queue(tcP -> guild.getController()
-                    .createVoiceChannel(vcName).addPermissionOverride(guild.getPublicRole(), null,
-                            Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.VIEW_CHANNEL)).addPermissionOverride(event.getSelfMember(),
-                            Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.VIEW_CHANNEL),null)
-                            .addPermissionOverride(event.getMember(), Collections.singletonList(Permission.VIEW_CHANNEL),null)
-                            .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").queue(vcP -> {
-                        TextChannel tc = (TextChannel)tcP;
-                        VoiceChannel vc = (VoiceChannel)vcP;
-                        if(fExpiry)
-                        {
-                            tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
-                            bot.rsdm.createComboRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
-                            event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**) that will expire in "
-                                    +fFormattedTime);
-                        }
-                        else
-                        {
-                            tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
-                            bot.rsdm.createComboRoom(false, 0L, guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
-                            event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**)");
-                        }
-                    }, e -> event.replyError("Error while creating the voice room.")), e -> event.replyError("Error while creating the text room."));
+            event.async(() -> {
+                TextChannel tc;
+                VoiceChannel vc;
+                try
+                {
+                    tc = (TextChannel)guild.getController().createTextChannel(tcName).setTopic("Room Owner: "+owner.getAsMention()+"\nUse `"+p+"room leave` to leave this room")
+                            .addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.CREATE_INSTANT_INVITE, Permission.MESSAGE_READ))
+                            .addPermissionOverride(event.getSelfMember(), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.MESSAGE_READ),null)
+                            .addPermissionOverride(event.getMember(), Permission.MESSAGE_READ.getRawValue(), 0L)
+                            .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").complete();
+
+                    vc = (VoiceChannel)guild.getController().createVoiceChannel(vcName)
+                            .addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.CREATE_INSTANT_INVITE, Permission.VIEW_CHANNEL))
+                            .addPermissionOverride(event.getSelfMember(), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.VIEW_CHANNEL),null)
+                            .addPermissionOverride(event.getMember(), Permission.VIEW_CHANNEL.getRawValue(),0L)
+                            .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Combo Room Creation").complete();
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Something went wrong while creating the channels. Check that I have " +
+                            "Manage Channels permission.");
+                    return;
+                }
+
+                if(fExpiry)
+                {
+                    tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                    bot.rsdm.createComboRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
+                    event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**) that will expire in "
+                            +fFormattedTime);
+                }
+                else
+                {
+                    tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                    bot.rsdm.createComboRoom(false, 0L, guild.getIdLong(), tc.getIdLong(), owner.getIdLong(), vc.getIdLong());
+                    event.replySuccess("Successfully created Combo Room (**"+tc.getAsMention()+"** and **"+vc.getName()+"**)");
+                }
+            });
         }
     }
 
@@ -234,7 +247,7 @@ public class RoomCmd extends EndlessCommand
             this.arguments = "<room name> | [expiry time]";
             this.botPerms = new Permission[]{Permission.MANAGE_CHANNEL};
             this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
-            //this.cooldown = 1000;
+            this.cooldown = 1000;
             this.cooldownScope = CooldownScope.GUILD;
             this.parent = RoomCmd.this;
         }
@@ -292,25 +305,36 @@ public class RoomCmd extends EndlessCommand
             boolean fExpiry = expiry;
             Instant fExpiryTime = expiryTime;
             String fFormattedTime = formattedTime;
-            guild.getController().createTextChannel(tcName).setTopic("Room Owner: "+owner.getAsMention()+"\nUse `"+p+"room leave` to leave this room")
-                    .addPermissionOverride(guild.getPublicRole(), null, Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.MESSAGE_READ))
-                    .addPermissionOverride(event.getSelfMember(), Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS,
-                            Permission.MESSAGE_READ),null).addPermissionOverride(event.getMember(), Collections.singletonList(Permission.MESSAGE_READ),
-                    null).reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Text Room Creation").queue(created -> {
-                        TextChannel tc = (TextChannel)created;
-                        if(fExpiry)
-                        {
-                            tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
-                            bot.rsdm.createTextRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), created.getIdLong(), owner.getIdLong());
-                            event.replySuccess("Successfully created Text Room **"+tc.getAsMention()+"** that will expire in "+fFormattedTime);
-                        }
-                        else
-                        {
-                            tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
-                            bot.rsdm.createTextRoom(false, 0L, guild.getIdLong(), created.getIdLong(), owner.getIdLong());
-                            event.replySuccess("Successfully created Text Room **"+tc.getAsMention()+"**");
-                        }
-            }, e -> event.replyError("Error while creating a room."));
+            event.async(() -> {
+                TextChannel tc;
+                try
+                {
+                    tc = (TextChannel)guild.getController().createTextChannel(tcName).setTopic("Room Owner: "+owner.getAsMention()+"\nUse `"+p+"room leave` to leave this room")
+                            .addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.CREATE_INSTANT_INVITE, Permission.MESSAGE_READ))
+                            .addPermissionOverride(event.getSelfMember(), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.MESSAGE_READ),null)
+                            .addPermissionOverride(event.getMember(), Permission.MESSAGE_READ.getRawValue(), 0L)
+                            .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Text Room Creation").complete();
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Something went wrong while creating the channel. Check that I have " +
+                            "Manage Channels permission.");
+                    return;
+                }
+
+                if(fExpiry)
+                {
+                    tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                    bot.rsdm.createTextRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), tc.getIdLong(), owner.getIdLong());
+                    event.replySuccess("Successfully created Text Room **"+tc.getAsMention()+"** that will expire in "+fFormattedTime);
+                }
+                else
+                {
+                    tc.sendMessageFormat("%s %s, Your Room has been created.", event.getClient().getSuccess(), owner).queue();
+                    bot.rsdm.createTextRoom(false, 0L, guild.getIdLong(), tc.getIdLong(), owner.getIdLong());
+                    event.replySuccess("Successfully created Text Room **"+tc.getAsMention()+"**");
+                }
+            });
         }
     }
 
@@ -323,7 +347,7 @@ public class RoomCmd extends EndlessCommand
             this.arguments = "<room name> | [expiry time]";
             this.botPerms = new Permission[]{Permission.MANAGE_CHANNEL};
             this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
-            //this.cooldown = 1000;
+            this.cooldown = 1000;
             this.cooldownScope = CooldownScope.GUILD;
             this.parent = RoomCmd.this;
         }
@@ -380,23 +404,34 @@ public class RoomCmd extends EndlessCommand
             boolean fExpiry = expiry;
             Instant fExpiryTime = expiryTime;
             String fFormattedTime = formattedTime;
-            guild.getController().createVoiceChannel(vcName).addPermissionOverride(guild.getPublicRole(), null,
-                    Arrays.asList(Permission.CREATE_INSTANT_INVITE, Permission.VIEW_CHANNEL)).addPermissionOverride(event.getSelfMember(),
-                    Arrays.asList(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.VIEW_CHANNEL),null)
-                    .addPermissionOverride(event.getMember(), Collections.singletonList(Permission.VIEW_CHANNEL),null)
-                    .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Voice Room Creation").queue(created -> {
-                VoiceChannel vc = (VoiceChannel)created;
+            event.async(() -> {
+                VoiceChannel vc;
+                try
+                {
+                    vc = (VoiceChannel)guild.getController().createVoiceChannel(vcName)
+                            .addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.CREATE_INSTANT_INVITE, Permission.VIEW_CHANNEL))
+                            .addPermissionOverride(event.getSelfMember(), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS, Permission.VIEW_CHANNEL), null)
+                            .addPermissionOverride(event.getMember(), Permission.VIEW_CHANNEL.getRawValue(),0L)
+                            .reason("["+owner.getName()+"#"+owner.getDiscriminator()+"] Voice Room Creation").complete();
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Something went wrong while creating the channel. Check that I have " +
+                            "Manage Channels permission.");
+                    return;
+                }
+
                 if(fExpiry)
                 {
-                    bot.rsdm.createVoiceRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), owner.getIdLong(), created.getIdLong());
+                    bot.rsdm.createVoiceRoom(false, fExpiryTime.toEpochMilli(), guild.getIdLong(), owner.getIdLong(), vc.getIdLong());
                     event.replySuccess("Successfully created Voice Room **"+vc.getName()+"** that will expire in "+fFormattedTime);
                 }
                 else
                 {
-                    bot.rsdm.createVoiceRoom(false, 0L, guild.getIdLong(), owner.getIdLong(), created.getIdLong());
+                    bot.rsdm.createVoiceRoom(false, 0L, guild.getIdLong(), owner.getIdLong(), vc.getIdLong());
                     event.replySuccess("Successfully created Voice Room **"+vc.getName()+"**");
                 }
-            }, e -> event.replyError("Error while creating a voice room."));
+            });
         }
     }
 
