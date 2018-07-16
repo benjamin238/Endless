@@ -450,20 +450,24 @@ public class RoomCmd extends EndlessCommand
         {
             String[] args = splitArgs(event.getArgs(), " to ");
             Member member = findMember(event, args[0]);
-            TextChannel tc;
+            Channel channel;
             if(args[1].isEmpty())
-                tc = event.getTextChannel();
+                channel = event.getTextChannel();
             else
-                tc = findTextChannel(event, args[1]);
+                channel = findTextChannel(event, args[1]);
             if(member==null)
                 return;
-            if(tc==null)
-                return;
+            if(channel==null)
+            {
+                channel = findVoiceChannel(event, args[1]);
+                if(channel==null)
+                    return;
+            }
 
-            Room room = bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getTextChannelId()==tc.getIdLong()).findFirst().orElse(null);
+            Room room = bot.rsdm.getRoom(channel.getIdLong());
             if(room==null)
             {
-                event.replyError(tc.getAsMention()+" is not an Endless room!");
+                event.replyError(channel instanceof TextChannel?((TextChannel)channel).getAsMention():channel.getName()+" is not an Endless room!");
                 return;
             }
             PermLevel permLevel = PermLevel.getLevel(bot.endless.getGuildSettings(event.getGuild()), event.getMember());
@@ -472,21 +476,42 @@ public class RoomCmd extends EndlessCommand
                 event.replyError("You can't invite someone to a room you don't own if its locked!");
                 return;
             }
-            if(!(tc.getMembers().contains(event.getMember())) && !(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))
+            TextChannel tc = event.getGuild().getTextChannelById(room.getTextChannelId());;
+            if(room.isCombo())
             {
-                event.replyError("You must be on the room to invite someone!");
-                return;
-            }
-            if(tc.getMembers().contains(member))
-            {
-                event.replyError("The specified user is already on that room!");
-                return;
+                if(!(tc==null))
+                {
+                    if(!(tc.getMembers().contains(event.getMember())) && !(room.getOwnerId()==event.getAuthor().getIdLong()) && !(permLevel.isAtLeast(PermLevel.ADMINISTRATOR)))
+                    {
+                        event.replyError("You must be on the room to invite someone!");
+                        return;
+                    }
+                    if(tc.getMembers().contains(member))
+                    {
+                        event.replyError("The specified user is already on that room!");
+                        return;
+                    }
+                }
             }
 
-            tc.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).queue(s -> {
-                event.reactSuccess();
-                tc.sendMessageFormat("Welcome, %s to the room!", member.getUser()).queue();
-            }, e -> event.replyError("Could not add **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** to the room!"));
+            Channel fChannel = channel;
+            event.async(() -> {
+                try
+                {
+                    fChannel.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).reason().complete();
+                    if(!(tc==null))
+                        tc.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).reason().complete();
+                    event.reactSuccess();
+                    if(fChannel instanceof TextChannel)
+                        ((TextChannel)fChannel).sendMessageFormat("Welcome, %s to the room!", member.getUser()).queue();
+                    else if(!(tc==null))
+                        tc.sendMessageFormat("Welcome, %s to the room!", member.getUser()).queue();
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Could not add **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** to the room!");
+                }
+            });
         }
     }
 
@@ -503,14 +528,18 @@ public class RoomCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            TextChannel tc = findTextChannel(event, event.getArgs());
-            if(tc==null)
-                return;
+            Channel channel = findTextChannel(event, event.getArgs());
+            if(channel==null)
+            {
+                channel = findVoiceChannel(event, event.getArgs());
+                if(channel==null)
+                    return;
+            }
 
-            Room room = bot.rsdm.getRoomsForGuild(event.getGuild().getIdLong()).stream().filter(r -> r.getTextChannelId()==tc.getIdLong()).findFirst().orElse(null);
+            Room room = bot.rsdm.getRoom(channel.getIdLong());
             if(room==null)
             {
-                event.replyError(tc.getAsMention()+" is not an Endless room!");
+                event.replyError(channel instanceof TextChannel?((TextChannel)channel).getAsMention():channel.getName()+" is not an Endless room!");
                 return;
             }
             PermLevel permLevel = PermLevel.getLevel(bot.endless.getGuildSettings(event.getGuild()), event.getMember());
@@ -519,16 +548,23 @@ public class RoomCmd extends EndlessCommand
                 event.replyError("You can't join a room if its locked!");
                 return;
             }
-            if(tc.getMembers().contains(event.getMember()))
+            if(room.isCombo())
             {
-                event.replyError("You are already on that room!");
-                return;
+                TextChannel tc = event.getGuild().getTextChannelById(room.getTextChannelId());
+                if(!(tc==null))
+                {
+                    if(tc.getMembers().contains(event.getMember()))
+                    {
+                        event.replyError("You are already on that room!");
+                        return;
+                    }
+                }
             }
 
-            tc.putPermissionOverride(event.getMember()).setAllow(Permission.MESSAGE_READ).queue(s -> {
+            /*tc.putPermissionOverride(event.getMember()).setAllow(Permission.MESSAGE_READ).queue(s -> {
                 event.reactSuccess();
                 tc.sendMessageFormat("Welcome, %s to the room!", event.getMember().getUser()).queue();
-            }, e -> event.replyError("Could not add you to the room!"));
+            }, e -> event.replyError("Could not add you to the room!"));*/
         }
     }
 
@@ -746,6 +782,24 @@ public class RoomCmd extends EndlessCommand
         else if(list.size()>1)
         {
             event.replyWarning(FormatUtil.listOfTcChannels(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
+    private VoiceChannel findVoiceChannel(CommandEvent event, String query)
+    {
+        List<VoiceChannel> list = FinderUtil.findVoiceChannels(query, event.getGuild());
+
+        if(list.isEmpty())
+        {
+            event.replyWarning("I was not able to found a voice channel with the provided arguments: '"+query+"'");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfVcChannels(list, query));
             return null;
         }
         else
