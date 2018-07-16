@@ -478,7 +478,7 @@ public class TagCmd extends EndlessCommand
                 }
                 if(!(localTags.isEmpty()))
                 {
-                    sb.append("\n").append(event.getClient().getSuccess()).append(" **").append(globalTags.size()).append("** tags in **")
+                    sb.append("\n").append(event.getClient().getSuccess()).append(" **").append(localTags.size()).append("** tags in **")
                             .append(event.getGuild().getName()).append("**:\n");
                     localTags.forEach(t -> sb.append(t.getName()).append(" "));
                 }
