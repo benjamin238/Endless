@@ -114,7 +114,7 @@ public class EntityBuilder
                 results.getLong("serverlog_id"),
                 results.getLong("starboard_id"),
                 results.getLong("welcome_id"),
-                results.getString("room_mode")==null?null:Room.Mode.valueOf(results.getString("room_mode")),
+                results.getString("room_mode")==null?Room.Mode.NO_CREATION:Room.Mode.valueOf(results.getString("room_mode")),
                 results.getString("leave_msg"),
                 results.getString("welcome_msg"));
     }

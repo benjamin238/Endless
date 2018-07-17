@@ -24,6 +24,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.Room;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -65,6 +66,7 @@ public class ServerSettingsCmd extends EndlessCommand
         Role adminRole = GuildUtils.getAdminRole(guild);
         Role modRole = GuildUtils.getModRole(guild);
         Role mutedRole = GuildUtils.getMutedRole(guild);
+        Room.Mode roomMode = settings.getRoomMode();
         String welcomeMsg = settings.getWelcomeMsg();
         String leaveMsg = settings.getLeaveMsg();
         TextChannel modlog = guild.getTextChannelById(settings.getModlog());
@@ -89,7 +91,8 @@ public class ServerSettingsCmd extends EndlessCommand
         settingsString.append("Admin Role: ").append((adminRole==null?"None":"**"+adminRole.getAsMention()+"**"))
                 .append("\nMod Role: ").append((modRole==null?"None":"**"+modRole.getAsMention()+"**"))
                 .append("\nMuted Role: ").append((mutedRole==null?"None":"**"+mutedRole.getAsMention()+"**"))
-                .append("\nBan delete days: ").append((banDeleteDays==0?"Don't delete":String.valueOf("**"+banDeleteDays+"**")));
+                .append("\nBan delete days: ").append((banDeleteDays==0?"Don't delete":String.valueOf("**"+banDeleteDays+"**")))
+                .append("\nRoom Mode: **").append(roomMode.getName()).append("**");
 
         starboardString.append("Starboard Channel: ").append((starboard==null?"None":"**"+starboard.getAsMention()+"**"))
                 .append("\nStar Count: ").append((starboardCount==0?"Disabled":String.valueOf("**"+starboardCount+"**")));

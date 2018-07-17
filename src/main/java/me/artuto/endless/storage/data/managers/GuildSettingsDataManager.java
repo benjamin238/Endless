@@ -19,6 +19,7 @@ package me.artuto.endless.storage.data.managers;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.Ignore;
+import me.artuto.endless.core.entities.Room;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import me.artuto.endless.core.entities.impl.IgnoreImpl;
@@ -779,6 +780,50 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while removing a ignore for the guild "+guild.getId(), e);
+        }
+    }
+
+    public void setRoomMode(Guild guild, Room.Mode mode)
+    {
+        try
+        {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, room_mode FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            {
+                if(mode==null)
+                {
+                    if(results.next())
+                    {
+                        results.updateNull("room_mode");
+                        results.updateRow();
+                    }
+                }
+                else
+                {
+                    if(results.next())
+                    {
+                        results.updateString("room_mode", mode.getName());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateString("mode_room", mode.getName());
+                        results.insertRow();
+                    }
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setRoomMode(mode);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while setting the room mode for the guild "+guild.getId(), e);
         }
     }
 }

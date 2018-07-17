@@ -78,7 +78,7 @@ public class GuildSettingsImpl implements GuildSettings
     {
         return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && roleMeRoles.isEmpty() && ignoredEntities.isEmpty()
                 && importedTags.isEmpty() && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
-                && welcomeId==0L && roomMode==null &&leaveMsg==null && welcomeMsg==null;
+                && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && welcomeMsg==null;
     }
 
     @Override
