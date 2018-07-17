@@ -44,9 +44,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.dv8tion</groupId>
+            <groupId>com.github.DV8FromTheWorld</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.6.0_376</version>
+            <version>3a580d0</version>
         </dependency>
         <dependency>
             <groupId>com.jagrosh</groupId>
