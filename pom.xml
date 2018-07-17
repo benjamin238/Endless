@@ -46,7 +46,7 @@
         <dependency>
             <groupId>com.github.DV8FromTheWorld</groupId>
             <artifactId>JDA</artifactId>
-            <version>3a580d0</version>
+            <version>acbb09f</version>
         </dependency>
         <dependency>
             <groupId>com.jagrosh</groupId>
