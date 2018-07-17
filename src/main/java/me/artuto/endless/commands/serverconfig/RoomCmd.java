@@ -35,8 +35,6 @@ import net.dv8tion.jda.core.entities.*;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -476,7 +474,7 @@ public class RoomCmd extends EndlessCommand
                 event.replyError("You can't invite someone to a room you don't own if its locked!");
                 return;
             }
-            TextChannel tc = event.getGuild().getTextChannelById(room.getTextChannelId());;
+            TextChannel tc = event.getGuild().getTextChannelById(room.getTextChannelId());
             if(room.isCombo())
             {
                 if(!(tc==null))
@@ -498,9 +496,9 @@ public class RoomCmd extends EndlessCommand
             event.async(() -> {
                 try
                 {
-                    fChannel.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).reason().complete();
+                    fChannel.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).reason("[Room Invite]").complete();
                     if(!(tc==null))
-                        tc.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).reason().complete();
+                        tc.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).reason("[Room Invite]").complete();
                     event.reactSuccess();
                     if(fChannel instanceof TextChannel)
                         ((TextChannel)fChannel).sendMessageFormat("Welcome, %s to the room!", member.getUser()).queue();
@@ -529,6 +527,7 @@ public class RoomCmd extends EndlessCommand
         protected void executeCommand(CommandEvent event)
         {
             Channel channel = findTextChannel(event, event.getArgs());
+            Member member = event.getMember();
             if(channel==null)
             {
                 channel = findVoiceChannel(event, event.getArgs());
@@ -548,12 +547,12 @@ public class RoomCmd extends EndlessCommand
                 event.replyError("You can't join a room if its locked!");
                 return;
             }
+            TextChannel tc = event.getGuild().getTextChannelById(room.getTextChannelId());
             if(room.isCombo())
             {
-                TextChannel tc = event.getGuild().getTextChannelById(room.getTextChannelId());
                 if(!(tc==null))
                 {
-                    if(tc.getMembers().contains(event.getMember()))
+                    if(tc.getMembers().contains(member))
                     {
                         event.replyError("You are already on that room!");
                         return;
@@ -561,10 +560,24 @@ public class RoomCmd extends EndlessCommand
                 }
             }
 
-            /*tc.putPermissionOverride(event.getMember()).setAllow(Permission.MESSAGE_READ).queue(s -> {
-                event.reactSuccess();
-                tc.sendMessageFormat("Welcome, %s to the room!", event.getMember().getUser()).queue();
-            }, e -> event.replyError("Could not add you to the room!"));*/
+            Channel fChannel = channel;
+            event.async(() -> {
+                try
+                {
+                    fChannel.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).reason("[Room Join]").complete();
+                    if(!(tc==null))
+                        tc.putPermissionOverride(member).setAllow(Permission.MESSAGE_READ).reason("[Room Join]").complete();
+                    event.reactSuccess();
+                    if(fChannel instanceof TextChannel)
+                        ((TextChannel)fChannel).sendMessageFormat("Welcome, %s to the room!", member.getUser()).queue();
+                    else if(!(tc==null))
+                        tc.sendMessageFormat("Welcome, %s to the room!", member.getUser()).queue();
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Could not join to the room!");
+                }
+            });
         }
     }
 
