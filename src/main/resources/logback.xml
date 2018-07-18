@@ -45,6 +45,9 @@
         <config>webhook.txt</config>
     </appender>
 
+    <logger name="net.dv8tion.jda.core.handle.GuildSetupController" level="trace" />
+    <logger name="net.dv8tion.jda.core.handle.EventCache" level="trace" />
+
     <root level="DEBUG">
         <appender-ref ref="Console"/>
         <appender-ref ref="Sentry"/>
