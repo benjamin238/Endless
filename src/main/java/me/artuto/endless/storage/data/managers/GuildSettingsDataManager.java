@@ -811,7 +811,7 @@ public class GuildSettingsDataManager
                     {
                         results.moveToInsertRow();
                         results.updateLong("guild_id", guild.getIdLong());
-                        results.updateString("mode_room", mode.getName());
+                        results.updateString("mode_room", mode.name());
                         results.insertRow();
                     }
                 }

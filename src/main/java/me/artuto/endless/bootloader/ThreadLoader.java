@@ -28,7 +28,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class ThreadLoader
 {
-    public static ScheduledExecutorService createThread(String name)
+    public static ScheduledThreadPoolExecutor createThread(String name)
     {
         try
         {

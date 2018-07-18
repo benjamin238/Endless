@@ -20,6 +20,7 @@ package me.artuto.endless.core.entities;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public interface GuildSettings
 
     boolean isEmpty();
 
+    @Nullable
     Collection<String> getPrefixes();
 
     Guild getGuild();

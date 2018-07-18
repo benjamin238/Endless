@@ -21,8 +21,8 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Tag;
-import me.artuto.endless.storage.data.managers.ClientGSDMProvider;
 import me.artuto.endless.utils.TagUtil;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
@@ -48,7 +48,7 @@ public class ImportedTagHandler
         if(event.getGuild()==null)
             return;
 
-        ClientGSDMProvider settings = client.getSettingsFor(event.getGuild());
+        GuildSettings settings = client.getSettingsFor(event.getGuild());
         String contentRaw = event.getMessage().getContentRaw();
         String[] parts = null;
 

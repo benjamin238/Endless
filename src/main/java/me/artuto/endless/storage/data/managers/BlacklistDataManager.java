@@ -140,7 +140,7 @@ public class BlacklistDataManager
                 while(results.next())
                 {
                     long id = results.getLong("id");
-                    Guild guild = jda.getGuildCache().getElementById(id);
+                    Guild guild = jda.getGuildById(id);
 
                     if(!(guild==null))
                         map.put(guild, getBlacklist(id));

@@ -22,7 +22,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.storage.data.managers.ClientGSDMProvider;
+import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
@@ -81,7 +81,7 @@ public class PrefixCmd extends EndlessCommand
         {
             String args = event.getArgs().toLowerCase().trim();
             Guild guild = event.getGuild();
-            ClientGSDMProvider settings = event.getClient().getSettingsFor(guild);
+            GuildSettings settings = event.getClient().getSettingsFor(guild);
 
             if(!(settings.getPrefixes()==null) && settings.getPrefixes().contains(args))
                 event.replyWarning("That prefix is already added!");
@@ -110,7 +110,7 @@ public class PrefixCmd extends EndlessCommand
         {
             String args = event.getArgs().toLowerCase().trim();
             Guild guild = event.getGuild();
-            ClientGSDMProvider settings = event.getClient().getSettingsFor(guild);
+            GuildSettings settings = event.getClient().getSettingsFor(guild);
 
             if(!(settings.getPrefixes()==null) && settings.getPrefixes().contains(args))
             {

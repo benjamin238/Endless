@@ -49,6 +49,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.impl.JDAImpl;
+import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.requests.Requester;
@@ -63,6 +64,7 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -107,6 +109,9 @@ public class Bot extends ListenerAdapter
 
     // Loggers
     private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
+
+    // Pools
+    public ScheduledThreadPoolExecutor endlessPool;
 
     // Schedulers;
     private ScheduledExecutorService muteScheduler;
@@ -185,6 +190,7 @@ public class Bot extends ListenerAdapter
             roomScheduler = ThreadLoader.createThread("Rooms");
             starboardThread = ThreadLoader.createThread("Starboard");
         }
+        endlessPool = ThreadLoader.createThread("Endless");
         optimizerScheduler = ThreadLoader.createThread("Optimizer");
 
         waiter = new EventWaiter();
@@ -237,7 +243,7 @@ public class Bot extends ListenerAdapter
                 new GoogleSearchCmd(this), new ReminderCmd(this), new RoleMeCmd(this),
                 new TimeForCmd(this), new TranslateCmd(this), new WeatherCmd(this), new YouTubeCmd(this));
         if(dataEnabled)
-            clientBuilder.setGuildSettingsManager(new ClientGSDM());
+            clientBuilder.setGuildSettingsManager(new ClientGSDM(this));
 
         client = clientBuilder.build();
         Endless.LOG.info("Starting JDA...");
@@ -248,7 +254,8 @@ public class Bot extends ListenerAdapter
                 .setGame(Game.playing("[ENDLESS] Loading..."))
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
-                .setEnableShutdownHook(true);
+                .setEnableShutdownHook(true)
+                .setShardsTotal(3);
         if(maintenance)
             builder.addEventListeners(this, client);
         else
@@ -256,6 +263,12 @@ public class Bot extends ListenerAdapter
         shardManager = builder.build();
 
         endlessBuilder = new EndlessCoreBuilder(this, client, shardManager);
+    }
+
+    @Override
+    public void onReady(ReadyEvent event)
+    {
+        endlessBuilder.addShard(event.getJDA());
     }
 
     @Override
@@ -276,6 +289,7 @@ public class Bot extends ListenerAdapter
                     reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 10, TimeUnit.SECONDS);
                     roomScheduler.scheduleWithFixedDelay(() -> rsdm.updateRooms(shardManager), 0, 10, TimeUnit.SECONDS);
                 }
+                endlessPool.schedule(() -> db.toDelete.forEach(g -> db.deleteSettings(g)), 24, TimeUnit.HOURS);
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);
                 sendStats(event.getJDA());
             }

@@ -17,6 +17,7 @@
 
 package me.artuto.endless.core.entities.impl;
 
+import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.core.entities.Room;
@@ -24,11 +25,12 @@ import me.artuto.endless.core.entities.Tag;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class GuildSettingsImpl implements GuildSettings
+public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
 {
     private boolean isDefault;
     private Collection<String> prefixes;
@@ -81,6 +83,7 @@ public class GuildSettingsImpl implements GuildSettings
                 && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && welcomeMsg==null;
     }
 
+    @Nullable
     @Override
     public Collection<String> getPrefixes()
     {

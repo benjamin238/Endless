@@ -18,16 +18,28 @@
 package me.artuto.endless.storage.data.managers;
 
 import com.jagrosh.jdautilities.command.GuildSettingsManager;
+import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.GuildSettings;
 import net.dv8tion.jda.core.entities.Guild;
 
 import javax.annotation.Nullable;
 
-public class ClientGSDM implements GuildSettingsManager<ClientGSDMProvider>
+public class ClientGSDM implements GuildSettingsManager<GuildSettings>
 {
+    private final Bot bot;
+
+    public ClientGSDM(Bot bot)
+    {
+        this.bot = bot;
+    }
+
     @Nullable
     @Override
-    public ClientGSDMProvider getSettings(Guild guild)
+    public GuildSettings getSettings(Guild guild)
     {
-        return new ClientGSDMProvider(guild);
+        if(bot.endless==null)
+            return null;
+        else
+            return bot.endless.getGuildSettings(guild);
     }
 }

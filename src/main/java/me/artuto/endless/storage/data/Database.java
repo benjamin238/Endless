@@ -33,9 +33,11 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Database
 {
+    public final List<Long> toDelete = new LinkedList<>();
     private final Bot bot;
     private final Connection connection;
 
@@ -94,9 +96,6 @@ public class Database
 
     public List<Guild> getGuildsThatHaveSettings(JDA jda)
     {
-        Guild guild;
-        List<Guild> guilds = new LinkedList<>();
-
         try
         {
             Statement statement = connection.createStatement();
@@ -104,20 +103,25 @@ public class Database
 
             try(ResultSet results = statement.executeQuery("SELECT * FROM GUILD_SETTINGS"))
             {
+                Guild guild;
+                List<Guild> guilds = new LinkedList<>();
                 while(results.next())
                 {
-                    guild = jda.getGuildById(results.getLong("guild_id"));
+                    long id = results.getLong("guild_id");
+                    guild = jda.getGuildById(id);
                     if(!(guild==null))
                         guilds.add(guild);
+                    else
+                        toDelete.add(id);
                 }
+                return guilds;
             }
         }
         catch(SQLException e)
         {
             LOG.warn("Error while getting settings", e);
-            return guilds;
+            return Collections.emptyList();
         }
-        return guilds;
     }
 
     public List<Ignore> getIgnoresForGuild(Guild guild)
@@ -142,25 +146,6 @@ public class Database
         }
     }
 
-    public boolean hasSettings(Guild guild)
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getId())))
-            {
-                return results.next();
-            }
-        }
-        catch(SQLException e)
-        {
-            LOG.warn("Error while checking the settings of a guild. ID: "+guild.getId(), e);
-            return false;
-        }
-    }
-
     public boolean hasSettings(long guild)
     {
         try
@@ -177,6 +162,26 @@ public class Database
         {
             LOG.warn("Error while checking the settings of a guild. ID: "+guild, e);
             return false;
+        }
+    }
+
+    public void deleteSettings(long guild)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = ?");
+            statement.setLong(1, guild);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                    results.deleteRow();
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.warn("Error while deleting the settings of a guild. ID: {}", guild, e);
         }
     }
 

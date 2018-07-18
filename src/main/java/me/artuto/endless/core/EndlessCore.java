@@ -34,11 +34,11 @@ public interface EndlessCore
 {
     Bot getBot();
 
+    CommandClient getClient();
+
     Blacklist getBlacklist(long id);
 
-    JDA getShard(int id);
-
-    Tag getGlobalTag(String name);
+    EndlessUser getUser(long id);
 
     GuildSettings getGuildSettings(Guild guild);
 
@@ -48,21 +48,27 @@ public interface EndlessCore
 
     Ignore getIgnore(Guild guild, long entity);
 
+    JDA getShard(int id);
+
     List<Blacklist> getBlacklists();
 
     List<Blacklist> getGuildBlacklists();
 
     List<Blacklist> getUserBlacklists();
 
-    List<JDA> getShards();
-
-    List<Tag> getGlobalTags();
+    List<EndlessUser> getUsers();
 
     List<GuildSettings> getGuildSettings();
 
+    List<JDA> getShards();
+
     List<LocalTag> getLocalTags();
+
+    List<Tag> getGlobalTags();
 
     LocalTag getLocalTag(long guildId, String name);
 
     ShardManager getShardManager();
+
+    Tag getGlobalTag(String name);
 }

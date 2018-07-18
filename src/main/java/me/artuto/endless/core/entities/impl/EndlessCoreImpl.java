@@ -18,6 +18,7 @@
 package me.artuto.endless.core.entities.impl;
 
 import ch.qos.logback.classic.Logger;
+import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.Endless;
@@ -39,6 +40,7 @@ public class EndlessCoreImpl implements EndlessCore
     private final Logger LOG = Endless.getLog(this.getClass());
 
     private final Bot bot;
+    private final CommandClient client;
     private final EntityBuilder entityBuilder;
     private final List<JDA> shards;
     private final Map<Integer, JDA> shardMap;
@@ -47,24 +49,31 @@ public class EndlessCoreImpl implements EndlessCore
     private final List<Blacklist> blacklists;
     private final Map<Long, Blacklist> blacklistMap;
 
+    private final List<EndlessUser> users;
+    private final Map<Long, EndlessUser> userMap;
+
     private final List<GuildSettings> guildSettings;
-    private final Map<Guild, GuildSettings> guildSettingsMap;
+    private final Map<Long, GuildSettings> guildSettingsMap;
 
     private final List<Tag> globalTags;
     private final List<LocalTag> localTags;
     private final Map<String, Tag> globalTagMap;
     private final Map<String, LocalTag> localTagMap;
 
-    public EndlessCoreImpl(Bot bot, EntityBuilder entityBuilder, List<JDA> shards, ShardManager shardManager)
+    public EndlessCoreImpl(Bot bot, CommandClient client, EntityBuilder entityBuilder, ShardManager shardManager)
     {
         this.bot = bot;
+        this.client = client;
         this.entityBuilder = entityBuilder;
         this.shardManager = shardManager;
-        this.shards = shards;
+        this.shards = new LinkedList<>();
         this.shardMap = new HashMap<>();
 
         this.blacklists = new LinkedList<>();
         this.blacklistMap = new HashMap<>();
+
+        this.users = new LinkedList<>();
+        this.userMap = new HashMap<>();
 
         this.guildSettings = new LinkedList<>();
         this.guildSettingsMap = new HashMap<>();
@@ -82,41 +91,41 @@ public class EndlessCoreImpl implements EndlessCore
     }
 
     @Override
+    public CommandClient getClient()
+    {
+        return client;
+    }
+
+    @Override
     public Blacklist getBlacklist(long id)
     {
         return blacklistMap.get(id);
     }
 
     @Override
-    public JDA getShard(int id)
+    public EndlessUser getUser(long id)
     {
-        return shardMap.get(id);
-    }
-
-    @Override
-    public Tag getGlobalTag(String name)
-    {
-        return globalTagMap.get(name);
+        return userMap.get(id);
     }
 
     @Override
     public GuildSettings getGuildSettings(Guild guild)
     {
-        return guildSettingsMap.getOrDefault(guild, bot.db.createDefaultSettings(guild));
+        return guildSettingsMap.getOrDefault(guild.getIdLong(), bot.db.createDefaultSettings(guild));
     }
 
     @Override
     public GuildSettings getGuildSettingsById(long id)
     {
         Guild guild = shardManager.getGuildById(id);
-        return guildSettingsMap.getOrDefault(guild, bot.db.createDefaultSettings(guild));
+        return guildSettingsMap.getOrDefault(id, bot.db.createDefaultSettings(guild));
     }
 
     @Override
     public GuildSettings getGuildSettingsById(String id)
     {
         Guild guild = shardManager.getGuildById(id);
-        return guildSettingsMap.getOrDefault(guild, bot.db.createDefaultSettings(guild));
+        return guildSettingsMap.getOrDefault(guild.getIdLong(), bot.db.createDefaultSettings(guild));
     }
 
     @Override
@@ -124,6 +133,12 @@ public class EndlessCoreImpl implements EndlessCore
     {
         return getGuildSettings(guild).getIgnoredEntities().stream().filter(ignore ->
                 ignore.getEntityId()==entity).findFirst().orElse(null);
+    }
+
+    @Override
+    public JDA getShard(int id)
+    {
+        return shardMap.get(id);
     }
 
     @Override
@@ -147,15 +162,9 @@ public class EndlessCoreImpl implements EndlessCore
     }
 
     @Override
-    public List<JDA> getShards()
+    public List<EndlessUser> getUsers()
     {
-        return Collections.unmodifiableList(shards);
-    }
-
-    @Override
-    public List<Tag> getGlobalTags()
-    {
-        return Collections.unmodifiableList(globalTags);
+        return Collections.unmodifiableList(users);
     }
 
     @Override
@@ -165,9 +174,21 @@ public class EndlessCoreImpl implements EndlessCore
     }
 
     @Override
+    public List<JDA> getShards()
+    {
+        return Collections.unmodifiableList(shards);
+    }
+
+    @Override
     public List<LocalTag> getLocalTags()
     {
         return Collections.unmodifiableList(localTags);
+    }
+
+    @Override
+    public List<Tag> getGlobalTags()
+    {
+        return Collections.unmodifiableList(globalTags);
     }
 
     @Override
@@ -182,6 +203,12 @@ public class EndlessCoreImpl implements EndlessCore
         return shardManager;
     }
 
+    @Override
+    public Tag getGlobalTag(String name)
+    {
+        return globalTagMap.get(name);
+    }
+
     public EntityBuilder getEntityBuilder()
     {
         return entityBuilder;
@@ -189,73 +216,88 @@ public class EndlessCoreImpl implements EndlessCore
 
     public void addBlacklist(Blacklist blacklist)
     {
-        blacklists.add(blacklist);
         blacklistMap.put(blacklist.getId(), blacklist);
+        blacklists.add(blacklist);
+    }
+
+    public void addUser(EndlessUser user)
+    {
+        userMap.put(user.getUserId(), user);
+        users.add(user);
     }
 
     public void addGlobalTag(Tag tag)
     {
-        globalTags.add(tag);
         globalTagMap.put(tag.getName(), tag);
+        globalTags.add(tag);
     }
 
     public void addLocalTag(LocalTag tag)
     {
-        localTags.add(tag);
         localTagMap.put(tag.getGuildId()+":"+tag.getName(), tag);
+        localTags.add(tag);
     }
 
     public void addSettings(Guild guild, GuildSettings settings)
     {
+        guildSettingsMap.put(guild.getIdLong(), settings);
         guildSettings.add(settings);
-        guildSettingsMap.put(guild, settings);
     }
 
-    public void makeCache()
+    public void addShard(JDA jda)
+    {
+        shardMap.put(jda.getShardInfo().getShardId(), jda);
+        shards.add(jda);
+    }
+
+    public void finishSetup()
+    {
+        long totalCache = blacklists.size()+guildSettings.size()+globalTags.size()+localTags.size();
+        LOG.debug("Successfully cached {} across {} Shards", totalCache, shards.size());
+    }
+
+    public void makeCacheForShard(JDA shard)
     {
         if(!(bot.dataEnabled))
             return;
 
-        shards.forEach(shard -> {
-            LOG.debug("Starting cache creation for shard "+shard.getShardInfo().getShardId()+"...");
+        LOG.debug("Starting cache creation for shard "+shard.getShardInfo().getShardId()+"...");
 
-            bot.bdm.getBlacklistedGuilds(shard).forEach((g, b) -> {
-                blacklists.add(b);
-                blacklistMap.put(g.getIdLong(), b);
-            });
-            bot.bdm.getBlacklistedUsers(shard).forEach((u, b) -> {
-                blacklists.add(b);
-                blacklistMap.put(u.getIdLong(), b);
-            });
-            LOG.debug("Cached {} Blacklists", blacklists.size());
-
-            for(Guild guild : bot.db.getGuildsThatHaveSettings(shard))
-            {
-                GuildSettings settings = bot.db.getSettings(guild);
-                addSettings(guild, settings);
-            }
-            LOG.debug("Cached {} Guild Settings", guildSettings.size());
-
-            for(Tag tag : bot.tdm.getGlobalTags())
-                addGlobalTag(tag);
-            LOG.debug("Cached {} Global tags", globalTags.size());
-
-            shard.getGuilds().forEach(guild -> {
-                for(LocalTag tag : bot.tdm.getLocalTagsForGuild(guild))
-                    addLocalTag(tag);
-            });
-            LOG.debug("Cached {} Local tags", localTags.size());
-
-            shardMap.put(shard.getShardInfo().getShardId(), shard);
-            long totalCache = blacklists.size()+guildSettings.size()+globalTags.size()+localTags.size();
-
-            LOG.debug("Successfully cached {} across {} Shards", totalCache, shards.size());
+        // Cache Guild Blacklists
+        bot.bdm.getBlacklistedGuilds(shard).forEach((g, b) -> {
+            blacklists.add(b);
+            blacklistMap.put(g.getIdLong(), b);
         });
+
+        // Cache User Blacklists
+        bot.bdm.getBlacklistedUsers(shard).forEach((u, b) -> {
+            blacklists.add(b);
+            blacklistMap.put(u.getIdLong(), b);
+        });
+        LOG.debug("Cached {} Blacklists", blacklists.size());
+
+        // Cache Guild Settings
+        bot.db.getGuildsThatHaveSettings(shard).forEach(g -> {
+            GuildSettings settings = bot.db.getSettings(g);
+            addSettings(g, settings);
+        });
+        LOG.debug("Cached {} Guild Settings", guildSettings.size());
+
+        bot.tdm.getGlobalTags().forEach(this::addGlobalTag);
+        LOG.debug("Cached {} Global tags", globalTags.size());
+
+        shardManager.getGuilds().forEach(guild -> bot.tdm.getLocalTagsForGuild(guild).forEach(this::addLocalTag));
+        LOG.debug("Cached {} Local tags", localTags.size());
     }
 
     public void removeBlacklist(Blacklist blacklist)
     {
         blacklists.remove(blacklistMap.remove(blacklist.getId()));
+    }
+
+    public void removeUser(EndlessUser user)
+    {
+        users.remove(userMap.remove(user.getUserId()));
     }
 
     public void removeGlobalTag(String name)

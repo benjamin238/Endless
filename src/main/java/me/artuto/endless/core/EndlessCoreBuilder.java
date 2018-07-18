@@ -29,7 +29,9 @@ import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.managers.Presence;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Artuto
@@ -37,27 +39,29 @@ import java.util.List;
 
 public class EndlessCoreBuilder
 {
-    private final Bot bot;
-    private final CommandClient client;
     public final EntityBuilder entityBuilder;
-    private final ShardManager shardManager;
+    private final Bot bot;
 
-    private final List<JDA> shards;
+    private final EndlessCoreImpl impl;
 
     public EndlessCoreBuilder(Bot bot, CommandClient client, ShardManager shardManager)
     {
         this.bot = bot;
-        this.client = client;
         this.entityBuilder = new EntityBuilder(bot);
-        this.shardManager = shardManager;
-        this.shards = shardManager.getShards();
+
+        this.impl = new EndlessCoreImpl(bot, client, entityBuilder, shardManager);
+    }
+
+    public void addShard(JDA shard)
+    {
+        impl.addShard(shard);
+        impl.makeCacheForShard(shard);
     }
 
     public EndlessCore build()
     {
-        EndlessCoreImpl impl = new EndlessCoreImpl(bot, entityBuilder, shards, shardManager);
-        impl.makeCache();
-        shards.forEach(this::updateGame);
+        impl.finishSetup();
+        impl.getShards().forEach(this::updateGame);
         bot.initialized = true;
         Endless.LOG.info("Endless is ready!");
         return impl;
