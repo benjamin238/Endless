@@ -45,9 +45,9 @@
     <dependencies>
         <!-- JDA/Discord -->
         <dependency>
-            <groupId>net.dv8tion</groupId>
+            <groupId>com.github.DV8FromTheWorld</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.7.0_382</version>
+            <version>acbb09f</version>
         </dependency>
         <dependency>
             <groupId>com.jagrosh</groupId>
