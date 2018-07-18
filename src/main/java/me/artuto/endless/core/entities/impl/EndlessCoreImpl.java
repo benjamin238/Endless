@@ -252,8 +252,11 @@ public class EndlessCoreImpl implements EndlessCore
 
     public void finishSetup()
     {
+        bot.tdm.getGlobalTags().forEach(this::addGlobalTag);
+        LOG.debug("Cached {} Global tags", globalTags.size());
+
         long totalCache = blacklists.size()+guildSettings.size()+globalTags.size()+localTags.size();
-        LOG.debug("Successfully cached {} across {} Shards", totalCache, shards.size());
+        LOG.debug("Successfully cached {} entities across {} Shards", totalCache, shards.size());
     }
 
     public void makeCacheForShard(JDA shard)
@@ -283,11 +286,10 @@ public class EndlessCoreImpl implements EndlessCore
         });
         LOG.debug("Cached {} Guild Settings", guildSettings.size());
 
-        bot.tdm.getGlobalTags().forEach(this::addGlobalTag);
-        LOG.debug("Cached {} Global tags", globalTags.size());
-
-        shardManager.getGuilds().forEach(guild -> bot.tdm.getLocalTagsForGuild(guild).forEach(this::addLocalTag));
+        shard.getGuilds().forEach(guild -> bot.tdm.getLocalTagsForGuild(guild).forEach(this::addLocalTag));
         LOG.debug("Cached {} Local tags", localTags.size());
+
+        LOG.debug("Successfully cached entities for shard {}", shard.getShardInfo().getShardId());
     }
 
     public void removeBlacklist(Blacklist blacklist)
