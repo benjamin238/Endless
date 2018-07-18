@@ -176,8 +176,7 @@ public class Bot extends ListenerAdapter
         new GuildUtils(this);
 
         botlog = new BotLogging(this);
-        logWebhook = new WebhookClientBuilder(config.getBotlogWebhook())
-                .setExecutorService(ThreadLoader.createThread("Botlog")).setDaemon(true).build();
+        logWebhook = new WebhookClientBuilder(config.getBotlogWebhook()).setExecutorService(ThreadLoader.createThread("Botlog")).build();
         modlog = new ModLogging(this);
         serverlog = new ServerLogging(this);
 
@@ -280,7 +279,6 @@ public class Bot extends ListenerAdapter
                     && !(initialized))
             {
                 this.endless = endlessBuilder.build();
-                logWebhook.close();
                 if(dataEnabled)
                 {
                     muteScheduler.scheduleWithFixedDelay(() -> pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, shardManager),

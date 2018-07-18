@@ -30,8 +30,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
-import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.core.events.guild.*;
@@ -43,8 +42,6 @@ import net.dv8tion.jda.core.events.message.guild.react.*;
 import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.webhook.WebhookClient;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Artuto
@@ -75,10 +72,37 @@ public class Listener implements CommandListener, EventListener
             JDA.ShardInfo shardInfo = jda.getShardInfo();
 
             if(bot.config.isBotlogEnabled())
-                webhook.send(":radio_button: Connected to shard `"+shardInfo.getShardString()+"` Guilds: `"+jda.getGuildCache().size()+"` " +
-                        "Users: `"+jda.getUserCache().size()+"`");
+                webhook.send("Endless is now "+Const.ONLINE_ROLE+" - Connected to shard `"+shardInfo.getShardString()+"` Guilds: `"
+                        +jda.getGuildCache().size()+"` " +"Users: `"+jda.getUserCache().size()+"`");
 
             Endless.LOG.info("Shard "+shardInfo.getShardString()+" ready!");
+        }
+        else if(preEvent instanceof ResumedEvent)
+        {
+            ResumedEvent event = (ResumedEvent)preEvent;
+            JDA jda = event.getJDA();
+            JDA.ShardInfo shardInfo = jda.getShardInfo();
+
+            if(bot.config.isBotlogEnabled())
+                webhook.send("Endless has "+Const.RESUMED_ROLE+" - Shard `"+shardInfo.getShardString()+"`");
+        }
+        else if(preEvent instanceof ReconnectedEvent)
+        {
+            ReconnectedEvent event = (ReconnectedEvent)preEvent;
+            JDA jda = event.getJDA();
+            JDA.ShardInfo shardInfo = jda.getShardInfo();
+
+            if(bot.config.isBotlogEnabled())
+                webhook.send("Endless has "+Const.RECONNECTED_ROLE+" - Shard `"+shardInfo.getShardString()+"`");
+        }
+        else if(preEvent instanceof ShutdownEvent)
+        {
+            ShutdownEvent event = (ShutdownEvent)preEvent;
+            JDA jda = event.getJDA();
+            JDA.ShardInfo shardInfo = jda.getShardInfo();
+
+            if(bot.config.isBotlogEnabled())
+                webhook.send("Endless has gone "+Const.OFFLINE_ROLE+" - Shard `"+shardInfo.getShardString()+"`");
         }
         else if(preEvent instanceof GuildJoinEvent)
         {

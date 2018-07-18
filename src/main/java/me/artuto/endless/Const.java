@@ -62,6 +62,12 @@ public class Const
     public static String STREAMING = "<:streaming:334859814771359744>";
     public static String VERIFIED = "<:verified:465670198775644161>";
 
+    // Roles
+    public static String ONLINE_ROLE = "<@&436352838822658049>";
+    public static String RESUMED_ROLE = "<@&436352909685424134>";
+    public static String RECONNECTED_ROLE = "<@&436352708304175106>";
+    public static String OFFLINE_ROLE = "<@&436352915469369345>";
+
     // URLs
     public static String BING_MAPS = "https://dev.virtualearth.net/REST/v1/Locations/?query=%s&maxResults=1&key=%s";
 
