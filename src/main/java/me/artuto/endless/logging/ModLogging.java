@@ -133,7 +133,7 @@ public class ModLogging
                 LogUtils.isTargetIgnored(target.getIdLong(), modlog))
             return;
 
-        Sender.sendMessage(modlog, FormatUtil.formatLogBan(BAN_FORMAT));
+        Sender.sendMessage(modlog, FormatUtil.formatLogKick(BAN_FORMAT));
 
 
         /*TextChannel tc = GuildUtils.getModlogChannel(guild);

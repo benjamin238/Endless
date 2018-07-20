@@ -30,6 +30,7 @@ public interface Room
 
     enum Mode
     {
+        ALL("All"),
         COMBO_ONLY("Combo Only"),
         NO_CREATION("No Creation"),
         TEXT_ONLY("Text Only"),

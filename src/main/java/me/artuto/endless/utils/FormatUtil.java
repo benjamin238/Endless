@@ -31,7 +31,7 @@ import java.util.List;
 
 public class FormatUtil
 {
-    public static String formatLogBan(String message)
+    public static String formatLogKick(String message)
     {
         return String.format(message);
     }

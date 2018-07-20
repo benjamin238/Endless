@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 public class RoomCmd extends EndlessCommand
 {
     private final Bot bot;
-    private final String[] MODES = new String[]{Room.Mode.COMBO_ONLY.name(), Room.Mode.NO_CREATION.name(),
+    private final String[] MODES = new String[]{Room.Mode.ALL.name(), Room.Mode.COMBO_ONLY.name(), Room.Mode.NO_CREATION.name(),
             Room.Mode.TEXT_ONLY.name(), Room.Mode.VOICE_ONLY.name()};
 
     public RoomCmd(Bot bot)

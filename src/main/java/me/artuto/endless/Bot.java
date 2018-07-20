@@ -95,7 +95,7 @@ public class Bot extends ListenerAdapter
     public StarboardDataManager sdm;
     public TagDataManager tdm;
 
-    // Discord
+    // JDA
     public CommandClient client;
     public ShardManager shardManager;
 

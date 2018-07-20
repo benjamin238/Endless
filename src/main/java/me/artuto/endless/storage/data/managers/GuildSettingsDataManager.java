@@ -804,7 +804,7 @@ public class GuildSettingsDataManager
                 {
                     if(results.next())
                     {
-                        results.updateString("room_mode", mode.getName());
+                        results.updateString("room_mode", mode.name());
                         results.updateRow();
                     }
                     else
