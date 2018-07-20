@@ -38,10 +38,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.time.OffsetDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +50,8 @@ import java.util.stream.Collectors;
 public class ModLogging
 {
     private Bot bot;
+    private final HashMap<Long,Integer> caseNum = new HashMap<>();
+
     // Parts
     private String TIME = "`[%s]";
     private String CASE = " [%d]`";
@@ -64,14 +64,9 @@ public class ModLogging
     private String EXPIRY_TIME = " \n`[ Duration ]` %s";
 
     // Formats
-    private String BAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
+    private String GENERAL_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
     private String CLEAR_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+"`%d` messages in %s"+CRITERIA+REASON;
-    private String HACKBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
-    private String KICK_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
-    private String MUTE_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
-    private String SOFTBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
     private String TEMPMUTE_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON+EXPIRY_TIME;
-    private String UNBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
 
     public ModLogging(Bot bot)
     {
@@ -120,7 +115,7 @@ public class ModLogging
         }
     }
 
-    public void logKick(Action action, CommandEvent event, OffsetDateTime time, String reason, User target)
+    public void logGeneral(Action action, CommandEvent event, OffsetDateTime time, String reason, User target)
     {
         if(!(bot.dataEnabled))
             return;
@@ -133,23 +128,9 @@ public class ModLogging
                 LogUtils.isTargetIgnored(target.getIdLong(), modlog))
             return;
 
-        Sender.sendMessage(modlog, FormatUtil.formatLogKick(BAN_FORMAT));
-
-
-        /*TextChannel tc = GuildUtils.getModlogChannel(guild);
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
-
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Kick]:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
-        }*/
+        getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogGeneral(GENERAL_FORMAT, time, gs.getTimezone(),
+                id, action.getEmote(), author.getName(), author.getDiscriminator(), action.getVerb(), target.getName(),
+                target.getDiscriminator(), target.getIdLong(), reason)));
     }
 
     public void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)
@@ -373,7 +354,77 @@ public class ModLogging
         }
         if(m==null)
             return num==-1?-4:-3;
-        m.editMessage(m.getContentRaw().replaceAll("(?is)\n`\\[Reason\\]` .+", "\n`[Reason]` "+reason)).queue();
+        m.editMessage(m.getContentRaw().replaceAll("(?is)\n`\\[ Reason \\]` .+", "\n`[ Reason ]` "+reason)).queue();
         return thisCase;
+    }
+
+    private int getCaseNumber(TextChannel tc) // not async
+    {
+        if(caseNum.containsKey(tc.getGuild().getIdLong()))
+        {
+            int num = caseNum.get(tc.getGuild().getIdLong());
+            caseNum.put(tc.getGuild().getIdLong(), num+1);
+            return num;
+        }
+        else
+        {
+            int num;
+            for(Message m: tc.getHistory().retrievePast(100).complete())
+            {
+                num = getCaseNumber(m);
+                if(num!=-1)
+                {
+                    caseNum.put(tc.getGuild().getIdLong(), num+2);
+                    return num+1;
+                }
+            }
+            caseNum.put(tc.getGuild().getIdLong(), 2);
+            return 1;
+        }
+    }
+
+    private void getCaseNumberAsync(TextChannel tc, Consumer<Integer> result)
+    {
+        if(caseNum.containsKey(tc.getGuild().getIdLong()))
+        {
+            int num = caseNum.get(tc.getGuild().getIdLong());
+            caseNum.put(tc.getGuild().getIdLong(), num+1);
+            result.accept(num);
+        }
+        else
+        {
+            tc.getHistory().retrievePast(100).queue(list ->
+            {
+                int num;
+                for(Message m: list)
+                {
+                    num = getCaseNumber(m);
+                    if(num!=-1)
+                    {
+                        caseNum.put(tc.getGuild().getIdLong(), num+2);
+                        result.accept(num+1);
+                        return;
+                    }
+                }
+                caseNum.put(tc.getGuild().getIdLong(), 2);
+                result.accept(1);
+            });
+        }
+    }
+
+    private static int getCaseNumber(Message m)
+    {
+        if(!(m.getAuthor().getIdLong()==m.getJDA().getSelfUser().getIdLong()))
+            return -1;
+        if(!(m.getContentRaw().startsWith("`[")))
+            return -1;
+        try
+        {
+            return Integer.parseInt(m.getContentRaw().substring(15, m.getContentRaw().indexOf("]` ",15)));
+        }
+        catch(Exception e)
+        {
+            return -1;
+        }
     }
 }

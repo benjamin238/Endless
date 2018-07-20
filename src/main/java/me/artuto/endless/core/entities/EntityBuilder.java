@@ -32,6 +32,7 @@ import org.json.JSONArray;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -40,6 +41,7 @@ import java.util.*;
 
 public class EntityBuilder
 {
+    public static final ZoneId DEFAULT_TZ = ZoneId.of("GMT-5");
     private final Bot bot;
 
     public EntityBuilder(Bot bot)
@@ -125,6 +127,9 @@ public class EntityBuilder
             }
         }
 
+        ZoneId tz = results.getString("logs_timezone")==null?DEFAULT_TZ:
+                ZoneId.of(results.getString("logs_timezone"));
+
         return new GuildSettingsImpl(false,
                 prefixes,
                 guild,
@@ -143,7 +148,8 @@ public class EntityBuilder
                 results.getLong("welcome_id"),
                 results.getString("room_mode")==null?Room.Mode.NO_CREATION:Room.Mode.valueOf(results.getString("room_mode")),
                 results.getString("leave_msg"),
-                results.getString("welcome_msg"));
+                results.getString("welcome_msg"),
+                tz);
     }
 
     public Ignore createIgnore(ResultSet results) throws SQLException

@@ -19,6 +19,7 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.commands.cmddata.Categories;
@@ -29,6 +30,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -101,7 +103,7 @@ public class KickCmd extends EndlessCommand
 
         event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
             event.replySuccess(Messages.KICK_SUCCESS+username);
-            //bot.modlog.logKick(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
+            bot.modlog.logGeneral(Action.KICK, event, OffsetDateTime.now(), fReason, member.getUser());
         }, e -> event.replyError(Messages.KICK_ERROR+username));
     }
 }

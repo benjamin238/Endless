@@ -26,6 +26,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 
 import javax.annotation.Nullable;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -41,12 +42,13 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     private List<Tag> importedTags;
     private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
     private Room.Mode roomMode;
-    private String welcomeMsg, leaveMsg;
+    private String leaveMsg, welcomeMsg;
+    private ZoneId tz;
 
     public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
                              List<Ignore> ignoredEntities, List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId,
                              long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
-                             long starboardId, long welcomeId, Room.Mode roomMode, String leaveMsg, String welcomeMsg)
+                             long starboardId, long welcomeId, Room.Mode roomMode, String leaveMsg, String welcomeMsg, ZoneId tz)
     {
         this.isDefault = isDefault;
         this.prefixes = prefixes;
@@ -67,6 +69,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.roomMode = roomMode;
         this.leaveMsg = leaveMsg;
         this.welcomeMsg = welcomeMsg;
+        this.tz = tz;
     }
 
     @Override
@@ -193,6 +196,12 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     }
 
     @Override
+    public ZoneId getTimezone()
+    {
+        return tz;
+    }
+
+    @Override
     public String toString()
     {
         if(isDefault())
@@ -309,5 +318,10 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public void setWelcomeMsg(String welcomeMsg)
     {
         this.welcomeMsg = welcomeMsg;
+    }
+
+    public void setTimeZone(ZoneId tz)
+    {
+        this.tz = tz;
     }
 }
