@@ -17,8 +17,12 @@
 
 package me.artuto.endless.logging;
 
+import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
+import me.artuto.endless.Sender;
+import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.ParsedAuditLog;
 import me.artuto.endless.utils.*;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -33,6 +37,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.time.OffsetDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -52,20 +57,21 @@ public class ModLogging
     private String CASE = " [%d]`";
     private String EMOTE = " %s";
     private String AUTHOR = " **%s**#%d";
+    private String ACTION = " %s ";
     private String TARGET = " **%s**#%d (ID: %d)";
     private String REASON = " \n`[ Reason ]` %s";
     private String CRITERIA = " \n`[ Criteria ]` %s";
     private String EXPIRY_TIME = " \n`[ Duration ]` %s";
 
     // Formats
-    private String BAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+" banned"+TARGET+REASON;
-    private String CLEAR_FORMAT = TIME+CASE+EMOTE+AUTHOR+" cleaned `%d` messages in %s"+CRITERIA+REASON;
-    private String HACKBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+" hackbanned"+TARGET+REASON;
-    private String KICK_FORMAT = TIME+CASE+EMOTE+AUTHOR+" kicked"+TARGET+REASON;
-    private String MUTE_FORMAT = TIME+CASE+EMOTE+AUTHOR+" muted"+TARGET+REASON;
-    private String SOFTBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+" softbanned"+TARGET+REASON;
-    private String TEMPMUTE_FORMAT = TIME+CASE+EMOTE+AUTHOR+" tempmuted"+TARGET+REASON+EXPIRY_TIME;
-    private String UNBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+" unbanned"+TARGET+REASON;
+    private String BAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
+    private String CLEAR_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+"`%d` messages in %s"+CRITERIA+REASON;
+    private String HACKBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
+    private String KICK_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
+    private String MUTE_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
+    private String SOFTBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
+    private String TEMPMUTE_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON+EXPIRY_TIME;
+    private String UNBAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
 
     public ModLogging(Bot bot)
     {
@@ -114,12 +120,23 @@ public class ModLogging
         }
     }
 
-    public void logKick(User author, Member target, String reason, Guild guild, TextChannel channel)
+    public void logKick(Action action, CommandEvent event, OffsetDateTime time, String reason, User target)
     {
         if(!(bot.dataEnabled))
             return;
 
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
+        Guild guild = event.getGuild();
+        GuildSettings gs = event.getClient().getSettingsFor(guild);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        User author = event.getAuthor();
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
+                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+            return;
+
+        Sender.sendMessage(modlog, FormatUtil.formatLogBan(BAN_FORMAT));
+
+
+        /*TextChannel tc = GuildUtils.getModlogChannel(guild);
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
@@ -132,7 +149,7 @@ public class ModLogging
                 guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
             else
                 tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Kick]:` :boot: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") kicked **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
-        }
+        }*/
     }
 
     public void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)

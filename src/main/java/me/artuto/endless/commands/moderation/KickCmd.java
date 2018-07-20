@@ -101,7 +101,7 @@ public class KickCmd extends EndlessCommand
 
         event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
             event.replySuccess(Messages.KICK_SUCCESS+username);
-            bot.modlog.logKick(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
+            //bot.modlog.logKick(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
         }, e -> event.replyError(Messages.KICK_ERROR+username));
     }
 }

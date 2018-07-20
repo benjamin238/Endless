@@ -26,13 +26,16 @@ import java.util.List;
 
 /**
  * @author Artuto
- * <p>
- * The following code is property of jagrosh (https://github.com/jagrosh/Spectra) with some changes made by me.
- * Contact me if any issue.
+ *
  */
 
 public class FormatUtil
 {
+    public static String formatLogBan(String message)
+    {
+        return String.format(message);
+    }
+
     public static String listOfMembers(List<Member> list, String query)
     {
         String out = " Multiple members found matching \""+query+"\":";

@@ -264,7 +264,7 @@ public class ServerLogging
                         builder.setImage("attachment://avatarchange"+user.getId()+".png");
                         builder.setColor(guild.getSelfMember().getColor());
 
-                        File f = MiscUtils.getAvatarUpdateImage(event);
+                        File f = LogUtils.getAvatarUpdateImage(event);
                         if(f==null)
                             return;
 
