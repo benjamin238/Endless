@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 public class ModLogging
 {
     private final Bot bot;
+    private final HashMap<String, Message> banLogs = new HashMap<>();
     private final HashMap<Long,Integer> caseNum = new HashMap<>();
 
     // Parts
@@ -58,8 +59,8 @@ public class ModLogging
     private final String ACTION = " %s";
     private final String TARGET = " **%s**#%s (ID: %d)";
     private final String REASON = " \n`[ Reason ]` %s";
-    private final String CRITERIA = " \n`[ Criteria ]` %s";
-    private final String EXPIRY_TIME = " \n`[ Duration ]` %s";
+    private final String CRITERIA = " \n`[Criteria]` %s";
+    private final String EXPIRY_TIME = " \n`[Duration]` %s";
 
     // Formats
     private final String GENERAL_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
@@ -69,58 +70,6 @@ public class ModLogging
     public ModLogging(Bot bot)
     {
         this.bot = bot;
-    }
-
-    public void logGeneral(Action action, CommandEvent event, OffsetDateTime time, String reason, User target)
-    {
-        if(!(bot.dataEnabled))
-            return;
-
-        Guild guild = event.getGuild();
-        GuildSettings gs = event.getClient().getSettingsFor(guild);
-        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
-        User author = event.getAuthor();
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
-                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
-            return;
-
-        getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogGeneral(GENERAL_FORMAT, time, gs.getTimezone(),
-                id, action.getEmote(), author.getName(), author.getDiscriminator(), action.getVerb(), target.getName(),
-                target.getDiscriminator(), target.getIdLong(), reason)));
-    }
-
-    public void logTemp(Action action, CommandEvent event, int mins, OffsetDateTime time, String reason, User target)
-    {
-        if(!(bot.dataEnabled))
-            return;
-
-        Guild guild = event.getGuild();
-        GuildSettings gs = event.getClient().getSettingsFor(guild);
-        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
-        User author = event.getAuthor();
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
-                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
-            return;
-
-        getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogTemp(TEMP_FORMAT, time, gs.getTimezone(),
-                id, FormatUtil.formatTimeFromSeconds(mins*60), action.getEmote(), author.getName(), author.getDiscriminator(), action.getVerb(),
-                target.getName(), target.getDiscriminator(), target.getIdLong(), reason)));
-    }
-
-    public void logManual(Action action, Guild guild, OffsetDateTime time, String reason, User author, User target)
-    {
-        if(!(bot.dataEnabled))
-            return;
-
-        GuildSettings gs = bot.endless.getGuildSettings(guild);
-        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
-                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
-            return;
-
-        getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogGeneral(GENERAL_FORMAT, time, gs.getTimezone(),
-                id, action.getEmote(), author.getName(), author.getDiscriminator(), action.getVerb(), target.getName(),
-                target.getDiscriminator(), target.getIdLong(), reason)));
     }
 
     public void logClear(Action action, CommandEvent event, List<Message> messages, OffsetDateTime time, String crit, String reason)
@@ -140,7 +89,7 @@ public class ModLogging
         getCaseNumberAsync(modlog, id -> {
             EmbedBuilder fileEmbed = new EmbedBuilder().setColor(guild.getSelfMember().getColor());
             MessageBuilder mb = new MessageBuilder();
-            mb.setContent(FormatUtil.formatLogClean(CLEAN_FORMAT, OffsetDateTime.now(), gs.getTimezone(), id, action.getEmote(), author.getName(),
+            mb.setContent(FormatUtil.formatLogClean(CLEAN_FORMAT, time, gs.getTimezone(), id, action.getEmote(), author.getName(),
                     author.getDiscriminator(), action.getVerb(), messages.size(), event.getTextChannel().getIdLong(), crit, reason));
             Sender.sendMessage(modlog, mb.build(), m -> {
                 File file = LogUtils.createMessagesTextFile(messages, "Messages.txt");
@@ -152,6 +101,77 @@ public class ModLogging
                 }
             });
         });
+    }
+
+    public void logGeneral(Action action, CommandEvent event, OffsetDateTime time, String reason, User target)
+    {
+        if(!(bot.dataEnabled))
+            return;
+
+        Guild guild = event.getGuild();
+        GuildSettings gs = event.getClient().getSettingsFor(guild);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        User author = event.getAuthor();
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
+                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+            return;
+
+        getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogGeneral(GENERAL_FORMAT, time, gs.getTimezone(),
+                id, action.getEmote(), author.getName(), author.getDiscriminator(), action.getVerb(), target.getName(),
+                target.getDiscriminator(), target.getIdLong(), reason), m -> {
+            if(action==Action.BAN)
+            {
+                guild.getAuditLogs().type(ActionType.BAN).limit(3).queue(preEntries -> {
+                    List<AuditLogEntry> entries = preEntries.stream().filter(ale -> ale.getTargetIdLong() == target.getIdLong()).collect(Collectors.toList());
+                    if(entries.isEmpty())
+                        return;
+
+                    if(LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
+                        return;
+
+                    banLogs.put(banCacheKey(entries.get(0), target), m);
+                });
+            }
+        }));
+    }
+
+    public void logManual(Action action, Guild guild, OffsetDateTime time, String reason, User author, User target)
+    {
+        logManual(action, guild, time, reason, author, target, m -> {});
+    }
+
+    private void logManual(Action action, Guild guild, OffsetDateTime time, String reason, User author, User target, Consumer<Message> m)
+    {
+        if(!(bot.dataEnabled))
+            return;
+
+        GuildSettings gs = bot.endless.getGuildSettings(guild);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
+                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+            return;
+
+        getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogGeneral(GENERAL_FORMAT, time, gs.getTimezone(),
+                id, action.getEmote(), author.getName(), author.getDiscriminator(), action.getVerb(), target.getName(),
+                target.getDiscriminator(), target.getIdLong(), reason), m));
+    }
+
+    public void logTemp(Action action, CommandEvent event, int mins, OffsetDateTime time, String reason, User target)
+    {
+        if(!(bot.dataEnabled))
+            return;
+
+        Guild guild = event.getGuild();
+        GuildSettings gs = event.getClient().getSettingsFor(guild);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        User author = event.getAuthor();
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
+                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+            return;
+
+        getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogTemp(TEMP_FORMAT, time, gs.getTimezone(),
+                id, FormatUtil.formatTimeFromSeconds(mins*60), action.getEmote(), author.getName(), author.getDiscriminator(), action.getVerb(),
+                target.getName(), target.getDiscriminator(), target.getIdLong(), reason)));
     }
 
     public void onGuildBan(GuildBanEvent event)
@@ -184,7 +204,7 @@ public class ModLogging
             if(author.isBot() ||  LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
                 return;
 
-            logManual(action, guild, OffsetDateTime.now(), reason, author, target);
+            logManual(action, guild, OffsetDateTime.now(), reason, author, target, m -> banLogs.put(banCacheKey(entries.get(0), target), m));
         });
     }
 
@@ -253,7 +273,31 @@ public class ModLogging
             if(author.isBot() ||  LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
                 return;
 
-            logManual(action, guild, OffsetDateTime.now(), reason, author, target);
+            guild.getAuditLogs().type(ActionType.BAN).limit(3).queue(preEntries2 -> {
+                List<AuditLogEntry> ent2 = preEntries2.stream().filter(ale -> ale.getTargetIdLong()==target.getIdLong()).collect(Collectors.toList());
+                if(ent2.isEmpty())
+                {
+                    logManual(action, guild, OffsetDateTime.now(), reason, author, target);
+                    return;
+                }
+
+                ParsedAuditLog parsedAuditLog2 = GuildUtils.getAuditLog(ent2.get(0), null);
+                if(parsedAuditLog2==null)
+                    return;
+
+                String reason2 = parsedAuditLog2.getReason();
+                if(!(reason2.endsWith("Softban Unban")))
+                {
+                    String key = banCacheKey(entries.get(0), target);
+                    Message banMsg = banLogs.get(key);
+                    if(!(banMsg==null) && banMsg.getCreationTime().plusMinutes(2).isAfter(ent2.get(0).getCreationTime()))
+                    {
+                        banMsg.editMessage(banMsg.getContentRaw()
+                                .replaceFirst(Action.BAN.getEmote(), Action.SOFTBAN.getEmote())
+                                .replaceFirst(Action.BAN.getVerb(), Action.SOFTBAN.getVerb())).queue();
+                    }
+                }
+            });
         });
     }
 
@@ -353,6 +397,11 @@ public class ModLogging
         {
             return -1;
         }
+    }
+
+    private String banCacheKey(AuditLogEntry ale, User mod)
+    {
+        return ale.getGuild().getId()+"|"+ale.getTargetId()+"|"+mod.getId();
     }
 
     private String getTextUrl(Message.Attachment att)

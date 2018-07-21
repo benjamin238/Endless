@@ -18,6 +18,7 @@
 package me.artuto.endless;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 
@@ -39,7 +40,19 @@ public class Sender
 
     public static void sendMessage(MessageChannel chan, Message message, Consumer<Message> success)
     {
-        chan.sendMessage(message).queue(success::accept);
+        chan.sendMessage(message).queue(success);
+    }
+
+    public static void sendMessage(MessageChannel chan, String message, Consumer<Message> success)
+    {
+        ArrayList<String> messages = splitMessage(message);
+        for(int i=0; i<CommandEvent.MAX_MESSAGES && i<messages.size(); i++)
+        {
+            if(i+1==CommandEvent.MAX_MESSAGES || i+1==messages.size())
+                chan.sendMessage(messages.get(i)).queue(success);
+            else
+                chan.sendMessage(messages.get(i)).queue();
+        }
     }
 
     public static void sendMessage(MessageChannel chan, String message)
