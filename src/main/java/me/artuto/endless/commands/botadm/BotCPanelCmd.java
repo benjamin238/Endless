@@ -70,7 +70,7 @@ public class BotCPanelCmd extends EndlessCommand
             jda.asBot().getShardManager().getShards().forEach(shard -> {
                 try
                 {
-                    String status = event.getArgs();
+                    String status = event.getArgs().toUpperCase();
                     event.getJDA().getPresence().setStatus(OnlineStatus.valueOf(status));
                 }
                 catch(Exception e)
