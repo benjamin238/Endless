@@ -28,18 +28,8 @@ package me.artuto.endless;
 public class Messages
 {
     // Moderation Messages
-    public static String BAN_SUCCESS = "Successfully banned user ";
-    public static String BAN_ERROR = "An error happened when banning ";
-    public static String KICK_SUCCESS = "Successfully kicked user ";
-    public static String KICK_ERROR = "An error happened when kicking ";
     public static String UNBAN_SUCCESS = "Successfully unbanned user ";
     public static String UNBAN_ERROR = "An error happened when unbanning ";
-    public static String SOFTBAN_SUCCESS = "Successfully softbanned user ";
-    public static String SOFTBAN_ERROR = "An error happened when softbanning ";
-    public static String HACKBAN_SUCCESS = "Successfully hackbanned user ";
-    public static String HACKBAN_ERROR = "An error happened when hackbanning ";
-    public static String CLEAR_SUCCESS = "Successfully cleared ";
-    public static String CLEAR_ERROR = "An error happened when clearing ";
     public static String MUTE_SUCCESS = "Successfully muted ";
     public static String MUTE_ERROR = "An error happened when muting ";
 

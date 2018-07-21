@@ -17,12 +17,24 @@
 
 package me.artuto.endless.utils;
 
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.exceptions.ErrorResponseException;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author Artuto
  */
 
 public class ArgsUtils
 {
+    private static final Pattern ID = Pattern.compile("(?:^|\\s)(\\d{17,22})(?:$|\\s)");
+
     public static int parseTime(String timestr)
     {
         timestr = timestr.replaceAll("(?i)(\\s|,|and)","").replaceAll("(?is)(-?\\d+|[a-z]+)", "$1 ").trim();
@@ -55,6 +67,54 @@ public class ArgsUtils
         }
 
         return timeinseconds;
+    }
+
+    public static Member findMember(CommandEvent event, String query)
+    {
+        List<Member> list = FinderUtil.findMembers(query, event.getGuild());
+
+        if(list.isEmpty())
+        {
+            event.replyWarning("I was not able to found a user with the provided arguments: '"+query+"'");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfMembers(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
+    public static User findUser(boolean full, CommandEvent event, String query)
+    {
+        List<User> list = FinderUtil.findUsers(query, event.getJDA());
+
+        if(list.isEmpty())
+        {
+            if(full)
+            {
+                Matcher m = ID.matcher(query);
+                if(ID.matcher(query).matches())
+                {
+                    try
+                    {
+                        return event.getJDA().retrieveUserById(m.group(1)).complete();
+                    }
+                    catch(ErrorResponseException ignored) {}
+                }
+            }
+            event.replyWarning("I was not able to found a user with the provided arguments: '"+query+"'");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfUsers(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
     }
 
     public static String[] splitWithReason(int limit, String args, String regex)

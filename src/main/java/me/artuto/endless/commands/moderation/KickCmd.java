@@ -18,20 +18,18 @@
 package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Messages;
+import me.artuto.endless.Endless;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.ChecksUtil;
-import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 /**
  * @author Artuto
@@ -55,55 +53,34 @@ public class KickCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        Member member;
+        String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
+        String query = args[0];
+        String reason = args[1];
+
+        Member target = ArgsUtils.findMember(event, query);
         User author = event.getAuthor();
-        String target;
-        String reason;
-
-        try
-        {
-            String[] args = event.getArgs().split(" for ", 2);
-            target = args[0].trim();
-            reason = args[1].trim();
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            target = event.getArgs();
-            reason = "[no reason specified]";
-        }
-
-        List<Member> list = FinderUtil.findMembers(target, event.getGuild());
-
-        if(list.isEmpty())
-        {
-            event.replyWarning("I was not able to found a user with the provided arguments: '"+target+"'");
+        if(target==null)
             return;
-        }
-        else if(list.size()>1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(list, target));
-            return;
-        }
-        else member = list.get(0);
 
-        if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), target)))
         {
             event.replyError("I can't kick the specified user!");
             return;
         }
-
-        if(!(ChecksUtil.canMemberInteract(event.getMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getMember(), target)))
         {
             event.replyError("You can't kick the specified user!");
             return;
         }
 
-        String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
-        String fReason = reason;
-
-        event.getGuild().getController().kick(member).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
-            event.replySuccess(Messages.KICK_SUCCESS+username);
-            bot.modlog.logGeneral(Action.KICK, event, OffsetDateTime.now(), fReason, member.getUser());
-        }, e -> event.replyError(Messages.KICK_ERROR+username));
+        String username = "**"+target.getUser().getName()+"**#"+target.getUser().getDiscriminator();
+        event.getGuild().getController().kick(target).reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).queue(s -> {
+            event.replySuccess(String.format("Successfully kicked user %s", username));
+            bot.modlog.logGeneral(Action.KICK, event, OffsetDateTime.now(), reason, target.getUser());
+        }, e -> {
+            event.replyError(String.format("An error happened when kicking %s", username));
+            Endless.LOG.error("Could not ban user {} in guild {}",
+                    target.getUser().getId(), event.getGuild().getId(), e);
+        });
     }
 }

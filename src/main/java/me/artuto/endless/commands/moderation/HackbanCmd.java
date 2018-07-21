@@ -20,9 +20,10 @@ package me.artuto.endless.commands.moderation;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Messages;
+import me.artuto.endless.Endless;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
@@ -47,44 +48,29 @@ public class HackbanCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
+        String query = args[0];
+        String reason = args[1];
+
+        User target = ArgsUtils.findUser(true, event, query);
         User author = event.getAuthor();
-        User user;
-        String target;
-        String reason;
+        if(target==null)
+            return;
 
-        try
+        if(!(event.getGuild().getMember(target)==null))
         {
-            String[] args = event.getArgs().split(" for ", 2);
-            target = args[0];
-            reason = args[1];
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            target = event.getArgs();
-            reason = "[no reason specified]";
-        }
-
-        try
-        {
-            user = event.getJDA().retrieveUserById(target).complete();
-        }
-        catch(Exception e)
-        {
-            event.replyError("That ID isn't valid!");
+            event.replyWarning("This user is on this Guild! Please use `"+event.getClient().getPrefix()+"ban` instead.");
             return;
         }
 
-        String username = "**"+user.getName()+"**#**"+user.getDiscriminator()+"**";
-        String fReason = reason;
-
-        if(event.getGuild().getMembers().contains(event.getGuild().getMemberById(target)))
-            event.replyWarning("This user is on this Guild! Please use `"+event.getClient().getPrefix()+"ban` instead.");
-        else
-        {
-            event.getGuild().getController().ban(user, GuildUtils.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
-                event.replySuccess(Messages.HACKBAN_SUCCESS+username);
-                bot.modlog.logGeneral(Action.BAN, event, OffsetDateTime.now(), fReason, user);
-            }, e -> event.replyError(Messages.HACKBAN_ERROR+username));
-        }
+        String username = "**"+target.getName()+"**#"+target.getDiscriminator();
+        event.getGuild().getController().ban(target, GuildUtils.getBanDeleteDays(event.getGuild()))
+                .reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).queue(s -> {
+                    event.replySuccess(String.format("Successfully hackbanned user %s", username));
+                    bot.modlog.logGeneral(Action.BAN, event, OffsetDateTime.now(), reason, target);
+            }, e -> {
+                    event.replyError(String.format("An error happened when hackbanning %s", username));
+                    Endless.LOG.error("Could not hackban user {} in guild {}", target.getId(), event.getGuild().getId(), e);
+        });
     }
 }
