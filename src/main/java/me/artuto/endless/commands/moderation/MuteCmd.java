@@ -18,16 +18,11 @@
 package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
-import me.artuto.endless.Action;
-import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
-import me.artuto.endless.Messages;
+import me.artuto.endless.*;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.ChecksUtil;
-import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
@@ -37,7 +32,6 @@ import net.dv8tion.jda.core.entities.User;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 /**
  * @author Artuto
@@ -67,69 +61,34 @@ public class MuteCmd extends EndlessCommand
             return;
         }
 
-        Member member;
-        User author = event.getAuthor();
-        Role mutedRole;
-        String[] args = event.getArgs().split(" for ", 2);
-        String target;
-        String reason = "";
         int time;
+        Role mutedRole;
+        String[] args = ArgsUtils.splitWithReasonAndTime(2, event.getArgs(), " for ");
+        time = Integer.valueOf(args[1]);
+        String query = args[0];
+        String reason = args[2];
 
-        try
-        {
-            target = args[0].trim();
-            time = ArgsUtils.parseTime(args[1].trim());
-
-            try
-            {
-                if(time==0) reason = args[1].trim();
-                else reason = args[1].trim().split(" for ", 2)[1].trim();
-            }
-            catch(ArrayIndexOutOfBoundsException e)
-            {
-                reason = "[no reason specified]";
-            }
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            target = event.getArgs().trim();
-            time = 0;
-        }
-
-        List<Member> list = FinderUtil.findMembers(target, event.getGuild());
-
-        if(list.isEmpty())
-        {
-            event.replyWarning("I was not able to found a user with the provided arguments: '"+target+"'");
+        Member target = ArgsUtils.findMember(event, query);
+        User author = event.getAuthor();
+        if(target==null)
             return;
-        }
-        else if(list.size()>1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(list, target));
-            return;
-        }
-        else member = list.get(0);
 
-        if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), target)))
         {
             event.replyError("I can't mute the specified user!");
             return;
         }
-
-        if(!(ChecksUtil.canMemberInteract(event.getMember(), member)))
+        if(!(ChecksUtil.canMemberInteract(event.getMember(), target)))
         {
             event.replyError("You can't mute the specified user!");
             return;
         }
 
-        String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
+        String username = "**"+target.getUser().getName()+"**#"+target.getUser().getDiscriminator();
         mutedRole = GuildUtils.getMutedRole(event.getGuild());
         int minutes = time/60;
-        int fTime = time;
-        String fReason = reason;
         Instant unmuteTime = Instant.now().plus(minutes, ChronoUnit.MINUTES);
         Const.PunishmentType type = time==0?Const.PunishmentType.MUTE:Const.PunishmentType.TEMPMUTE;
-
         if(time<0)
         {
             event.replyError("The time cannot be negative!");
@@ -139,9 +98,9 @@ public class MuteCmd extends EndlessCommand
             minutes = 0;
         else if(time>60)
             minutes = (int)Math.round(time/60.0);
-        else minutes = 1;
-
-        int fMinutes = minutes;
+        else
+            minutes = 1;
+        int fMins = minutes;
 
         if(mutedRole==null)
             event.replyError("No muted role set! Please set one using `e!config mutedrole <role>` or let the me create one for you using `e!setup mutedrole`");
@@ -152,26 +111,37 @@ public class MuteCmd extends EndlessCommand
                 event.replyError("I can't interact with the Muted role!");
                 return;
             }
-
-            if(!(bot.pdm.getPunishment(member.getUser().getIdLong(), event.getGuild().getIdLong(), type)==null))
+            if(type==Const.PunishmentType.MUTE && (!(bot.pdm.getPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE)==null)))
+                bot.pdm.removePunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE);
+            else if(type==Const.PunishmentType.TEMPMUTE && (!(bot.pdm.getPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE)==null)))
+            {
+                event.replyWarning("This user is already muted!");
+                return;
+            }
+            else if(!(bot.pdm.getPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), type)==null))
             {
                 event.replyWarning("This user is already muted!");
                 return;
             }
 
-            event.getGuild().getController().addSingleRoleToMember(member, mutedRole).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
-                event.replySuccess(Messages.MUTE_SUCCESS+username);
-                if(fMinutes>0)
-                {
-                    bot.modlog.logTemp(Action.TEMP_MUTE, event, fMinutes, OffsetDateTime.now(), fReason, member.getUser());
-                    bot.pdm.addTempPunishment(member.getUser().getIdLong(), event.getGuild().getIdLong(), unmuteTime.toEpochMilli(), Const.PunishmentType.TEMPMUTE);
-                }
-                else
-                {
-                    bot.modlog.logGeneral(Action.MUTE, event, OffsetDateTime.now(), fReason, member.getUser());
-                    bot.pdm.addPunishment(member.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE);
-                }
-            }, e -> event.replyError(Messages.MUTE_ERROR+username));
+            event.getGuild().getController().addSingleRoleToMember(target, mutedRole).reason(author.getName()+"#"+author.getDiscriminator()+": "+reason)
+                    .queue(s -> {
+                        event.replySuccess(String.format("Successfully muted %s", username));
+                        if(fMins>0)
+                        {
+                            bot.modlog.logTemp(Action.TEMP_MUTE, event, fMins, OffsetDateTime.now(), reason, target.getUser());
+                            bot.pdm.addTempPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), unmuteTime.toEpochMilli(),
+                                    Const.PunishmentType.TEMPMUTE);
+                        }
+                        else
+                        {
+                            bot.modlog.logGeneral(Action.MUTE, event, OffsetDateTime.now(), reason, target.getUser());
+                            bot.pdm.addPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE);
+                        }
+            }, e -> {
+                        event.replyError(String.format("An error happened when muting %s", username));
+                        Endless.LOG.error("Could not mute user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
+                    });
         }
     }
 }

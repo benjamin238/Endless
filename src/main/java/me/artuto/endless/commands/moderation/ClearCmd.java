@@ -213,8 +213,7 @@ public class ClearCmd extends EndlessCommand
                 return;
             }
 
-            event.replySuccess(String.format("Successfully cleared **%d** messages!", deletion.size()), s ->
-                    event.getMessage().delete().queue());
+            event.replySuccess(String.format("Successfully cleared **%d** messages!", deletion.size()), s -> event.getMessage().delete().queue());
             bot.modlog.logClear(Action.CLEAN, event, deletion, OffsetDateTime.now(), logParams, reason);
         });
     }

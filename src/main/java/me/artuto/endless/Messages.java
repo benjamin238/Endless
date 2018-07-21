@@ -27,15 +27,7 @@ package me.artuto.endless;
 
 public class Messages
 {
-    // Moderation Messages
-    public static String UNBAN_SUCCESS = "Successfully unbanned user ";
-    public static String UNBAN_ERROR = "An error happened when unbanning ";
-    public static String MUTE_SUCCESS = "Successfully muted ";
-    public static String MUTE_ERROR = "An error happened when muting ";
-
     // Warning
-    public static String MODLOG_NOPERMISSIONS = "You have a modlog channel configured, but I don't have the required permissions, make sure I have: `Message Read` and `Message Write`!";
-    public static String CLEARMODLOG_NOPERMISSIONS = "You have a modlog channel configured, but I don't have the required permissions, make sure I have: `Upload Attachments`!";
     public static String SRVLOG_NOPERMISSIONS = "You have a serverlog channel configured, but I don't have the required permissions, make sure I have: `Message Read` and `Message Write`!";
     public static String WELCOME_NOPERMISSIONS = "You have a welcome channel configured, but I don't have the required permissions, make sure I have: `Message Read` and `Message Write`!";
     public static String LEAVE_NOPERMISSIONS = "You have a leave channel configured, but I don't have the required permissions, make sure I have: `Message Read` and `Message Write`!";

@@ -87,6 +87,24 @@ public class ArgsUtils
             return list.get(0);
     }
 
+    public static User findBannedUser(CommandEvent event, String query)
+    {
+        List<User> list = FinderUtil.findBannedUsers(query, event.getGuild());
+
+        if(list.isEmpty())
+        {
+            event.replyWarning("I was not able to found a banned user with the provided arguments: '"+query+"'");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfUsers(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
     public static User findUser(boolean full, CommandEvent event, String query)
     {
         List<User> list = FinderUtil.findUsers(query, event.getJDA());
@@ -128,5 +146,35 @@ public class ArgsUtils
         {
             return new String[]{args, "[no reason provided]"};
         }
+    }
+
+    public static String[] splitWithReasonAndTime(int limit, String args, String regex)
+    {
+        int time;
+        String reason = "[no reason specified]";
+        String target;
+
+        try
+        {
+            String[] argsArr = args.split(regex, limit);
+            target = argsArr[0].trim();
+            time = ArgsUtils.parseTime(argsArr[1].trim());
+
+            try
+            {
+                if(time==0)
+                    reason = argsArr[1].trim();
+                else
+                    reason = argsArr[1].trim().split(regex, 2)[1].trim();
+            }
+            catch(ArrayIndexOutOfBoundsException ignored) {}
+        }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            target = args.trim();
+            time = 0;
+        }
+
+        return new String[]{target, String.valueOf(time), reason};
     }
 }

@@ -110,6 +110,7 @@ public class MutedRoleHandler
 
             Bot.getInstance().modlog.logManual(Action.MANUAL_UNMUTE, guild, OffsetDateTime.now(), reason, author, target);
             Bot.getInstance().pdm.removePunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE);
+            Bot.getInstance().pdm.removePunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.TEMPMUTE);
         }, e -> {});
     }
 

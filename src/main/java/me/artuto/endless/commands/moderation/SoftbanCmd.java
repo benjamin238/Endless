@@ -18,22 +18,19 @@
 package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
-import me.artuto.endless.Messages;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.ChecksUtil;
-import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 /**
  * @author Artuto
@@ -63,8 +60,7 @@ public class SoftbanCmd extends EndlessCommand
 
         Member target = ArgsUtils.findMember(event, query);
         User author = event.getAuthor();
-        if(target==null)
-            return;
+        if(target == null) return;
 
         if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), target)))
         {
@@ -78,21 +74,32 @@ public class SoftbanCmd extends EndlessCommand
         }
 
         String username = "**"+target.getUser().getName()+"**#"+target.getUser().getDiscriminator();
-        event.getGuild().getController().ban(target, 1)
-                .reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).queue(s ->
-                event.getGuild().getController().unban(target.getUser())
-                        .reason(author.getName()+"#"+author.getDiscriminator()+": Softban Unban").queue(s2 -> {
-                            event.replySuccess(String.format("Successfully softbanned user %s", username));
-                            bot.modlog.logGeneral(Action.SOFTBAN, event, OffsetDateTime.now(), reason, target.getUser());
-        }, e -> {
-                        event.replyError(String.format("Error while unbanning %s", username));
-                    Endless.LOG.error("Could not ban user {} in guild {}",
-                            target.getUser().getId(), event.getGuild().getId(), e);
-                }),
-                e -> {
-                    event.replyError(String.format("An error happened when softbanning %s", username));
-                    Endless.LOG.error("Could not softban user {} in guild {}",
-                            target.getUser().getId(), event.getGuild().getId(), e);
-                });
+        event.async(() ->
+        {
+            // Ban
+            try
+            {
+                event.getGuild().getController().ban(target, 1).reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).complete();
+            }
+            catch(ErrorResponseException e)
+            {
+                event.replyError(String.format("An error happened when softbanning %s", username));
+                Endless.LOG.error("Could not softban user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
+            }
+
+            // Unban
+            try
+            {
+                event.getGuild().getController().unban(target.getUser()).reason(author.getName()+"#"+author.getDiscriminator()+": Softban Unban").complete();
+            }
+            catch(ErrorResponseException e)
+            {
+                event.replyError(String.format("Error while unbanning %s", username));
+                Endless.LOG.error("Could not unban user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
+            }
+
+            event.replySuccess(String.format("Successfully softbanned user %s", username));
+            bot.modlog.logGeneral(Action.SOFTBAN, event, OffsetDateTime.now(), reason, target.getUser());
+        });
     }
 }

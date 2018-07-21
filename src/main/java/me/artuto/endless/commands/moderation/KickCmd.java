@@ -79,8 +79,7 @@ public class KickCmd extends EndlessCommand
             bot.modlog.logGeneral(Action.KICK, event, OffsetDateTime.now(), reason, target.getUser());
         }, e -> {
             event.replyError(String.format("An error happened when kicking %s", username));
-            Endless.LOG.error("Could not ban user {} in guild {}",
-                    target.getUser().getId(), event.getGuild().getId(), e);
+            Endless.LOG.error("Could not kick user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
         });
     }
 }
