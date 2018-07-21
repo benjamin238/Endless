@@ -53,12 +53,12 @@ public class ModLogging
     private final HashMap<Long,Integer> caseNum = new HashMap<>();
 
     // Parts
-    private String TIME = "`[%s]";
-    private String CASE = " [%d]`";
+    private String TIME = "`[%s]`";
+    private String CASE = " `[%d]`";
     private String EMOTE = " %s";
-    private String AUTHOR = " **%s**#%d";
+    private String AUTHOR = " **%s**#%s";
     private String ACTION = " %s ";
-    private String TARGET = " **%s**#%d (ID: %d)";
+    private String TARGET = " **%s**#%s (ID: %d)";
     private String REASON = " \n`[ Reason ]` %s";
     private String CRITERIA = " \n`[ Criteria ]` %s";
     private String EXPIRY_TIME = " \n`[ Duration ]` %s";

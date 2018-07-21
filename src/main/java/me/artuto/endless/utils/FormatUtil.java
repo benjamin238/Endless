@@ -33,8 +33,7 @@ import java.util.List;
 
 public class FormatUtil
 {
-    public static String formatLogGeneral(String message, OffsetDateTime now, ZoneId tz, int caseId, String emote, String aN,
-                                       String aD, String verb, String tN, String tD, long tId, String reason)
+    public static String formatLogGeneral(String message, OffsetDateTime now, ZoneId tz, int caseId, String emote, String aN, String aD, String verb, String tN, String tD, long tId, String reason)
     {
         return String.format(message, timeF(now, tz), caseId, emote, aN, aD, verb, tN, tD, tId, reason);
     }
