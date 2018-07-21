@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.commands.cmddata.Categories;
@@ -186,9 +187,7 @@ public class ClearCmd extends EndlessCommand
                 {
                     if(!(p == null) && msg.getContentRaw().matches(p)) deletion.add(msg);
                 }
-                catch(Exception ignored)
-                {
-                }
+                catch(Exception ignored) {}
             }
 
             if(deletion.isEmpty())
@@ -221,7 +220,7 @@ public class ClearCmd extends EndlessCommand
             }
 
             event.replySuccess(Messages.CLEAR_SUCCESS+"**"+deletion.size()+"** messages!");
-            bot.modlog.logClear(event.getAuthor(), event.getTextChannel(), finalR, event.getGuild(), deletion, finalParams);
+            bot.modlog.logClear(Action.CLEAN, event, deletion, OffsetDateTime.now(), finalParams, finalR);
         });
     }
 

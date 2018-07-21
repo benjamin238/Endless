@@ -19,6 +19,7 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.Messages;
@@ -34,6 +35,7 @@ import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -161,12 +163,12 @@ public class MuteCmd extends EndlessCommand
                 event.replySuccess(Messages.MUTE_SUCCESS+username);
                 if(fMinutes>0)
                 {
-                    bot.modlog.logTempMute(author, member, fReason, event.getGuild(), event.getTextChannel(), fTime);
+                    bot.modlog.logTemp(Action.TEMP_MUTE, event, fMinutes, OffsetDateTime.now(), fReason, member.getUser());
                     bot.pdm.addTempPunishment(member.getUser().getIdLong(), event.getGuild().getIdLong(), unmuteTime.toEpochMilli(), Const.PunishmentType.TEMPMUTE);
                 }
                 else
                 {
-                    bot.modlog.logMute(author, member, fReason, event.getGuild(), event.getTextChannel());
+                    bot.modlog.logGeneral(Action.MUTE, event, OffsetDateTime.now(), fReason, member.getUser());
                     bot.pdm.addPunishment(member.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE);
                 }
             }, e -> event.replyError(Messages.MUTE_ERROR+username));

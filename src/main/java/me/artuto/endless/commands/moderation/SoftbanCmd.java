@@ -19,6 +19,7 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.commands.cmddata.Categories;
@@ -29,6 +30,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -102,7 +104,7 @@ public class SoftbanCmd extends EndlessCommand
         event.getGuild().getController().ban(member, 1).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s ->
                 event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+fReason).queue(s2 -> {
             event.replySuccess(Messages.SOFTBAN_SUCCESS+username);
-            bot.modlog.logSoftban(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
+            bot.modlog.logGeneral(Action.SOFTBAN, event, OffsetDateTime.now(), fReason, member.getUser());
         }, e -> event.replyError("Error while unbanning "+username)), e -> event.replyError(Messages.SOFTBAN_ERROR+username));
     }
 }

@@ -159,6 +159,7 @@ public class Listener implements CommandListener, EventListener
             if(bot.maintenance || !(bot.initialized))
                 return;
             GuildMemberLeaveEvent event = (GuildMemberLeaveEvent)preEvent;
+            modlog.onGuildMemberLeave(event);
             serverlog.onGuildMemberLeave(event);
         }
         else if(preEvent instanceof GuildMessageReactionAddEvent)
@@ -231,6 +232,13 @@ public class Listener implements CommandListener, EventListener
                 return;
             GuildBanEvent event = (GuildBanEvent)preEvent;
             modlog.onGuildBan(event);
+        }
+        else if(preEvent instanceof GuildUnbanEvent)
+        {
+            if(bot.maintenance || !(bot.initialized))
+                return;
+            GuildUnbanEvent event = (GuildUnbanEvent)preEvent;
+            modlog.onGuildUnban(event);
         }
         else if(preEvent instanceof TextChannelDeleteEvent)
         {

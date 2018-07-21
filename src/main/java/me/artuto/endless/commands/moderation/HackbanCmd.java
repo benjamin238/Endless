@@ -18,6 +18,7 @@
 package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.commands.cmddata.Categories;
@@ -25,6 +26,8 @@ import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
+
+import java.time.OffsetDateTime;
 
 public class HackbanCmd extends EndlessCommand
 {
@@ -80,7 +83,7 @@ public class HackbanCmd extends EndlessCommand
         {
             event.getGuild().getController().ban(user, GuildUtils.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
                 event.replySuccess(Messages.HACKBAN_SUCCESS+username);
-                bot.modlog.logHackban(event.getAuthor(), user, fReason, event.getGuild(), event.getTextChannel());
+                bot.modlog.logGeneral(Action.BAN, event, OffsetDateTime.now(), fReason, user);
             }, e -> event.replyError(Messages.HACKBAN_ERROR+username));
         }
     }

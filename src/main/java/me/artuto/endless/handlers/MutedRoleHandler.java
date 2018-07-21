@@ -17,13 +17,13 @@
 
 package me.artuto.endless.handlers;
 
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.core.entities.ParsedAuditLog;
 import me.artuto.endless.core.entities.Punishment;
 import me.artuto.endless.core.entities.TempPunishment;
 import me.artuto.endless.utils.ChecksUtil;
-import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.audit.ActionType;
@@ -36,6 +36,7 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,7 @@ public class MutedRoleHandler
             if(author.isBot())
                 return;
 
-            Bot.getInstance().modlog.logMute(author, guild.getMember(target), reason, guild, FinderUtil.getDefaultChannel(guild));
+            Bot.getInstance().modlog.logManual(Action.MANUAL_MUTE, guild, OffsetDateTime.now(), reason, author, target);
             Bot.getInstance().pdm.addPunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE);
         }, e -> {});
     }
@@ -107,7 +108,7 @@ public class MutedRoleHandler
             User author = parsedAuditLog.getAuthor();
             User target = parsedAuditLog.getTarget();
 
-            Bot.getInstance().modlog.logUnmute(author, guild.getMember(target), reason, guild, FinderUtil.getDefaultChannel(guild));
+            Bot.getInstance().modlog.logManual(Action.MANUAL_UNMUTE, guild, OffsetDateTime.now(), reason, author, target);
             Bot.getInstance().pdm.removePunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE);
         }, e -> {});
     }

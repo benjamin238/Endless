@@ -19,6 +19,7 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.commands.cmddata.Categories;
@@ -27,6 +28,7 @@ import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -88,7 +90,7 @@ public class UnbanCmd extends EndlessCommand
 
         event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
             event.replySuccess(Messages.UNBAN_SUCCESS+username);
-            bot.modlog.logUnban(event.getAuthor(), user, fReason, event.getGuild(), event.getTextChannel());
+            bot.modlog.logGeneral(Action.UNBAN, event, OffsetDateTime.now(), fReason, user);
         }, e -> event.replyError(Messages.UNBAN_ERROR+username));
     }
 }

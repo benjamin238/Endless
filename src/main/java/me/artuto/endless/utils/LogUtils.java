@@ -18,14 +18,17 @@
 package me.artuto.endless.utils;
 
 import me.artuto.endless.Action;
+import me.artuto.endless.Endless;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -34,6 +37,34 @@ import java.util.Objects;
 
 public class LogUtils
 {
+    public static File createMessagesTextFile(List<Message> msgs, String name)
+    {
+        StringBuilder content = new StringBuilder();
+        msgs.forEach(m -> {
+            User a = m.getAuthor();
+            content.append(a.getName()).append("#").append(a.getDiscriminator()).append(": ").append(m.getContentRaw()).append("\n");
+            if(!(m.getAttachments().isEmpty()))
+            {
+                content.append("\nAttachments:");
+                m.getAttachments().forEach(att -> content.append("\n").append(att.getFileName()).append(": ").append(att.getUrl()));
+            }
+            content.append("\n");
+        });
+
+        Writer output = null;
+        try
+        {
+            output = new BufferedWriter(new FileWriter(name, true));
+            output.append(content).close();
+            return new File(name);
+        }
+        catch(IOException e)
+        {
+            Endless.getLog(LogUtils.class).error("Could not create deleted messages file: ", e);
+            return null;
+        }
+    }
+
     public static boolean isActionIgnored(Action action, TextChannel modlog)
     {
         return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-"+action.getInternalAction()+"}");

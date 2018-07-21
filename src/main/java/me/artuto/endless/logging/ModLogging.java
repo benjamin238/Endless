@@ -22,15 +22,19 @@ import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.Sender;
+import me.artuto.endless.commands.moderation.ClearCmd;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.ParsedAuditLog;
 import me.artuto.endless.utils.*;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.audit.ActionType;
 import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.guild.GuildBanEvent;
+import net.dv8tion.jda.core.events.guild.GuildUnbanEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
@@ -49,70 +53,28 @@ import java.util.stream.Collectors;
 
 public class ModLogging
 {
-    private Bot bot;
+    private final Bot bot;
     private final HashMap<Long,Integer> caseNum = new HashMap<>();
 
     // Parts
-    private String TIME = "`[%s]`";
-    private String CASE = " `[%d]`";
-    private String EMOTE = " %s";
-    private String AUTHOR = " **%s**#%s";
-    private String ACTION = " %s ";
-    private String TARGET = " **%s**#%s (ID: %d)";
-    private String REASON = " \n`[ Reason ]` %s";
-    private String CRITERIA = " \n`[ Criteria ]` %s";
-    private String EXPIRY_TIME = " \n`[ Duration ]` %s";
+    private final String TIME = "`[%s]`";
+    private final String CASE = " `[%d]`";
+    private final String EMOTE = " %s";
+    private final String AUTHOR = " **%s**#%s";
+    private final String ACTION = " %s";
+    private final String TARGET = " **%s**#%s (ID: %d)";
+    private final String REASON = " \n`[ Reason ]` %s";
+    private final String CRITERIA = " \n`[ Criteria ]` %s";
+    private final String EXPIRY_TIME = " \n`[ Duration ]` %s";
 
     // Formats
-    private String GENERAL_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
-    private String CLEAR_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+"`%d` messages in %s"+CRITERIA+REASON;
-    private String TEMPMUTE_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON+EXPIRY_TIME;
+    private final String GENERAL_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON;
+    private final String CLEAN_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+" `%d` messages in <#%d>"+CRITERIA+REASON;
+    private final String TEMP_FORMAT = TIME+CASE+EMOTE+AUTHOR+ACTION+TARGET+REASON+EXPIRY_TIME;
 
     public ModLogging(Bot bot)
     {
         this.bot = bot;
-    }
-
-    public void logBan(User author, Member target, String reason, Guild guild, TextChannel channel)
-    {
-        if(!(bot.dataEnabled))
-            return;
-
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
-
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Ban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") banned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
-        }
-    }
-
-    public void logHackban(User author, User target, String reason, Guild guild, TextChannel channel)
-    {
-        if(!(bot.dataEnabled))
-            return;
-
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
-
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Hackban]:` :hammer: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") hackbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"+"`[Reason]:` "+reason).queue();
-        }
     }
 
     public void logGeneral(Action action, CommandEvent event, OffsetDateTime time, String reason, User target)
@@ -133,159 +95,69 @@ public class ModLogging
                 target.getDiscriminator(), target.getIdLong(), reason)));
     }
 
-    public void logSoftban(User author, Member target, String reason, Guild guild, TextChannel channel)
+    public void logTemp(Action action, CommandEvent event, int mins, OffsetDateTime time, String reason, User target)
     {
         if(!(bot.dataEnabled))
             return;
 
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+        Guild guild = event.getGuild();
+        GuildSettings gs = event.getClient().getSettingsFor(guild);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        User author = event.getAuthor();
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
+                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+            return;
 
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Softban]:` :banana: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") softbanned **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
-        }
+        getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogTemp(TEMP_FORMAT, time, gs.getTimezone(),
+                id, FormatUtil.formatTimeFromSeconds(mins*60), action.getEmote(), author.getName(), author.getDiscriminator(), action.getVerb(),
+                target.getName(), target.getDiscriminator(), target.getIdLong(), reason)));
     }
 
-    public void logUnban(User author, User target, String reason, Guild guild, TextChannel channel)
+    public void logManual(Action action, Guild guild, OffsetDateTime time, String reason, User author, User target)
     {
         if(!(bot.dataEnabled))
             return;
 
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+        GuildSettings gs = bot.endless.getGuildSettings(guild);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
+                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+            return;
 
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-                tc.sendMessage("`["+hour+":"+min+":"+sec+"] [Unban]:` :wrench: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unbanned **"+target.getName()+"**#**"+target.getDiscriminator()+"** ("+target.getId()+")\n"+"`[Reason]:` "+reason).queue();
-        }
+        getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogGeneral(GENERAL_FORMAT, time, gs.getTimezone(),
+                id, action.getEmote(), author.getName(), author.getDiscriminator(), action.getVerb(), target.getName(),
+                target.getDiscriminator(), target.getIdLong(), reason)));
     }
 
-    public void logClear(User author, TextChannel channel, String reason, Guild guild, List<Message> deleted, String args)
+    public void logClear(Action action, CommandEvent event, List<Message> messages, OffsetDateTime time, String crit, String reason)
     {
         if(!(bot.dataEnabled))
             return;
 
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(new Date());
-        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
-        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
-        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
-        File file = new File("cleared"+System.currentTimeMillis()+".txt");
+        Guild guild = event.getGuild();
+        GuildSettings gs = event.getClient().getSettingsFor(guild);
+        TextChannel cleanLog = event.getJDA().asBot().getShardManager().getTextChannelById(470068055322525708L);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        User author = event.getAuthor();
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, event.getTextChannel()) || LogUtils.isIssuerIgnored(author.getIdLong(),
+                modlog))
+            return;
 
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.CLEARMODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-            {
-                try
+        getCaseNumberAsync(modlog, id -> {
+            EmbedBuilder fileEmbed = new EmbedBuilder().setColor(guild.getSelfMember().getColor());
+            MessageBuilder mb = new MessageBuilder();
+            mb.setContent(FormatUtil.formatLogClean(CLEAN_FORMAT, OffsetDateTime.now(), gs.getTimezone(), id, action.getEmote(), author.getName(),
+                    author.getDiscriminator(), action.getVerb(), messages.size(), event.getTextChannel().getIdLong(), crit, reason));
+            Sender.sendMessage(modlog, mb.build(), m -> {
+                File file = LogUtils.createMessagesTextFile(messages, "Messages.txt");
+                if(!(file==null) || !(ChecksUtil.hasPermission(guild.getSelfMember(), modlog, Permission.MESSAGE_ATTACH_FILES)))
                 {
-                    Writer output = new BufferedWriter(new FileWriter(file, true));
-
-                    for(Message msg : deleted)
-                    {
-                        User a = msg.getAuthor();
-
-                        if(!(msg.getContentDisplay().isEmpty()))
-                        {
-                            String toWrite = a.getName()+"#"+a.getDiscriminator()+": "+msg.getContentDisplay()+"\n";
-                            output.append(toWrite);
-                        }
-                    }
-
-                    output.close();
+                    Message.Attachment att = cleanLog.sendFile(file).complete().getAttachments().get(0);
+                    fileEmbed.setDescription("[`\uD83D\uDCC4 View`]("+getTextUrl(att)+") | [`\uD83D\uDCE9 Download`]("+att.getUrl()+")");
+                    m.editMessage(mb.setEmbed(fileEmbed.build()).build()).queue();
                 }
-                catch(Exception e)
-                {
-                    LoggerFactory.getLogger("Clear Modlog").error("Error when creating the text file with the deleted messages: "+e);
-                }
-
-                String message = "`["+hour+":"+min+":"+sec+"] [Clear]:` :wastebasket: **"+author.getName()+"**#**"+author.getDiscriminator()+"** cleared **"+deleted.size()+"** messages in "+channel.getAsMention()+" ("+args+").\n"+"`[Reason]:` "+reason;
-
-                if(!(file.exists()))
-                    tc.sendMessage(message).queue();
-                else
-                    //noinspection ResultOfMethodCallIgnored
-                    tc.sendFile(file, "cleared.txt", new MessageBuilder().append(message).build()).queue(s -> file.delete());
-            }
-        }
-    }
-
-    public void logMute(User author, Member target, String reason, Guild guild, TextChannel channel)
-    {
-        if(!(bot.dataEnabled))
-            return;
-
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-            {
-                if(author==null)
-                    tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Mute]:` :mute: **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** " +
-                            "("+target.getUser().getId()+") has been muted.\n"+"`[Reason]:` "+reason).queue();
-                else
-                    tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Mute]:` :mute: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") " +
-                            "muted **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
-            }
-        }
-    }
-
-    public void logTempMute(User author, Member target, String reason, Guild guild, TextChannel channel, int time)
-    {
-        if(!(bot.dataEnabled))
-            return;
-
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
-        String formattedTime = FormatUtil.formatTimeFromSeconds(time);
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-                tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Mute]:` :mute: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") " +
-                        "muted **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+") for "+formattedTime+"\n"+"`[Reason]:` "+reason).queue();
-        }
-    }
-
-    public void logUnmute(User author, Member target, String reason, Guild guild, TextChannel channel)
-    {
-        if(!(bot.dataEnabled))
-            return;
-
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-            {
-                if(author==null)
-                    tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Unmute]:` :speaker: **"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** " +
-                            "("+target.getUser().getId()+") has been unmuted.\n"+"`[Reason]:` "+reason).queue();
-                else
-                    tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [Unmute]:` :speaker: **"+author.getName()+"**#**"+author.getDiscriminator()+"** ("+author.getId()+") unmuted " +
-                            "**"+target.getUser().getName()+"**#**"+target.getUser().getDiscriminator()+"** ("+target.getUser().getId()+")\n"+"`[Reason]:` "+reason).queue();
-            }
-        }
+            });
+        });
     }
 
     public void onGuildBan(GuildBanEvent event)
@@ -293,41 +165,102 @@ public class ModLogging
         if(!(bot.dataEnabled))
             return;
 
+        Action action = Action.MANUAL_BAN;
         Guild guild = event.getGuild();
-        TextChannel tc = GuildUtils.getModlogChannel(guild);
-        TextChannel channel = FinderUtil.getDefaultChannel(event.getGuild());
-        if(!(tc == null))
-        {
-            if(!(ChecksUtil.hasPermission(guild.getSelfMember(), tc, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
-                guild.getOwner().getUser().openPrivateChannel().queue(s -> s.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue(null, (e) -> channel.sendMessage(Messages.MODLOG_NOPERMISSIONS).queue()));
-            else
-            {
-                if(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS))
-                {
-                    guild.getAuditLogs().type(ActionType.BAN).limit(20).queue(preEntries -> {
-                        List<AuditLogEntry> entries = preEntries.stream().filter(ale -> ale.getTargetIdLong()==event.getUser().getIdLong()).collect(Collectors.toList());
+        User target = event.getUser();
 
-                        if(entries.isEmpty())
-                            return;
+        GuildSettings gs = bot.endless.getGuildSettings(guild);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+            return;
+        if(!(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
+            return;
 
-                        ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), null);
-                        if(parsedAuditLog==null)
-                            return;
+        guild.getAuditLogs().type(ActionType.BAN).limit(3).queue(preEntries -> {
+            List<AuditLogEntry> entries = preEntries.stream().filter(ale -> ale.getTargetIdLong()==target.getIdLong()).collect(Collectors.toList());
+            if(entries.isEmpty())
+                return;
 
-                        String reason = parsedAuditLog.getReason();
-                        User author = parsedAuditLog.getAuthor();
-                        User target = parsedAuditLog.getTarget();
+            ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), null);
+            if(parsedAuditLog==null)
+                return;
 
-                        if(author.isBot())
-                            return;
+            String reason = parsedAuditLog.getReason();
+            User author = parsedAuditLog.getAuthor();
+            if(author.isBot() ||  LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
+                return;
 
-                        tc.sendMessage("`"+TimeUtils.getTimeAndDate()+" [User Banned]:` :hammer: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
-                                "banned **"+target.getName()+"#"+target.getDiscriminator()+"** ("+target.getId()+")\n" +
-                                "`[Reason]:` "+reason).queue();
-                    });
-                }
-            }
-        }
+            logManual(action, guild, OffsetDateTime.now(), reason, author, target);
+        });
+    }
+
+    public void onGuildMemberLeave(GuildMemberLeaveEvent event)
+    {
+        if(!(bot.dataEnabled))
+            return;
+
+        Action action = Action.MANUAL_KICK;
+        Guild guild = event.getGuild();
+        User target = event.getUser();
+
+        GuildSettings gs = bot.endless.getGuildSettings(guild);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+            return;
+        if(!(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
+            return;
+
+        guild.getAuditLogs().type(ActionType.KICK).limit(3).queue(preEntries -> {
+            List<AuditLogEntry> entries = preEntries.stream().filter(ale -> ale.getTargetIdLong()==target.getIdLong()).collect(Collectors.toList());
+            if(entries.isEmpty())
+                return;
+            ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), null);
+            if(parsedAuditLog==null)
+                return;
+            if(entries.get(0).getCreationTime().plusSeconds(5).isBefore(OffsetDateTime.now()))
+                return;
+
+            String reason = parsedAuditLog.getReason();
+            User author = parsedAuditLog.getAuthor();
+            if(author.isBot() ||  LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
+                return;
+
+            logManual(action, guild, OffsetDateTime.now(), reason, author, target);
+        });
+    }
+
+    public void onGuildUnban(GuildUnbanEvent event)
+    {
+        if(!(bot.dataEnabled))
+            return;
+
+        Action action = Action.MANUAL_UNBAN;
+        Guild guild = event.getGuild();
+        User target = event.getUser();
+
+        GuildSettings gs = bot.endless.getGuildSettings(guild);
+        TextChannel modlog = guild.getTextChannelById(gs.getModlog());
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+            return;
+        if(!(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
+            return;
+
+        guild.getAuditLogs().type(ActionType.UNBAN).limit(3).queue(preEntries -> {
+            List<AuditLogEntry> entries = preEntries.stream().filter(ale -> ale.getTargetIdLong()==target.getIdLong()).collect(Collectors.toList());
+            if(entries.isEmpty())
+                return;
+
+            ParsedAuditLog parsedAuditLog = GuildUtils.getAuditLog(entries.get(0), null);
+            if(parsedAuditLog==null)
+                return;
+
+            String reason = parsedAuditLog.getReason();
+            User author = parsedAuditLog.getAuthor();
+            if(author.isBot() ||  LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
+                return;
+
+            logManual(action, guild, OffsetDateTime.now(), reason, author, target);
+        });
     }
 
     public int updateCase(Guild guild, int num, String reason)
@@ -412,7 +345,7 @@ public class ModLogging
         }
     }
 
-    private static int getCaseNumber(Message m)
+    private int getCaseNumber(Message m)
     {
         if(!(m.getAuthor().getIdLong()==m.getJDA().getSelfUser().getIdLong()))
             return -1;
@@ -426,5 +359,10 @@ public class ModLogging
         {
             return -1;
         }
+    }
+
+    private String getTextUrl(Message.Attachment att)
+    {
+        return "http://txt.discord.website/?txt=470068055322525708/"+att.getId()+"/Messages";
     }
 }

@@ -19,6 +19,7 @@ package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Messages;
 import me.artuto.endless.commands.cmddata.Categories;
@@ -30,6 +31,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -102,7 +104,7 @@ public class BanCmd extends EndlessCommand
 
         event.getGuild().getController().ban(member, GuildUtils.getBanDeleteDays(event.getGuild())).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
             event.replySuccess(Messages.BAN_SUCCESS+username);
-            bot.modlog.logBan(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
+            bot.modlog.logGeneral(Action.BAN, event, OffsetDateTime.now(), fReason, member.getUser());
         }, e -> event.replyError(Messages.BAN_ERROR+username));
     }
 }

@@ -18,9 +18,12 @@
 package me.artuto.endless;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 /**
  * @author Artuto
@@ -29,6 +32,16 @@ import java.util.ArrayList;
 
 public class Sender
 {
+    public static void sendFile(MessageChannel chan, File file, Message message)
+    {
+        chan.sendFile(file, message).queue();
+    }
+
+    public static void sendMessage(MessageChannel chan, Message message, Consumer<Message> success)
+    {
+        chan.sendMessage(message).queue(success::accept);
+    }
+
     public static void sendMessage(MessageChannel chan, String message)
     {
         ArrayList<String> messages = splitMessage(message);

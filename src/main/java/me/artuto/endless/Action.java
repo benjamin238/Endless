@@ -26,12 +26,14 @@ public enum Action
     BAN(":hammer:", "ban", "banned"),
     CLEAN(":wastebasket:", "clean", "cleaned"),
     KICK(":boot:", "kick", "kicked"),
-    MANUALBAN(":hammer:", "manualban", "banned"),
-    MANUALMUTE(":zipper_mouth:", "manualmute", "muted"),
-    MANUALUNBAN(":wrench:", "manualunban", "unbanned"),
+    MANUAL_BAN(":hammer:", "manualban", "banned"),
+    MANUAL_KICK(":boot:", "manualkick", "kicked"),
+    MANUAL_MUTE(":zipper_mouth:", "manualmute", "muted"),
+    MANUAL_UNBAN(":wrench:", "manualunban", "unbanned"),
+    MANUAL_UNMUTE(":loud_sound:", "manualunmute", "unmuted"),
     MUTE(":zipper_mouth:", "mute", "muted"),
     SOFTBAN(":banana:", "softban", "softbanned"),
-    TEMPMUTE(":zipper_mouth:", "tempmute", "tempmuted"),
+    TEMP_MUTE(":zipper_mouth:", "tempmute", "tempmuted"),
     UNBAN(":wrench:", "unban", "unbanned"),
     UNMUTE(":loud_sound:", "unmute", "unmuted");
 
