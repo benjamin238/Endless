@@ -31,6 +31,7 @@ import me.artuto.endless.utils.TagUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 
 import java.util.List;
@@ -155,6 +156,9 @@ public class TagCmd extends EndlessCommand
                 return;
             }
 
+            for(Message.Attachment att : event.getMessage().getAttachments())
+                content += "\n"+att.getUrl();
+
             Tag tag = bot.endless.getGlobalTag(name);
 
             if(tag==null)
@@ -202,6 +206,9 @@ public class TagCmd extends EndlessCommand
                 event.replyWarning("Please specify a tag name and content!");
                 return;
             }
+
+            for(Message.Attachment att : event.getMessage().getAttachments())
+                content += "\n"+att.getUrl();
 
             Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), name);
 
@@ -351,6 +358,9 @@ public class TagCmd extends EndlessCommand
                     event.replyError("No tag found with that name!");
                     return;
                 }
+
+                for(Message.Attachment att : event.getMessage().getAttachments())
+                    content += "\n"+att.getUrl();
 
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
@@ -612,6 +622,9 @@ public class TagCmd extends EndlessCommand
                     return;
                 }
             }
+
+            for(Message.Attachment att : event.getMessage().getAttachments())
+                tagContent += "\n"+att.getUrl();
 
             if(tag.isOverriden())
             {
