@@ -34,6 +34,8 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 
+import java.time.ZoneId;
+import java.time.zone.ZoneRulesException;
 import java.util.List;
 
 public class ServerSettingsCmd extends EndlessCommand
@@ -45,7 +47,7 @@ public class ServerSettingsCmd extends EndlessCommand
         this.bot = bot;
         this.name = "settings";
         this.children = new Command[]{new ModlogCmd(), new ServerlogCmd(), new WelcomeCmd(), new LeaveCmd(),
-                new AdminRoleCmd(), new ModRoleCmd(), new MutedRoleCmd(), new BanDeleteDaysCmd()};
+                new AdminRoleCmd(), new ModRoleCmd(), new MutedRoleCmd(), new BanDeleteDaysCmd(), new TimezoneCmd()};
         this.help = "Displays the settings of the server";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -67,6 +69,7 @@ public class ServerSettingsCmd extends EndlessCommand
         Role modRole = GuildUtils.getModRole(guild);
         Role mutedRole = GuildUtils.getMutedRole(guild);
         Room.Mode roomMode = settings.getRoomMode();
+        String welcomeDm = settings.getWelcomeDM();
         String welcomeMsg = settings.getWelcomeMsg();
         String leaveMsg = settings.getLeaveMsg();
         TextChannel modlog = guild.getTextChannelById(settings.getModlog());
@@ -74,6 +77,7 @@ public class ServerSettingsCmd extends EndlessCommand
         TextChannel welcome = guild.getTextChannelById(settings.getWelcomeChannel());
         TextChannel leave = guild.getTextChannelById(settings.getLeaveChannel());
         TextChannel starboard = guild.getTextChannelById(settings.getStarboard());
+        ZoneId tz = settings.getTimezone();
 
         StringBuilder logsString = new StringBuilder();
         StringBuilder messagesString = new StringBuilder();
@@ -85,22 +89,24 @@ public class ServerSettingsCmd extends EndlessCommand
                 .append("\nWelcome Channel: ").append((welcome==null?"None":"**"+welcome.getAsMention()+"**"))
                 .append("\nLeave Channel: ").append((leave==null?"None":"**"+leave.getAsMention()+"**"));
 
-        messagesString.append("Welcome Message: ").append((welcomeMsg==null?"None":"```"+welcomeMsg+"```"))
-            .append("\nLeave Message: ").append((leaveMsg==null?"None":"```"+leaveMsg+"```"));
+        messagesString.append("Welcome DM: ").append((welcomeDm==null?"None":"`"+welcomeDm+"`"))
+                .append("\nWelcome Message: ").append((welcomeMsg==null?"None":"`"+welcomeMsg+"`"))
+            .append("\nLeave Message: ").append((leaveMsg==null?"None":"`"+leaveMsg+"`"));
 
         settingsString.append("Admin Role: ").append((adminRole==null?"None":"**"+adminRole.getAsMention()+"**"))
                 .append("\nMod Role: ").append((modRole==null?"None":"**"+modRole.getAsMention()+"**"))
                 .append("\nMuted Role: ").append((mutedRole==null?"None":"**"+mutedRole.getAsMention()+"**"))
                 .append("\nBan delete days: ").append((banDeleteDays==0?"Don't delete":String.valueOf("**"+banDeleteDays+"**")))
-                .append("\nRoom Mode: **").append(roomMode.getName()).append("**");
+                .append("\nRoom Mode: **").append(roomMode.getName()).append("**")
+                .append("\nTimezone: **").append(tz.toString()).append("**");
 
         starboardString.append("Starboard Channel: ").append((starboard==null?"None":"**"+starboard.getAsMention()+"**"))
                 .append("\nStar Count: ").append((starboardCount==0?"Disabled":String.valueOf("**"+starboardCount+"**")));
 
-        builder.addField(":mag: Logs", logsString.toString(), true);
-        builder.addField(":speech_balloon: Messages", messagesString.toString(), true);
-        builder.addField(":bar_chart: Server Settings", settingsString.toString(), true);
-        builder.addField(":star: Starboard", starboardString.toString(), true);
+        builder.addField(":mag: Logs", logsString.toString(), false);
+        builder.addField(":speech_balloon: Messages", messagesString.toString(), false);
+        builder.addField(":bar_chart: Server Settings", settingsString.toString(), false);
+        builder.addField(":star: Starboard", starboardString.toString(), false);
 
         builder.setColor(event.getSelfMember().getColor());
         event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
@@ -417,6 +423,39 @@ public class ServerSettingsCmd extends EndlessCommand
             }
             else
                 event.replyError("That isn't a valid option! Valid options are `0` (Don't delete), `1` and `7`");
+        }
+    }
+
+    private class TimezoneCmd extends EndlessCommand
+    {
+        TimezoneCmd()
+        {
+            this.name = "timezone";
+            this.help = "Sets the timezone for logs on the guild";
+            this.arguments = "<timezone>";
+            this.category = Categories.SERVER_CONFIG;
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.parent = ServerSettingsCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            String args = event.getArgs();
+            ZoneId tz;
+
+            try
+            {
+                tz = ZoneId.of(args);
+            }
+            catch(ZoneRulesException e)
+            {
+                event.replyError("Please specify a valid timezone!");
+                return;
+            }
+
+            bot.gsdm.setTimezone(event.getGuild(), tz);
+            event.replySuccess("Successfully updated timezone!");
         }
     }
 }
