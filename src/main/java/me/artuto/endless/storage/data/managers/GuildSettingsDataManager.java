@@ -30,6 +30,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import org.json.JSONArray;
 
 import java.sql.*;
+import java.time.ZoneId;
 
 public class GuildSettingsDataManager
 {
@@ -824,6 +825,74 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the room mode for the guild "+guild.getId(), e);
+        }
+    }
+
+    public void setTimezone(Guild guild, ZoneId tz)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, logs_timezone FROM GUILD_SETTINGS WHERE guild_id = ?");
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    results.updateString("logs_timezone", tz.toString());
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateString("logs_timezone", tz.toString());
+                    results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setTimezone(tz);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while setting the timezone for the guild "+guild.getId(), e);
+        }
+    }
+
+    public void setWelcomeDm(Guild guild, String welcomeDm)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, welcome_dm FROM GUILD_SETTINGS WHERE guild_id = ?");
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    results.updateString("welcome_dm", welcomeDm);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateString("welcome_dm", welcomeDm);
+                    results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setWelcomeDM(welcomeDm);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while setting the welcome DM for the guild "+guild.getId(), e);
         }
     }
 }

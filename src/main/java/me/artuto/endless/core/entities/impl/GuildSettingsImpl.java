@@ -329,7 +329,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.welcomeMsg = welcomeMsg;
     }
 
-    public void setTimeZone(ZoneId tz)
+    public void setTimezone(ZoneId tz)
     {
         this.tz = tz;
     }
