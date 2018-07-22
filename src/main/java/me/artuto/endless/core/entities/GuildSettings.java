@@ -68,5 +68,7 @@ public interface GuildSettings
 
     ZoneId getTimezone();
 
+    String getWelcomeDM();
+
     String getWelcomeMsg();
 }

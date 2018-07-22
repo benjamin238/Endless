@@ -20,10 +20,12 @@ package me.artuto.endless;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.CommandListener;
+import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.handlers.*;
 import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.storage.tempdata.AfkManager;
+import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
@@ -154,6 +156,7 @@ public class Listener implements CommandListener, EventListener
             GuildMemberJoinEvent event = (GuildMemberJoinEvent)preEvent;
             MutedRoleHandler.checkJoin(event);
             serverlog.onGuildMemberJoin(event);
+            welcomeDm(event);
         }
         else if(preEvent instanceof GuildMemberLeaveEvent)
         {
@@ -325,5 +328,18 @@ public class Listener implements CommandListener, EventListener
             Endless.LOG.error(String.format("Command Error: %s | Message ID: %s | Executed in: Text Channel %s",
                     command.getName(), event.getMessage().getIdLong(), event.getTextChannel().getIdLong()), throwable);
         }
+    }
+
+    // I didnt found a better place for this method
+    private void welcomeDm(GuildMemberJoinEvent event)
+    {
+        Guild guild = event.getGuild();
+        GuildSettings gs = bot.endless.getGuildSettings(guild);
+        String welcomeDM = gs.getWelcomeDM();
+
+        if(welcomeDM==null)
+            return;
+
+        event.getUser().openPrivateChannel().queue(c -> c.sendMessage(FormatUtil.sanitize(welcomeDM)).queue(null, e -> {}));
     }
 }

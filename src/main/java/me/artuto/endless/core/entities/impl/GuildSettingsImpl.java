@@ -18,10 +18,7 @@
 package me.artuto.endless.core.entities.impl;
 
 import com.jagrosh.jdautilities.command.GuildSettingsProvider;
-import me.artuto.endless.core.entities.GuildSettings;
-import me.artuto.endless.core.entities.Ignore;
-import me.artuto.endless.core.entities.Room;
-import me.artuto.endless.core.entities.Tag;
+import me.artuto.endless.core.entities.*;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 
@@ -42,13 +39,13 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     private List<Tag> importedTags;
     private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
     private Room.Mode roomMode;
-    private String leaveMsg, welcomeMsg;
+    private String leaveMsg, welcomeDM, welcomeMsg;
     private ZoneId tz;
 
     public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
                              List<Ignore> ignoredEntities, List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId,
                              long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
-                             long starboardId, long welcomeId, Room.Mode roomMode, String leaveMsg, String welcomeMsg, ZoneId tz)
+                             long starboardId, long welcomeId, Room.Mode roomMode, String leaveMsg, String welcomeDM, String welcomeMsg, ZoneId tz)
     {
         this.isDefault = isDefault;
         this.prefixes = prefixes;
@@ -68,6 +65,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.welcomeId = welcomeId;
         this.roomMode = roomMode;
         this.leaveMsg = leaveMsg;
+        this.welcomeDM = welcomeDM;
         this.welcomeMsg = welcomeMsg;
         this.tz = tz;
     }
@@ -83,7 +81,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     {
         return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && roleMeRoles.isEmpty() && ignoredEntities.isEmpty()
                 && importedTags.isEmpty() && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
-                && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && welcomeMsg==null;
+                && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && welcomeDM==null && welcomeMsg==null && tz==EntityBuilder.DEFAULT_TZ;
     }
 
     @Nullable
@@ -187,6 +185,12 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public String getLeaveMsg()
     {
         return leaveMsg;
+    }
+
+    @Override
+    public String getWelcomeDM()
+    {
+        return welcomeDM;
     }
 
     @Override
@@ -313,6 +317,11 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public void setWelcomeId(long welcomeId)
     {
         this.welcomeId = welcomeId;
+    }
+
+    public void setWelcomeDM(String welcomeDM)
+    {
+        this.welcomeDM = welcomeDM;
     }
 
     public void setWelcomeMsg(String welcomeMsg)

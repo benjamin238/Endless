@@ -47,7 +47,7 @@ public class Database
     {
         return new GuildSettingsImpl(true, new HashSet<>(), guild, 0, 0, new LinkedList<>(),
                 new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L, 0L,
-                0L, 0L, 0L, Room.Mode.NO_CREATION, null, null, EntityBuilder.DEFAULT_TZ);
+                0L, 0L, 0L, Room.Mode.NO_CREATION, null, null, null, EntityBuilder.DEFAULT_TZ);
     }
 
     public Profile createDefaultProfile(User user)
