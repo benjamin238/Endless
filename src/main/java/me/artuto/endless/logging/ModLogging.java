@@ -97,7 +97,7 @@ public class ModLogging
                 {
                     Message.Attachment att = cleanLog.sendFile(file).complete().getAttachments().get(0);
                     fileEmbed.setDescription("[`\uD83D\uDCC4 View`]("+getTextUrl(att)+") | [`\uD83D\uDCE9 Download`]("+att.getUrl()+")");
-                    m.editMessage(mb.setEmbed(fileEmbed.build()).build()).queue(s -> file.delete());
+                    m.editMessage(mb.setEmbed(fileEmbed.build()).build()).queue(s -> file.delete(), e -> file.delete());
                 }
             });
         });
