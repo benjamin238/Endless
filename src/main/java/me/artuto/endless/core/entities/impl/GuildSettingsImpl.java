@@ -35,7 +35,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     private Guild guild;
     private int banDeleteDays, starboardCount;
     private List<Ignore> ignoredEntities;
-    private List<Role> roleMeRoles;
+    private List<Role> colorMeRoles, roleMeRoles;
     private List<Tag> importedTags;
     private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
     private Room.Mode roomMode;
@@ -43,7 +43,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     private ZoneId tz;
 
     public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
-                             List<Ignore> ignoredEntities, List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId,
+                             List<Ignore> ignoredEntities, List<Role> colorMeRoles, List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId,
                              long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
                              long starboardId, long welcomeId, Room.Mode roomMode, String leaveMsg, String welcomeDM, String welcomeMsg, ZoneId tz)
     {
@@ -53,6 +53,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.banDeleteDays = banDeleteDays;
         this.starboardCount = starboardCount;
         this.ignoredEntities = ignoredEntities;
+        this.colorMeRoles = colorMeRoles;
         this.roleMeRoles = roleMeRoles;
         this.importedTags = importedTags;
         this.adminRoleId = adminRoleId;
@@ -79,8 +80,8 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     @Override
     public boolean isEmpty()
     {
-        return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && roleMeRoles.isEmpty() && ignoredEntities.isEmpty()
-                && importedTags.isEmpty() && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
+        return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && ignoredEntities.isEmpty() && colorMeRoles.isEmpty()
+                && roleMeRoles.isEmpty() && importedTags.isEmpty() && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
                 && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && welcomeDM==null && welcomeMsg==null && tz==EntityBuilder.DEFAULT_TZ;
     }
 
@@ -113,6 +114,12 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public List<Ignore> getIgnoredEntities()
     {
         return Collections.unmodifiableList(ignoredEntities);
+    }
+
+    @Override
+    public List<Role> getColorMeRoles()
+    {
+        return Collections.unmodifiableList(colorMeRoles);
     }
 
     @Override
@@ -214,6 +221,11 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
             return String.format("GS:%s(%s)", guild.getName(), guild.getId());
     }
 
+    public void addColorMeRole(Role role)
+    {
+        colorMeRoles.add(role);
+    }
+
     public void addIgnoredEntity(Ignore ignore)
     {
         ignoredEntities.add(ignore);
@@ -232,6 +244,11 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public void addRoleMeRole(Role role)
     {
         roleMeRoles.add(role);
+    }
+
+    public void removeColorMeRole(Role role)
+    {
+        colorMeRoles.remove(role);
     }
 
     public void removeIgnoredEntity(Ignore ignore)

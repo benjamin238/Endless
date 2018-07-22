@@ -22,32 +22,35 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
-import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.Endless;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.User;
 
+import java.awt.*;
 import java.util.List;
 
 /**
  * @author Artuto
  */
 
-public class RoleMeCmd extends EndlessCommand
+public class ColorMeCmd extends EndlessCommand
 {
     private final Bot bot;
 
-    public RoleMeCmd(Bot bot)
+    public ColorMeCmd(Bot bot)
     {
         this.bot = bot;
-        this.name = "roleme";
-        this.help = "Self-assignable roles.";
-        this.arguments = "[roleme role]";
+        this.name = "colorme";
+        this.help = "Command for enabled roles that lets user change their color.";
+        this.arguments = "[color in hex]";
         this.category = Categories.UTILS;
         this.children = new Command[]{new AddCmd(), new RemoveCmd()};
         this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
@@ -65,22 +68,20 @@ public class RoleMeCmd extends EndlessCommand
 
         String args = event.getArgs();
         Guild guild = event.getGuild();
-        List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
+        List<Role> colorMeRoles = ((GuildSettings)event.getClient().getSettingsFor(guild)).getColorMeRoles();
         Member member = event.getMember();
         Role role;
 
         if(args.isEmpty())
         {
-            if(rolemeRoles==null)
-                event.replyError("Something has gone wrong while getting the settings, please contact the bot owner.");
-            else if(rolemeRoles.isEmpty())
-                event.replyWarning("This guild doesn't has any RoleMe roles.");
+            if(colorMeRoles.isEmpty())
+                event.replyWarning("This guild doesn't has any ColorMe roles.");
             else
             {
                 StringBuilder sb = new StringBuilder();
-                sb.append(":performing_arts: RoleMe roles available on **").append(guild.getName()).append("**:").append("\n");
+                sb.append(":performing_arts: ColorMe roles available on **").append(guild.getName()).append("**:").append("\n");
 
-                for(Role r : rolemeRoles)
+                for(Role r : colorMeRoles)
                     sb.append(Const.LINE_START).append(" ").append(r.getName()).append("\n");
 
                 event.reply(sb.toString());
@@ -88,36 +89,36 @@ public class RoleMeCmd extends EndlessCommand
         }
         else
         {
-            List<Role> list = FinderUtil.findRoles(args, event.getGuild());
-
-            if(list.isEmpty())
+            Color color = getColor(event.getArgs());
+            role = member.getRoles().stream().filter(r -> !(r.getColor()==null)).findFirst().orElse(null);
+            if(color==null)
             {
-                event.replyWarning("I was not able to found a role with the provided arguments: '"+event.getArgs()+"'");
+                event.replyError("The string you specified is not a valid HEX value!");
                 return;
             }
-            else if(list.size()>1)
+            if(role==null)
             {
-                event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
+                event.replyError("You don't have any colored roles! Make sure you have at least one colored role **already** created!");
                 return;
             }
-            else role = list.get(0);
 
-            if(rolemeRoles.contains(role))
+            if(colorMeRoles.contains(role))
             {
                 if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
                     event.replyError("I can't interact with that role!");
                 else
                 {
-                    if(member.getRoles().contains(role))
-                        guild.getController().removeSingleRoleFromMember(member, role).queue(s -> event.replySuccess("The role *"+role.getName()+"* has been removed."),
-                                e -> event.replyError("Something has gone wrong while removing the role from you, please contact the bot owner."));
-                    else
-                        guild.getController().addSingleRoleToMember(member, role).queue(s -> event.replySuccess("You have been given the role *"+role.getName()+"*"),
-                                e -> event.replyError("Something has gone wrong while giving you the role, please contact the bot owner."));
+                    User author = event.getAuthor();
+                    role.getManager().setColor(color).reason(author.getName()+"#"+author.getDiscriminator()+": ColorMe")
+                            .queue(s -> event.replySuccess(String.format("Successfully changed *%s's* color to %s", role.getName(), event.getArgs())),
+                                    e -> {
+                        event.replyError(String.format("Could not change *%s's* color to %s", role.getName(), event.getArgs()));
+                        Endless.LOG.error("Error while changing the color of role {}", role.getId());
+                    });
                 }
             }
             else
-                event.replyWarning("That role is not enabled for RoleMe!");
+                event.replyWarning("The role *"+role.getName()+"* is not enabled for RoleMe!");
         }
     }
 
@@ -126,14 +127,15 @@ public class RoleMeCmd extends EndlessCommand
         AddCmd()
         {
             this.name = "add";
-            this.help = "Adds a role to the list of available RoleMe roles.";
+            this.help = "Adds a role to the list of available ColorMe roles.";
             this.arguments = "<role>";
             this.category = Categories.UTILS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.parent = RoleMeCmd.this;
+            this.parent = ColorMeCmd.this;
         }
 
+        @Override
         protected void executeCommand(CommandEvent event)
         {
             if(!(bot.dataEnabled))
@@ -143,7 +145,7 @@ public class RoleMeCmd extends EndlessCommand
             }
 
             Guild guild = event.getGuild();
-            List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
+            List<Role> colormeRoles = ((GuildSettings)event.getClient().getSettingsFor(guild)).getColorMeRoles();
             String args = event.getArgs();
             Role role;
 
@@ -161,9 +163,9 @@ public class RoleMeCmd extends EndlessCommand
             }
             else role = list.get(0);
 
-            if(rolemeRoles.contains(role))
+            if(colormeRoles.contains(role))
             {
-                event.replyError("That role is already on the RoleMe roles list!");
+                event.replyError("That role is already on the ColorMe roles list!");
                 return;
             }
 
@@ -171,8 +173,8 @@ public class RoleMeCmd extends EndlessCommand
                 event.replyError("I can't interact with that role!");
             else
             {
-                bot.gsdm.addRolemeRole(guild, role);
-                event.replySuccess("Successfully added the role *"+role.getName()+"* to the RoleMe roles list.");
+                bot.gsdm.addColormeRole(guild, role);
+                event.replySuccess("Successfully added the role *"+role.getName()+"* to the ColorMe roles list.");
             }
         }
     }
@@ -182,14 +184,15 @@ public class RoleMeCmd extends EndlessCommand
         RemoveCmd()
         {
             this.name = "remove";
-            this.help = "Removes a role from the list of available RoleMe roles.";
+            this.help = "Removes a role from the list of available ColorMe roles.";
             this.arguments = "<role>";
             this.category = Categories.UTILS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.parent = RoleMeCmd.this;
+            this.parent = ColorMeCmd.this;
         }
 
+        @Override
         protected void executeCommand(CommandEvent event)
         {
             if(!(bot.dataEnabled))
@@ -199,7 +202,7 @@ public class RoleMeCmd extends EndlessCommand
             }
 
             Guild guild = event.getGuild();
-            List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
+            List<Role> colormeRoles = ((GuildSettings)event.getClient().getSettingsFor(guild)).getColorMeRoles();
             String args = event.getArgs();
             Role role;
 
@@ -218,14 +221,26 @@ public class RoleMeCmd extends EndlessCommand
             else role = list.get(0);
 
 
-            if(!(rolemeRoles.contains(role)))
+            if(!(colormeRoles.contains(role)))
             {
-                event.replyError("That role isn't on the RoleMe roles list!");
+                event.replyError("That role isn't on the ColorMe roles list!");
                 return;
             }
 
-            bot.gsdm.removeRolemeRole(guild, role);
-            event.replySuccess("Successfully removed the role *"+role.getName()+"* from the RoleMe roles list.");
+            bot.gsdm.removeColormeRole(guild, role);
+            event.replySuccess("Successfully removed the role *"+role.getName()+"* from the ColorMe roles list.");
+        }
+    }
+
+    private Color getColor(String hex)
+    {
+        try
+        {
+            return Color.decode(hex);
+        }
+        catch(NumberFormatException e)
+        {
+            return null;
         }
     }
 }

@@ -536,7 +536,7 @@ public class GuildSettingsDataManager
                             if(array.get(i).toString().equals(prefix))
                             {
                                 array.remove(i);
-                                if(array.length()<0)
+                                if(array.length()==0)
                                 {
                                     results.updateNull("prefixes");
                                     results.updateRow();
@@ -625,7 +625,7 @@ public class GuildSettingsDataManager
                             if(array.get(i).toString().equals(role.getId()))
                             {
                                 array.remove(i);
-                                if(array.length()<0)
+                                if(array.length()==0)
                                 {
                                     results.updateNull("roleme_roles");
                                     results.updateRow();
@@ -895,6 +895,98 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             Database.LOG.error("Error while setting the welcome DM for the guild "+guild.getId(), e);
+        }
+    }
+
+    public void addColormeRole(Guild guild, Role role)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, colorme_roles FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+            String roles;
+            JSONArray array;
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    roles = results.getString("colorme_roles");
+                    if(roles==null)
+                        array = new JSONArray().put(role.getId());
+                    else
+                        array = new JSONArray(roles).put(role.getId());
+
+                    results.updateString("colorme_roles", array.toString());
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateString("colorme_roles", new JSONArray().put(role.getId()).toString());
+                    results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.addColorMeRole(role);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while adding a colorme role for the guild "+guild.getId(), e);
+        }
+    }
+
+    public void removeColormeRole(Guild guild, Role role)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, colorme_roles FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+            String roles;
+            JSONArray array;
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    roles = results.getString("colorme_roles");
+                    if(!(roles == null))
+                    {
+                        array = new JSONArray(roles);
+
+                        for(int i = 0; i<array.length(); i++)
+                        {
+                            if(array.get(i).toString().equals(role.getId()))
+                            {
+                                array.remove(i);
+                                if(array.length()==0)
+                                {
+                                    results.updateNull("colorme_roles");
+                                    results.updateRow();
+                                }
+                                else
+                                {
+                                    results.updateString("colorme_roles", array.toString());
+                                    results.updateRow();
+                                }
+                            }
+                        }
+                        GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                        settings.removeColorMeRole(role);
+                    }
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while removing a colorme role from the guild "+guild.getId(), e);
         }
     }
 }

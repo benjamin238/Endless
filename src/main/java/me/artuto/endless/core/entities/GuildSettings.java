@@ -42,6 +42,8 @@ public interface GuildSettings
 
     List<Ignore> getIgnoredEntities();
 
+    List<Role> getColorMeRoles();
+
     List<Role> getRoleMeRoles();
 
     List<Tag> getImportedTags();

@@ -88,6 +88,7 @@ public class EntityBuilder
 
     public GuildSettings createGuildSettings(Guild guild, ResultSet results) throws SQLException
     {
+        List<Role> colorMeRoles = new LinkedList<>();
         List<Role> roleMeRoles = new LinkedList<>();
         List<Tag> importedTags = new LinkedList<>();
         Set<String> prefixes = new HashSet<>();
@@ -99,8 +100,19 @@ public class EntityBuilder
                 prefixes.add(prefix.toString());
         }
 
-        array = results.getString("roleme_roles");
+        array = results.getString("colorme_roles");
+        if(!(array == null))
+        {
+            for(Object preRole : new JSONArray(array))
+            {
+                Role role = guild.getRoleById(preRole.toString());
 
+                if(!(role==null))
+                    colorMeRoles.add(role);
+            }
+        }
+
+        array = results.getString("roleme_roles");
         if(!(array == null))
         {
             for(Object preRole : new JSONArray(array))
@@ -113,7 +125,6 @@ public class EntityBuilder
         }
 
         array = results.getString("imported_tags");
-
         if(!(array == null))
         {
             for(Object preTag : new JSONArray(array))
@@ -136,6 +147,7 @@ public class EntityBuilder
                 results.getInt("ban_delete_days"),
                 results.getInt("starboard_count"),
                 bot.db.getIgnoresForGuild(guild),
+                colorMeRoles,
                 roleMeRoles,
                 importedTags,
                 results.getLong("admin_role_id"),
