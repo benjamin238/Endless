@@ -227,8 +227,8 @@ public class Bot extends ListenerAdapter
                 new GiphyGifCmd(this), new ProfileCmd(this), new SayCmd(), new TagCmd(this),
 
                 // Moderation
-                new BanCmd(this), new ClearCmd(this), new KickCmd(this),
-                new HackbanCmd(this), new MuteCmd(this), new SoftbanCmd(this), new UnbanCmd(this),
+                new BanCmd(this), new ClearCmd(this), new KickCmd(this), new HackbanCmd(this),
+                new MuteCmd(this), new ReasonCmd(this), new SoftbanCmd(this), new UnbanCmd(this),
 
                 // Server Settings
                 new IgnoreCmd(this), new LeaveCmd(this), new PrefixCmd(this), new RoomCmd(this),

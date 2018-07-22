@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.core.entities.GuildSettings;
 import net.dv8tion.jda.core.Permission;
 
 /**
@@ -44,6 +45,54 @@ public class ReasonCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        int caseNum;
+        String[] parts = event.getArgs().split("\\s+", 2);
+        String str;
+        try
+        {
+            caseNum = Integer.parseInt(parts[0]);
+            str = parts.length==1 ? null : parts[1];
+        }
+        catch(NumberFormatException ex)
+        {
+            caseNum = -1;
+            str = event.getArgs();
+        }
 
+        if(caseNum<-1 || caseNum==0)
+        {
+            event.replyError("Case number must be a positive integer! The case number can be omitted to use the latest un-reasoned case.");
+            return;
+        }
+        if(str==null || str.isEmpty())
+        {
+            event.replyError("Please provide a reason!");
+            return;
+        }
+
+        String fstr = str;
+        int fcaseNum = caseNum;
+        event.async(() ->
+        {
+            int result = bot.modlog.updateCase(event.getGuild(), fcaseNum, fstr);
+            switch(result)
+            {
+                case -1:
+                    event.replyError("No modlog is set on this server!");
+                    break;
+                case -2:
+                    event.replyError("I am unable to Read, Write or retrieve History in the modlog!");
+                    break;
+                case -3:
+                    event.replyError("Case `"+fcaseNum+"` could not be found among the recent cases in the modlog!");
+                    break;
+                case -4:
+                    event.replyError("A recent case with no reason could not be found in the modlog!");
+                    break;
+                default:
+                    event.replySuccess("Updated case **"+result+"** in <#"+((GuildSettings)event.getClient().getSettingsFor(event.getGuild())).getModlog()+">");
+                    break;
+            }
+        });
     }
 }
