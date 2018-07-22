@@ -20,23 +20,26 @@ package me.artuto.endless.commands.serverconfig;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.GuildUtils;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.core.entities.GuildSettings;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
-public class WelcomeMsgCmd extends EndlessCommand
+/**
+ * @author Artuto
+ */
+
+public class WelcomeDmCmd extends EndlessCommand
 {
     private final Bot bot;
 
-    public WelcomeMsgCmd(Bot bot)
+    public WelcomeDmCmd(Bot bot)
     {
         this.bot = bot;
-        this.name = "welcomemsg";
+        this.name = "welcomedm";
         this.children = new Command[]{new ChangeCmd()};
-        this.aliases = new String[]{"welcomemessage"};
-        this.help = "Changes or shows the welcome message";
+        this.help = "Changes or shows the message sent in DMs to new members";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.needsArguments = false;
@@ -46,13 +49,12 @@ public class WelcomeMsgCmd extends EndlessCommand
     protected void executeCommand(CommandEvent event)
     {
         Guild guild = event.getGuild();
-        String msg = GuildUtils.getWelcomeMessage(guild);
+        GuildSettings gs = event.getClient().getSettingsFor(guild);
 
-        if(!(msg==null))
-            event.replySuccess("Welcome message at **"+guild.getName()+"**:\n ```"+msg+"```");
+        if(!(gs.getWelcomeDM() == null))
+            event.replySuccess("Welcome DM at **"+guild.getName()+"**:\n ```"+gs.getWelcomeDM()+"```");
         else
-            event.replyError("No message configured! Use `"+event.getClient().getPrefix()+"welcomemsg change` to set one.\n" +
-                    "Remember to set the channel too!");
+            event.replyError("No message configured! Use `"+event.getClient().getPrefix()+"welcomedm change` to set one.");
     }
 
     private class ChangeCmd extends EndlessCommand
@@ -60,12 +62,12 @@ public class WelcomeMsgCmd extends EndlessCommand
         ChangeCmd()
         {
             this.name = "change";
-            this.help = "Changes the welcome message";
+            this.help = "Changes the message that will be sent to members that join.";
             this.aliases = new String[]{"set"};
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
-            this.needsArgumentsMessage = "Specify a new welcome message or `none` to disable it.";
-            this.parent = WelcomeMsgCmd.this;
+            this.needsArgumentsMessage = "Specify a new welcome DM or `none` to disable it.";
+            this.parent = WelcomeDmCmd.this;
         }
 
         @Override
@@ -73,8 +75,8 @@ public class WelcomeMsgCmd extends EndlessCommand
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
-                bot.gsdm.setWelcomeMessage(event.getGuild(), null);
-                event.replySuccess("Successfully removed welcome message");
+                bot.gsdm.setWelcomeDm(event.getGuild(), null);
+                event.replySuccess("Successfully removed welcome DM");
             }
             else
             {
@@ -84,8 +86,8 @@ public class WelcomeMsgCmd extends EndlessCommand
                     return;
                 }
 
-                bot.gsdm.setWelcomeMessage(event.getGuild(), event.getArgs());
-                event.replySuccess("Welcome message configured.");
+                bot.gsdm.setWelcomeDm(event.getGuild(), event.getArgs());
+                event.replySuccess("Welcome DM configured.");
             }
         }
     }
