@@ -31,10 +31,7 @@ import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.TagUtil;
 import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
@@ -45,6 +42,7 @@ import net.dv8tion.jda.core.events.message.MessageBulkDeleteEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.*;
 import net.dv8tion.jda.core.events.message.guild.react.*;
+import net.dv8tion.jda.core.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.webhook.WebhookClient;
@@ -291,6 +289,22 @@ public class Listener implements CommandListener, EventListener
                 else
                     bot.rsdm.deleteVoiceRoom(vc.getIdLong());
             });
+        }
+        else if(preEvent instanceof RoleDeleteEvent)
+        {
+            if(bot.maintenance || !(bot.initialized))
+                return;
+            RoleDeleteEvent event = (RoleDeleteEvent)preEvent;
+            Guild guild = event.getGuild();
+            GuildSettings gs = bot.endless.getGuildSettings(guild);
+            Role role = event.getRole();
+
+            if(gs.getColorMeRoles().contains(role))
+                bot.gsdm.removeColormeRole(guild, role);
+            else if(gs.getRoleMeRoles().contains(role))
+                bot.gsdm.removeColormeRole(guild, role);
+            else if(!(bot.endless.getIgnore(guild, role.getIdLong())==null))
+                bot.gsdm.removeIgnore(guild, role.getIdLong());
         }
     }
 
