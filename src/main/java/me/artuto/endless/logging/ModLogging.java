@@ -93,11 +93,11 @@ public class ModLogging
                     author.getDiscriminator(), action.getVerb(), messages.size(), event.getTextChannel().getIdLong(), crit, reason));
             Sender.sendMessage(modlog, mb.build(), m -> {
                 File file = LogUtils.createMessagesTextFile(messages, "Messages.txt");
-                if(!(file==null) || !(ChecksUtil.hasPermission(guild.getSelfMember(), modlog, Permission.MESSAGE_ATTACH_FILES)))
+                if(!(file==null) && ChecksUtil.hasPermission(guild.getSelfMember(), modlog, Permission.MESSAGE_ATTACH_FILES))
                 {
                     Message.Attachment att = cleanLog.sendFile(file).complete().getAttachments().get(0);
                     fileEmbed.setDescription("[`\uD83D\uDCC4 View`]("+getTextUrl(att)+") | [`\uD83D\uDCE9 Download`]("+att.getUrl()+")");
-                    m.editMessage(mb.setEmbed(fileEmbed.build()).build()).queue();
+                    m.editMessage(mb.setEmbed(fileEmbed.build()).build()).queue(s -> file.delete());
                 }
             });
         });
