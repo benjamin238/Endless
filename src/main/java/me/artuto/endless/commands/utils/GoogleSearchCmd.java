@@ -25,7 +25,7 @@ import com.jagrosh.jdautilities.menu.OrderedMenu;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.managers.GoogleAPIAuth;
+import me.artuto.endless.libraries.GoogleAPIAuth;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;

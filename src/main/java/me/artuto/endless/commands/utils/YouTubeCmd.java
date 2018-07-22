@@ -17,22 +17,17 @@
 
 package me.artuto.endless.commands.utils;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
-import me.artuto.endless.managers.GoogleAPIAuth;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
+import me.artuto.endless.libraries.GoogleAPIAuth;
 import net.dv8tion.jda.core.Permission;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
