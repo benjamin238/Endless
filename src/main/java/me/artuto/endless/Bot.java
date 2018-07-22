@@ -253,8 +253,7 @@ public class Bot extends ListenerAdapter
                 .setGame(Game.playing("[ENDLESS] Loading..."))
                 .setBulkDeleteSplittingEnabled(false)
                 .setAutoReconnect(true)
-                .setEnableShutdownHook(true)
-                .setShardsTotal(3);
+                .setEnableShutdownHook(true);
         if(maintenance)
             builder.addEventListeners(this, client);
         else
