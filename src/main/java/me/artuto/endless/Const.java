@@ -61,6 +61,9 @@ public class Const
     public static String SERVER_SETTINGS = ":wrench:";
     public static String STREAMING = "<:streaming:334859814771359744>";
     public static String VERIFIED = "<:verified:465670198775644161>";
+    public static String VOICE_JOIN = "<:voiceJoin:470420015418572801>";
+    public static String VOICE_LEAVE = "<:voiceLeave:470420087896145941>";
+    public static String VOICE_MOVE = "<:voiceMove:470420166791004172>";
 
     // Roles
     public static String ONLINE_ROLE = "<@&436352838822658049>";

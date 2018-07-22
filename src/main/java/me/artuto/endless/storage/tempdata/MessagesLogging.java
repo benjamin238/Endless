@@ -26,15 +26,14 @@ public class MessagesLogging
 {
     private static HashMap<Long, Message> messages = new HashMap<>();
 
-    public static void addMessage(Long id, Message msg)
+    public static void addMessage(long id, Message msg)
     {
         messages.put(id, msg);
     }
 
-    public static Message getMsg(Long id)
+    public static Message getMsg(long id)
     {
-        if(messages.containsKey(id)) return messages.get(id);
-        else return new MessageBuilder().append("No cached message").build();
+        return messages.get(id);
     }
 
     public static HashMap<Long, Message> getMap()
@@ -42,8 +41,8 @@ public class MessagesLogging
         return messages;
     }
 
-    public static void removeMessage(Long id)
+    public static void removeMessage(long id)
     {
-        if(messages.containsKey(id)) messages.remove(id);
+        messages.remove(id);
     }
 }

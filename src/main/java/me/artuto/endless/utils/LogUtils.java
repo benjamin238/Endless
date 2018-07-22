@@ -70,14 +70,19 @@ public class LogUtils
         return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-"+action.getInternalAction()+"}");
     }
 
-    public static boolean isIssuerIgnored(long id, TextChannel modlog)
+    public static boolean isIssuerIgnored(long id, TextChannel channel)
     {
-        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{ignore:"+id+"}");
+        return !(channel.getTopic()==null) && channel.getTopic().toLowerCase().contains("{ignore:"+id+"}");
     }
 
-    public static boolean isTargetIgnored(long id, TextChannel modlog)
+    public static boolean isTargetIgnored(long id, TextChannel channel)
     {
-        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{ignore:"+id+"}");
+        return !(channel.getTopic()==null) && channel.getTopic().toLowerCase().contains("{ignore:"+id+"}");
+    }
+
+    public static boolean isTypeIgnored(String type, TextChannel modlog)
+    {
+        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-"+type+"}");
     }
 
     public static File getAvatarUpdateImage(UserUpdateAvatarEvent event)
@@ -104,6 +109,27 @@ public class LogUtils
         {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static class UploadedText
+    {
+        private final String id, channel;
+
+        public UploadedText(String id, String channel)
+        {
+            this.id = id;
+            this.channel = channel;
+        }
+
+        public String getCDNUrl()
+        {
+            return "https://cdn.discordapp.com/attachments/470068055322525708/"+id+"/Messages"+channel+".txt";
+        }
+
+        public String getViewUrl()
+        {
+            return "http://txt.discord.website/?txt=470068055322525708/"+id+"/Messages"+channel;
         }
     }
 }

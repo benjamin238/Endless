@@ -37,10 +37,19 @@ public class Sender
     {
         chan.sendFile(file, message).queue();
     }
+    public static void sendFile(MessageChannel chan, File file, Message message, Consumer<Message> success)
+    {
+        chan.sendFile(file, message).queue(success);
+    }
 
     public static void sendMessage(MessageChannel chan, Message message, Consumer<Message> success)
     {
         chan.sendMessage(message).queue(success);
+    }
+
+    public static void sendMessage(MessageChannel chan, Message message)
+    {
+        chan.sendMessage(message).queue();
     }
 
     public static void sendMessage(MessageChannel chan, String message, Consumer<Message> success)

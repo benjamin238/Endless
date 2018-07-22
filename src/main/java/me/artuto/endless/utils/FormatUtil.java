@@ -148,7 +148,7 @@ public class FormatUtil
         return message.replace("@everyone", "@\u0435veryone").replace("@here", "@h\u0435re").trim();
     }
 
-    private static String timeF(OffsetDateTime time, ZoneId zone)
+    public static String timeF(OffsetDateTime time, ZoneId zone)
     {
         return time.atZoneSameInstant(zone).format(DateTimeFormatter.ISO_LOCAL_TIME).substring(0,8);
     }

@@ -92,11 +92,12 @@ public class ModLogging
             mb.setContent(FormatUtil.formatLogClean(CLEAN_FORMAT, time, gs.getTimezone(), id, action.getEmote(), author.getName(),
                     author.getDiscriminator(), action.getVerb(), messages.size(), event.getTextChannel().getIdLong(), crit, reason));
             Sender.sendMessage(modlog, mb.build(), m -> {
-                File file = LogUtils.createMessagesTextFile(messages, "Messages.txt");
-                if(!(file==null) && ChecksUtil.hasPermission(guild.getSelfMember(), modlog, Permission.MESSAGE_ATTACH_FILES))
+                File file = LogUtils.createMessagesTextFile(messages, "Messages"+event.getTextChannel().getId()+".txt");
+                if(!(file==null) && ChecksUtil.hasPermission(guild.getSelfMember(), modlog, Permission.MESSAGE_EMBED_LINKS))
                 {
                     Message.Attachment att = cleanLog.sendFile(file).complete().getAttachments().get(0);
-                    fileEmbed.setDescription("[`\uD83D\uDCC4 View`]("+getTextUrl(att)+") | [`\uD83D\uDCE9 Download`]("+att.getUrl()+")");
+                    LogUtils.UploadedText text = new LogUtils.UploadedText(att.getId(), event.getTextChannel().getId());
+                    fileEmbed.setDescription("[`\uD83D\uDCC4 View`]("+text.getViewUrl()+") | [`\uD83D\uDCE9 Download`]("+text.getCDNUrl()+")");
                     m.editMessage(mb.setEmbed(fileEmbed.build()).build()).queue(s -> file.delete(), e -> file.delete());
                 }
             });
@@ -402,10 +403,5 @@ public class ModLogging
     private String banCacheKey(AuditLogEntry ale, User mod)
     {
         return ale.getGuild().getId()+"|"+ale.getTargetId()+"|"+mod.getId();
-    }
-
-    private String getTextUrl(Message.Attachment att)
-    {
-        return "http://txt.discord.website/?txt=470068055322525708/"+att.getId()+"/Messages";
     }
 }

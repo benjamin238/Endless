@@ -36,6 +36,7 @@ import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.core.events.guild.*;
 import net.dv8tion.jda.core.events.guild.member.*;
 import net.dv8tion.jda.core.events.guild.voice.*;
+import net.dv8tion.jda.core.events.message.MessageBulkDeleteEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.*;
 import net.dv8tion.jda.core.events.message.guild.react.*;
@@ -190,6 +191,13 @@ public class Listener implements CommandListener, EventListener
             GuildMessageDeleteEvent event = (GuildMessageDeleteEvent)preEvent;
             StarboardHandler.checkDeleteMessage(event);
             serverlog.onGuildMessageDelete(event);
+        }
+        else if(preEvent instanceof MessageBulkDeleteEvent)
+        {
+            if(bot.maintenance || !(bot.initialized))
+                return;
+            MessageBulkDeleteEvent event = (MessageBulkDeleteEvent)preEvent;
+            serverlog.onMessageBulkDeleteEvent(event);
         }
         else if(preEvent instanceof GuildMessageUpdateEvent)
         {
