@@ -26,16 +26,16 @@ import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
-public class WelcomeCmd extends EndlessCommand
+public class WelcomeMsgCmd extends EndlessCommand
 {
     private final Bot bot;
 
-    public WelcomeCmd(Bot bot)
+    public WelcomeMsgCmd(Bot bot)
     {
         this.bot = bot;
-        this.name = "welcome";
+        this.name = "welcomemsg";
         this.children = new Command[]{new ChangeCmd()};
-        this.aliases = new String[]{"welcomemessage", "welcomemsg"};
+        this.aliases = new String[]{"welcomemessage"};
         this.help = "Changes or shows the welcome message";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -49,9 +49,9 @@ public class WelcomeCmd extends EndlessCommand
         String msg = GuildUtils.getWelcomeMessage(guild);
 
         if(!(msg==null))
-            event.replySuccess("Welcome message at **"+guild.getName()+"**: `"+msg+"`");
+            event.replySuccess("Welcome message at **"+guild.getName()+"**:\n ```"+msg+"```");
         else
-            event.replyError("No message configured!");
+            event.replyError("No message configured! Use `"+event.getClient().getPrefix()+"welcomemsg change` to set one.");
     }
 
     private class ChangeCmd extends EndlessCommand
@@ -64,7 +64,7 @@ public class WelcomeCmd extends EndlessCommand
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Specify a new welcome message or `none` to disable it.";
-            this.parent = WelcomeCmd.this;
+            this.parent = WelcomeMsgCmd.this;
         }
 
         @Override
@@ -77,6 +77,12 @@ public class WelcomeCmd extends EndlessCommand
             }
             else
             {
+                if(event.getArgs().length()>350)
+                {
+                    event.replyError("The message can't be longer than 350 characters!");
+                    return;
+                }
+
                 bot.gsdm.setWelcomeMessage(event.getGuild(), event.getArgs());
                 event.replySuccess("Welcome message configured.");
             }

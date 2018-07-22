@@ -26,11 +26,11 @@ import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
-public class LeaveCmd extends EndlessCommand
+public class LeaveMsgCmd extends EndlessCommand
 {
     private final Bot bot;
 
-    public LeaveCmd(Bot bot)
+    public LeaveMsgCmd(Bot bot)
     {
         this.bot = bot;
         this.name = "leave";
@@ -49,9 +49,9 @@ public class LeaveCmd extends EndlessCommand
         String msg = GuildUtils.getLeaveMessage(guild);
 
         if(!(msg==null))
-            event.replySuccess("Leave message at **"+guild.getName()+"**: `"+msg+"`");
+            event.replySuccess("Leave message at **"+guild.getName()+"**:\n ```"+msg+"```");
         else
-            event.replyError("No message configured!");
+            event.replyError("No message configured! Use `"+event.getClient().getPrefix()+"leavemsg change` to set one.");
     }
 
     private class ChangeCmd extends EndlessCommand
@@ -59,12 +59,12 @@ public class LeaveCmd extends EndlessCommand
         ChangeCmd()
         {
             this.name = "change";
-            this.help = "Changes the welcome message";
+            this.help = "Changes the leave message";
             this.aliases = new String[]{"set"};
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "Specify a new leave message!";
-            this.parent = LeaveCmd.this;
+            this.parent = LeaveMsgCmd.this;
         }
 
         @Override
@@ -77,6 +77,12 @@ public class LeaveCmd extends EndlessCommand
             }
             else
             {
+                if(event.getArgs().length()>350)
+                {
+                    event.replyError("The message can't be longer than 350 characters!");
+                    return;
+                }
+
                 bot.gsdm.setLeaveMessage(event.getGuild(), event.getArgs());
                 event.replySuccess("Leave message configured.");
             }
