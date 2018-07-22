@@ -17,6 +17,7 @@
 
 package me.artuto.endless;
 
+import com.jagrosh.jagtag.Parser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.CommandListener;
@@ -25,7 +26,9 @@ import me.artuto.endless.handlers.*;
 import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.storage.tempdata.AfkManager;
+import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.TagUtil;
 import me.artuto.endless.utils.TimeUtils;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
@@ -54,6 +57,7 @@ public class Listener implements CommandListener, EventListener
 {
     protected Bot bot;
     private final ModLogging modlog;
+    private final Parser parser;
     private final ServerLogging serverlog;
     private final WebhookClient webhook;
     
@@ -61,6 +65,7 @@ public class Listener implements CommandListener, EventListener
     {
         this.bot = bot;
         this.modlog = bot.modlog;
+        this.parser = TagUtil.parser;
         this.serverlog = bot.serverlog;
         this.webhook = bot.logWebhook;
     }
@@ -336,10 +341,12 @@ public class Listener implements CommandListener, EventListener
         Guild guild = event.getGuild();
         GuildSettings gs = bot.endless.getGuildSettings(guild);
         String welcomeDM = gs.getWelcomeDM();
+        User user = event.getUser();
 
         if(welcomeDM==null)
             return;
 
-        event.getUser().openPrivateChannel().queue(c -> c.sendMessage(FormatUtil.sanitize(welcomeDM)).queue(null, e -> {}));
+        parser.clear().put("user", user).put("guild", guild).put("channel", FinderUtil.getDefaultChannel(guild));
+        user.openPrivateChannel().queue(c -> c.sendMessage(FormatUtil.sanitize(parser.parse(welcomeDM))).queue(null, e -> {}));
     }
 }
