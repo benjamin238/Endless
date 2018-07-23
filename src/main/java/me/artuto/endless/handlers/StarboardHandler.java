@@ -71,7 +71,9 @@ public class StarboardHandler
             if(starredMsg==null)
                 return;
 
-            if(isSameAuthor(starredMsg.getAuthor(), event.getUser()) && event.getReactionEmote().getName().equals("\u2B50"))
+            String emote = Bot.getInstance().endless.getGuildSettings(guild).getStarboardEmote();
+            MessageReaction.ReactionEmote re = event.getReactionEmote();
+            if(isSameAuthor(starredMsg.getAuthor(), event.getUser()) && (re.isEmote()?re.getEmote().getId().equals(emote):re.getName().equals(emote)))
                 return;
 
             if(!(amountPassed(starredMsg))) return;
@@ -93,7 +95,13 @@ public class StarboardHandler
                         return;
 
                     Message originalMsg = originalTc.getMessageById(m.group(4)).complete();
-                    if(isSameAuthor(originalMsg.getAuthor(), event.getUser()) && event.getReactionEmote().getName().equals("\u2B50"))
+                    MessageReaction reaction = originalMsg.getReactions().stream().filter(r -> {
+                        MessageReaction.ReactionEmote reE = r.getReactionEmote();
+                        return (reE.isEmote()?reE.getId().equals(emote):reE.getName().equals(emote));
+                    }).findFirst().orElse(null);
+                    if(reaction==null || reaction.getUsers().complete().contains(event.getUser()))
+                        return;
+                    if(isSameAuthor(originalMsg.getAuthor(), event.getUser()) && (re.isEmote()?re.getId().equals(emote):re.getName().equals(emote)))
                         return;
                     int count = getStarCount(originalMsg)+getStarCount(starredMsg);
                     System.out.println(count);
@@ -135,6 +143,8 @@ public class StarboardHandler
             if(starredMsg==null)
                 return;
 
+            String emote = Bot.getInstance().endless.getGuildSettings(guild).getStarboardEmote();
+            MessageReaction.ReactionEmote re = event.getReactionEmote();
             StarboardMessage starboardMsg;
             TextChannel starboard = GuildUtils.getStarboardChannel(event.getGuild());
 
@@ -150,7 +160,7 @@ public class StarboardHandler
 
                     Message originalMsg = originalTc.getMessageById(m.group(4)).complete();
                     starboardMsg = sdm.getStarboardMessage(originalMsg.getIdLong());
-                    if(isSameAuthor(originalMsg.getAuthor(), event.getUser()) && event.getReactionEmote().getName().equals("\u2B50"))
+                    if(isSameAuthor(originalMsg.getAuthor(), event.getUser()) && (re.isEmote()?re.getId().equals(emote):re.getName().equals(emote)))
                         return;
                     int count = getStarCount(originalMsg)+getStarCount(starredMsg);
 
@@ -247,8 +257,13 @@ public class StarboardHandler
         if(!(Bot.getInstance().dataEnabled))
             return 0;
 
-        List<MessageReaction> reactions = msg.getReactions().stream().filter(r -> r.getReactionEmote().getName().equals("\u2B50")).collect(Collectors.toList());
-        if(reactions.isEmpty()) return 0;
+        List<MessageReaction> reactions = msg.getReactions().stream().filter(r -> {
+            String emote = Bot.getInstance().endless.getGuildSettings(r.getGuild()).getStarboardEmote();
+            MessageReaction.ReactionEmote re = r.getReactionEmote();
+            return (re.isEmote()?re.getId().equals(emote):re.getName().equals(emote));
+        }).collect(Collectors.toList());
+        if(reactions.isEmpty())
+            return 0;
 
         List<User> users = reactions.get(0).getUsers().complete();
 
@@ -269,8 +284,9 @@ public class StarboardHandler
         if(!(Bot.getInstance().dataEnabled))
             return;
 
+        String emote = Bot.getInstance().endless.getGuildSettings(msg.getGuild()).getStarboardEmote();
         TextChannel tc = GuildUtils.getStarboardChannel(msg.getGuild());
-        tc.getMessageById(starboardMsg).queue(s -> s.editMessage(s.getContentRaw().replaceAll(":(\\D+):", getEmote(amount))
+        tc.getMessageById(starboardMsg).queue(s -> s.editMessage(s.getContentRaw().replaceAll(":(\\D+):", getEmote(amount, emote))
                 .replaceAll("\\*\\*(\\d+)\\*\\*", "**"+amount+"**")).queue(),null);
     }
 
@@ -279,6 +295,7 @@ public class StarboardHandler
         EmbedBuilder eb = new EmbedBuilder();
         MessageBuilder msgB = new MessageBuilder();
         StringBuilder sb = new StringBuilder();
+        String emote = Bot.getInstance().endless.getGuildSettings(starboard.getGuild()).getStarboardEmote();
 
         List<Message.Attachment> attachments = starredMsg.getAttachments().stream().filter(a -> !(a.isImage())).collect(Collectors.toList());
         List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
@@ -293,7 +310,7 @@ public class StarboardHandler
         eb.setDescription(sb.toString());
         eb.setColor(Color.ORANGE);
 
-        msgB.setContent(getEmote(getStarCount(starredMsg))+" **"+getStarCount(starredMsg)+"** "+starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
+        msgB.setContent(getEmote(getStarCount(starredMsg), emote)+" **"+getStarCount(starredMsg)+"** "+starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
         msgB.setEmbed(eb.build());
 
         if(!(sdm.addMessage(starredMsg, getStarCount(starredMsg))))
@@ -301,8 +318,11 @@ public class StarboardHandler
         starboard.sendMessage(msgB.build()).queue(s -> sdm.setStarboardMessageId(starredMsg, s.getIdLong()));
     }
 
-    private static String getEmote(Integer count)
+    private static String getEmote(Integer count, String emote)
     {
+        if(!(emote.equals("\u2B50")))
+            return emote;
+
         if(count<5) return ":star:";
         else if(count>5 || count<=10) return ":star2:";
         else if(count>15) return ":dizzy:";

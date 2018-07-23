@@ -22,7 +22,6 @@ import me.artuto.endless.core.entities.*;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 
-import javax.annotation.Nullable;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,13 +38,14 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     private List<Tag> importedTags;
     private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
     private Room.Mode roomMode;
-    private String leaveMsg, welcomeDM, welcomeMsg;
+    private String leaveMsg, starboardEmote, welcomeDM, welcomeMsg;
     private ZoneId tz;
 
     public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
                              List<Ignore> ignoredEntities, List<Role> colorMeRoles, List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId,
                              long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
-                             long starboardId, long welcomeId, Room.Mode roomMode, String leaveMsg, String welcomeDM, String welcomeMsg, ZoneId tz)
+                             long starboardId, long welcomeId, Room.Mode roomMode, String leaveMsg, String starboardEmote,
+                             String welcomeDM, String welcomeMsg, ZoneId tz)
     {
         this.isDefault = isDefault;
         this.prefixes = prefixes;
@@ -66,6 +66,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.welcomeId = welcomeId;
         this.roomMode = roomMode;
         this.leaveMsg = leaveMsg;
+        this.starboardEmote = starboardEmote;
         this.welcomeDM = welcomeDM;
         this.welcomeMsg = welcomeMsg;
         this.tz = tz;
@@ -82,10 +83,10 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     {
         return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && ignoredEntities.isEmpty() && colorMeRoles.isEmpty()
                 && roleMeRoles.isEmpty() && importedTags.isEmpty() && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
-                && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && welcomeDM==null && welcomeMsg==null && tz==EntityBuilder.DEFAULT_TZ;
+                && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && starboardEmote.equals("\u2B50") && welcomeDM==null
+                && welcomeMsg==null && tz==EntityBuilder.DEFAULT_TZ;
     }
 
-    @Nullable
     @Override
     public Collection<String> getPrefixes()
     {
@@ -192,6 +193,12 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public String getLeaveMsg()
     {
         return leaveMsg;
+    }
+
+    @Override
+    public String getStarboardEmote()
+    {
+        return starboardEmote;
     }
 
     @Override
@@ -324,6 +331,11 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public void setStarboardCount(int starboardCount)
     {
         this.starboardCount = starboardCount;
+    }
+
+    public void setStarboardEmote(String starboardEmote)
+    {
+        this.starboardEmote = starboardEmote;
     }
 
     public void setStarboardId(long starboardId)

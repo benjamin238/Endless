@@ -989,4 +989,38 @@ public class GuildSettingsDataManager
             Database.LOG.error("Error while removing a colorme role from the guild "+guild.getId(), e);
         }
     }
+
+    public void setStarboardEmote(Guild guild, String emote)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, starboard_emote FROM GUILD_SETTINGS WHERE guild_id = ?");
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    results.updateString("starboard_emote", emote);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateString("starboard_emote", emote);
+                    results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setStarboardEmote(emote);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            Database.LOG.error("Error while setting the starboard emote for the guild "+guild.getId(), e);
+        }
+    }
 }
