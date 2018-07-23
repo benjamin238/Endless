@@ -17,10 +17,10 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.storage.data.Database;
+import me.artuto.endless.Endless;
+import me.artuto.endless.core.entities.PunishmentType;
 import me.artuto.endless.core.entities.Punishment;
 import me.artuto.endless.core.entities.TempPunishment;
 import me.artuto.endless.utils.ChecksUtil;
@@ -31,10 +31,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.OffsetDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +44,7 @@ public class PunishmentsDataManager
 {
     private final Bot bot;
     private final Connection connection;
+    private final Logger LOG = Endless.getLog(PunishmentsDataManager.class);
 
     public PunishmentsDataManager(Bot bot)
     {
@@ -54,14 +52,15 @@ public class PunishmentsDataManager
         this.connection = bot.db.getConnection();
     }
 
-    public void addPunishment(long user, long guild, Const.PunishmentType type)
+    public void addPunishment(long user, long guild, PunishmentType type)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM PUNISHMENTS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 results.moveToInsertRow();
                 results.updateLong("user_id", user);
@@ -72,37 +71,42 @@ public class PunishmentsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a punishment. User ID: "+user+". Guild ID: "+guild, e);
+            LOG.error("Error while adding a punishment. User ID: {} Guild ID: {}", user, guild, e);
         }
     }
 
-    public void removePunishment(long user, long guild, Const.PunishmentType type)
+    public void removePunishment(long user, long guild, PunishmentType type)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE user_id = %s AND guild_id = %s AND type = \"%s\"", user, guild, type.name())))
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS WHERE user_id = ? AND guild_id = ? AND type = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user);
+            statement.setLong(2, guild);
+            statement.setString(3, type.name());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     results.deleteRow();
             }
-            statement.executeUpdate(String.format("DELETE FROM PUNISHMENTS WHERE user_id = %s AND guild_id = %s AND type = \"%s\"", user, guild, type.name()));
-            statement.closeOnCompletion();
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a punishment. User ID: "+user+". Guild ID: "+guild, e);
+            LOG.error("Error while removing a punishment. User ID: {} Guild ID: {}", user, guild, e);
         }
     }
 
-    public void addTempPunishment(long user, long guild, long time, Const.PunishmentType type)
+    public void addTempPunishment(long user, long guild, long time, PunishmentType type)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM PUNISHMENTS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 results.moveToInsertRow();
                 results.updateLong("user_id", user);
@@ -114,18 +118,22 @@ public class PunishmentsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a temporal punishment. User ID: "+user+". Guild ID: "+guild, e);
+            LOG.error("Error while adding a temporal punishment. User ID: {} Guild ID: {}", user, guild, e);
         }
     }
 
-    public Punishment getPunishment(long user, long guild, Const.PunishmentType type)
+    public Punishment getPunishment(long user, long guild, PunishmentType type)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS WHERE user_id = ? AND guild_id = ? AND type = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user);
+            statement.setLong(2, guild);
+            statement.setString(3, type.name());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE user_id = %s AND guild_id = %s AND type = \"%s\"", user, guild, type.name())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return bot.endlessBuilder.entityBuilder.createPunishment(results);
@@ -135,19 +143,23 @@ public class PunishmentsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting a punishment. User ID: "+user+". Guild ID: "+guild, e);
+            LOG.error("Error while getting a punishment. User ID: {} Guild ID: {}", user, guild, e);
             return null;
         }
     }
 
-    public TempPunishment getTempPunishment(long user, long guild, Const.PunishmentType type)
+    public TempPunishment getTempPunishment(long user, long guild, PunishmentType type)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS WHERE user_id = ? AND guild_id = ? AND type = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user);
+            statement.setLong(2, guild);
+            statement.setString(3, type.name());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE user_id = %s AND guild_id = %s AND type = \"%s\"", user, guild, type.name())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return bot.endlessBuilder.entityBuilder.createTempPunishment(results);
@@ -157,19 +169,21 @@ public class PunishmentsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting a temporal punishment. User ID: "+user+". Guild ID: "+guild, e);
+            LOG.error("Error while getting a temporal punishment. User ID: {} Guild ID: {}", user, guild, e);
             return null;
         }
     }
 
-    public List<Punishment> getPunishments(Const.PunishmentType type)
+    public List<Punishment> getPunishments(PunishmentType type)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS WHERE type = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, type.name());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE type = \"%s\"", type.name())))
+            try(ResultSet results = statement.executeQuery())
             {
                 List<Punishment> list = new LinkedList<>();
 
@@ -180,19 +194,21 @@ public class PunishmentsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the list of punishments.", e);
+            LOG.error("Error while getting the list of punishments.", e);
             return null;
         }
     }
 
-    public List<TempPunishment> getTempPunishments(Const.PunishmentType type)
+    public List<TempPunishment> getTempPunishments(PunishmentType type)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS WHERE type = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, type.name());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PUNISHMENTS WHERE type = \"%s\"", type.name())))
+            try(ResultSet results = statement.executeQuery())
             {
                 List<TempPunishment> list = new LinkedList<>();
 
@@ -203,12 +219,12 @@ public class PunishmentsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the list of temporal punishments.", e);
+            LOG.error("Error while getting the list of temporal punishments.", e);
             return null;
         }
     }
 
-    public void updateTempPunishments(Const.PunishmentType type, ShardManager shardManager)
+    public void updateTempPunishments(PunishmentType type, ShardManager shardManager)
     {
         for(TempPunishment p : getTempPunishments(type))
         {

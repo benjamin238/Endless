@@ -17,13 +17,14 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.core.entities.Room;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import me.artuto.endless.core.entities.impl.IgnoreImpl;
-import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -36,6 +37,7 @@ public class GuildSettingsDataManager
 {
     private final Bot bot;
     private final Connection connection;
+    private final Logger LOG = Endless.getLog(GuildSettingsDataManager.class);
 
     public GuildSettingsDataManager(Bot bot)
     {
@@ -47,10 +49,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, modlog_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, modlog_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(tc==null)
                 {
@@ -83,7 +87,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the modlog channel for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the modlog channel for the guild {}", guild.getId(), e);
         }
     }
 
@@ -91,10 +95,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, serverlog_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, serverlog_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(tc == null)
                 {
@@ -127,7 +133,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the serverlog channel for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the serverlog channel for the guild {}", guild.getId(), e);
         }
     }
 
@@ -135,10 +141,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, welcome_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(tc==null)
                 {
@@ -171,7 +179,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the welcome channel for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the welcome channel for the guild {}", guild.getId(), e);
         }
     }
 
@@ -179,10 +187,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, leave_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, leave_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(tc==null)
                 {
@@ -215,7 +225,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the leave channel for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the leave channel for the guild {}", guild.getId(), e);
         }
     }
 
@@ -223,10 +233,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, welcome_msg FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, welcome_msg FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(message==null)
                 {
@@ -259,7 +271,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the welcome message for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the welcome message for the guild {}", guild.getId(), e);
         }
     }
 
@@ -267,10 +279,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, leave_msg FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, leave_msg FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(message==null)
                 {
@@ -303,7 +317,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the leave message for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the leave message for the guild {}", guild.getId(), e);
         }
     }
 
@@ -311,10 +325,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, starboard_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, starboard_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(tc==null)
                 {
@@ -347,7 +363,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the starboard channel for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the starboard channel for the guild {}", guild.getId(), e);
         }
     }
 
@@ -355,10 +371,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, admin_role_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, admin_role_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(role==null)
                 {
@@ -391,7 +409,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the muted role for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the muted role for the guild {}", guild.getId(), e);
         }
     }
 
@@ -399,10 +417,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, mod_role_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, mod_role_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(role==null)
                 {
@@ -435,7 +455,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the muted role for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the muted role for the guild {}", guild.getId(), e);
         }
     }
 
@@ -443,10 +463,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, starboard_count FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, starboard_count FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -468,7 +490,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the starboard count for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the starboard count for the guild {}", guild.getId(), e);
         }
     }
 
@@ -476,12 +498,14 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, prefixes FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
             String prefixes;
             JSONArray array;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, prefixes FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -508,7 +532,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a prefix for the guild "+guild.getId(), e);
+            LOG.error("Error while adding a prefix for the guild {}", guild.getId(), e);
         }
     }
 
@@ -516,12 +540,14 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, prefixes FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
             String prefixes;
             JSONArray array;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, prefixes FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -556,7 +582,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while removing a prefix for the guild "+guild.getId(), e);
+            LOG.error("Error while removing a prefix for the guild {}", guild.getId(), e);
         }
     }
 
@@ -564,12 +590,14 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, roleme_roles FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
             String roles;
             JSONArray array;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, roleme_roles FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -597,7 +625,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a roleme role for the guild "+guild.getId(), e);
+            LOG.error("Error while adding a roleme role for the guild {}", guild.getId(), e);
         }
     }
 
@@ -605,12 +633,14 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, roleme_roles FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
             String roles;
             JSONArray array;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, roleme_roles FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -645,7 +675,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while removing a roleme role from the guild "+guild.getId(), e);
+            LOG.error("Error while removing a roleme role from the guild {}", guild.getId(), e);
         }
     }
 
@@ -653,10 +683,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, muted_role_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, muted_role_id FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(role==null)
                 {
@@ -689,7 +721,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the muted role for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the muted role for the guild {}", guild.getId(), e);
         }
     }
 
@@ -697,10 +729,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, ban_delete_days FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, ban_delete_days FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(days==0)
                 {
@@ -733,7 +767,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while settings the ban delete days number for the guild "+guild.getId(), e);
+            LOG.error("Error while settings the ban delete days number for the guild {}", guild.getId(), e);
         }
     }
 
@@ -741,10 +775,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM IGNORES WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM IGNORES WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 results.moveToInsertRow();
                 results.updateLong("guild_id", guild.getIdLong());
@@ -758,7 +794,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a ignore for the guild "+guild.getId(), e);
+            LOG.error("Error while adding a ignore for the guild {}", guild.getId(), e);
         }
     }
 
@@ -766,10 +802,12 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM IGNORES WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM IGNORES WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     results.deleteRow();
@@ -780,7 +818,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while removing a ignore for the guild "+guild.getId(), e);
+            LOG.error("Error while removing a ignore for the guild {}", guild.getId(), e);
         }
     }
 
@@ -788,33 +826,24 @@ public class GuildSettingsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, room_mode FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, room_mode FROM GUILD_SETTINGS WHERE guild_id = %s", guild.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
-                if(mode==null)
+                if(results.next())
                 {
-                    if(results.next())
-                    {
-                        results.updateNull("room_mode");
-                        results.updateRow();
-                    }
+                    results.updateString("room_mode", mode.name());
+                    results.updateRow();
                 }
                 else
                 {
-                    if(results.next())
-                    {
-                        results.updateString("room_mode", mode.name());
-                        results.updateRow();
-                    }
-                    else
-                    {
-                        results.moveToInsertRow();
-                        results.updateLong("guild_id", guild.getIdLong());
-                        results.updateString("mode_room", mode.name());
-                        results.insertRow();
-                    }
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateString("mode_room", mode.name());
+                    results.insertRow();
                 }
                 GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
                 settings.setRoomMode(mode);
@@ -824,7 +853,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the room mode for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the room mode for the guild {}", guild.getId(), e);
         }
     }
 
@@ -859,7 +888,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the timezone for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the timezone for the guild {}", guild.getId(), e);
         }
     }
 
@@ -894,7 +923,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the welcome DM for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the welcome DM for the guild {}", guild.getId(), e);
         }
     }
 
@@ -937,7 +966,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a colorme role for the guild "+guild.getId(), e);
+            LOG.error("Error while adding a colorme role for the guild {}", guild.getId(), e);
         }
     }
 
@@ -986,7 +1015,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while removing a colorme role from the guild "+guild.getId(), e);
+            LOG.error("Error while removing a colorme role from the guild {}", guild.getId(), e);
         }
     }
 
@@ -1021,7 +1050,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the starboard emote for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the starboard emote for the guild {}", guild.getId(), e);
         }
     }
 }

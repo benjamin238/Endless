@@ -17,34 +17,36 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
+import me.artuto.endless.Endless;
 import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
 public class DonatorsDataManager
 {
-    private static Connection connection;
+    private final Connection connection;
+    private final Logger LOG = Endless.getLog(DonatorsDataManager.class);
 
     public DonatorsDataManager(Database db)
     {
-        connection = db.getConnection();
+        this.connection = db.getConnection();
     }
 
     public boolean hasDonated(User user)
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT user_id, donation FROM PROFILES WHERE user_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donation FROM PROFILES WHERE user_id = %s", user.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return !(results.getString("donation")==null);
@@ -54,7 +56,7 @@ public class DonatorsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while checking if the specified user has donated. ID: "+user.getId(), e);
+            LOG.error("Error while checking if the specified user has donated. ID: {}", user.getId(), e);
             return false;
         }
     }
@@ -63,10 +65,12 @@ public class DonatorsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT user_id, donation FROM PROFILES WHERE user_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donation FROM PROFILES WHERE user_id = %s", user)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -84,7 +88,7 @@ public class DonatorsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting a donation for the specified user. ID: "+user, e);
+            LOG.error("Error while setting a donation for the specified user. ID: {}", user, e);
         }
     }
 
@@ -92,10 +96,12 @@ public class DonatorsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT user_id, donation FROM PROFILES WHERE user_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, donation FROM PROFILES WHERE user_id = %s", user.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return results.getString("donation");
@@ -105,7 +111,7 @@ public class DonatorsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the donation of the specified user. ID: "+user.getId(), e);
+            LOG.error("Error while getting the donation of the specified user. ID: {}", user.getId(), e);
             return null;
         }
     }
@@ -114,11 +120,12 @@ public class DonatorsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT user_id, donation FROM PROFILES",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
             List<User> users;
 
-            try(ResultSet results = statement.executeQuery("SELECT user_id, donation FROM PROFILES"))
+            try(ResultSet results = statement.executeQuery())
             {
                 users = new LinkedList<>();
                 while(results.next())
@@ -134,7 +141,7 @@ public class DonatorsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the users that donated list.", e);
+            LOG.error("Error while getting the list of donators.", e);
             return null;
         }
     }

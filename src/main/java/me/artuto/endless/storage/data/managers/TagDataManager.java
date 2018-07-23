@@ -17,21 +17,19 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.LocalTag;
 import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.core.entities.impl.GlobalTagImpl;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import me.artuto.endless.core.entities.impl.LocalTagImpl;
-import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.core.entities.Guild;
 import org.json.JSONArray;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +38,7 @@ public class TagDataManager
 {
     private final Bot bot;
     private final Connection connection;
+    private final Logger LOG = Endless.getLog(TagDataManager.class);
 
     public TagDataManager(Bot bot)
     {
@@ -51,9 +50,12 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GLOBAL_TAGS WHERE name = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, name);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GLOBAL_TAGS WHERE name = \"%s\"", name)))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return bot.endlessBuilder.entityBuilder.createTag(results);
@@ -61,7 +63,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting a global tag.", e);
+            LOG.error("Error while getting a global tag.", e);
             return null;
         }
         return null;
@@ -71,29 +73,37 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM LOCAL_TAGS WHERE name = ? AND guild = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, name);
+            statement.setLong(2, guild);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE name = \"%s\" AND guild = %s", name, guild)))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return bot.endlessBuilder.entityBuilder.createLocalTag(results);
+                else
+                    return null;
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting a global tag.", e);
+            LOG.error("Error while getting a local tag.", e);
             return null;
         }
-        return null;
     }
 
     public boolean isImported(long guild, String id)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, imported_tags FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, imported_tags FROM GUILD_SETTINGS WHERE guild_id = \"%s\"", guild)))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -107,7 +117,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while importing a tag. Guild ID: "+guild, e);
+            LOG.error("Error while importing a tag. Guild ID: {}", guild, e);
             return false;
         }
         return false;
@@ -117,8 +127,10 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GLOBAL_TAGS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
+
             try(ResultSet results = statement.executeQuery("SELECT * FROM GLOBAL_TAGS"))
             {
                 List<Tag> list = new LinkedList<>();
@@ -129,7 +141,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the list of global tags.", e);
+            LOG.error("Error while getting the list of global tags.", e);
             return Collections.emptyList();
         }
     }
@@ -138,9 +150,12 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM LOCAL_TAGS WHERE guild = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE guild = %s", guild.getIdLong())))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 List<LocalTag> list = new LinkedList<>();
                 while(results.next())
@@ -150,7 +165,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the list of global tags.", e);
+            LOG.error("Error while getting the list of global tags.", e);
             return Collections.emptyList();
         }
     }
@@ -159,9 +174,11 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GLOBAL_TAGS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GLOBAL_TAGS WHERE name = \"%s\"", name)))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 results.moveToInsertRow();
                 results.updateString("name", name);
@@ -174,7 +191,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a global tag.", e);
+            LOG.error("Error while adding a global tag.", e);
         }
     }
 
@@ -187,8 +204,10 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM LOCAL_TAGS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
+
             try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE name = \"%s\"", name)))
             {
                 results.moveToInsertRow();
@@ -204,7 +223,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a global tag.", e);
+            LOG.error("Error while adding a global tag.", e);
         }
     }
 
@@ -212,14 +231,21 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GLOBAL_TAGS WHERE name = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, name);
             statement.closeOnCompletion();
-            statement.executeUpdate(String.format("DELETE FROM GLOBAL_TAGS WHERE name = \"%s\"", name));
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                    results.deleteRow();
+            }
             ((EndlessCoreImpl)bot.endless).removeGlobalTag(name);
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while deleting a global tag.", e);
+            LOG.error("Error while deleting a global tag.", e);
         }
     }
 
@@ -227,14 +253,22 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM LOCAL_TAGS WHERE name = ? AND guild = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, name);
+            statement.setLong(2, guild);
             statement.closeOnCompletion();
-            statement.executeUpdate(String.format("DELETE FROM LOCAL_TAGS WHERE name = \"%s\" AND guild = %s", name, guild));
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                    results.deleteRow();
+            }
             ((EndlessCoreImpl)bot.endless).removeLocalTag(guild, name);
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while deleting a local tag.", e);
+            LOG.error("Error while deleting a local tag.", e);
         }
     }
 
@@ -242,9 +276,12 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, imported_tags FROM GUILD_SETTINGS WHERE guild_id = \"%s\"", guild)))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -274,7 +311,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while importing a tag. Guild ID: "+guild, e);
+            LOG.error("Error while importing a tag. Guild ID: {}", guild, e);
         }
     }
 
@@ -282,9 +319,12 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT guild_id, imported_tags FROM GUILD_SETTINGS WHERE guild_id = %s", guild)))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -321,7 +361,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while removing a prefix for the guild "+guild, e);
+            LOG.error("Error while removing a prefix for the guild {}", guild, e);
         }
     }
 
@@ -329,9 +369,12 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GLOBAL_TAGS WHERE name = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, name);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GLOBAL_TAGS WHERE name = \"%s\"", name)))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -343,7 +386,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while editing a global tag.", e);
+            LOG.error("Error while editing a global tag.", e);
         }
     }
 
@@ -351,9 +394,13 @@ public class TagDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM LOCAL_TAGS WHERE name = ? AND guild = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, name);
+            statement.setLong(2, guild);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM LOCAL_TAGS WHERE name = \"%s\" AND guild = %s", name, guild)))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -365,7 +412,7 @@ public class TagDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while editing a local tag.", e);
+            LOG.error("Error while editing a local tag.", e);
         }
     }
 }

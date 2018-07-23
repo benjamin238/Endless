@@ -18,7 +18,6 @@
 package me.artuto.endless.core.entities;
 
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
 import me.artuto.endless.core.entities.impl.*;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audit.AuditLogChange;
@@ -53,7 +52,7 @@ public class EntityBuilder
     {
         Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         gmt.setTimeInMillis(results.getLong("time"));
-        return new BlacklistImpl(Const.BlacklistType.valueOf(results.getString("type")),
+        return new BlacklistImpl(BlacklistType.valueOf(results.getString("type")),
                 results.getLong("id"),
                 OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()),
                 results.getString("reason"));
@@ -230,7 +229,7 @@ public class EntityBuilder
     {
         Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         gmt.setTimeInMillis(results.getLong("time"));
-        return new PunishmentImpl(Const.PunishmentType.valueOf(results.getString("type")),
+        return new PunishmentImpl(PunishmentType.valueOf(results.getString("type")),
                 results.getLong("guild_id"),
                 results.getLong("user_id"),
                 OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()));
@@ -246,7 +245,7 @@ public class EntityBuilder
 
     public Punishment createPunishment(ResultSet results) throws SQLException
     {
-        return new PunishmentImpl(Const.PunishmentType.valueOf(results.getString("type")),
+        return new PunishmentImpl(PunishmentType.valueOf(results.getString("type")),
                 results.getLong("guild_id"),
                 results.getLong("user_id"),
                 null);

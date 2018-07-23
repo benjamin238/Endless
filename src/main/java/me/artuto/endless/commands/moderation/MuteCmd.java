@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.*;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.core.entities.PunishmentType;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.GuildUtils;
@@ -88,7 +89,7 @@ public class MuteCmd extends EndlessCommand
         mutedRole = GuildUtils.getMutedRole(event.getGuild());
         int minutes = time/60;
         Instant unmuteTime = Instant.now().plus(minutes, ChronoUnit.MINUTES);
-        Const.PunishmentType type = time==0?Const.PunishmentType.MUTE:Const.PunishmentType.TEMPMUTE;
+        PunishmentType type = time==0?PunishmentType.MUTE:PunishmentType.TEMPMUTE;
         if(time<0)
         {
             event.replyError("The time cannot be negative!");
@@ -111,9 +112,9 @@ public class MuteCmd extends EndlessCommand
                 event.replyError("I can't interact with the Muted role!");
                 return;
             }
-            if(type==Const.PunishmentType.MUTE && (!(bot.pdm.getPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE)==null)))
-                bot.pdm.removePunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE);
-            else if(type==Const.PunishmentType.TEMPMUTE && (!(bot.pdm.getPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE)==null)))
+            if(type==PunishmentType.MUTE && (!(bot.pdm.getPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), PunishmentType.TEMPMUTE)==null)))
+                bot.pdm.removePunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), PunishmentType.TEMPMUTE);
+            else if(type==PunishmentType.TEMPMUTE && (!(bot.pdm.getPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), PunishmentType.MUTE)==null)))
             {
                 event.replyWarning("This user is already muted!");
                 return;
@@ -131,12 +132,12 @@ public class MuteCmd extends EndlessCommand
                         {
                             bot.modlog.logTemp(Action.TEMP_MUTE, event, fMins, OffsetDateTime.now(), reason, target.getUser());
                             bot.pdm.addTempPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), unmuteTime.toEpochMilli(),
-                                    Const.PunishmentType.TEMPMUTE);
+                                    PunishmentType.TEMPMUTE);
                         }
                         else
                         {
                             bot.modlog.logGeneral(Action.MUTE, event, OffsetDateTime.now(), reason, target.getUser());
-                            bot.pdm.addPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE);
+                            bot.pdm.addPunishment(target.getUser().getIdLong(), event.getGuild().getIdLong(), PunishmentType.MUTE);
                         }
             }, e -> {
                         event.replyError(String.format("An error happened when muting %s", username));

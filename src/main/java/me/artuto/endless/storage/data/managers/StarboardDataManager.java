@@ -17,21 +17,19 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.storage.data.Database;
+import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.StarboardMessage;
 import net.dv8tion.jda.core.entities.Message;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class StarboardDataManager
 {
     private final Bot bot;
     private final Connection connection;
+    private final Logger LOG = Endless.getLog(StarboardDataManager.class);
 
     public StarboardDataManager(Bot bot)
     {
@@ -39,14 +37,15 @@ public class StarboardDataManager
         this.connection = bot.db.getConnection();
     }
 
-    public boolean addMessage(Message msg, Integer amount)
+    public void addMessage(Message msg, int amount)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM STARBOARD",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM STARBOARD WHERE msg_id = %s", msg.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 results.moveToInsertRow();
                 results.updateLong("msg_id", msg.getIdLong());
@@ -54,73 +53,73 @@ public class StarboardDataManager
                 results.updateLong("guild_id", msg.getGuild().getIdLong());
                 results.updateInt("star_amount", amount);
                 results.insertRow();
-                return true;
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a message to the starboard. Message ID: "+msg.getId()+" TC ID: "+msg.getTextChannel().getId(), e);
-            return false;
+            LOG.error("Error while adding a message to the starboard. Message ID: {} TC ID: {}", msg.getIdLong(), msg.getTextChannel().getIdLong(), e);
         }
     }
 
-    public boolean setStarboardMessageId(Message msg, Long starboardMsg)
+    public void setStarboardMessageId(Message msg, long starboardMsg)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM STARBOARD WHERE msg_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, msg.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT msg_id, starboard_msg_id FROM STARBOARD WHERE msg_id = %s", msg.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
                     results.updateLong("starboard_msg_id", starboardMsg);
                     results.updateRow();
-                    return true;
                 }
-                else return false;
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the starboard message ID. Message ID: "+msg.getId()+". TC ID: "+msg.getTextChannel().getId()+". Starboard Message ID: "+starboardMsg, e);
-            return false;
+            LOG.error("Error while setting the starboard message ID. Message ID: {} TC ID: {} Starboard Message ID: ",
+                    msg.getIdLong(), msg.getTextChannel().getIdLong(), starboardMsg, e);
         }
     }
 
-    public boolean updateCount(Long msg, Integer amount)
+    public void updateCount(long msg, int amount)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM STARBOARD WHERE msg_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, msg);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM STARBOARD WHERE msg_id = %s", msg)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
                     results.updateInt("star_amount", amount);
                     results.updateRow();
-                    return true;
                 }
-                else return false;
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while updating the count of stars of a message. Message ID: "+msg, e);
-            return false;
+            LOG.error("Error while updating the count of stars of a message. Message ID: {}", msg, e);
         }
     }
 
-    public StarboardMessage getStarboardMessage(Long message)
+    public StarboardMessage getStarboardMessage(long msg)
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM STARBOARD WHERE msg_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, msg);
             statement.closeOnCompletion();
-            try(ResultSet results = statement.executeQuery(String.format("SELECT msg_id, tc_id, guild_id, star_amount, starboard_msg_id FROM STARBOARD WHERE msg_id = %s", message)))
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return bot.endlessBuilder.entityBuilder.createStarboardMessage(results);
@@ -130,27 +129,29 @@ public class StarboardDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting a message from the starboard. Message ID: "+message, e);
+            LOG.error("Error while getting a message from the starboard. Message ID: {}", msg, e);
             return null;
         }
     }
 
-    public void deleteMessage(Long msg, Long starboardMsg)
+    public void deleteMessage(long msg, long starboardMsg)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM STARBOARD WHERE msg_id = \"%s\"", msg)))
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM STARBOARD WHERE msg_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, msg);
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     results.deleteRow();
             }
-            statement.executeUpdate(String.format("DELETE FROM STARBOARD WHERE starboard_msg_id = \"%s\"", starboardMsg));
-            statement.closeOnCompletion();
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while deleting a message from the starboard. Message ID: "+msg+". Starboard Message ID: "+starboardMsg, e);
+            LOG.error("Error while deleting a message from the starboard. Message ID: {} Starboard Message ID: {}", msg, starboardMsg, e);
         }
     }
 }

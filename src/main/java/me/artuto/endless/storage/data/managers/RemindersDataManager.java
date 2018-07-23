@@ -17,21 +17,17 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.Reminder;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.core.entities.impl.ReminderImpl;
-import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.User;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -44,6 +40,7 @@ public class RemindersDataManager
 {
     private final Bot bot;
     private final Connection connection;
+    private final Logger LOG = Endless.getLog(RemindersDataManager.class);
 
     public RemindersDataManager(Bot bot)
     {
@@ -55,10 +52,11 @@ public class RemindersDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM REMINDERS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM REMINDERS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 results.moveToInsertRow();
                 results.updateLong("user_id", userId);
@@ -70,7 +68,7 @@ public class RemindersDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while creating a reminder. User ID: "+userId, e);
+            LOG.error("Error while creating a reminder. User ID: {}", userId, e);
         }
     }
 
@@ -78,10 +76,13 @@ public class RemindersDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM REMINDERS WHERE user_id = ? AND id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, userId);
+            statement.setLong(2, id);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM REMINDERS WHERE user_id = %s AND id = %s", userId, id)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     results.deleteRow();
@@ -89,7 +90,7 @@ public class RemindersDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while deleting a reminder. User ID: "+userId, e);
+            LOG.error("Error while deleting a reminder. User ID: [}", userId, e);
         }
     }
 
@@ -97,11 +98,13 @@ public class RemindersDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM REMINDERS WHERE user_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, userId);
             statement.closeOnCompletion();
             List<Reminder> list;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM REMINDERS WHERE user_id = %s", userId)))
+            try(ResultSet results = statement.executeQuery())
             {
                 list = new LinkedList<>();
                 while(results.next())
@@ -111,7 +114,7 @@ public class RemindersDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a list of reminders of a specified user. User ID: "+userId, e);
+            LOG.error("Error while adding a list of reminders of a specified user. User ID: {}", userId, e);
             return Collections.emptyList();
         }
     }
@@ -145,11 +148,12 @@ public class RemindersDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM REMINDERS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
             List<Reminder> list;
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM REMINDERS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 list = new LinkedList<>();
                 while(results.next())
@@ -159,7 +163,7 @@ public class RemindersDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding a list of reminders", e);
+            LOG.error("Error while adding a list of reminders", e);
             return Collections.emptyList();
         }
     }

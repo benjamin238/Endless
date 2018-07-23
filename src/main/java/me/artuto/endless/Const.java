@@ -73,18 +73,4 @@ public class Const
 
     // URLs
     public static String BING_MAPS = "https://dev.virtualearth.net/REST/v1/Locations/?query=%s&maxResults=1&key=%s";
-
-    // Enums
-    public enum BlacklistType
-    {
-        GUILD,
-        USER
-    }
-    public enum PunishmentType
-    {
-        BAN,
-        MUTE,
-        TEMPBAN,
-        TEMPMUTE
-    }
 }

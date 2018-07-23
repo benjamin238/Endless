@@ -34,6 +34,7 @@ import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.EndlessCoreBuilder;
+import me.artuto.endless.core.entities.PunishmentType;
 import me.artuto.endless.handlers.IgnoreHandler;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.storage.data.managers.*;
@@ -281,7 +282,7 @@ public class Bot extends ListenerAdapter
                 this.endless = endlessBuilder.build();
                 if(dataEnabled)
                 {
-                    muteScheduler.scheduleWithFixedDelay(() -> pdm.updateTempPunishments(Const.PunishmentType.TEMPMUTE, shardManager),
+                    muteScheduler.scheduleWithFixedDelay(() -> pdm.updateTempPunishments(PunishmentType.TEMPMUTE, shardManager),
                             0, 10, TimeUnit.SECONDS);
                     pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 0, 10, TimeUnit.SECONDS);
                     reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 10, TimeUnit.SECONDS);

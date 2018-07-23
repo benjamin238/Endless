@@ -17,15 +17,13 @@
 
 package me.artuto.endless.core.entities;
 
-import me.artuto.endless.Const;
-
 /**
  * @author Artuto
  */
 
 public interface Punishment
 {
-    Const.PunishmentType getType();
+    PunishmentType getType();
 
     long getGuildId();
 

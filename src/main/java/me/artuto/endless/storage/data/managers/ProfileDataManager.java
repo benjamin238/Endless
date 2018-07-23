@@ -17,21 +17,19 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.storage.data.Database;
+import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.Profile;
 import net.dv8tion.jda.core.entities.User;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class ProfileDataManager
 {
     private final Bot bot;
     private final Connection connection;
+    private final Logger LOG = Endless.getLog(ProfileDataManager.class);
 
     public ProfileDataManager(Bot bot)
     {
@@ -43,24 +41,22 @@ public class ProfileDataManager
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PROFILES where user_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user.getIdLong());
             statement.closeOnCompletion();
-            Profile p;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PROFILES WHERE USER_ID = %s", user.getIdLong())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
-                {
-                    p = bot.endlessBuilder.entityBuilder.createProfile(results, user);
-                }
+                    return bot.endlessBuilder.entityBuilder.createProfile(results, user);
                 else
-                    p = bot.db.createDefaultProfile(user);
+                    return bot.db.createDefaultProfile(user);
             }
-            return p;
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the profile of the specified user. ID: "+user.getId(), e);
+            LOG.error("Error while getting the profile of the specified user. ID: {}", user.getId(), e);
             return bot.db.createDefaultProfile(user);
         }
     }
@@ -69,17 +65,19 @@ public class ProfileDataManager
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PROFILES where user_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PROFILES WHERE USER_ID = %s", user.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 return results.next();
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while checking if the specified user has a profile. ID: "+user.getId(), e);
+            LOG.error("Error while checking if the specified user has a profile. ID: {}", user.getId(), e);
             return false;
         }
     }
@@ -88,10 +86,12 @@ public class ProfileDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PROFILES where user_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM PROFILES WHERE user_id = %s", user.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -109,7 +109,7 @@ public class ProfileDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the "+field+" of the specified user. ID: "+user.getId(), e);
+            LOG.error("Error while setting the {} of the specified user. ID: {}", field, user.getId(), e);
         }
     }
 
@@ -117,10 +117,12 @@ public class ProfileDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT user_id, timezone FROM PROFILES where user_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT user_id, timezone FROM PROFILES WHERE user_id = %s", user.getId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -138,7 +140,7 @@ public class ProfileDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the timezone of the specified user. ID: "+user.getId(), e);
+            LOG.error("Error while setting the timezone of the specified user. ID: {}", user.getId(), e);
         }
     }
 }

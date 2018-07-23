@@ -17,17 +17,14 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.Poll;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.handlers.PollHandler;
-import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -41,6 +38,7 @@ public class PollsDataManager
 {
     private final Bot bot;
     private final Connection connection;
+    private final Logger LOG = Endless.getLog(PollsDataManager.class);
 
     public PollsDataManager(Bot bot)
     {
@@ -52,10 +50,11 @@ public class PollsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM POLLS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM POLLS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 results.moveToInsertRow();
                 results.updateLong("channel_id", tcId);
@@ -67,7 +66,7 @@ public class PollsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while creating a poll.", e);
+            LOG.error("Error while creating a poll.", e);
         }
     }
 
@@ -75,11 +74,13 @@ public class PollsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM POLLS WHERE channel_id = ? AND msg_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, poll.getTextChannelId());
+            statement.setLong(2, poll.getMessageId());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM POLLS WHERE channel_id = %s AND msg_id = %s",
-                    poll.getTextChannelId(), poll.getMessageId())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     results.deleteRow();
@@ -87,7 +88,7 @@ public class PollsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while deleting a poll.", e);
+            LOG.error("Error while deleting a poll.", e);
         }
     }
 
@@ -107,11 +108,12 @@ public class PollsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM POLLS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
             List<Poll> polls = new LinkedList<>();
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM POLLS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 while(results.next())
                     polls.add(bot.endlessBuilder.entityBuilder.createPoll(results));
@@ -120,7 +122,7 @@ public class PollsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while deleting a poll.", e);
+            LOG.error("Error while deleting a poll.", e);
             return Collections.emptyList();
         }
     }

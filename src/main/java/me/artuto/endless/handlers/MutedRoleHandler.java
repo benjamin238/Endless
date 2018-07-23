@@ -22,6 +22,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.core.entities.ParsedAuditLog;
 import me.artuto.endless.core.entities.Punishment;
+import me.artuto.endless.core.entities.PunishmentType;
 import me.artuto.endless.core.entities.TempPunishment;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.GuildUtils;
@@ -78,7 +79,7 @@ public class MutedRoleHandler
                 return;
 
             Bot.getInstance().modlog.logManual(Action.MANUAL_MUTE, guild, OffsetDateTime.now(), reason, author, target);
-            Bot.getInstance().pdm.addPunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE);
+            Bot.getInstance().pdm.addPunishment(target.getIdLong(), guild.getIdLong(), PunishmentType.MUTE);
         }, e -> {});
     }
 
@@ -109,8 +110,8 @@ public class MutedRoleHandler
             User target = parsedAuditLog.getTarget();
 
             Bot.getInstance().modlog.logManual(Action.MANUAL_UNMUTE, guild, OffsetDateTime.now(), reason, author, target);
-            Bot.getInstance().pdm.removePunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.MUTE);
-            Bot.getInstance().pdm.removePunishment(target.getIdLong(), guild.getIdLong(), Const.PunishmentType.TEMPMUTE);
+            Bot.getInstance().pdm.removePunishment(target.getIdLong(), guild.getIdLong(), PunishmentType.MUTE);
+            Bot.getInstance().pdm.removePunishment(target.getIdLong(), guild.getIdLong(), PunishmentType.TEMPMUTE);
         }, e -> {});
     }
 
@@ -120,8 +121,8 @@ public class MutedRoleHandler
             return;
 
         Guild guild = event.getGuild();
-        Punishment punishment = Bot.getInstance().pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.MUTE);
-        TempPunishment tempPunishment = (TempPunishment)Bot.getInstance().pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), Const.PunishmentType.TEMPMUTE);
+        Punishment punishment = Bot.getInstance().pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), PunishmentType.MUTE);
+        TempPunishment tempPunishment = (TempPunishment)Bot.getInstance().pdm.getPunishment(event.getUser().getIdLong(), event.getGuild().getIdLong(), PunishmentType.TEMPMUTE);
 
         if(!(punishment==null))
         {

@@ -18,30 +18,24 @@
 package me.artuto.endless.storage.data;
 
 import me.artuto.endless.Bot;
+import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.*;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
-import me.artuto.endless.core.entities.impl.IgnoreImpl;
 import me.artuto.endless.core.entities.impl.ProfileImpl;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
-import org.json.JSONArray;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Database
 {
     public final List<Long> toDelete = new LinkedList<>();
     private final Bot bot;
     private final Connection connection;
-
-    public static final Logger LOG = LoggerFactory.getLogger(Database.class);
+    private final Logger LOG = Endless.getLog(Database.class);
 
     public GuildSettings createDefaultSettings(Guild guild)
     {
@@ -74,22 +68,22 @@ public class Database
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
-            GuildSettings gs;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild.getIdLong())))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return bot.endlessBuilder.entityBuilder.createGuildSettings(guild, results);
                 else
-                    gs = createDefaultSettings(guild);
+                    return createDefaultSettings(guild);
             }
-            return gs;
         }
         catch(SQLException e)
         {
-            LOG.warn("Error while getting the settings of a guild. ID: "+guild.getId(), e);
+            LOG.error("Error while getting the settings of a guild. ID: {}", guild.getId(), e);
             return createDefaultSettings(guild);
         }
     }
@@ -98,10 +92,11 @@ public class Database
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GUILD_SETTINGS", ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM GUILD_SETTINGS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 Guild guild;
                 List<Guild> guilds = new LinkedList<>();
@@ -119,7 +114,7 @@ public class Database
         }
         catch(SQLException e)
         {
-            LOG.warn("Error while getting settings", e);
+            LOG.error("Error while getting settings", e);
             return Collections.emptyList();
         }
     }
@@ -128,10 +123,12 @@ public class Database
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM IGNORES WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM IGNORES WHERE GUILD_ID = %s", guild.getIdLong())))
+            try(ResultSet results = statement.executeQuery())
             {
                 List<Ignore> ignores = new LinkedList<>();
                 while(results.next())
@@ -141,7 +138,7 @@ public class Database
         }
         catch(SQLException e)
         {
-            LOG.warn("Error while getting the list of ignored entities of a guild. ID: "+guild.getIdLong(), e);
+            LOG.error("Error while getting the list of ignored entities of a guild. ID: {} ", guild.getIdLong(), e);
             return Collections.emptyList();
         }
     }
@@ -150,17 +147,19 @@ public class Database
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = %s", guild)))
+            try(ResultSet results = statement.executeQuery())
             {
                 return results.next();
             }
         }
         catch(SQLException e)
         {
-            LOG.warn("Error while checking the settings of a guild. ID: "+guild, e);
+            LOG.error("Error while checking the settings of a guild. ID: {}", guild, e);
             return false;
         }
     }
@@ -169,7 +168,8 @@ public class Database
     {
         try
         {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = ?");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM GUILD_SETTINGS WHERE GUILD_ID = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.setLong(1, guild);
             statement.closeOnCompletion();
 
@@ -181,7 +181,7 @@ public class Database
         }
         catch(SQLException e)
         {
-            LOG.warn("Error while deleting the settings of a guild. ID: {}", guild, e);
+            LOG.error("Error while deleting the settings of a guild. ID: {}", guild, e);
         }
     }
 
@@ -193,7 +193,7 @@ public class Database
         }
         catch(SQLException e)
         {
-            LOG.warn("Unexpected error while shutdown process!", e);
+            LOG.error("Unexpected error while shutdown process!", e);
         }
     }
 }

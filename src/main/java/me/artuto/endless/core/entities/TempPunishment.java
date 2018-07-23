@@ -17,8 +17,6 @@
 
 package me.artuto.endless.core.entities;
 
-import me.artuto.endless.Const;
-
 import java.time.OffsetDateTime;
 
 /**
@@ -27,7 +25,7 @@ import java.time.OffsetDateTime;
 
 public interface TempPunishment
 {
-    Const.PunishmentType getType();
+    PunishmentType getType();
 
     long getGuildId();
 

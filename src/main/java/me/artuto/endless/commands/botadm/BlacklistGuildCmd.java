@@ -24,6 +24,7 @@ import me.artuto.endless.Const;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.core.entities.Blacklist;
+import me.artuto.endless.core.entities.BlacklistType;
 import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -93,7 +94,7 @@ public class BlacklistGuildCmd extends EndlessCommand
                 return;
             }
 
-            bot.bdm.addBlacklist(Const.BlacklistType.GUILD, guild.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
+            bot.bdm.addBlacklist(BlacklistType.GUILD, guild.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
             event.replySuccess("Added **"+guild.getName()+"** to the blacklist.");
             guild.leave().queue();
         }

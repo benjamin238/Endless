@@ -17,8 +17,8 @@
 
 package me.artuto.endless.core.entities.impl;
 
-import me.artuto.endless.Const;
 import me.artuto.endless.core.entities.Punishment;
+import me.artuto.endless.core.entities.PunishmentType;
 import me.artuto.endless.core.entities.TempPunishment;
 
 import java.time.OffsetDateTime;
@@ -29,11 +29,11 @@ import java.time.OffsetDateTime;
 
 public class PunishmentImpl implements Punishment, TempPunishment
 {
-    private Const.PunishmentType type;
+    private PunishmentType type;
     private long guildId, userId;
     private OffsetDateTime expiryTime;
 
-    public PunishmentImpl(Const.PunishmentType type, long guildId, long userId, OffsetDateTime expiryTime)
+    public PunishmentImpl(PunishmentType type, long guildId, long userId, OffsetDateTime expiryTime)
     {
         this.type = type;
         this.guildId = guildId;
@@ -42,7 +42,7 @@ public class PunishmentImpl implements Punishment, TempPunishment
     }
 
     @Override
-    public Const.PunishmentType getType()
+    public PunishmentType getType()
     {
         return type;
     }

@@ -17,19 +17,12 @@
 
 package me.artuto.endless.core.entities;
 
-import java.time.OffsetDateTime;
-
 /**
  * @author Artuto
  */
 
-public interface Blacklist
+public enum BlacklistType
 {
-    BlacklistType getType();
-
-    long getId();
-
-    OffsetDateTime getTime();
-
-    String getReason();
+    GUILD,
+    USER
 }

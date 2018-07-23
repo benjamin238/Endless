@@ -32,8 +32,6 @@ import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEv
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveAllEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.core.exceptions.ErrorResponseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.List;
@@ -48,7 +46,6 @@ import java.util.stream.Collectors;
 
 public class StarboardHandler
 {
-    private static final Logger LOG = LoggerFactory.getLogger("Starboard");
     private static final Pattern MESSAGE = Pattern.compile(":(\\D+): \\*\\*(\\d+)\\*\\* <#(\\d{17,20})> ID: (\\d{17,20})");
     private static final ScheduledExecutorService thread = Bot.getInstance().starboardThread;
     private static final StarboardDataManager sdm = Bot.getInstance().sdm;
@@ -105,10 +102,8 @@ public class StarboardHandler
                         return;
                     int count = getStarCount(originalMsg)+getStarCount(starredMsg);
 
-                    if(!(sdm.updateCount(originalMsg.getIdLong(), count)))
-                        LOG.warn("Error when updating star count. Message ID: "+originalMsg.getId()+" TC ID: "+originalMsg.getTextChannel().getId());
-                    else
-                        updateCount(starredMsg, sdm.getStarboardMessage(originalMsg.getIdLong()).getStarboardMessageIdLong(), count);
+                    sdm.updateCount(originalMsg.getIdLong(), count);
+                    updateCount(starredMsg, sdm.getStarboardMessage(originalMsg.getIdLong()).getStarboardMessageIdLong(), count);
                 }
                 else
                     addMessage(starredMsg, starboard);
@@ -117,10 +112,8 @@ public class StarboardHandler
             {
                 if(existsOnStarboard(starredMsg.getIdLong()))
                 {
-                    if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
-                        LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
-                    else
-                        updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+                    sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg));
+                    updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
                 }
                 else
                     addMessage(starredMsg, starboard);
@@ -169,10 +162,8 @@ public class StarboardHandler
                         return;
                     }
 
-                    if(!(sdm.updateCount(originalMsg.getIdLong(), count)))
-                        LOG.warn("Error when updating star count. Message ID: "+originalMsg.getId()+" TC ID: "+originalMsg.getTextChannel().getId());
-                    else
-                        updateCount(starredMsg, sdm.getStarboardMessage(originalMsg.getIdLong()).getStarboardMessageIdLong(), count);
+                    sdm.updateCount(originalMsg.getIdLong(), count);
+                    updateCount(starredMsg, sdm.getStarboardMessage(originalMsg.getIdLong()).getStarboardMessageIdLong(), count);
                 }
             }
 
@@ -185,10 +176,8 @@ public class StarboardHandler
                     return;
                 }
 
-                if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
-                    LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
-                else
-                    updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+                sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg));
+                updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
             }
         });
     }
@@ -313,8 +302,7 @@ public class StarboardHandler
                 starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
         msgB.setEmbed(eb.build());
 
-        if(!(sdm.addMessage(starredMsg, getStarCount(starredMsg))))
-            LOG.warn("Error when adding message to starboard. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
+        sdm.addMessage(starredMsg, getStarCount(starredMsg));
         starboard.sendMessage(msgB.build()).queue(s -> sdm.setStarboardMessageId(starredMsg, s.getIdLong()));
     }
 
@@ -323,10 +311,14 @@ public class StarboardHandler
         if(!(emote.equals("\u2B50")))
             return guild.getEmoteById(emote).getAsMention();
 
-        if(count<5) return ":star:";
-        else if(count>5 || count<=10) return ":star2:";
-        else if(count>15) return ":dizzy:";
-        else return ":star:";
+        if(count<5)
+            return ":star:";
+        else if(count>5)
+            return ":star2:";
+        else if(count>15)
+            return ":dizzy:";
+        else
+            return ":star:";
     }
 
     private static void delete(TextChannel starboard, StarboardMessage starboardMsg)

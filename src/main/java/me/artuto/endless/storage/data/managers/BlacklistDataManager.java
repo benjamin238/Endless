@@ -17,27 +17,24 @@
 
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
+import me.artuto.endless.Endless;
+import me.artuto.endless.core.entities.BlacklistType;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.core.entities.Blacklist;
-import me.artuto.endless.core.entities.impl.BlacklistImpl;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.OffsetDateTime;
+import java.sql.*;
 import java.util.*;
 
 public class BlacklistDataManager
 {
     private final Bot bot;
     private final Connection connection;
+    private final Logger LOG = Endless.getLog(BlacklistDataManager.class);
 
     public BlacklistDataManager(Bot bot)
     {
@@ -49,10 +46,12 @@ public class BlacklistDataManager
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM BLACKLISTED_ENTITIES WHERE id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, id);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE id = %s", id)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return bot.endlessBuilder.entityBuilder.createBlacklist(results);
@@ -62,19 +61,21 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while checking if the specified ID is blacklisted. ID: "+id, e);
+            LOG.error("Error while checking if the specified ID is blacklisted. ID: {}", id, e);
             return null;
         }
     }
 
-    public void addBlacklist(Const.BlacklistType type, long id, long time, String reason)
+    public void addBlacklist(BlacklistType type, long id, long time, String reason)
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM BLACKLISTED_ENTITIES WHERE id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, id);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE id = %s", id)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -100,7 +101,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while adding the specified ID to the blacklisted entities list. ID: "+id, e);
+            LOG.error("Error while adding the specified ID to the blacklisted entities list. ID: {}", id, e);
         }
     }
 
@@ -108,21 +109,25 @@ public class BlacklistDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM BLACKLISTED_ENTITIES WHERE id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, id);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE id = %s", id)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
+                {
                     results.deleteRow();
-                Blacklist blacklist = bot.endless.getBlacklist(id);
-                if(!(blacklist==null))
-                    ((EndlessCoreImpl)bot.endless).removeBlacklist(blacklist);
+                    Blacklist blacklist = bot.endless.getBlacklist(id);
+                    if(!(blacklist==null))
+                        ((EndlessCoreImpl)bot.endless).removeBlacklist(blacklist);
+                }
             }
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while removing the specified ID from the blacklisted entities list. ID: "+id, e);
+            LOG.error("Error while removing the specified ID from the blacklisted entities list. ID: {}", id, e);
         }
     }
 
@@ -130,11 +135,12 @@ public class BlacklistDataManager
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = ?");
+            statement.setString(1, BlacklistType.GUILD.name());
             statement.closeOnCompletion();
             Map<Guild, Blacklist> map;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = \"%s\"", Const.BlacklistType.GUILD.name())))
+            try(ResultSet results = statement.executeQuery())
             {
                 map = new HashMap<>();
                 while(results.next())
@@ -150,7 +156,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the blacklisted guilds map.", e);
+            LOG.error("Error while getting the blacklisted guilds map.", e);
             return null;
         }
     }
@@ -159,11 +165,13 @@ public class BlacklistDataManager
     {
         try
         {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, BlacklistType.USER.name());
             statement.closeOnCompletion();
             Map<User, Blacklist> map;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = \"%s\"", Const.BlacklistType.USER.name())))
+            try(ResultSet results = statement.executeQuery())
             {
                 map = new HashMap<>();
                 while(results.next())
@@ -176,59 +184,7 @@ public class BlacklistDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting the blacklisted users map.", e);
-            return null;
-        }
-    }
-
-    public Map<Blacklist, Long> getBlacklistedGuildsRaw()
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            Map<Blacklist, Long> map;
-
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = %s", Const.BlacklistType.GUILD.name())))
-            {
-                map = new HashMap<>();
-                while(results.next())
-                {
-                    long id = results.getLong("id");
-                        map.put(getBlacklist(id), id);
-                }
-            }
-            return map;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the raw blacklisted guilds map.", e);
-            return null;
-        }
-    }
-
-    public Map<Blacklist, Long> getBlacklistedUsersRaw()
-    {
-        try
-        {
-            Statement statement = connection.createStatement();
-            statement.closeOnCompletion();
-            Map<Blacklist, Long> map;
-
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM BLACKLISTED_ENTITIES WHERE type = \"%s\"", Const.BlacklistType.USER.name())))
-            {
-                map = new HashMap<>();
-                while(results.next())
-                {
-                    long id = results.getLong("id");
-                    map.put(getBlacklist(id), id);
-                }
-            }
-            return map;
-        }
-        catch(SQLException e)
-        {
-            Database.LOG.error("Error while getting the raw blacklisted users map.", e);
+            LOG.error("Error while getting the blacklisted users map.", e);
             return null;
         }
     }

@@ -17,8 +17,8 @@
 
 package me.artuto.endless.core.entities.impl;
 
-import me.artuto.endless.Const;
 import me.artuto.endless.core.entities.Blacklist;
+import me.artuto.endless.core.entities.BlacklistType;
 
 import java.time.OffsetDateTime;
 
@@ -28,12 +28,12 @@ import java.time.OffsetDateTime;
 
 public class BlacklistImpl implements Blacklist
 {
-    private Const.BlacklistType type;
+    private BlacklistType type;
     private long id;
     private OffsetDateTime time;
     private String reason;
 
-    public BlacklistImpl(Const.BlacklistType type, long id, OffsetDateTime time, String reason)
+    public BlacklistImpl(BlacklistType type, long id, OffsetDateTime time, String reason)
     {
         this.type = type;
         this.id = id;
@@ -42,7 +42,7 @@ public class BlacklistImpl implements Blacklist
     }
 
     @Override
-    public Const.BlacklistType getType()
+    public BlacklistType getType()
     {
         return type;
     }

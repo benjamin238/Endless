@@ -24,6 +24,7 @@ import me.artuto.endless.Const;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.core.entities.Blacklist;
+import me.artuto.endless.core.entities.BlacklistType;
 import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -87,7 +88,7 @@ public class BlacklistUserCmd extends EndlessCommand
                     return;
                 }
 
-                bot.bdm.addBlacklist(Const.BlacklistType.USER, user.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
+                bot.bdm.addBlacklist(BlacklistType.USER, user.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
                 event.replySuccess("Added **"+user.getName()+"#"+user.getDiscriminator()+"** to the blacklist.");
             }, e -> event.replyError("That ID isn't valid!"));
         }

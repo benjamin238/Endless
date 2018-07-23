@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.Room;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.utils.ChecksUtil;
 import net.dv8tion.jda.bot.sharding.ShardManager;
@@ -13,10 +12,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -36,10 +32,11 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM ROOMS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 results.moveToInsertRow();
                 results.updateBoolean("restricted", restricted);
@@ -54,7 +51,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while creating a combo room.", e);
+            LOG.error("Error while creating a combo room.", e);
         }
     }
 
@@ -62,10 +59,11 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM ROOMS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 results.moveToInsertRow();
                 results.updateBoolean("restricted", restricted);
@@ -79,7 +77,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while creating a text room.", e);
+            LOG.error("Error while creating a text room.", e);
         }
     }
 
@@ -87,7 +85,8 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
             try(ResultSet results = statement.executeQuery("SELECT * FROM ROOMS"))
@@ -104,7 +103,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while creating a voice room.", e);
+            LOG.error("Error while creating a voice room.", e);
         }
     }
 
@@ -112,10 +111,13 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE tc_id = ? AND vc_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, tcId);
+            statement.setLong(2, vcId);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE tc_id = %s AND vc_id = %s", tcId, vcId)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     results.deleteRow();
@@ -123,7 +125,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while deleting a combo room.", e);
+            LOG.error("Error while deleting a combo room.", e);
         }
     }
 
@@ -131,10 +133,12 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE tc_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, tcId);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE tc_id = %s", tcId)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     results.deleteRow();
@@ -142,7 +146,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while deleting a text room.", e);
+            LOG.error("Error while deleting a text room.", e);
         }
     }
 
@@ -150,10 +154,12 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE vc_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, vcId);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE vc_id = %s", vcId)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     results.deleteRow();
@@ -161,7 +167,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while deleting a voice room.", e);
+            LOG.error("Error while deleting a voice room.", e);
         }
     }
 
@@ -169,10 +175,12 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE tc_id = ? OR vc_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, roomId);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE tc_id = %s OR vc_id = %s", roomId, roomId)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -183,7 +191,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while locking a room.", e);
+            LOG.error("Error while locking a room.", e);
         }
     }
 
@@ -191,10 +199,12 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE tc_id = ? OR vc_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, roomId);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE tc_id = %s OR vc_id = %s", roomId, roomId)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                 {
@@ -205,7 +215,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while transferring the property of a room.", e);
+            LOG.error("Error while transferring the property of a room.", e);
         }
     }
 
@@ -213,11 +223,13 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guildId);
             statement.closeOnCompletion();
             List<Room> list;
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE guild_id = %s", guildId)))
+            try(ResultSet results = statement.executeQuery())
             {
                 list = new LinkedList<>();
                 while(results.next())
@@ -227,7 +239,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting a list of rooms for guild ID: "+guildId, e);
+            LOG.error("Error while getting a list of rooms for guild ID: {}", guildId, e);
             return Collections.emptyList();
         }
     }
@@ -236,10 +248,12 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE tc_id = ? OR vc_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, id);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery(String.format("SELECT * FROM ROOMS WHERE tc_id = %s OR vc_id = %s", id, id)))
+            try(ResultSet results = statement.executeQuery())
             {
                 if(results.next())
                     return bot.endlessBuilder.entityBuilder.createRoom(results);
@@ -249,7 +263,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while locking a room.", e);
+            LOG.error("Error while locking a room.", e);
             return null;
         }
     }
@@ -312,11 +326,12 @@ public class RoomsDataManager
     {
         try
         {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE expiry_time IS NOT NULL",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
             List<Room> list;
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM ROOMS WHERE expiry_time IS NOT null"))
+            try(ResultSet results = statement.executeQuery())
             {
                 list = new LinkedList<>();
                 while(results.next())
@@ -326,7 +341,7 @@ public class RoomsDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while getting a list of temporal rooms.", e);
+            LOG.error("Error while getting a list of temporal rooms.", e);
             return Collections.emptyList();
         }
     }

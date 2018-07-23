@@ -1,9 +1,8 @@
 package me.artuto.endless.storage.data.managers;
 
+import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
-import me.artuto.endless.storage.data.Database;
+import me.artuto.endless.Endless;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 import org.json.JSONArray;
@@ -14,6 +13,7 @@ public class UserDataManager
 {
     private final Bot bot;
     private final Connection connection;
+    private final Logger LOG = Endless.getLog(UserDataManager.class);
 
     public UserDataManager(Bot bot)
     {
@@ -57,7 +57,7 @@ public class UserDataManager
         }
         catch(SQLException e)
         {
-            Database.LOG.error("Error while setting the modlog channel for the guild "+guild.getId(), e);
+            LOG.error("Error while setting the modlog channel for the guild {}", guild.getId(), e);
         }
     }
 }

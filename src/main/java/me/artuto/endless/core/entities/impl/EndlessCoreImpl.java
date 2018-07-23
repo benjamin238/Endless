@@ -20,7 +20,6 @@ package me.artuto.endless.core.entities.impl;
 import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.command.CommandClient;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
 import me.artuto.endless.Endless;
 import me.artuto.endless.core.EndlessCore;
 import me.artuto.endless.core.entities.*;
@@ -151,14 +150,14 @@ public class EndlessCoreImpl implements EndlessCore
     public List<Blacklist> getGuildBlacklists()
     {
         return Collections.unmodifiableList(blacklists.stream().filter(b ->
-                b.getType()==Const.BlacklistType.GUILD).collect(Collectors.toList()));
+                b.getType()==BlacklistType.GUILD).collect(Collectors.toList()));
     }
 
     @Override
     public List<Blacklist> getUserBlacklists()
     {
         return Collections.unmodifiableList(blacklists.stream().filter(b ->
-                b.getType()==Const.BlacklistType.USER).collect(Collectors.toList()));
+                b.getType()==BlacklistType.USER).collect(Collectors.toList()));
     }
 
     @Override
