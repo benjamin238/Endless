@@ -312,16 +312,22 @@ public class StarboardHandler
         {
             return guild.getEmoteById(emote).getAsMention();
         }
-        catch(NumberFormatException ignored) {}
-
-        if(count<5)
-            return ":star:";
-        else if(count>5)
-            return ":star2:";
-        else if(count>15)
-            return ":dizzy:";
-        else
-            return ":star:";
+        catch(NumberFormatException e)
+        {
+            if(!(emote.equals("\u2B50")))
+                return emote;
+            else
+            {
+                if(count<5)
+                    return ":star:";
+                else if(count>5)
+                    return ":star2:";
+                else if(count>15)
+                    return ":dizzy:";
+                else
+                    return ":star:";
+            }
+        }
     }
 
     private static void delete(TextChannel starboard, StarboardMessage starboardMsg)
