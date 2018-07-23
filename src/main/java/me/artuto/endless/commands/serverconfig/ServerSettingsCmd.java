@@ -30,6 +30,7 @@ import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -63,6 +64,7 @@ public class ServerSettingsCmd extends EndlessCommand
         String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
         GuildSettings settings = bot.endless.getGuildSettings(guild);
 
+        Emote starboardEmote = getEmote(guild, settings.getStarboardEmote());
         int banDeleteDays = settings.getBanDeleteDays();
         int starboardCount = settings.getStarboardCount();
         Role adminRole = GuildUtils.getAdminRole(guild);
@@ -91,7 +93,7 @@ public class ServerSettingsCmd extends EndlessCommand
 
         messagesString.append("Welcome DM: ").append((welcomeDm==null?"None":"`"+welcomeDm+"`"))
                 .append("\nWelcome Message: ").append((welcomeMsg==null?"None":"`"+welcomeMsg+"`"))
-            .append("\nLeave Message: ").append((leaveMsg==null?"None":"`"+leaveMsg+"`"));
+                .append("\nLeave Message: ").append((leaveMsg==null?"None":"`"+leaveMsg+"`"));
 
         settingsString.append("Admin Role: ").append((adminRole==null?"None":"**"+adminRole.getAsMention()+"**"))
                 .append("\nMod Role: ").append((modRole==null?"None":"**"+modRole.getAsMention()+"**"))
@@ -101,7 +103,8 @@ public class ServerSettingsCmd extends EndlessCommand
                 .append("\nTimezone: **").append(tz.toString()).append("**");
 
         starboardString.append("Starboard Channel: ").append((starboard==null?"None":"**"+starboard.getAsMention()+"**"))
-                .append("\nStar Count: ").append((starboardCount==0?"Disabled":String.valueOf("**"+starboardCount+"**")));
+                .append("\nStar Count: ").append((starboardCount==0?"Disabled":String.valueOf("**"+starboardCount+"**")))
+                .append("\nEmote: ").append(starboardEmote==null?settings.getStarboardEmote():starboardEmote.getAsMention());
 
         builder.addField(":mag: Logs", logsString.toString(), false);
         builder.addField(":speech_balloon: Messages", messagesString.toString(), false);
@@ -457,5 +460,20 @@ public class ServerSettingsCmd extends EndlessCommand
             bot.gsdm.setTimezone(event.getGuild(), tz);
             event.replySuccess("Successfully updated timezone!");
         }
+    }
+
+    private Emote getEmote(Guild guild, String emote)
+    {
+        long id;
+        try
+        {
+             id = Long.parseLong(emote);
+        }
+        catch(NumberFormatException e)
+        {
+            return null;
+        }
+
+        return guild.getEmoteById(id);
     }
 }

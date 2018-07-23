@@ -104,7 +104,6 @@ public class StarboardHandler
                     if(isSameAuthor(originalMsg.getAuthor(), event.getUser()) && (re.isEmote()?re.getId().equals(emote):re.getName().equals(emote)))
                         return;
                     int count = getStarCount(originalMsg)+getStarCount(starredMsg);
-                    System.out.println(count);
 
                     if(!(sdm.updateCount(originalMsg.getIdLong(), count)))
                         LOG.warn("Error when updating star count. Message ID: "+originalMsg.getId()+" TC ID: "+originalMsg.getTextChannel().getId());
@@ -279,14 +278,14 @@ public class StarboardHandler
         return !(sdm.getStarboardMessage(id)==null);
     }
 
-    private static void updateCount(Message msg, Long starboardMsg, Integer amount)
+    private static void updateCount(Message msg, long starboardMsg, int amount)
     {
         if(!(Bot.getInstance().dataEnabled))
             return;
 
         String emote = Bot.getInstance().endless.getGuildSettings(msg.getGuild()).getStarboardEmote();
         TextChannel tc = GuildUtils.getStarboardChannel(msg.getGuild());
-        tc.getMessageById(starboardMsg).queue(s -> s.editMessage(s.getContentRaw().replaceAll(":(\\D+):", getEmote(amount, emote))
+        tc.getMessageById(starboardMsg).queue(s -> s.editMessage(s.getContentRaw().replaceAll(":(\\D+):", getEmote(msg.getGuild(), amount, emote))
                 .replaceAll("\\*\\*(\\d+)\\*\\*", "**"+amount+"**")).queue(),null);
     }
 
@@ -310,7 +309,8 @@ public class StarboardHandler
         eb.setDescription(sb.toString());
         eb.setColor(Color.ORANGE);
 
-        msgB.setContent(getEmote(getStarCount(starredMsg), emote)+" **"+getStarCount(starredMsg)+"** "+starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
+        msgB.setContent(getEmote(starboard.getGuild(), getStarCount(starredMsg), emote)+" **"+getStarCount(starredMsg)+"** "+
+                starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
         msgB.setEmbed(eb.build());
 
         if(!(sdm.addMessage(starredMsg, getStarCount(starredMsg))))
@@ -318,10 +318,10 @@ public class StarboardHandler
         starboard.sendMessage(msgB.build()).queue(s -> sdm.setStarboardMessageId(starredMsg, s.getIdLong()));
     }
 
-    private static String getEmote(Integer count, String emote)
+    private static String getEmote(Guild guild, int count, String emote)
     {
         if(!(emote.equals("\u2B50")))
-            return emote;
+            return guild.getEmoteById(emote).getAsMention();
 
         if(count<5) return ":star:";
         else if(count>5 || count<=10) return ":star2:";

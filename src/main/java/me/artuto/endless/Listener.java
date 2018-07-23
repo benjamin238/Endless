@@ -35,6 +35,7 @@ import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
+import net.dv8tion.jda.core.events.emote.EmoteRemovedEvent;
 import net.dv8tion.jda.core.events.guild.*;
 import net.dv8tion.jda.core.events.guild.member.*;
 import net.dv8tion.jda.core.events.guild.voice.*;
@@ -305,6 +306,18 @@ public class Listener implements CommandListener, EventListener
                 bot.gsdm.removeColormeRole(guild, role);
             else if(!(bot.endless.getIgnore(guild, role.getIdLong())==null))
                 bot.gsdm.removeIgnore(guild, role.getIdLong());
+        }
+        else if(preEvent instanceof EmoteRemovedEvent)
+        {
+            if(bot.maintenance || !(bot.initialized))
+                return;
+            EmoteRemovedEvent event = (EmoteRemovedEvent)preEvent;
+            Emote emote = event.getEmote();
+            Guild guild = event.getGuild();
+            GuildSettings gs = bot.endless.getGuildSettings(guild);
+
+            if(gs.getStarboardEmote().equals(emote.getId()))
+                bot.gsdm.setStarboardEmote(guild, null);
         }
     }
 

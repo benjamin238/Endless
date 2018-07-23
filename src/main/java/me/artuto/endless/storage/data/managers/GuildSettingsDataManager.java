@@ -994,7 +994,8 @@ public class GuildSettingsDataManager
     {
         try
         {
-            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, starboard_emote FROM GUILD_SETTINGS WHERE guild_id = ?");
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, starboard_emote FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.setLong(1, guild.getIdLong());
             statement.closeOnCompletion();
 
