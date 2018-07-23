@@ -308,7 +308,7 @@ public class StarboardHandler
 
     private static String getEmote(Guild guild, int count, String emote)
     {
-        if(!(emote.equals("\u2B50")))
+        if(!(emote.startsWith("\\u")))
             return guild.getEmoteById(emote).getAsMention();
 
         if(count<5)
