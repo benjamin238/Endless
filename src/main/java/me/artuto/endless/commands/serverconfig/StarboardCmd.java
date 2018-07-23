@@ -147,7 +147,7 @@ public class StarboardCmd extends EndlessCommand
             {
                 List<String> emojis = EmojiParser.extractEmojis(e.getMessage().getContentRaw());
                 if(!(e.getMessage().getEmotes().isEmpty()))
-                    args = event.getMessage().getEmotes().get(0).getId();
+                    args = e.getMessage().getEmotes().get(0).getId();
                 else if(!(emojis.isEmpty()))
                     args = emojis.get(0);
                 else
