@@ -308,8 +308,11 @@ public class StarboardHandler
 
     private static String getEmote(Guild guild, int count, String emote)
     {
-        if(!(emote.startsWith("\\u")))
+        try
+        {
             return guild.getEmoteById(emote).getAsMention();
+        }
+        catch(NumberFormatException ignored) {}
 
         if(count<5)
             return ":star:";
