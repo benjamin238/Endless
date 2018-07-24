@@ -60,7 +60,7 @@ public class LogUtils
         }
         catch(IOException e)
         {
-            Endless.getLog(LogUtils.class).error("Could not create deleted messages file: ", e);
+            Endless.getLog(LogUtils.class).error("Could not create messages file: ", e);
             return null;
         }
     }
