@@ -111,7 +111,7 @@ public class EmoteCmd extends EndlessCommand
             this.help = "Uploads the specified URL and creates an emote.";
             this.arguments = "<emote> <name>";
             this.botPerms = new Permission[]{Permission.MANAGE_EMOTES};
-            this.userPermissions = new Permission[]{Permission.MANAGE_EMOTES};
+            this.userPerms = new Permission[]{Permission.MANAGE_EMOTES};
             this.parent = EmoteCmd.this;
         }
 
@@ -183,7 +183,7 @@ public class EmoteCmd extends EndlessCommand
             this.help = "Uploads the specified emote to the current server.";
             this.arguments = "<emote> [name]";
             this.botPerms = new Permission[]{Permission.MANAGE_EMOTES};
-            this.userPermissions = new Permission[]{Permission.MANAGE_EMOTES};
+            this.userPerms = new Permission[]{Permission.MANAGE_EMOTES};
             this.parent = EmoteCmd.this;
         }
 
@@ -254,7 +254,7 @@ public class EmoteCmd extends EndlessCommand
             this.help = "Deletes the specified emote.";
             this.arguments = "<emote>";
             this.botPerms = new Permission[]{Permission.MANAGE_EMOTES};
-            this.userPermissions = new Permission[]{Permission.MANAGE_EMOTES};
+            this.userPerms = new Permission[]{Permission.MANAGE_EMOTES};
             this.parent = EmoteCmd.this;
         }
 
