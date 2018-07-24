@@ -126,6 +126,23 @@ public class ArgsUtils
             return list.get(0);
     }
 
+    public static TextChannel findTextChannel(CommandEvent event, String query)
+    {
+        List<TextChannel> list = FinderUtil.findTextChannels(query, event.getGuild());
+        if(list.isEmpty())
+        {
+            event.replyWarning("No Text Channels found matching \""+query+"\"");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfTcChannels(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
     public static User findBannedUser(CommandEvent event, String query)
     {
         List<User> list = FinderUtil.findBannedUsers(query, event.getGuild());

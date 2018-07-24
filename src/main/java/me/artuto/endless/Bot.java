@@ -122,6 +122,7 @@ public class Bot extends ListenerAdapter
     private ScheduledExecutorService roomScheduler;
 
     // Threads
+    public ScheduledExecutorService archiveThread;
     public ScheduledExecutorService clearThread;
     public ScheduledExecutorService starboardThread;
 
@@ -183,13 +184,14 @@ public class Bot extends ListenerAdapter
 
         if(dataEnabled)
         {
-            clearThread = ThreadLoader.createThread("Clear Command");
             muteScheduler = ThreadLoader.createThread("Mutes");
             pollScheduler = ThreadLoader.createThread("Polls");
             reminderScheduler = ThreadLoader.createThread("Reminders");
             roomScheduler = ThreadLoader.createThread("Rooms");
             starboardThread = ThreadLoader.createThread("Starboard");
         }
+        archiveThread = ThreadLoader.createThread("Archive Command");
+        clearThread = ThreadLoader.createThread("Clear Command");
         endlessPool = ThreadLoader.createThread("Endless");
         optimizerScheduler = ThreadLoader.createThread("Optimizer");
 

@@ -85,9 +85,7 @@ public class GoogleSearchCmd extends EndlessCommand
             query = inputs[1];
         }
         else
-        {
             query = event.getArgs();
-        }
 
         if(num<1 || num>10)
         {
