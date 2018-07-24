@@ -17,7 +17,6 @@
 
 package me.artuto.endless.handlers;
 
-import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 import me.artuto.endless.Bot;
 import me.artuto.endless.storage.data.managers.StarboardDataManager;
