@@ -55,6 +55,15 @@ public class FormatUtil
         return String.format(message, timeF(now, tz), caseId, emote, aN, aD, verb, tN, tD, tId, reason, expT);
     }
 
+    public static String listOfCategories(List<Category> list, String query)
+    {
+        String out = " Multiple categories found matching \""+query+"\":";
+        for(int i = 0; i<6 && i<list.size(); i++)
+            out += "\n - "+list.get(i).getName()+" (ID:"+list.get(i).getId()+")";
+        if(list.size()>6) out += "\n**And "+(list.size()-6)+" more...**";
+        return out;
+    }
+
     public static String listOfMembers(List<Member> list, String query)
     {
         String out = " Multiple members found matching \""+query+"\":";

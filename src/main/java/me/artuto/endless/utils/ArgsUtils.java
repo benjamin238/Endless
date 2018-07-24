@@ -19,8 +19,7 @@ package me.artuto.endless.utils;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
 import java.util.List;
@@ -67,6 +66,46 @@ public class ArgsUtils
         }
 
         return timeinseconds;
+    }
+
+    public static Channel findChannel(CommandEvent event, String query)
+    {
+        Guild guild = event.getGuild();
+        List<TextChannel> tcs = FinderUtil.findTextChannels(query, guild);
+        if(tcs.isEmpty())
+        {
+            List<VoiceChannel> vcs = FinderUtil.findVoiceChannels(query, guild);
+            if(vcs.isEmpty())
+            {
+                List<Category> cats = FinderUtil.findCategories(query, guild);
+                if(cats.isEmpty())
+                {
+                    event.replyWarning("I was not able to found a channel with the provided arguments: '"+query+"'");
+                    return null;
+                }
+                else if(cats.size()>1)
+                {
+                    event.replyWarning(FormatUtil.listOfCategories(cats, query));
+                    return null;
+                }
+                else
+                    return cats.get(0);
+            }
+            else if(vcs.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfVcChannels(vcs, query));
+                return null;
+            }
+            else
+                return vcs.get(0);
+        }
+        else if(tcs.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfTcChannels(tcs, query));
+            return null;
+        }
+        else
+            return tcs.get(0);
     }
 
     public static Member findMember(CommandEvent event, String query)
