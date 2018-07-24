@@ -23,10 +23,13 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.utils.FormatUtil;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 
+import java.awt.*;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +44,7 @@ public class DiscordJagTag
     public static Collection<Method> getMethods()
     {
         return Arrays.asList(
+                // User
                 new Method("user", (env) -> {
                     User u = env.get("user");
                     return u.getName();
@@ -117,6 +121,7 @@ public class DiscordJagTag
                     JDA jda = user.getJDA();
                     return findUser(jda, in[0]).getEffectiveAvatarUrl();
                 }),
+                // Guild
                 new Method("server", (env) -> {
                     Guild guild = env.get("guild");
                     return guild==null?"Direct Message":guild.getName();
@@ -129,6 +134,7 @@ public class DiscordJagTag
                     Guild guild = env.get("guild");
                     return guild==null?"2":String.valueOf(guild.getMemberCache().size());
                 }),
+                // Channel
                 new Method("channel", (env) -> {
                     MessageChannel channel = env.get("channel");
                     return channel.getName();
@@ -137,6 +143,7 @@ public class DiscordJagTag
                     MessageChannel channel = env.get("channel");
                     return channel.getId();
                 }),
+                // Random
                 new Method("randuser", (env) -> {
                     Guild guild = env.get("guild");
                     User user = env.get("user");
@@ -161,7 +168,71 @@ public class DiscordJagTag
                         return channel.getName();
                     return guild.getTextChannels().get((int)(guild.getTextChannelCache().size()*Math.random())).getName();
                 }),
-                new Method("nsfw", (env) -> ""));
+                // NSFW
+                new Method("nsfw", (env) -> ""),
+                // Embed. Taken from https://github.com/jagrosh/Selfbot/blob/master/src/jselfbot/entities/JagTagMethods.java#L24-L92
+                new Method("title", (env, in) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    String[] parts = in[0].split("\\|",2);
+                    eb.setTitle(parts[0], parts.length>1 ? parts[1] : null);
+                    return "";}),
+                new Method("author", (env, in) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    String[] parts = in[0].split("\\|",3);
+                    eb.setAuthor(parts[0], parts.length>2 ? parts[2] : null, parts.length>1 ? parts[1] : null);
+                    return "";}),
+                new Method("thumbnail", (env, in) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    eb.setThumbnail(in[0]);
+                    return "";}),
+                new Method("field", (env, in) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    String[] parts = in[0].split("\\|",3);
+                    eb.addField(parts[0], parts[1], parts.length>2 ? parts[2].equalsIgnoreCase("true") : true);
+                    return "";}),
+                new Method("image", (env, in) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    eb.setImage(in[0]);
+                    return "";}),
+                new Method("color", (env, in) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    switch(in[0].toLowerCase()) {
+                        //standard
+                        case "red": eb.setColor(Color.RED); break;
+                        case "orange": eb.setColor(Color.ORANGE); break;
+                        case "yellow": eb.setColor(Color.YELLOW); break;
+                        case "green": eb.setColor(Color.GREEN); break;
+                        case "cyan": eb.setColor(Color.CYAN); break;
+                        case "blue": eb.setColor(Color.BLUE); break;
+                        case "magenta": eb.setColor(Color.MAGENTA); break;
+                        case "pink": eb.setColor(Color.PINK); break;
+                        case "black": eb.setColor(Color.decode("#000001")); break;
+                        case "dark_gray":
+                        case "dark_grey": eb.setColor(Color.DARK_GRAY); break;
+                        case "gray":
+                        case "grey": eb.setColor(Color.GRAY); break;
+                        case "light_gray":
+                        case "light_grey": eb.setColor(Color.LIGHT_GRAY); break;
+                        case "white": eb.setColor(Color.WHITE); break;
+                        //discord
+                        case "blurple": eb.setColor(Color.decode("#7289DA")); break;
+                        case "greyple": eb.setColor(Color.decode("#99AAB5")); break;
+                        case "darktheme": eb.setColor(Color.decode("#2C2F33")); break;
+                        default: eb.setColor(Color.decode(in[0]));
+                    }
+                    return "";}),
+                new Method("footer", (env, in) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    String[] parts = in[0].split("\\|",2);
+                    eb.setFooter(parts[0], parts.length>1 ? parts[1] : null);
+                    return "";}),
+                new Method("timestamp", (env) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    eb.setTimestamp(OffsetDateTime.now());
+                    return "";}, (env, in) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    eb.setTimestamp(OffsetDateTime.parse(in[0]));
+                    return "";}));
     }
 
     private static Member findMember(Guild guild, String query) throws ParseException
