@@ -92,7 +92,7 @@ public class ServerLogging
         }
         if(!(welcomeChan==null) && welcomeChan.canTalk() && !(welcomeMsg==null))
         {
-            parser.clear().put("user", user).put("guild", guild).put("channel", welcomeChan);
+            parser.clear().put("user", user).put("guild", guild).put("channel", welcomeChan).put("builder", new EmbedBuilder());
             toSend = parser.parse(welcomeMsg);
             Sender.sendMessage(welcomeChan, toSend);
             parser.clear();
@@ -124,7 +124,7 @@ public class ServerLogging
         }
         if(!(leaveChan==null) && leaveChan.canTalk() && !(leaveMsg==null))
         {
-            parser.clear().put("user", user).put("guild", guild).put("channel", leaveChan);
+            parser.clear().put("user", user).put("guild", guild).put("channel", leaveChan).put("builder", new EmbedBuilder());
             toSend = parser.parse(leaveMsg);
             Sender.sendMessage(leaveChan, toSend);
             parser.clear();
