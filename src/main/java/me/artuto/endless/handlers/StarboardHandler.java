@@ -17,6 +17,8 @@
 
 package me.artuto.endless.handlers;
 
+import com.vdurmont.emoji.EmojiManager;
+import com.vdurmont.emoji.EmojiParser;
 import me.artuto.endless.Bot;
 import me.artuto.endless.storage.data.managers.StarboardDataManager;
 import me.artuto.endless.core.entities.StarboardMessage;
@@ -46,7 +48,9 @@ import java.util.stream.Collectors;
 
 public class StarboardHandler
 {
-    private static final Pattern MESSAGE = Pattern.compile(":(\\D+): \\*\\*(\\d+)\\*\\* <#(\\d{17,20})> ID: (\\d{17,20})");
+    private static final String GENERAL = " \\*\\*(\\d+)\\*\\* <#(\\d{17,20})> ID: (\\d{17,20})";
+    private static final Pattern EMOTE_PATTERN = Pattern.compile(Message.MentionType.EMOTE.getPattern()+GENERAL);
+    private static final Pattern EMOJI_PATTERN = Pattern.compile("(:\\w+:|.*u\\w+|.*u\\w+.*u\\w+)"+GENERAL);
     private static final ScheduledExecutorService thread = Bot.getInstance().starboardThread;
     private static final StarboardDataManager sdm = Bot.getInstance().sdm;
 
@@ -83,15 +87,39 @@ public class StarboardHandler
 
             if(event.getChannel().getIdLong()==starboard.getIdLong())
             {
+                boolean isUnicode = false;
                 String content = starredMsg.getContentRaw();
-                Matcher m = MESSAGE.matcher(content);
+                String unicode;
+                Pattern REGEX;
+                if(starredMsg.getEmotes().isEmpty())
+                {
+                    isUnicode = true;
+                    REGEX = EMOJI_PATTERN;
+                    unicode = getUnicode(emote);
+                    content = content.replace(emote, unicode);
+                }
+                else
+                    REGEX = EMOTE_PATTERN;
+                Matcher m = REGEX.matcher(content);
                 if(m.matches() && starredMsg.getAuthor().getIdLong()==event.getJDA().getSelfUser().getIdLong())
                 {
-                    TextChannel originalTc = guild.getTextChannelById(m.group(3));
+                    String channelId;
+                    String msgId;
+                    if(isUnicode)
+                    {
+                        channelId = m.group(3);
+                        msgId = m.group(4);
+                    }
+                    else
+                    {
+                        channelId = m.group(4);
+                        msgId = m.group(5);
+                    }
+                    TextChannel originalTc = guild.getTextChannelById(channelId);
                     if(originalTc==null || !(ChecksUtil.hasPermission(guild.getSelfMember(), originalTc, Permission.MESSAGE_HISTORY)))
                         return;
 
-                    Message originalMsg = originalTc.getMessageById(m.group(4)).complete();
+                    Message originalMsg = originalTc.getMessageById(msgId).complete();
                     MessageReaction reaction = originalMsg.getReactions().stream().filter(r -> {
                         MessageReaction.ReactionEmote reE = r.getReactionEmote();
                         return (reE.isEmote()?reE.getId().equals(emote):reE.getName().equals(emote));
@@ -142,15 +170,39 @@ public class StarboardHandler
 
             if(event.getChannel().getIdLong()==starboard.getIdLong())
             {
+                boolean isUnicode = false;
                 String content = starredMsg.getContentRaw();
-                Matcher m = MESSAGE.matcher(content);
+                String unicode;
+                Pattern REGEX;
+                if(starredMsg.getEmotes().isEmpty())
+                {
+                    isUnicode = true;
+                    REGEX = EMOJI_PATTERN;
+                    unicode = getUnicode(emote);
+                    content = content.replace(emote, unicode);
+                }
+                else
+                    REGEX = EMOTE_PATTERN;
+                Matcher m = REGEX.matcher(content);
                 if(m.matches() && starredMsg.getAuthor().getIdLong()==event.getJDA().getSelfUser().getIdLong())
                 {
-                    TextChannel originalTc = guild.getTextChannelById(m.group(3));
+                    String channelId;
+                    String msgId;
+                    if(isUnicode)
+                    {
+                        channelId = m.group(3);
+                        msgId = m.group(4);
+                    }
+                    else
+                    {
+                        channelId = m.group(4);
+                        msgId = m.group(5);
+                    }
+                    TextChannel originalTc = guild.getTextChannelById(channelId);
                     if(originalTc==null || !(ChecksUtil.hasPermission(guild.getSelfMember(), originalTc, Permission.MESSAGE_HISTORY)))
                         return;
 
-                    Message originalMsg = originalTc.getMessageById(m.group(4)).complete();
+                    Message originalMsg = originalTc.getMessageById(msgId).complete();
                     starboardMsg = sdm.getStarboardMessage(originalMsg.getIdLong());
                     if(isSameAuthor(originalMsg.getAuthor(), event.getUser()) && (re.isEmote()?re.getId().equals(emote):re.getName().equals(emote)))
                         return;
@@ -196,8 +248,13 @@ public class StarboardHandler
                 if(starredMsg==null)
                     return;
 
+                Pattern REGEX;
+                if(starredMsg.getEmotes().isEmpty())
+                    REGEX = EMOJI_PATTERN;
+                else
+                    REGEX = EMOTE_PATTERN;
                 String content = starredMsg.getContentRaw();
-                Matcher m = MESSAGE.matcher(content);
+                Matcher m = REGEX.matcher(content);
                 if(m.matches() && starredMsg.getAuthor().getIdLong()==event.getJDA().getSelfUser().getIdLong())
                 {
                     TextChannel originalTc = guild.getTextChannelById(m.group(3));
@@ -272,10 +329,27 @@ public class StarboardHandler
         if(!(Bot.getInstance().dataEnabled))
             return;
 
-        String emote = Bot.getInstance().endless.getGuildSettings(msg.getGuild()).getStarboardEmote();
+        String sbEmote = Bot.getInstance().endless.getGuildSettings(msg.getGuild()).getStarboardEmote();
         TextChannel tc = GuildUtils.getStarboardChannel(msg.getGuild());
-        tc.getMessageById(starboardMsg).queue(s -> s.editMessage(s.getContentRaw().replaceAll(":(\\D+):", getEmote(msg.getGuild(), amount, emote))
-                .replaceAll("\\*\\*(\\d+)\\*\\*", "**"+amount+"**")).queue(),null);
+        tc.getMessageById(starboardMsg).queue(s -> {
+            String emote;
+            if(!(s.getEmotes().isEmpty()))
+            {
+                emote = sbEmote;
+                s.editMessage(s.getContentRaw().replaceAll(Message.MentionType.EMOTE.getPattern().pattern(), getEmote(amount, s, emote))
+                        .replaceAll("\\*\\*(\\d+)\\*\\*", "**"+amount+"**")).queue();
+            }
+            else
+            {
+                List<String> emojis = EmojiParser.extractEmojis(sbEmote);
+                if(!(emojis.isEmpty()))
+                {
+                    emote = emojis.get(0);
+                    s.editMessage(s.getContentRaw().replaceAll("(\\\\u\\w+|\\\\u\\w+\\\\u\\w+)", getEmote(amount, s, emote))
+                            .replaceAll("\\*\\*(\\d+)\\*\\*", "**"+amount+"**")).queue();
+                }
+            }
+        },null);
     }
 
     private static void addMessage(Message starredMsg, TextChannel starboard)
@@ -298,7 +372,7 @@ public class StarboardHandler
         eb.setDescription(sb.toString());
         eb.setColor(Color.ORANGE);
 
-        msgB.setContent(getEmote(starboard.getGuild(), getStarCount(starredMsg), emote)+" **"+getStarCount(starredMsg)+"** "+
+        msgB.setContent(getEmote(getStarCount(starredMsg), starredMsg, emote)+" **"+getStarCount(starredMsg)+"** "+
                 starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
         msgB.setEmbed(eb.build());
 
@@ -306,11 +380,11 @@ public class StarboardHandler
         starboard.sendMessage(msgB.build()).queue(s -> sdm.setStarboardMessageId(starredMsg, s.getIdLong()));
     }
 
-    private static String getEmote(Guild guild, int count, String emote)
+    private static String getEmote(int count, Message msg, String emote)
     {
         try
         {
-            return guild.getEmoteById(emote).getAsMention();
+            return msg.getGuild().getEmoteById(emote).getAsMention();
         }
         catch(NumberFormatException e)
         {
@@ -364,5 +438,31 @@ public class StarboardHandler
             delete(GuildUtils.getStarboardChannel(tc.getGuild()), sdm.getStarboardMessage(id));
             return null;
         }
+    }
+
+    private static String getUnicode(String emoji)
+    {
+        StringBuilder sb = new StringBuilder();
+        emoji.codePoints().forEachOrdered(code -> {
+            char[] chars = Character.toChars(code);
+            if(chars.length>1)
+            {
+                String hex0 = Integer.toHexString(chars[0]).toUpperCase();
+                String hex1 = Integer.toHexString(chars[1]).toUpperCase();
+                while(hex0.length()<4)
+                    hex0 = "0"+hex0;
+                while(hex1.length()<4)
+                    hex1 = "0"+hex1;
+                sb.append("\\u").append(hex0).append("\\u").append(hex1);
+            }
+            else
+            {
+                String hex = Integer.toHexString(code).toUpperCase();
+                while(hex.length()<4)
+                    hex = "0"+hex;
+                sb.append("\\u").append(hex);
+            }
+        });
+        return sb.toString();
     }
 }
