@@ -116,7 +116,7 @@ public class TagCmd extends EndlessCommand
             return;
         }
 
-        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getChannel()).put("args", tagArgs);
+        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getChannel()).put("args", tagArgs).put("builder", new EmbedBuilder());
         event.reply(parser.parse(tag.getContent()));
     }
 
@@ -388,7 +388,7 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel());
+            parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel()).put("builder", new EmbedBuilder());
             event.reply(parser.parse(event.getArgs()));
         }
     }
