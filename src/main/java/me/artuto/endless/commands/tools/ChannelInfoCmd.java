@@ -51,7 +51,11 @@ public class ChannelInfoCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        Channel channel = ArgsUtils.findChannel(event, event.getArgs());
+        Channel channel;
+        if(event.getArgs().isEmpty())
+            channel = event.getTextChannel();
+        else
+            channel = ArgsUtils.findChannel(event, event.getArgs());
         Guild guild = event.getGuild();
         if(channel==null)
             return;
@@ -74,21 +78,26 @@ public class ChannelInfoCmd extends EndlessCommand
         sb.append(Const.LINE_START).append(" Users: **").append(channel.getMembers().size());
         if(channel instanceof VoiceChannel)
         {
-            sb.append("/").append(((VoiceChannel)channel).getUserLimit()==0?"Unlimited":((VoiceChannel)channel).getUserLimit()).append("**\n");
-            sb.append(Const.LINE_START).append(" Bitrate: **").append(((VoiceChannel)channel).getBitrate()).append("**\n");
+            VoiceChannel vc = (VoiceChannel)channel;
+            sb.append("/").append(vc.getUserLimit()==0?"Unlimited":vc.getUserLimit()).append("**\n");
+            sb.append(Const.LINE_START).append(" Bitrate: **").append(vc.getBitrate()).append("**kbps\n");
         }
         else
             sb.append("**\n");
 
-        if(channel instanceof TextChannel && (!(((TextChannel)channel).getTopic()==null) || !(((TextChannel)channel).getTopic().isEmpty())))
-            eb.addField("Topic:", ((TextChannel)channel).getTopic(), false);
-        if(channel instanceof net.dv8tion.jda.core.entities.Category)
+        if(channel instanceof TextChannel)
+        {
+            TextChannel tc = (TextChannel)channel;
+            if(!(tc.getTopic()==null || tc.getTopic().isEmpty()))
+                eb.addField("Topic:", tc.getTopic(), false);
+        }
+        else if(channel instanceof net.dv8tion.jda.core.entities.Category)
         {
             net.dv8tion.jda.core.entities.Category category = (net.dv8tion.jda.core.entities.Category)channel;
             if(!(category.getTextChannels().isEmpty()))
                 eb.addField("Text Channels:", category.getTextChannels().stream().map(IMentionable::getAsMention)
                         .collect(Collectors.joining(", ")), false);
-            if(!(category.getTextChannels().isEmpty()))
+            if(!(category.getVoiceChannels().isEmpty()))
                 eb.addField("Voice Channels:", category.getVoiceChannels().stream().map(Channel::getName)
                         .collect(Collectors.joining(", ")), false);
         }
