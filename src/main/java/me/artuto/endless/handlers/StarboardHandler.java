@@ -133,7 +133,15 @@ public class StarboardHandler
                     updateCount(starredMsg, sdm.getStarboardMessage(originalMsg.getIdLong()).getStarboardMessageIdLong(), count);
                 }
                 else
-                    addMessage(starredMsg, starboard);
+                {
+                    if(existsOnStarboard(starredMsg.getIdLong()))
+                    {
+                        sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg));
+                        updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+                    }
+                   else
+                       addMessage(starredMsg, starboard);
+                }
             }
             else
             {
