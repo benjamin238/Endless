@@ -130,6 +130,7 @@ public class Listener implements CommandListener, EventListener
             GuildJoinEvent event = (GuildJoinEvent)preEvent;
             bot.botlog.logJoin(event);
             bot.sendStats(event.getJDA());
+            sendJoinMessage(event);
         }
         else if(preEvent instanceof GuildLeaveEvent)
         {
@@ -380,7 +381,25 @@ public class Listener implements CommandListener, EventListener
         }
     }
 
-    // I didnt found a better place for that method
+    // I didnt found a better place for those methods
+    private void sendJoinMessage(GuildJoinEvent event)
+    {
+        Guild guild = event.getGuild();
+        SelfUser selfUser = event.getJDA().getSelfUser();
+        TextChannel defaultTc = FinderUtil.getDefaultChannel(guild);
+        if(defaultTc==null)
+            return;
+
+        String toSend = "Hi! Thanks for adding **"+selfUser.getName()+"** to your guild!\n" +
+                "If you need help with the bot please join the support guild `e!help support`\n" +
+                "Please report all the bugs you find. If you have a feature request is welcome as well :)\n\n" +
+                Const.ENDLESS+" Join the support server: **<"+Const.INVITE+">**\n" +
+                Const.GITHUB+" Endless GitHub: **<https://github.com/EndlessBot/Endless>**\n" +
+                Const.LINE_START+" Contribute to Endless development **<https://paypal.me/artuto>**";
+
+        Sender.sendMessage(defaultTc, toSend);
+    }
+
     private void welcomeDm(GuildMemberJoinEvent event)
     {
         Guild guild = event.getGuild();
