@@ -23,6 +23,7 @@ import me.artuto.endless.storage.data.managers.StarboardDataManager;
 import me.artuto.endless.core.entities.StarboardMessage;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FinderUtil;
+import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -379,8 +380,8 @@ public class StarboardHandler
         eb.setDescription(sb.toString());
         eb.setColor(Color.ORANGE);
 
-        msgB.setContent(getEmote(getStarCount(starredMsg), starredMsg, emote)+" **"+getStarCount(starredMsg)+"** "+
-                starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
+        msgB.setContent(FormatUtil.sanitize(getEmote(getStarCount(starredMsg), starredMsg, emote)+" **"+getStarCount(starredMsg)+"** "+
+                starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId()));
         msgB.setEmbed(eb.build());
 
         sdm.addMessage(starredMsg, getStarCount(starredMsg));

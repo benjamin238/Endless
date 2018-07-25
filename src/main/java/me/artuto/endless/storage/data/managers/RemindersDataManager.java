@@ -139,7 +139,7 @@ public class RemindersDataManager
                 else
                     toSend = user.getAsMention()+" :alarm_clock: "+reminder.getMessage()+" ~set "+formattedTime+" ago";
 
-                channel.sendMessage(toSend).queue(null, e -> {});
+                channel.sendMessage(FormatUtil.sanitize(toSend)).queue(null, e -> {});
             }
         }
     }

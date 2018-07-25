@@ -48,9 +48,6 @@ import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.webhook.WebhookClient;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * @author Artuto
  */

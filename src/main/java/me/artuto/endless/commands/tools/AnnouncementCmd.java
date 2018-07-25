@@ -171,13 +171,13 @@ public class AnnouncementCmd extends EndlessCommand
              }
              else
              {
-                 tc.sendMessage(role.getAsMention()+" "+message).queue(s -> event.replySuccess("Successfully sent the announcement!"), e ->
+                 tc.sendMessage(role.getAsMention()+" "+FormatUtil.sanitize(message)).queue(s -> event.replySuccess("Successfully sent the announcement!"), e ->
                  event.replyError("Error while sending the announcement!"));
              }
          }
 		 else
 		 {
-			tc.sendMessage(message).queue(s -> event.replySuccess("Successfully sent the announcement!"), e ->
+			tc.sendMessage(FormatUtil.sanitize(message)).queue(s -> event.replySuccess("Successfully sent the announcement!"), e ->
                  event.replyError("Error while sending the announcement!"));
 		 }
      }
