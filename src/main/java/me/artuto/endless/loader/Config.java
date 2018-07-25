@@ -76,11 +76,6 @@ public class Config
         return format.discordBotListToken;
     }
 
-    public String getDBansToken()
-    {
-        return format.discordBansToken;
-    }
-
     public String getBingMapsKey()
     {
         return format.bingMapsKey;
@@ -161,9 +156,9 @@ public class Config
         return format.rootGuildId;
     }
 
-    public Long getBotlogChannelId()
+    public String getCommandlogWebhook()
     {
-        return format.botlogChannelId;
+        return format.commandlogWebhook;
     }
 
     public String getBotlogWebhook()
@@ -214,10 +209,5 @@ public class Config
     public String getSentryDSN()
     {
         return format.sentryDSN;
-    }
-
-    public Long getCommandslogChannelId()
-    {
-        return format.commandslogChannelId;
     }
 }

@@ -324,24 +324,28 @@ public class Listener implements CommandListener, EventListener
     @Override
     public void onCommand(CommandEvent event, Command command)
     {
-        TextChannel commandLog = bot.shardManager.getTextChannelById(bot.config.getCommandslogChannelId());
         User author = event.getAuthor();
         Guild guild = event.getGuild();
 
         // If is the help command is null
-        if(command==null) return;
-
-        if(event.isOwner()) return;
+        if(command==null)
+            return;
+        if(event.isOwner())
+            return;
 
         if(guild==null)
         {
-            commandLog.sendMessage("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
-                    "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped()+"`) in a **Direct message**").queue();
+            String toSend = FormatUtil.sanitize("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
+                    "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped().trim()+
+                    "`) in a **Direct message** (ID: "+event.getChannel().getId()+")");
+            bot.cmdWebhook.send(toSend);
         }
         else
         {
-            commandLog.sendMessage("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
-                    "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped()+"`) in **"+guild.getName()+"** (ID: "+guild.getId()+")").queue();
+            String toSend = FormatUtil.sanitize("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
+                    "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped().trim()+
+                    "`) in **"+guild.getName()+"** (ID: "+guild.getId()+")");
+            bot.cmdWebhook.send(toSend);
         }
     }
 

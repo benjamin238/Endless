@@ -127,6 +127,7 @@ public class Bot extends ListenerAdapter
     public ScheduledExecutorService starboardThread;
 
     // Webhooks
+    public WebhookClient cmdWebhook;
     public WebhookClient logWebhook;
 
     public static Bot getInstance()
@@ -178,6 +179,7 @@ public class Bot extends ListenerAdapter
         new GuildUtils(this);
 
         botlog = new BotLogging(this);
+        cmdWebhook = new WebhookClientBuilder(config.getCommandlogWebhook()).setExecutorService(ThreadLoader.createThread("Command Log")).build();
         logWebhook = new WebhookClientBuilder(config.getBotlogWebhook()).setExecutorService(ThreadLoader.createThread("Botlog")).build();
         modlog = new ModLogging(this);
         serverlog = new ServerLogging(this);
