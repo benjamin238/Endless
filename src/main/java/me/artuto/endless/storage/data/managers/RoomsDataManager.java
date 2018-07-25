@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.Room;
-import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.utils.ChecksUtil;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.Permission;
@@ -12,9 +11,14 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class RoomsDataManager
 {

@@ -23,7 +23,11 @@ import me.artuto.endless.storage.data.Database;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -142,7 +146,7 @@ public class DonatorsDataManager
         catch(SQLException e)
         {
             LOG.error("Error while getting the list of donators.", e);
-            return null;
+            return Collections.emptyList();
         }
     }
 }

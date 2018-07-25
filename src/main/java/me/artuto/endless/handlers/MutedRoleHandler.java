@@ -19,7 +19,6 @@ package me.artuto.endless.handlers;
 
 import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
 import me.artuto.endless.core.entities.ParsedAuditLog;
 import me.artuto.endless.core.entities.Punishment;
 import me.artuto.endless.core.entities.PunishmentType;

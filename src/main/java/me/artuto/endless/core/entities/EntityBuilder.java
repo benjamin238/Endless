@@ -27,7 +27,6 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -19,8 +19,8 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
-import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;

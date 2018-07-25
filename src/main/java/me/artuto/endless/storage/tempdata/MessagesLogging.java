@@ -17,7 +17,6 @@
 
 package me.artuto.endless.storage.tempdata;
 
-import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 
 import java.util.HashMap;

@@ -18,8 +18,8 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
 
 /**
  * @author Artuto

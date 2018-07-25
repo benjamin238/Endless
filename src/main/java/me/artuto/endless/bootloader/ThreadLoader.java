@@ -19,7 +19,6 @@ package me.artuto.endless.bootloader;
 
 import me.artuto.endless.tools.EndlessThreadFactory;
 
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**

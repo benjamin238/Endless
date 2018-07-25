@@ -24,19 +24,13 @@ import ch.qos.logback.classic.spi.ThrowableProxy;
 import me.artuto.endless.Const;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Artuto

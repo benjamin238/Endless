@@ -28,7 +28,10 @@ import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
 
 import java.sql.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Database
 {

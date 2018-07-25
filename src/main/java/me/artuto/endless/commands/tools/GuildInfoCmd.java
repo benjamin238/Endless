@@ -19,8 +19,8 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
-import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
