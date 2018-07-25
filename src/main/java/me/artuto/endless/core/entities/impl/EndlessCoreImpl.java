@@ -48,9 +48,6 @@ public class EndlessCoreImpl implements EndlessCore
     private final List<Blacklist> blacklists;
     private final Map<Long, Blacklist> blacklistMap;
 
-    private final List<EndlessUser> users;
-    private final Map<Long, EndlessUser> userMap;
-
     private final List<GuildSettings> guildSettings;
     private final Map<Long, GuildSettings> guildSettingsMap;
 
@@ -70,9 +67,6 @@ public class EndlessCoreImpl implements EndlessCore
 
         this.blacklists = new LinkedList<>();
         this.blacklistMap = new HashMap<>();
-
-        this.users = new LinkedList<>();
-        this.userMap = new HashMap<>();
 
         this.guildSettings = new LinkedList<>();
         this.guildSettingsMap = new HashMap<>();
@@ -99,12 +93,6 @@ public class EndlessCoreImpl implements EndlessCore
     public Blacklist getBlacklist(long id)
     {
         return blacklistMap.get(id);
-    }
-
-    @Override
-    public EndlessUser getUser(long id)
-    {
-        return userMap.get(id);
     }
 
     @Override
@@ -161,12 +149,6 @@ public class EndlessCoreImpl implements EndlessCore
     }
 
     @Override
-    public List<EndlessUser> getUsers()
-    {
-        return Collections.unmodifiableList(users);
-    }
-
-    @Override
     public List<GuildSettings> getGuildSettings()
     {
         return Collections.unmodifiableList(guildSettings);
@@ -219,12 +201,6 @@ public class EndlessCoreImpl implements EndlessCore
         blacklists.add(blacklist);
     }
 
-    public void addUser(EndlessUser user)
-    {
-        userMap.put(user.getUserId(), user);
-        users.add(user);
-    }
-
     public void addGlobalTag(Tag tag)
     {
         globalTagMap.put(tag.getName(), tag);
@@ -251,6 +227,7 @@ public class EndlessCoreImpl implements EndlessCore
 
     public void finishSetup()
     {
+        // Cache Global Tags
         bot.tdm.getGlobalTags().forEach(this::addGlobalTag);
         LOG.debug("Cached {} Global tags", globalTags.size());
 
@@ -294,11 +271,6 @@ public class EndlessCoreImpl implements EndlessCore
     public void removeBlacklist(Blacklist blacklist)
     {
         blacklists.remove(blacklistMap.remove(blacklist.getId()));
-    }
-
-    public void removeUser(EndlessUser user)
-    {
-        users.remove(userMap.remove(user.getUserId()));
     }
 
     public void removeGlobalTag(String name)

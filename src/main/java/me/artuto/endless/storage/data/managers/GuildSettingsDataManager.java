@@ -572,6 +572,7 @@ public class GuildSettingsDataManager
                                     results.updateString("prefixes", array.toString());
                                     results.updateRow();
                                 }
+                                break;
                             }
                         }
                         GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
@@ -665,6 +666,7 @@ public class GuildSettingsDataManager
                                     results.updateString("roleme_roles", array.toString());
                                     results.updateRow();
                                 }
+                                break;
                             }
                         }
                         GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
@@ -1005,6 +1007,7 @@ public class GuildSettingsDataManager
                                     results.updateString("colorme_roles", array.toString());
                                     results.updateRow();
                                 }
+                                break;
                             }
                         }
                         GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);

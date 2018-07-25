@@ -48,6 +48,9 @@ import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.webhook.WebhookClient;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * @author Artuto
  */
@@ -362,7 +365,7 @@ public class Listener implements CommandListener, EventListener
         }
     }
 
-    // I didnt found a better place for this method
+    // I didnt found a better place for that method
     private void welcomeDm(GuildMemberJoinEvent event)
     {
         Guild guild = event.getGuild();

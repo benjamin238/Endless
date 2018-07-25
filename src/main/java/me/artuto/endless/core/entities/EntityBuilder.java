@@ -27,6 +27,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,33 +57,6 @@ public class EntityBuilder
                 results.getLong("id"),
                 OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()),
                 results.getString("reason"));
-    }
-
-    public EndlessUser createUser(ResultSet results) throws SQLException
-    {
-        Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        gmt.setTimeInMillis(results.getLong("last_active"));
-        List<String> highlightWords = new LinkedList<>();
-        List<String> names = new LinkedList<>();
-        String array = results.getString("highlight_words");
-
-        if(!(array == null))
-        {
-            for(Object word : new JSONArray(array))
-                highlightWords.add(word.toString());
-        }
-
-        array = results.getString("names");
-        if(!(array == null))
-        {
-            for(Object name : new JSONArray(array))
-                names.add(name.toString());
-        }
-
-        return new EndlessUserImpl(highlightWords,
-                names,
-                results.getLong("user_id"),
-                OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()));
     }
 
     public GuildSettings createGuildSettings(Guild guild, ResultSet results) throws SQLException

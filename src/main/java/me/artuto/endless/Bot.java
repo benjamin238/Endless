@@ -244,8 +244,8 @@ public class Bot extends ListenerAdapter
 
                 // Utils
                 new ArchiveCmd(this), new ColorMeCmd(this), new GoogleSearchCmd(this), new ReminderCmd(this),
-                new RoleMeCmd(this), new TimeForCmd(this), new TranslateCmd(this), new WeatherCmd(this),
-                new YouTubeCmd(this));
+                new RoleMeCmd(this), new TimeForCmd(this), new TranslateCmd(this),
+                new WeatherCmd(this), new YouTubeCmd(this));
         if(dataEnabled)
             clientBuilder.setGuildSettingsManager(new ClientGSDM(this));
 

@@ -131,7 +131,7 @@ public class TagDataManager
                     ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.closeOnCompletion();
 
-            try(ResultSet results = statement.executeQuery("SELECT * FROM GLOBAL_TAGS"))
+            try(ResultSet results = statement.executeQuery())
             {
                 List<Tag> list = new LinkedList<>();
                 while(results.next())

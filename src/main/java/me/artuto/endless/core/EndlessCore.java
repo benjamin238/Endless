@@ -38,8 +38,6 @@ public interface EndlessCore
 
     Blacklist getBlacklist(long id);
 
-    EndlessUser getUser(long id);
-
     GuildSettings getGuildSettings(Guild guild);
 
     GuildSettings getGuildSettingsById(long id);
@@ -55,8 +53,6 @@ public interface EndlessCore
     List<Blacklist> getGuildBlacklists();
 
     List<Blacklist> getUserBlacklists();
-
-    List<EndlessUser> getUsers();
 
     List<GuildSettings> getGuildSettings();
 
