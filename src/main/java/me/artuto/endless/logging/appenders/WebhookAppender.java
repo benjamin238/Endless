@@ -49,7 +49,7 @@ public class WebhookAppender extends AppenderBase<ILoggingEvent>
     {
         Level level = event.getLevel();
 
-        String toSend = "["+level.levelStr.toUpperCase()+"] \n"+MiscUtils.getStackTrace(event);
+        String toSend = "["+level.levelStr.toUpperCase()+"] "+MiscUtils.getStackTrace(event);
         client.send(FormatUtil.sanitize(toSend));
     }
 }
