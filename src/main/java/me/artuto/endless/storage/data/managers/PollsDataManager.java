@@ -24,7 +24,10 @@ import me.artuto.endless.core.entities.Poll;
 import me.artuto.endless.handlers.PollHandler;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.LinkedList;

@@ -29,7 +29,10 @@ import me.artuto.endless.core.entities.impl.LocalTagImpl;
 import net.dv8tion.jda.core.entities.Guild;
 import org.json.JSONArray;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;

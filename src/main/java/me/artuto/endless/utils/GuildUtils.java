@@ -21,13 +21,11 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.core.entities.ParsedAuditLog;
-import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.core.entities.impl.ParsedAuditLogImpl;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.audit.AuditLogChange;
 import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.audit.AuditLogKey;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.Collection;
 import java.util.Collections;

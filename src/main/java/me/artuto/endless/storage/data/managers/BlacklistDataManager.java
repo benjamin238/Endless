@@ -20,15 +20,19 @@ package me.artuto.endless.storage.data.managers;
 import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
+import me.artuto.endless.core.entities.Blacklist;
 import me.artuto.endless.core.entities.BlacklistType;
 import me.artuto.endless.core.entities.impl.EndlessCoreImpl;
-import me.artuto.endless.core.entities.Blacklist;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BlacklistDataManager
 {

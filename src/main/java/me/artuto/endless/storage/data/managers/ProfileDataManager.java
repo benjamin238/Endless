@@ -23,7 +23,10 @@ import me.artuto.endless.Endless;
 import me.artuto.endless.core.entities.Profile;
 import net.dv8tion.jda.core.entities.User;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ProfileDataManager
 {
