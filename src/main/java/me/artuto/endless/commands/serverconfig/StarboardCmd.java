@@ -48,6 +48,8 @@ public class StarboardCmd extends EndlessCommand
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
         this.needsArguments = false;
+        this.cooldown = 60;
+        this.cooldownScope = CooldownScope.GUILD;
     }
 
     @Override
