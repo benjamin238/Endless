@@ -92,9 +92,14 @@ public class ServerLogging
         }
         if(!(welcomeChan==null) && welcomeChan.canTalk() && !(welcomeMsg==null))
         {
-            parser.clear().put("user", user).put("guild", guild).put("channel", welcomeChan).put("builder", new EmbedBuilder());
+            EmbedBuilder tagEmbed = new EmbedBuilder();
+            parser.clear().put("user", user).put("guild", guild).put("channel", welcomeChan).put("builder", tagEmbed);
             toSend = parser.parse(welcomeMsg);
-            Sender.sendMessage(welcomeChan, toSend);
+            if(!(tagEmbed.isEmpty()))
+                Sender.sendMessage(welcomeChan, new MessageBuilder().setContent(FormatUtil.sanitize(toSend))
+                        .setEmbed(tagEmbed.build()).build());
+            else
+                Sender.sendMessage(welcomeChan, toSend);
             parser.clear();
         }
     }
@@ -124,9 +129,14 @@ public class ServerLogging
         }
         if(!(leaveChan==null) && leaveChan.canTalk() && !(leaveMsg==null))
         {
-            parser.clear().put("user", user).put("guild", guild).put("channel", leaveChan).put("builder", new EmbedBuilder());
+            EmbedBuilder tagEmbed = new EmbedBuilder();
+            parser.clear().put("user", user).put("guild", guild).put("channel", leaveChan).put("builder", tagEmbed);
             toSend = parser.parse(leaveMsg);
-            Sender.sendMessage(leaveChan, toSend);
+            if(!(tagEmbed.isEmpty()))
+                Sender.sendMessage(leaveChan, new MessageBuilder().setContent(FormatUtil.sanitize(toSend))
+                        .setEmbed(tagEmbed.build()).build());
+            else
+                Sender.sendMessage(leaveChan, toSend);
             parser.clear();
         }
     }

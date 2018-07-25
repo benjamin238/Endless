@@ -29,6 +29,7 @@ import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.TagUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Member;
@@ -117,8 +118,13 @@ public class TagCmd extends EndlessCommand
             return;
         }
 
-        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getChannel()).put("args", tagArgs);
-        event.reply(parser.parse(tag.getContent()));
+        EmbedBuilder tagEmbed = new EmbedBuilder();
+        parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getChannel())
+                .put("args", tagArgs).put("builder", tagEmbed);
+        if(!(tagEmbed.isEmpty()))
+            event.reply(new MessageBuilder().setContent(parser.parse(tag.getContent())).setEmbed(tagEmbed.build()).build());
+        else
+            event.reply(parser.parse(tag.getContent()));
     }
 
     private class CreateGlobalCmd extends EndlessCommand
@@ -380,6 +386,7 @@ public class TagCmd extends EndlessCommand
         {
             this.name = "exec";
             this.help = "Parses the specified content";
+            this.aliases = new String[]{"execute", "test"};
             this.arguments = "<content>";
             this.category = Categories.FUN;
             this.guildOnly = false;
@@ -389,8 +396,13 @@ public class TagCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel());
-            event.reply(parser.parse(event.getArgs()));
+            EmbedBuilder tagEmbed = new EmbedBuilder();
+            parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel())
+                    .put("builder", tagEmbed);
+            if(!(tagEmbed.isEmpty()))
+                event.reply(new MessageBuilder().setContent(parser.parse(event.getArgs())).setEmbed(tagEmbed.build()).build());
+            else
+                event.reply(parser.parse(event.getArgs()));
         }
     }
 
