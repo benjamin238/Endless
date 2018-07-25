@@ -127,7 +127,7 @@ public class Bot extends ListenerAdapter
     public ScheduledExecutorService starboardThread;
 
     // Webhooks
-    WebhookClient logWebhook;
+    public WebhookClient logWebhook;
 
     public static Bot getInstance()
     {

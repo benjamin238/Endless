@@ -152,6 +152,12 @@ public class FormatUtil
         return str;
     }
 
+    public static String removeFormatting(String text)
+    {
+        return text.replace("_", "\\_").replace("*", "\\*").replace("~", "\\~")
+                .replace("`", "\\`");
+    }
+
     public static String sanitize(String message)
     {
         return message.replace("@everyone", "@\u0435veryone").replace("@here", "@h\u0435re").trim();
