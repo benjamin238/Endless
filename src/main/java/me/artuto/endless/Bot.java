@@ -109,15 +109,15 @@ public class Bot extends ListenerAdapter
     public EventWaiter waiter;
 
     // Logging
-    public BotLogging botlog;
+    BotLogging botlog;
+    ServerLogging serverlog;
     public ModLogging modlog;
-    public ServerLogging serverlog;
 
     // Loggers
     private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
 
     // Pools
-    public ScheduledThreadPoolExecutor endlessPool;
+    private ScheduledThreadPoolExecutor endlessPool;
 
     // Schedulers;
     private ScheduledExecutorService muteScheduler;
@@ -132,7 +132,7 @@ public class Bot extends ListenerAdapter
     public ScheduledExecutorService starboardThread;
 
     // Webhooks
-    public WebhookClient cmdWebhook;
+    WebhookClient cmdWebhook;
     public WebhookClient logWebhook;
 
     public static Bot getInstance()
