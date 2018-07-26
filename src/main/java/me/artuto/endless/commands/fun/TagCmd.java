@@ -121,10 +121,11 @@ public class TagCmd extends EndlessCommand
         EmbedBuilder tagEmbed = new EmbedBuilder();
         parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getChannel())
                 .put("args", tagArgs).put("builder", tagEmbed);
+        String parsed = parser.parse(tag.getContent());
         if(!(tagEmbed.isEmpty()))
-            event.reply(new MessageBuilder().setContent(parser.parse(tag.getContent())).setEmbed(tagEmbed.build()).build());
+            event.reply(new MessageBuilder().setContent(parsed).setEmbed(tagEmbed.build()).build());
         else
-            event.reply(parser.parse(tag.getContent()));
+            event.reply(parsed);
     }
 
     private class CreateGlobalCmd extends EndlessCommand
@@ -399,10 +400,11 @@ public class TagCmd extends EndlessCommand
             EmbedBuilder tagEmbed = new EmbedBuilder();
             parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel())
                     .put("builder", tagEmbed);
+            String parsed = parser.parse(event.getArgs());
             if(!(tagEmbed.isEmpty()))
-                event.reply(new MessageBuilder().setContent(parser.parse(event.getArgs())).setEmbed(tagEmbed.build()).build());
+                event.reply(new MessageBuilder().setContent(parsed).setEmbed(tagEmbed.build()).build());
             else
-                event.reply(parser.parse(event.getArgs()));
+                event.reply(parsed);
         }
     }
 
