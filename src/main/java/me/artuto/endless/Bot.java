@@ -247,7 +247,7 @@ public class Bot extends ListenerAdapter
 
                 // Tools
                 new AfkCmd(), new AnnouncementCmd(), new AvatarCmd(), new ChannelInfoCmd(), new EmoteCmd(), new GuildInfoCmd(),
-                new LookupCmd(), new PollCmd(this), new QuoteCmd(), new RoleCmd(), new UserInfoCmd(),
+                new LookupCmd(), new NickCmd(), new PollCmd(this), new QuoteCmd(), new RoleCmd(), new UserInfoCmd(),
 
                 // Utils
                 new ArchiveCmd(this), new ColorMeCmd(this), new GoogleSearchCmd(this), new ReminderCmd(this),
