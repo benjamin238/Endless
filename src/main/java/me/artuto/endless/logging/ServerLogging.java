@@ -387,14 +387,14 @@ public class ServerLogging
 
         if(user.isBot())
             return;
-        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voiceleft", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog))
+        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voiceleave", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog))
             return;
 
         OffsetDateTime now = OffsetDateTime.now();
         String toSend;
 
-        String VOICE_LEFT = GENERAL+" disconnected from the voice channel **%s**";
-        toSend = String.format(VOICE_LEFT, FormatUtil.timeF(now, gs.getTimezone()), Const.VOICE_LEAVE, user.getName(), user.getDiscriminator(), user.getIdLong(),
+        String VOICE_LEAVE = GENERAL+" disconnected from the voice channel **%s**";
+        toSend = String.format(VOICE_LEAVE, FormatUtil.timeF(now, gs.getTimezone()), Const.VOICE_LEAVE, user.getName(), user.getDiscriminator(), user.getIdLong(),
                 left.getName());
         Sender.sendMessage(serverlog, FormatUtil.sanitize(toSend));
     }
