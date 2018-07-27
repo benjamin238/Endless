@@ -67,7 +67,7 @@ public class LogUtils
 
     public static boolean isActionIgnored(Action action, TextChannel modlog)
     {
-        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-"+action.getInternalAction()+"}");
+        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-ex:"+action.getInternalAction()+"}");
     }
 
     public static boolean isIssuerIgnored(long id, TextChannel channel)
@@ -82,7 +82,7 @@ public class LogUtils
 
     public static boolean isTypeIgnored(String type, TextChannel modlog)
     {
-        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-"+type+"}");
+        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-ex:"+type+"}");
     }
 
     public static File getAvatarUpdateImage(UserUpdateAvatarEvent event)
