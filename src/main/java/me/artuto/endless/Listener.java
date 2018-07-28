@@ -130,6 +130,7 @@ public class Listener implements CommandListener, EventListener
             GuildJoinEvent event = (GuildJoinEvent)preEvent;
             bot.botlog.logJoin(event);
             bot.sendStats(event.getJDA());
+            bot.updateGame(event.getJDA());
             sendJoinMessage(event);
         }
         else if(preEvent instanceof GuildLeaveEvent)
@@ -137,6 +138,7 @@ public class Listener implements CommandListener, EventListener
             GuildLeaveEvent event = (GuildLeaveEvent)preEvent;
             bot.botlog.logLeave(event);
             bot.sendStats(event.getJDA());
+            bot.updateGame(event.getJDA());
         }
         else if(preEvent instanceof GuildMessageReceivedEvent)
         {
