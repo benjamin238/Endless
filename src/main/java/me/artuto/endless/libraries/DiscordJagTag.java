@@ -221,6 +221,10 @@ public class DiscordJagTag
                         default: eb.setColor(Color.decode(in[0]));
                     }
                     return "";}),
+                new Method("description", (env, in) -> {
+                    EmbedBuilder eb = env.get("builder");
+                    eb.setDescription(in[0]);
+                    return "";}),
                 new Method("footer", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
                     String[] parts = in[0].split("\\|",2);
