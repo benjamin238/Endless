@@ -131,7 +131,7 @@ public class RoomCmd extends EndlessCommand
             this.arguments = "<rooms name> | [expiry time]";
             this.botPerms = new Permission[]{Permission.MANAGE_CHANNEL};
             this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
-            this.cooldown = 1000;
+            this.cooldown = 60;
             this.cooldownScope = CooldownScope.GUILD;
             this.parent = RoomCmd.this;
         }
@@ -248,7 +248,7 @@ public class RoomCmd extends EndlessCommand
             this.arguments = "<room name> | [expiry time]";
             this.botPerms = new Permission[]{Permission.MANAGE_CHANNEL};
             this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
-            this.cooldown = 1000;
+            this.cooldown = 60;
             this.cooldownScope = CooldownScope.GUILD;
             this.parent = RoomCmd.this;
         }
@@ -348,7 +348,7 @@ public class RoomCmd extends EndlessCommand
             this.arguments = "<room name> | [expiry time]";
             this.botPerms = new Permission[]{Permission.MANAGE_CHANNEL};
             this.userPerms = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER};
-            this.cooldown = 1000;
+            this.cooldown = 60;
             this.cooldownScope = CooldownScope.GUILD;
             this.parent = RoomCmd.this;
         }
