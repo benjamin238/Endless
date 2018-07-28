@@ -58,6 +58,7 @@ import net.dv8tion.jda.core.entities.impl.JDAImpl;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.managers.Presence;
 import net.dv8tion.jda.core.requests.Requester;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
@@ -379,8 +380,8 @@ public class Bot extends ListenerAdapter
         JDA.ShardInfo shardInfo = shard.getShardInfo();
         Presence presence = shard.getPresence();
 
-        if(!(bot.maintenance))
-            presence.setPresence(bot.config.getStatus(), Game.playing("Type "+bot.config.getPrefix()+"help | Version "
+        if(!(maintenance))
+            presence.setPresence(config.getStatus(), Game.playing("Type "+config.getPrefix()+"help | Version "
                     +Const.VERSION+" | On "+shard.getGuildCache().size()+" Guilds | "+shard.getUserCache().size()+
                     " Users | Shard "+(shardInfo.getShardId()+1)));
         else
