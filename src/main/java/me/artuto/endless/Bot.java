@@ -373,4 +373,18 @@ public class Bot extends ListenerAdapter
             });
         }
     }
+    
+    public void updateGame(JDA shard)
+    {
+        JDA.ShardInfo shardInfo = shard.getShardInfo();
+        Presence presence = shard.getPresence();
+
+        if(!(bot.maintenance))
+            presence.setPresence(bot.config.getStatus(), Game.playing("Type "+bot.config.getPrefix()+"help | Version "
+                    +Const.VERSION+" | On "+shard.getGuildCache().size()+" Guilds | "+shard.getUserCache().size()+
+                    " Users | Shard "+(shardInfo.getShardId()+1)));
+        else
+            presence.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("Maintenance mode enabled | Shard "
+                    +(shardInfo.getShardId()+1)));
+    }
 }
