@@ -20,11 +20,12 @@ package me.artuto.endless.commands.botadm;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.managers.Presence;
 
 /**
  * @author Artuto
@@ -37,7 +38,7 @@ public class BotCPanelCmd extends EndlessCommand
         this.name = "bot";
         this.help = "Controls the status, game, optimized the bot and other useful things.";
         this.category = Categories.BOTADM;
-        this.children = new Command[]{new Status(), new Playing(), new DefaultGameUpdate(), new Optimize()};
+        this.children = new Command[]{new StatusCmd(), new PlayingCmd(), new DefaultGameUpdateCmd(), new OptimizeCmd()};
         this.ownerCommand = true;
         this.guildOnly = false;
     }
@@ -45,17 +46,13 @@ public class BotCPanelCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        String prefix = event.getClient().getPrefix();
-
-        if(event.getArgs().isEmpty())
-            event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n"+"- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n"+"- `"+prefix+"bot updategame`: Updates the default game.\n"+"- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
-        else if(!(event.getArgs().contains("status")) || !(event.getArgs().contains("game") || !(event.getArgs().contains("updategame"))) || !(event.getArgs().contains("optimize")))
-            event.replyWarning("Please choose a subcommand:\n"+"- `"+prefix+"bot status`: Sets the Online Status (OnlineStatus) of the bot.\n"+"- `"+prefix+"bot game`: Sets the Game (Game.of) of the bot.\n"+"- `"+prefix+"bot updategame`: Updates the default game.\n"+"- `"+prefix+"bot optimize`: Optimizes the Bot's RAM usage. Use with caution.\n");
+        event.reply(Const.ENDLESS+" **Endless Control Panel** "+Const.ENDLESS+"\n" +
+                "Please use a subcommand.");
     }
 
-    private class Status extends EndlessCommand
+    private class StatusCmd extends EndlessCommand
     {
-        Status()
+        StatusCmd()
         {
             this.name = "status";
             this.help = "Sets the Online Status (OnlineStatus) of the bot.";
@@ -63,72 +60,84 @@ public class BotCPanelCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please provide me a valid OnlineStatus!";
+            this.parent = BotCPanelCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            try
-            {
-                String status = event.getArgs();
-                event.getJDA().getPresence().setStatus(OnlineStatus.valueOf(status));
-                event.replySuccess("Changed status to "+event.getJDA().getPresence().getStatus()+" without error!");
-            }
-            catch(Exception e)
-            {
-                event.replyError("Error when changing the status! Check the Bot console for more information.");
-                e.printStackTrace();
-            }
+            JDA jda = event.getJDA();
+            jda.asBot().getShardManager().getShards().forEach(shard -> {
+                try
+                {
+                    String status = event.getArgs().toUpperCase();
+                    event.getJDA().getPresence().setStatus(OnlineStatus.valueOf(status));
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Error when changing the status of shard "+(shard.getShardInfo().getShardId()+1)+
+                            "! Check the Bot console for more information.");
+                    e.printStackTrace();
+                }
+            });
+            event.replySuccess("Changed the status to "+event.getJDA().getPresence().getStatus()+" across "
+                    +jda.asBot().getShardManager().getShardsTotal()+" shards");
         }
     }
 
-    private class Playing extends EndlessCommand
+    private class PlayingCmd extends EndlessCommand
     {
-        Playing()
+        PlayingCmd()
         {
             this.name = "game";
-            this.help = "Sets the Game (Game.of) of the bot.";
+            this.help = "Sets the Game (Game.playing) of the bot.";
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BotCPanelCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            if(event.getArgs().isEmpty())
-            {
-                try
+            JDA jda = event.getJDA();
+            jda.asBot().getShardManager().getShards().forEach(shard -> {
+                if(event.getArgs().isEmpty())
                 {
-                    event.getJDA().getPresence().setGame(null);
-                    event.replySuccess("Game cleaned.");
+                    try
+                    {
+                        shard.getPresence().setGame(null);
+                    }
+                    catch(Exception e)
+                    {
+                        event.replyError("Error when changing the game of shard "+(shard.getShardInfo().getShardId()+1)+
+                                "! Check the Bot console for more information.");
+                        e.printStackTrace();
+                    }
                 }
-                catch(Exception e)
+                else
                 {
-                    event.replyError("Error when cleaning the game! Check the Bot console for more information.");
-                    e.printStackTrace();
+                    try
+                    {
+                        shard.getPresence().setGame(Game.playing(event.getArgs()));
+                    }
+                    catch(Exception e)
+                    {
+                        event.replyError("Error when changing the game of shard "+(shard.getShardInfo().getShardId()+1)+
+                                "! Check the Bot console for more information.");
+                        e.printStackTrace();
+                    }
                 }
-            }
-            else
-            {
-                try
-                {
-                    event.getJDA().getPresence().setGame(Game.playing(event.getArgs()));
-                    event.replySuccess("Changed game to "+event.getJDA().getPresence().getGame().getName()+" without error!");
-                }
-                catch(Exception e)
-                {
-                    event.replyError("Error when changing the game! Check the Bot console for more information.");
-                    e.printStackTrace();
-                }
-            }
+            });
+            event.replySuccess("Changed the game to "+event.getJDA().getPresence().getGame().getName()+" across "
+                    +jda.asBot().getShardManager().getShardsTotal()+" shards");
         }
     }
 
-    private class DefaultGameUpdate extends EndlessCommand
+    private class DefaultGameUpdateCmd extends EndlessCommand
     {
-        DefaultGameUpdate()
+        DefaultGameUpdateCmd()
         {
             this.name = "updategame";
             this.help = "Updates the default game.";
@@ -136,27 +145,37 @@ public class BotCPanelCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BotCPanelCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            try
-            {
-                event.getJDA().getPresence().setGame(Game.playing("Type "+event.getClient().getPrefix()+"help | Version "+Const.VERSION+" | On "+event.getJDA().getGuilds().size()+" Guilds | "+event.getJDA().getUsers().size()+" Users | "+event.getJDA().getTextChannels().size()+" Channels"));
-                event.replySuccess("Game updated.");
-            }
-            catch(Exception e)
-            {
-                event.replyError("Error when updating the game! Check the Bot console for more information.");
-                e.printStackTrace();
-            }
+            JDA jda = event.getJDA();
+            jda.asBot().getShardManager().getShards().forEach(shard -> {
+                JDA.ShardInfo shardInfo = shard.getShardInfo();
+                Presence presence = shard.getPresence();
+                try
+                {
+                    presence.setGame(Game.playing("Type "+event.getClient().getPrefix()+"help | Version "
+                            +Const.VERSION+" | On "+shard.getGuildCache().size()+" Guilds | "+shard.getUserCache().size()+
+                            " Users | Shard "+(shardInfo.getShardId()+1)));
+                }
+                catch(Exception e)
+                {
+                    event.replyError("Error when updating the game of shard "+(shard.getShardInfo().getShardId()+1)+
+                            "! Check the Bot console for more information.");
+                    e.printStackTrace();
+                }
+            });
+            event.replySuccess("Updated the game to "+event.getJDA().getPresence().getGame().getName()+" across "
+                    +jda.asBot().getShardManager().getShardsTotal()+" shards");
         }
     }
 
-    private class Optimize extends EndlessCommand
+    private class OptimizeCmd extends EndlessCommand
     {
-        Optimize()
+        OptimizeCmd()
         {
             this.name = "optimize";
             this.help = "Optimizes the Bot's RAM usage. Use with caution.";
@@ -164,6 +183,7 @@ public class BotCPanelCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BotCPanelCmd.this;
         }
 
         @Override

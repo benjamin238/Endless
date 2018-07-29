@@ -21,8 +21,9 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.data.managers.ClientGSDMProvider;
-import me.artuto.endless.entities.ImportedTag;
+import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.core.entities.Tag;
+import me.artuto.endless.utils.TagUtil;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
@@ -36,6 +37,9 @@ public class ImportedTagHandler
 {
     public static void runTag(Bot bot, MessageReceivedEvent event)
     {
+        if(!(bot.dataEnabled))
+            return;
+
         CommandClient client = bot.client;
         EndlessCommand tagCommand = (EndlessCommand)client.getCommands().stream()
                 .filter(c -> c.getName().equals("tag")).findFirst().orElse(null);
@@ -44,7 +48,7 @@ public class ImportedTagHandler
         if(event.getGuild()==null)
             return;
 
-        ClientGSDMProvider settings = client.getSettingsFor(event.getGuild());
+        GuildSettings settings = client.getSettingsFor(event.getGuild());
         String contentRaw = event.getMessage().getContentRaw();
         String[] parts = null;
 
@@ -82,13 +86,17 @@ public class ImportedTagHandler
 
                 String commandArgs = String.join(" ", parts[0], parts[1]==null?"":parts[1]);
                 String[] tagParts = splitTagNameAndArgs(commandArgs);
-                ImportedTag tag = bot.tdm.getImportedTagsForGuild(event.getGuild().getIdLong())
+                Tag tag = bot.endless.getGuildSettings(event.getGuild()).getImportedTags()
                         .stream().filter(t -> t.getName().equals(tagParts[0])).findFirst().orElse(null);
-
                 if(tag==null)
                     return;
 
                 CommandEvent cevent = new CommandEvent(event, commandArgs, client);
+                if(tag.isNSFW() && !(TagUtil.isNSFWAllowed(cevent)))
+                {
+                    cevent.replyError("This tag has been marked as NSFW! To use this tag mark this channel as NSFW.");
+                    return;
+                }
                 if(!(client.getListener()==null))
                     client.getListener().onCommand(cevent, tagCommand);
                 tagCommand.run(cevent);

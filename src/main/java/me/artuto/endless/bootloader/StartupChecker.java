@@ -19,9 +19,9 @@ package me.artuto.endless.bootloader;
 
 import ch.qos.logback.classic.Logger;
 import me.artuto.endless.Const;
-import me.artuto.endless.exceptions.ConfigException;
-import me.artuto.endless.exceptions.GuildException;
-import me.artuto.endless.exceptions.OwnerException;
+import me.artuto.endless.core.exceptions.ConfigException;
+import me.artuto.endless.core.exceptions.GuildException;
+import me.artuto.endless.core.exceptions.OwnerException;
 import me.artuto.endless.loader.Config;
 import org.slf4j.LoggerFactory;
 
@@ -31,19 +31,15 @@ import org.slf4j.LoggerFactory;
 
 public class StartupChecker
 {
-    private Config config;
     public static Logger LOG = (Logger)LoggerFactory.getLogger("Startup Checker");
 
-    public Config checkConfig()
+    public static void checkConfig(Config config)
     {
-        this.config = new ConfigLoader().loadConfig();
-
-        if(isConfigValid())
-            return config;
-        else throw new ConfigException();
+        if(!(isConfigValid(config)))
+            throw new ConfigException();
     }
 
-    private boolean isConfigValid()
+    private static boolean isConfigValid(Config config)
     {
         long owner = config.getOwnerId();
         long rootGuild = config.getRootGuildId();

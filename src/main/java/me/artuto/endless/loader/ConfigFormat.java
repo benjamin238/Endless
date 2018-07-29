@@ -27,9 +27,13 @@ public class ConfigFormat
     public String game;
     public String discordBotsToken;
     public String discordBotListToken;
-    public String discordBansToken;
+    public String bingMapsKey;
+    public String darkskyKey;
     public String giphyKey;
+    public String googleKey;
+    public String googleSearcherId;
     public String yandexTranslateKey;
+    public String youtubeKey;
     public String doneEmote;
     public String warnEmote;
     public String errorEmote;
@@ -39,7 +43,7 @@ public class ConfigFormat
     public Long ownerId;
     public Long[] coOwnerIds;
     public Long rootGuildId;
-    public Long botlogChannelId;
+    public String commandlogWebhook;
     public String botlogWebhook;
     public Boolean api;
     /*public int apiPort;
@@ -50,5 +54,4 @@ public class ConfigFormat
     public Boolean deepDebug;
     public boolean sentryEnabled;
     public String sentryDSN;
-    public Long commandslogChannelId;
 }

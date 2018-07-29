@@ -18,10 +18,9 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.tempdata.AfkManager;
-import net.dv8tion.jda.core.Permission;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.storage.tempdata.AfkManager;
 import net.dv8tion.jda.core.entities.User;
 
 public class AfkCmd extends EndlessCommand
@@ -29,7 +28,7 @@ public class AfkCmd extends EndlessCommand
     public AfkCmd()
     {
         this.name = "afk";
-        this.help = "Mark yourself ask afk with a message";
+        this.help = "Mark yourself as afk with a message";
         this.arguments = "[message]";
         this.category = Categories.TOOLS;
         this.guildOnly = false;
@@ -40,7 +39,7 @@ public class AfkCmd extends EndlessCommand
     {
         User user = event.getAuthor();
 
-        AfkManager.setAfk(user.getIdLong(), event.getArgs().isEmpty() ? null : event.getArgs());
+        AfkManager.setAfk(user.getIdLong(), event.getArgs().isEmpty()?null:event.getArgs());
         event.replySuccess("**"+user.getName()+"** is now AFK!");
     }
 }

@@ -21,9 +21,9 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.entities.Profile;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.core.entities.Profile;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
@@ -46,7 +46,7 @@ public class TimeForCmd extends EndlessCommand
         this.bot = bot;
         this.name = "timefor";
         this.aliases = new String[]{"tf"};
-        this.children = new Command[]{new Change(), new TList()};
+        this.children = new Command[]{new ChangeCmd(), new ListCmd()};
         this.help = "Shows the timezone for the specified user";
         this.arguments = "<user>";
         this.category = Categories.UTILS;
@@ -56,6 +56,12 @@ public class TimeForCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         Profile p;
         ZonedDateTime t;
         ZoneId zone;
@@ -70,7 +76,7 @@ public class TimeForCmd extends EndlessCommand
             p = bot.prdm.getProfile(user);
             name = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
 
-            if(bot.prdm.getProfile(user).getTimezone()==null)
+            if(p.getTimezone()==null)
                 event.replyWarning("You don't have a timezone configured!");
             else
             {
@@ -110,7 +116,8 @@ public class TimeForCmd extends EndlessCommand
             p = bot.prdm.getProfile(user);
             name = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
 
-            if(!(bot.prdm.hasProfile(user))) event.replyError(name+" doesn't has a timezone configured!");
+            if(!(bot.prdm.hasProfile(user)))
+                event.replyError(name+" doesn't has a timezone configured!");
             else
             {
                 try
@@ -132,9 +139,9 @@ public class TimeForCmd extends EndlessCommand
         }
     }
 
-    private class Change extends EndlessCommand
+    private class ChangeCmd extends EndlessCommand
     {
-        Change()
+        ChangeCmd()
         {
             this.name = "change";
             this.aliases = new String[]{"set"};
@@ -142,11 +149,18 @@ public class TimeForCmd extends EndlessCommand
             this.arguments = "<timezone>";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.parent = TimeForCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String args = event.getArgs();
 
             if(args.isEmpty())
@@ -170,15 +184,16 @@ public class TimeForCmd extends EndlessCommand
         }
     }
 
-    private class TList extends EndlessCommand
+    private class ListCmd extends EndlessCommand
     {
-        TList()
+        ListCmd()
         {
             this.name = "list";
             this.aliases = new String[]{"timezones"};
             this.help = "Shows the list with valid timezones";
             this.category = Categories.FUN;
             this.guildOnly = false;
+            this.parent = TimeForCmd.this;
         }
 
         @Override
@@ -195,6 +210,4 @@ public class TimeForCmd extends EndlessCommand
             }
         }
     }
-
-
 }

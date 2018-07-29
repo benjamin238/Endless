@@ -19,23 +19,22 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.tools.InfoTools;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.*;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Artuto
@@ -59,113 +58,202 @@ public class UserInfoCmd extends EndlessCommand
     protected void executeCommand(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
+        MessageBuilder mb = new MessageBuilder();
+        StringBuilder sb = new StringBuilder();
+
         Member member;
-        String ranks;
-        String roles;
-        String emote;
         User user;
 
         if(event.getArgs().isEmpty())
             user = event.getAuthor();
         else
         {
-            List<User> list = FinderUtil.findUsers(event.getArgs(), event.getJDA());
+            user = searchUser(event);
+            if(user==null)
+                return;
+        }
 
-            if(list.isEmpty())
+        Game game = user.getMutualGuilds().get(0).getMember(user).getGame();
+        String status = getStatus(user.getMutualGuilds().get(0).getMember(user).getOnlineStatus());
+        String statusEmote = getStatusEmote(user.getMutualGuilds().get(0).getMember(user));
+
+        sb.append(Const.LINE_START).append(" ID: **").append(user.getId()).append("**\n");
+
+        if(event.isFromType(ChannelType.TEXT))
+        {
+            member = event.getGuild().getMember(user);
+            if(member==null)
+                member = user.getMutualGuilds().get(0).getMember(user);
+            game = member.getGame();
+            status = getStatus(member.getOnlineStatus());
+            statusEmote = getStatusEmote(member);
+            sb.append(Const.LINE_START).append(" Status: ").append(statusEmote).append(" **").append(status).append("**");
+            if(!(game==null))
+                sb.append(" (").append(getGame(game.getType().getKey())).append(" *").append(game.getName()).append("*)");
+            sb.append("\n");
+
+            if(!(event.getGuild().getMember(user)==null))
             {
-                event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
-                return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfUsers(list, event.getArgs()));
-                return;
+                if(!(member.getNickname()==null))
+                    sb.append(Const.LINE_START).append(" Nickname: **").append(member.getNickname()).append("**\n");
+                String roles = member.getRoles().isEmpty()?"":member.getRoles().stream().map(IMentionable::getAsMention)
+                        .collect(Collectors.joining(", "));
+                if(!(roles.isEmpty()))
+                    sb.append(Const.LINE_START).append(" Roles: ").append(roles).append("\n");
+                sb.append(Const.LINE_START).append(" Guild Join Date: **").append(member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                        .append("**\n");
+                sb.append(Const.LINE_START).append(" Account Creation Date: **").append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                        .append("**\n");
+
+                StringBuilder strjoins;
+                List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
+                joins.sort(Comparator.comparing(Member::getJoinDate));
+                int index = joins.indexOf(member);
+                int joinnumber = index;
+                index -= 3;
+                if(index<0) index = 0;
+
+                if(joins.get(index).equals(member))
+                    strjoins = new StringBuilder("**"+joins.get(index).getUser().getName()+"**");
+                else
+                    strjoins = new StringBuilder(joins.get(index).getUser().getName());
+
+                for(int i = index+1; i<index+7; i++)
+                {
+                    if(i>=joins.size()) break;
+
+                    Member m = joins.get(i);
+                    String name = m.getUser().getName();
+
+                    if(m.equals(member)) name = "**"+name+"**";
+
+                    strjoins.append(" > ").append(name);
+                }
+                sb.append(Const.LINE_START).append(" Join Order: ").append("`(#").append(joinnumber+1).append(")` ").append(strjoins).append("\n");
+                builder.setColor(member.getColor());
             }
             else
-                user = list.get(0);
-        }
-
-        if(InfoTools.nitroCheck(user))
-            ranks = "<:nitro:334859814566101004>";
-        else
-            ranks = "";
-
-        String title = (user.isBot() ? ":information_source: Information about the bot **"+
-                user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** <:bot:334859813915983872>":
-                ":information_source: Information about the user **"+
-                        user.getName()+"**"+"#"+"**"+user.getDiscriminator()+"** "+ranks);
-
-        if(event.isFromType(ChannelType.PRIVATE))
-        {
-            member = user.getMutualGuilds().get(0).getMember(user);
-            emote = InfoTools.onlineStatus(member);
-            builder.addField(":1234: ID: ", user.getId(), true);
-            builder.addField(emote+" Status: ", member.getOnlineStatus()+
-                    (member.getGame() == null ? "" : " ("+(member.getGame().getType() == Game.GameType.STREAMING ?
-                            "On Live at [*"+member.getGame().getName()+"*]":"Playing "+member.getGame().getName())+")"+""), false);
-            builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
-            builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
+                sb.append(Const.LINE_START).append(" Account Creation Date: **").append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                        .append("**\n");
         }
         else
         {
-             member = event.getGuild().getMember(user);
-             if(member==null)
-             {
-                 member = user.getMutualGuilds().get(0).getMember(user);
-                 emote = InfoTools.onlineStatus(member);
-                 builder.addField(":1234: ID: ", user.getId(), true);
-                 builder.addField(emote+" Status: ", member.getOnlineStatus()+
-                         (member.getGame() == null ? "" : " ("+(member.getGame().getType() == Game.GameType.STREAMING ?
-                                 "On Live at [*"+member.getGame().getName()+"*]":"Playing "+member.getGame().getName())+")"+""), false);
-                 builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
-                 builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
-             }
-             else
-             {
-                 String strjoins;
-                 List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
-                 Collections.sort(joins, Comparator.comparing(Member::getJoinDate));
-                 int index = joins.indexOf(member);
-                 int joinnumber = index;
-                 index -= 3;
-                 if(index<0) index = 0;
-
-                 if(joins.get(index).equals(member))
-                     strjoins = "**"+joins.get(index).getUser().getName()+"**";
-                 else
-                     strjoins = joins.get(index).getUser().getName();
-
-                 for(int i = index+1; i<index+7; i++)
-                 {
-                     if(i>=joins.size()) break;
-
-                     Member m = joins.get(i);
-                     String name = m.getUser().getName();
-
-                     if(m.equals(member)) name = "**"+name+"**";
-
-                     strjoins += " > "+name;
-                 }
-
-                 roles = InfoTools.mentionUserRoles(member);
-                 emote = InfoTools.onlineStatus(member);
-
-                 builder.addField(":1234: ID: ", user.getId(), true);
-                 if(!(member.getNickname()==null))
-                     builder.addField(":bust_in_silhouette: Nickname: ", member.getNickname(), true);
-                 builder.addField(emote+" Status: ", member.getOnlineStatus()+
-                         (member.getGame() == null ? "" : " ("+(member.getGame().getType() == Game.GameType.STREAMING ?
-                                 "On Live at [*"+member.getGame().getName()+"*]":"Playing "+member.getGame().getName())+")"+""), false);
-                 if(!(roles.isEmpty()))
-                     builder.addField(":performing_arts: Roles: ", roles, false);
-                 builder.addField(":calendar_spiral: Guild Join Date: ", member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
-                 builder.addField(":calendar_spiral: Account Creation Date: ", member.getUser().getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME), true);
-                 builder.addField("Join Order: `(#"+(joinnumber+1)+")`", strjoins, false);
-                 builder.setColor(member.getColor());
-                 builder.setThumbnail(member.getUser().getEffectiveAvatarUrl());
-             }
+            sb.append(Const.LINE_START).append(" Status: ").append(statusEmote).append(" **").append(status).append("**");
+            if(!(game==null))
+                sb.append(" (").append(getGame(game.getType().getKey())).append(" *").append(game.getName()).append("*)");
+            sb.append("\n");
+            sb.append(Const.LINE_START).append(" Account Creation Date: **").append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                    .append("**\n");
         }
 
-        event.reply(new MessageBuilder(title).setEmbed(builder.build()).build());
+        builder.setDescription(sb).setThumbnail(MiscUtils.getImageUrl("png", null, user.getEffectiveAvatarUrl()));
+        boolean nitro = !(user.getAvatarId()==null) && user.getAvatarId().startsWith("a_");
+        String title = (user.isBot()?Const.BOT:Const.PEOPLE)+" Information about **"+user.getName()+"**#**"+user.getDiscriminator()+"** "
+                +(nitro?Const.NITRO:"");
+        event.reply(mb.setContent(title).setEmbed(builder.build()).build());
+    }
+
+    private String getGame(int type)
+    {
+        switch(type)
+        {
+            case 0:
+                return "Playing";
+            case 1:
+                return "Streaming";
+            case 2:
+                return "Listening";
+            case 3:
+                return "Watching";
+            default:
+                return "Playing";
+        }
+    }
+
+    private String getStatusEmote(Member member)
+    {
+        if(!(member.getGame()==null) && member.getGame().getType()==Game.GameType.STREAMING)
+            return Const.STREAMING;
+
+        switch(member.getOnlineStatus())
+        {
+            case ONLINE:
+                return Const.ONLINE;
+            case IDLE:
+                return Const.IDLE;
+            case DO_NOT_DISTURB:
+                return Const.DND;
+            case OFFLINE:
+                return Const.OFFLINE;
+            default:
+                return Const.INVISIBLE;
+        }
+    }
+
+    private String getStatus(OnlineStatus status)
+    {
+        switch(status)
+        {
+            case ONLINE:
+                return "Online";
+            case IDLE:
+                return "Idle";
+            case DO_NOT_DISTURB:
+                return "Do Not Disturb";
+            case OFFLINE:
+                return "Offline";
+            default:
+                return "Invisible";
+        }
+    }
+
+    private User searchUser(CommandEvent event)
+    {
+        if(event.isFromType(ChannelType.TEXT))
+        {
+            List<Member> members = FinderUtil.findMembers(event.getArgs(), event.getGuild());
+
+            if(members.isEmpty())
+            {
+                List<User> users = FinderUtil.findUsers(event.getArgs(), event.getJDA());
+
+                if(users.isEmpty())
+                {
+                    event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
+                    return null;
+                }
+                else if(users.size()>1)
+                {
+                    event.replyWarning(FormatUtil.listOfUsers(users, event.getArgs()));
+                    return null;
+                }
+                else
+                    return users.get(0);
+            }
+            else if(members.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfMembers(members, event.getArgs()));
+                return null;
+            }
+            else
+                return members.get(0).getUser();
+        }
+        else
+        {
+            List<User> users = FinderUtil.findUsers(event.getArgs(), event.getJDA());
+
+            if(users.isEmpty())
+            {
+                event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
+                return null;
+            }
+            else if(users.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfUsers(users, event.getArgs()));
+                return null;
+            }
+            else
+                return users.get(0);
+        }
     }
 }

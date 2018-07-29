@@ -18,17 +18,15 @@
 package me.artuto.endless.handlers;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.data.managers.BlacklistDataManager;
-import me.artuto.endless.entities.Blacklist;
+import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.Blacklist;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.time.format.DateTimeFormatter;
 
 /**
  * @author Artuto
@@ -36,12 +34,12 @@ import java.time.format.DateTimeFormatter;
 
 public class BlacklistHandler
 {
+    private final Bot bot;
     private final Logger LOG = LoggerFactory.getLogger("Blacklisted Entities");
-    private BlacklistDataManager db;
 
-    public BlacklistHandler(BlacklistDataManager db)
+    public BlacklistHandler(Bot bot)
     {
-        this.db = db;
+        this.bot = bot;
     }
 
     public boolean handleBlacklist(CommandEvent event)
@@ -49,13 +47,16 @@ public class BlacklistHandler
         Guild guild = event.getGuild();
         User user = event.getAuthor();
 
-        if(event.isOwner()) return true;
+        if(!(bot.dataEnabled))
+            return true;
+        if(event.isOwner())
+            return true;
 
-        Blacklist userBlacklist = db.getBlacklist(user.getIdLong());
-
+        Blacklist userBlacklist = bot.endless.getBlacklist(user.getIdLong());
         if(!(userBlacklist==null))
         {
             EmbedBuilder builder = new EmbedBuilder().setColor(Color.RED);
+            builder.setTitle("You have been blacklisted!");
             builder.setDescription("I'm sorry, but the owner of this bot has blocked you from using **"+event.getSelfUser().getName()+"**' commands.\n\n" +
                     "Reason: `"+userBlacklist.getReason()+"`\n\n" +
                     "*If you think this is an error, please join the support guild.*");
@@ -64,20 +65,34 @@ public class BlacklistHandler
             LOG.info("A Blacklisted user executed a command: "+user.getName()+"#"+user.getDiscriminator()+" (ID: "+user.getId()+")");
             return false;
         }
-        else if(!(guild==null) && !(db.getBlacklist(guild.getIdLong())==null))
+        else if(!(guild==null) && !(bot.endless.getBlacklist(guild.getIdLong())==null))
         {
-            Blacklist guildBlacklist = db.getBlacklist(guild.getIdLong());
+            Blacklist guildBlacklist = bot.endless.getBlacklist(guild.getIdLong());
             EmbedBuilder builder = new EmbedBuilder().setColor(Color.RED);
+            builder.setTitle("This guild has been blacklisted!");
             builder.setDescription("I'm sorry, but the owner of this bot has blocked this guild from using **"+event.getSelfUser().getName()+"**' commands.\n\n" +
                     "Reason: `"+guildBlacklist.getReason()+"`\n\n" +
                     "*If you think this is an error, please join the support guild.*");
             builder.setTimestamp(guildBlacklist.getTime());
             event.reply(builder.build());
             LOG.info("Command executed in blacklisted guild: "+guild.getName()+" (ID: "+guild.getId()+")");
-            guild.leave().queue();
             return false;
         }
 
         return true;
+    }
+
+    public boolean isBlacklisted(Guild guild)
+    {
+        if(!(bot.dataEnabled))
+            return false;
+        return !(bot.endless.getBlacklist(guild.getIdLong())==null);
+    }
+
+    public boolean isBlacklisted(User user)
+    {
+        if(!(bot.dataEnabled))
+            return false;
+        return !(bot.endless.getBlacklist(user.getIdLong())==null);
     }
 }

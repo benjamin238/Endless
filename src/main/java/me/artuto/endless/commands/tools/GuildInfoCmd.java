@@ -18,14 +18,16 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.FinderUtil;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
 
 import java.time.format.DateTimeFormatter;
 
@@ -49,47 +51,61 @@ public class GuildInfoCmd extends EndlessCommand
     protected void executeCommand(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
-        String roles;
-        String voicech;
+        MessageBuilder mb = new MessageBuilder();
+        StringBuilder sb = new StringBuilder();
+
         Guild guild = event.getGuild();
-        Member owner;
-        owner = guild.getOwner();
-        String title = ":information_source: Information about the guild **"+guild.getName()+"**";
-        long botCount = guild.getMembers().stream().filter(u -> u.getUser().isBot()).count();
+        int memberCount = (int)guild.getMemberCache().size();
+        int botCount = (int)guild.getMemberCache().stream().filter(m -> m.getUser().isBot()).count();
+        int onlineCount = (int)guild.getMemberCache().stream().filter(m -> m.getOnlineStatus()==OnlineStatus.ONLINE).count();
+        int idleCount = (int)guild.getMemberCache().stream().filter(m -> m.getOnlineStatus()==OnlineStatus.IDLE).count();
+        int dndCount = (int)guild.getMemberCache().stream().filter(m -> m.getOnlineStatus()==OnlineStatus.DO_NOT_DISTURB).count();
+        int offlineCount = (int)guild.getMemberCache().stream().filter(m -> m.getOnlineStatus()==OnlineStatus.OFFLINE).count();
+        User owner = guild.getOwner().getUser();
 
-        StringBuilder rolesbldr = new StringBuilder();
-        guild.getRoles().forEach(r -> rolesbldr.append(" ").append(r.getAsMention()));
+        sb.append(Const.LINE_START).append(" ID: **").append(guild.getId()).append("**\n");
+        sb.append(Const.LINE_START).append(" Owner: **").append(owner.getName()).append("#").append(owner.getDiscriminator()).append("**\n");
+        sb.append(Const.LINE_START).append(" Voice Region: **").append(guild.getRegion().getName()).append(" ")
+                .append(guild.getRegion().getEmoji()).append("**\n");
+        sb.append(Const.LINE_START).append(" Creation: **").append(guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
+        sb.append(Const.LINE_START).append(" Members: ").append(Const.ONLINE).append(" **").append(onlineCount).append("** - ")
+                .append(Const.IDLE).append(" **").append(idleCount).append("** - ").append(Const.DND).append(" **").append(dndCount)
+                .append("** - ").append(Const.OFFLINE).append(" **").append(offlineCount).append("** (**").append(memberCount).append("**, ")
+                .append(Const.BOT).append(" **").append(botCount).append("**)\n");
+        sb.append(Const.LINE_START).append(" Channels: Text: **").append(guild.getTextChannelCache().size()).append("** - Voice: **")
+                .append(guild.getVoiceChannelCache().size()).append("**\n");
+        sb.append(Const.LINE_START).append(" Verification Level: **").append(getVerificationLevel(guild.getVerificationLevel().getKey())).append("**\n");
+        sb.append(Const.LINE_START).append(" Explicit Content Level: **").append(guild.getExplicitContentLevel().getDescription()).append("**");
 
-        StringBuilder textchbldr = new StringBuilder();
-        guild.getTextChannels().forEach(tc -> textchbldr.append(" ").append(tc.getAsMention()));
+        if(!(guild.getSplashId()==null))
+        {
+            sb.append("\n_ _\n").append(Const.PARTNER).append(" **Discord Partner** ").append(Const.PARTNER);
+            builder.setImage(MiscUtils.getImageUrl("png", "2048", guild.getSplashUrl()));
+        }
 
-        StringBuilder voicechbldr = new StringBuilder();
-        guild.getVoiceChannels().forEach(vc -> voicechbldr.append(" ").append(vc.getName()));
+        builder.setColor(guild.getMember(owner).getColor()).setDescription(sb)
+                .setThumbnail(MiscUtils.getImageUrl("png", null, guild.getIconUrl()));
+        boolean verified = guild.getFeatures().contains("VERIFIED");
+        String title = ":computer: Info about **"+guild.getName()+"** "+(verified?Const.VERIFIED:"");
+        event.reply(mb.setContent(title).setEmbed(builder.build()).build());
+    }
 
-        if(rolesbldr.toString().isEmpty())
-            roles = "**None**";
-        else
-            roles = rolesbldr.toString();
-
-        if(voicechbldr.toString().isEmpty())
-            voicech = "**None**";
-        else
-            voicech = voicechbldr.toString();
-
-        builder.addField(":1234: ID: ", "**"+guild.getId()+"**", true);
-        builder.addField(":bust_in_silhouette: Owner: ", "**"+owner.getUser().getName()+"**#**"+owner.getUser().getDiscriminator()+"**", true);
-        builder.addField(":map: Region: ", "**"+guild.getRegion()+"**", true);
-        builder.addField(":one: User count: ", "**"+guild.getMembers().size()+"** (**"+botCount+"** bots)", true);
-        builder.addField(":hammer: Roles: ", roles, false);
-        builder.addField(":speech_left: Text Channels: ", textchbldr.toString(), false);
-        builder.addField(":speaker: Voice Channels: ", voicech, false);
-        builder.addField(":speech_balloon: Default Channel: ", FinderUtil.getDefaultChannel(guild).getAsMention(), true);
-        builder.addField(":date: Creation Date: ", "**"+guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", true);
-        builder.addField(":vertical_traffic_light: Verification level: ", "**"+guild.getVerificationLevel()+"**", true);
-        builder.addField(":envelope: Default Notification level: ", "**"+guild.getDefaultNotificationLevel()+"**", true);
-        builder.addField(":wrench: Explicit Content Filter level: ", "**"+guild.getExplicitContentLevel()+"**", true);
-        builder.setThumbnail(guild.getIconUrl());
-        builder.setColor(guild.getSelfMember().getColor());
-        event.getChannel().sendMessage(new MessageBuilder().append(title).setEmbed(builder.build()).build()).queue();
+    private String getVerificationLevel(int level)
+    {
+        switch(level)
+        {
+            case 0:
+                return "None";
+            case 1:
+                return "Low";
+            case 2:
+                return "Medium";
+            case 3:
+                return "(╯°□°）╯︵ ┻━┻";
+            case 4:
+                return "┻━┻ ﾐヽ(ಠ益ಠ)ノ彡┻━┻";
+            default:
+                return "Unknown";
+        }
     }
 }

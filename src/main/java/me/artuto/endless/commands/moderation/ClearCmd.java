@@ -18,14 +18,15 @@
 package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Messages;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.Endless;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;
-import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 import java.util.LinkedList;
@@ -50,7 +51,7 @@ public class ClearCmd extends EndlessCommand
         "-`links`: Clears messages which contains links.\n"+"-`images`: Clears messages with images.\n"+
         "-`<@user|ID|nickname|username>`: Clears messages sent by the specified user.\n"+
         "-`\"text\"`: Clears messages with the text specified in quotes.\n"+
-        "-` `regex` `: Clears messages that match the specified regex.";
+        "-` \\`regex\\` `: Clears messages that match the specified regex.";
 
     public ClearCmd(Bot bot)
     {
@@ -67,46 +68,39 @@ public class ClearCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        String params = event.getArgs();
-        String r;
-
-        try
-        {
-            String[] args = event.getArgs().split(" for", 2);
-            params = args[0];
-            r = args[1];
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            params = event.getArgs();
-            r = "[no reason specified]";
-        }
+        String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
+        String params = args[0];
+        String logParams = params;
+        String reason = args[1];
 
         int num = -1;
         List<String> text = new LinkedList<>();
         String pattern = null;
         List<String> ids = new LinkedList<>();
-        String finalR = r;
-        String finalParams = params;
 
         Matcher m = MESSAGE.matcher(params);
-        while(m.find()) text.add(m.group(1).trim().toLowerCase());
+        while(m.find())
+            text.add(m.group(1).trim().toLowerCase());
         params = params.replaceAll(MESSAGE.pattern(), " ");
 
         m = REGEX.matcher(params);
-        while(m.find()) pattern = m.group(1);
+        while(m.find())
+            pattern = m.group(1);
         params = params.replaceAll(REGEX.pattern(), " ");
 
         m = MENTION.matcher(params);
-        while(m.find()) ids.add(m.group(1));
+        while(m.find())
+            ids.add(m.group(1));
         params = params.replaceAll(MENTION.pattern(), " ");
 
         m = ID.matcher(params);
-        while(m.find()) ids.add(m.group(1));
+        while(m.find())
+            ids.add(m.group(1));
         params = params.replaceAll(ID.pattern(), " ");
 
         m = NUM.matcher(params);
-        while(m.find()) num = Integer.parseInt(m.group(1));
+        while(m.find())
+            num = Integer.parseInt(m.group(1));
         params = params.replaceAll(NUM.pattern(), " ");
 
         boolean bots = params.contains("bots");
@@ -121,7 +115,6 @@ public class ClearCmd extends EndlessCommand
             return;
         }
         else num = 100;
-
         if(num>1000 || num<2)
         {
             String numberOfPosts = "The number of messages must be between `2` and `1000`";
@@ -186,9 +179,10 @@ public class ClearCmd extends EndlessCommand
                 {
                     if(!(p == null) && msg.getContentRaw().matches(p)) deletion.add(msg);
                 }
-                catch(Exception ignored)
-                {
-                }
+                catch(Exception ignored) {}
+
+                if(msg.isPinned())
+                    deletion.remove(msg);
             }
 
             if(deletion.isEmpty())
@@ -214,14 +208,13 @@ public class ClearCmd extends EndlessCommand
             }
             catch(Exception e)
             {
-                event.replyError(Messages.CLEAR_ERROR+"**"+deletion.size()+"** messages!");
-                LoggerFactory.getLogger(ClearCmd.class).error("Error while cleaning messages in TC: "+event.getTextChannel().getId(), e);
-                e.printStackTrace();
+                event.replyError(String.format("An error happened when clearing **%d** messages!", deletion.size()));
+                Endless.LOG.error("Error while cleaning messages in TC: {}", event.getTextChannel().getId(), e);
                 return;
             }
 
-            event.replySuccess(Messages.CLEAR_SUCCESS+"**"+deletion.size()+"** messages!");
-            bot.modlog.logClear(event.getAuthor(), event.getTextChannel(), finalR, event.getGuild(), deletion, finalParams);
+            event.replySuccess(String.format("Successfully cleared **%d** messages!", deletion.size()), s -> event.getMessage().delete().queue());
+            bot.modlog.logClear(Action.CLEAN, event, deletion, OffsetDateTime.now(), logParams, reason);
         });
     }
 

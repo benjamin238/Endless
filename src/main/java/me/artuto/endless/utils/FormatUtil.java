@@ -19,17 +19,49 @@ package me.artuto.endless.utils;
 
 import net.dv8tion.jda.core.entities.*;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Artuto
- * <p>
- * The following code is property of jagrosh (https://github.com/jagrosh/Spectra) with some changes made by me.
- * Contact me if any issue.
+ *
  */
 
 public class FormatUtil
 {
+    private static final Pattern MENTION = Pattern.compile("<@!?(\\d{17,22})>");
+
+    public static String formatLogClean(String message, OffsetDateTime now, ZoneId tz, int caseId, String emote, String aN, String aD, String verb, int number, long tcId, String crit, String reason)
+    {
+        Matcher m = MENTION.matcher(crit);
+        while(m.find())
+            crit = crit.replaceAll(MENTION.pattern(), "$1");
+        return sanitize(String.format(message, timeF(now, tz), caseId, emote, aN, aD, verb, number, tcId, crit, reason));
+    }
+
+    public static String formatLogGeneral(String message, OffsetDateTime now, ZoneId tz, int caseId, String emote, String aN, String aD, String verb, String tN, String tD, long tId, String reason)
+    {
+        return String.format(message, timeF(now, tz), caseId, emote, aN, aD, verb, tN, tD, tId, reason);
+    }
+
+    public static String formatLogTemp(String message, OffsetDateTime now, ZoneId tz, int caseId, String expT, String emote, String aN, String aD, String verb, String tN, String tD, long tId, String reason)
+    {
+        return String.format(message, timeF(now, tz), caseId, emote, aN, aD, verb, tN, tD, tId, reason, expT);
+    }
+
+    public static String listOfCategories(List<Category> list, String query)
+    {
+        String out = " Multiple categories found matching \""+query+"\":";
+        for(int i = 0; i<6 && i<list.size(); i++)
+            out += "\n - "+list.get(i).getName()+" (ID:"+list.get(i).getId()+")";
+        if(list.size()>6) out += "\n**And "+(list.size()-6)+" more...**";
+        return out;
+    }
+
     public static String listOfMembers(List<Member> list, String query)
     {
         String out = " Multiple members found matching \""+query+"\":";
@@ -59,7 +91,7 @@ public class FormatUtil
 
     public static String listOfTcChannels(List<TextChannel> list, String query)
     {
-        String out = " Multiple roles found matching \""+query+"\":";
+        String out = " Multiple text channels found matching \""+query+"\":";
         for(int i = 0; i<6 && i<list.size(); i++)
             out += "\n - "+list.get(i).getName()+" (ID:"+list.get(i).getId()+")";
         if(list.size()>6) out += "\n**And "+(list.size()-6)+" more...**";
@@ -68,7 +100,7 @@ public class FormatUtil
 
     public static String listOfVcChannels(List<VoiceChannel> list, String query)
     {
-        String out = " Multiple roles found matching \""+query+"\":";
+        String out = " Multiple voice channels found matching \""+query+"\":";
         for(int i = 0; i<6 && i<list.size(); i++)
             out += "\n - "+list.get(i).getName()+" (ID:"+list.get(i).getId()+")";
         if(list.size()>6) out += "\n**And "+(list.size()-6)+" more...**";
@@ -116,5 +148,21 @@ public class FormatUtil
         if(str.isEmpty())
             str = "**No time**";
         return str;
+    }
+
+    public static String removeFormatting(String text)
+    {
+        return text.replace("_", "\\_").replace("*", "\\*").replace("~", "\\~")
+                .replace("`", "\\`");
+    }
+
+    public static String sanitize(String message)
+    {
+        return message.replace("@everyone", "@\u0435veryone").replace("@here", "@h\u0435re").trim();
+    }
+
+    public static String timeF(OffsetDateTime time, ZoneId zone)
+    {
+        return time.atZoneSameInstant(zone).format(DateTimeFormatter.ISO_LOCAL_TIME).substring(0,8);
     }
 }

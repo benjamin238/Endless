@@ -17,25 +17,29 @@
 
 package me.artuto.endless.handlers;
 
+import com.vdurmont.emoji.EmojiParser;
 import me.artuto.endless.Bot;
-import me.artuto.endless.data.managers.GuildSettingsDataManager;
-import me.artuto.endless.data.managers.StarboardDataManager;
-import me.artuto.endless.entities.StarboardMessage;
+import me.artuto.endless.core.entities.StarboardMessage;
+import me.artuto.endless.storage.data.managers.StarboardDataManager;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FinderUtil;
+import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveAllEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.core.exceptions.ErrorResponseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -44,37 +48,34 @@ import java.util.stream.Collectors;
 
 public class StarboardHandler
 {
-    private static final GuildSettingsDataManager gsdm = Bot.getInstance().gsdm;
-    private static final Logger LOG = LoggerFactory.getLogger("Starboard");
+    private static final String GENERAL = " \\*\\*(\\d+)\\*\\* <#(\\d{17,20})> ID: (\\d{17,20})";
+    private static final Pattern EMOTE_PATTERN = Pattern.compile(Message.MentionType.EMOTE.getPattern()+GENERAL);
+    private static final Pattern EMOJI_PATTERN = Pattern.compile("(:\\w+:|.*u\\w+|.*u\\w+.*u\\w+)"+GENERAL);
     private static final ScheduledExecutorService thread = Bot.getInstance().starboardThread;
     private static final StarboardDataManager sdm = Bot.getInstance().sdm;
 
     public static void checkAddReaction(GuildMessageReactionAddEvent event)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         thread.submit(() -> {
             Guild guild = event.getGuild();
-            EmbedBuilder eb = new EmbedBuilder();
-            MessageBuilder msgB = new MessageBuilder();
-            StringBuilder sb = new StringBuilder();
 
             if(!(event.getChannel().getTopic() == null) && event.getChannel().getTopic().toLowerCase().contains("{ignore:starboard}"))
                 return;
 
             if(!(isConfigured(guild))) return;
 
-            TextChannel starboard = gsdm.getStarboardChannel(guild);
+            TextChannel starboard = GuildUtils.getStarboardChannel(event.getGuild());
             Message starredMsg = getMessage(event.getMessageIdLong(), event.getChannel());
             if(starredMsg==null)
                 return;
 
-            List<Message.Attachment> attachments = starredMsg.getAttachments().stream().filter(a -> !(a.isImage())).collect(Collectors.toList());
-            List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
-
-            if(isSameAuthor(starredMsg.getAuthor(), event.getUser()) && event.getReactionEmote().getName().equals("\u2B50"))
-            {
-                //event.getChannel().sendMessage("Boooooo, "+event.getUser().getAsMention()+" selfstarred! SHAME!").queue();
+            String emote = Bot.getInstance().endless.getGuildSettings(guild).getStarboardEmote();
+            MessageReaction.ReactionEmote re = event.getReactionEmote();
+            if(isSameAuthor(starredMsg.getAuthor(), event.getUser()) && (re.isEmote()?re.getEmote().getId().equals(emote):re.getName().equals(emote)))
                 return;
-            }
 
             if(!(amountPassed(starredMsg))) return;
 
@@ -84,37 +85,85 @@ public class StarboardHandler
                 return;
             }
 
-            if(existsOnStarboard(starredMsg.getIdLong()))
+            if(event.getChannel().getIdLong()==starboard.getIdLong())
             {
-                if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
-                    LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
+                boolean isUnicode = false;
+                String content = starredMsg.getContentRaw();
+                String unicode;
+                Pattern REGEX;
+                if(starredMsg.getEmotes().isEmpty())
+                {
+                    isUnicode = true;
+                    REGEX = EMOJI_PATTERN;
+                    unicode = getUnicode(emote);
+                    content = content.replace(emote, unicode);
+                }
                 else
-                    updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+                    REGEX = EMOTE_PATTERN;
+                Matcher m = REGEX.matcher(content);
+                if(m.matches() && starredMsg.getAuthor().getIdLong()==event.getJDA().getSelfUser().getIdLong())
+                {
+                    String channelId;
+                    String msgId;
+                    if(isUnicode)
+                    {
+                        channelId = m.group(3);
+                        msgId = m.group(4);
+                    }
+                    else
+                    {
+                        channelId = m.group(4);
+                        msgId = m.group(5);
+                    }
+                    TextChannel originalTc = guild.getTextChannelById(channelId);
+                    if(originalTc==null || !(ChecksUtil.hasPermission(guild.getSelfMember(), originalTc, Permission.MESSAGE_HISTORY)))
+                        return;
+
+                    Message originalMsg = originalTc.getMessageById(msgId).complete();
+                    MessageReaction reaction = originalMsg.getReactions().stream().filter(r -> {
+                        MessageReaction.ReactionEmote reE = r.getReactionEmote();
+                        return (reE.isEmote()?reE.getId().equals(emote):reE.getName().equals(emote));
+                    }).findFirst().orElse(null);
+                    if(reaction==null || reaction.getUsers().complete().contains(event.getUser()))
+                        return;
+                    if(isSameAuthor(originalMsg.getAuthor(), event.getUser()) && (re.isEmote()?re.getId().equals(emote):re.getName().equals(emote)))
+                        return;
+                    int count = getStarCount(originalMsg)+getStarCount(starredMsg);
+
+                    sdm.updateCount(originalMsg.getIdLong(), count);
+                    updateCount(starredMsg, sdm.getStarboardMessage(originalMsg.getIdLong()).getStarboardMessageIdLong(), count);
+                }
+                else
+                {
+                    if(existsOnStarboard(starredMsg.getIdLong()))
+                    {
+                        sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg));
+                        updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+                    }
+                   else
+                       addMessage(starredMsg, starboard);
+                }
             }
             else
             {
-                sb.append(starredMsg.getContentRaw());
-                eb.setAuthor(starredMsg.getAuthor().getName(), null, starredMsg.getAuthor().getEffectiveAvatarUrl());
-                if(!(attachments.isEmpty())) for(Message.Attachment att : attachments)
-                    sb.append("\n").append(att.getUrl());
-                if(!(images.isEmpty())) if(images.size()>1) for(Message.Attachment img : images)
-                    sb.append("\n").append(img.getUrl());
-                else eb.setImage(images.get(0).getUrl());
-                eb.setDescription(sb.toString());
-                eb.setColor(Color.YELLOW);
-
-                msgB.setContent(getEmote(getStarCount(starredMsg))+" **"+getStarCount(starredMsg)+"** "+starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId());
-                msgB.setEmbed(eb.build());
-
-                if(!(sdm.addMessage(starredMsg, getStarCount(starredMsg))))
-                    LOG.warn("Error when adding message to starboard. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
-                starboard.sendMessage(msgB.build()).queue(s -> sdm.setStarboardMessageId(starredMsg, s.getIdLong()));
+                if(existsOnStarboard(starredMsg.getIdLong()))
+                {
+                    sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg));
+                    updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+                }
+                else
+                    addMessage(starredMsg, starboard);
             }
         });
     }
 
     public static void checkRemoveReaction(GuildMessageReactionRemoveEvent event)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
+        Guild guild = event.getGuild();
+
         thread.submit(() -> {
             if(!(isConfigured(event.getGuild()))) return;
 
@@ -122,32 +171,119 @@ public class StarboardHandler
             if(starredMsg==null)
                 return;
 
-            StarboardMessage starboardMsg = sdm.getStarboardMessage(starredMsg.getIdLong());
-            TextChannel starboard = gsdm.getStarboardChannel(event.getGuild());
+            String emote = Bot.getInstance().endless.getGuildSettings(guild).getStarboardEmote();
+            MessageReaction.ReactionEmote re = event.getReactionEmote();
+            StarboardMessage starboardMsg;
+            TextChannel starboard = GuildUtils.getStarboardChannel(event.getGuild());
+
+            if(event.getChannel().getIdLong()==starboard.getIdLong())
+            {
+                boolean isUnicode = false;
+                String content = starredMsg.getContentRaw();
+                String unicode;
+                Pattern REGEX;
+                if(starredMsg.getEmotes().isEmpty())
+                {
+                    isUnicode = true;
+                    REGEX = EMOJI_PATTERN;
+                    unicode = getUnicode(emote);
+                    content = content.replace(emote, unicode);
+                }
+                else
+                    REGEX = EMOTE_PATTERN;
+                Matcher m = REGEX.matcher(content);
+                if(m.matches() && starredMsg.getAuthor().getIdLong()==event.getJDA().getSelfUser().getIdLong())
+                {
+                    String channelId;
+                    String msgId;
+                    if(isUnicode)
+                    {
+                        channelId = m.group(3);
+                        msgId = m.group(4);
+                    }
+                    else
+                    {
+                        channelId = m.group(4);
+                        msgId = m.group(5);
+                    }
+                    TextChannel originalTc = guild.getTextChannelById(channelId);
+                    if(originalTc==null || !(ChecksUtil.hasPermission(guild.getSelfMember(), originalTc, Permission.MESSAGE_HISTORY)))
+                        return;
+
+                    Message originalMsg = originalTc.getMessageById(msgId).complete();
+                    starboardMsg = sdm.getStarboardMessage(originalMsg.getIdLong());
+                    if(isSameAuthor(originalMsg.getAuthor(), event.getUser()) && (re.isEmote()?re.getId().equals(emote):re.getName().equals(emote)))
+                        return;
+                    int count = getStarCount(originalMsg)+getStarCount(starredMsg);
+
+                    if(!(count>=GuildUtils.getStarboardCount(guild)))
+                    {
+                        delete(starboard, starboardMsg);
+                        return;
+                    }
+
+                    sdm.updateCount(originalMsg.getIdLong(), count);
+                    updateCount(starredMsg, sdm.getStarboardMessage(originalMsg.getIdLong()).getStarboardMessageIdLong(), count);
+                }
+            }
 
             if(existsOnStarboard(starredMsg.getIdLong()))
             {
+                starboardMsg = sdm.getStarboardMessage(starredMsg.getIdLong());
                 if(!(amountPassed(starredMsg)))
                 {
                     delete(starboard, starboardMsg);
                     return;
                 }
 
-                if(!(sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg))))
-                    LOG.warn("Error when updating star count. Message ID: "+starredMsg.getId()+" TC ID: "+starredMsg.getTextChannel().getId());
-                else
-                    updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
+                sdm.updateCount(starredMsg.getIdLong(), getStarCount(starredMsg));
+                updateCount(starredMsg, sdm.getStarboardMessage(starredMsg.getIdLong()).getStarboardMessageIdLong(), getStarCount(starredMsg));
             }
         });
     }
 
     public static void checkRemoveAllReactions(GuildMessageReactionRemoveAllEvent event)
     {
-        thread.submit(() -> check(event.getGuild(), event.getMessageIdLong()));
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
+        Guild guild = event.getGuild();
+        TextChannel starboard = GuildUtils.getStarboardChannel(guild);
+        thread.submit(() -> {
+            if(event.getChannel().getIdLong()==starboard.getIdLong())
+            {
+                Message starredMsg = getMessage(event.getMessageIdLong(), event.getChannel());
+                if(starredMsg==null)
+                    return;
+
+                Pattern REGEX;
+                if(starredMsg.getEmotes().isEmpty())
+                    REGEX = EMOJI_PATTERN;
+                else
+                    REGEX = EMOTE_PATTERN;
+                String content = starredMsg.getContentRaw();
+                Matcher m = REGEX.matcher(content);
+                if(m.matches() && starredMsg.getAuthor().getIdLong()==event.getJDA().getSelfUser().getIdLong())
+                {
+                    TextChannel originalTc = guild.getTextChannelById(m.group(3));
+                    if(originalTc == null || !(ChecksUtil.hasPermission(guild.getSelfMember(), originalTc, Permission.MESSAGE_HISTORY)))
+                        return;
+
+                    Message originalMsg = originalTc.getMessageById(m.group(4)).complete();
+                    StarboardMessage starboardMsg = sdm.getStarboardMessage(originalMsg.getIdLong());
+                    delete(starboard, starboardMsg);
+                }
+            }
+            else
+                thread.submit(() -> check(event.getGuild(), event.getMessageIdLong()));
+        });
     }
 
     public static void checkDeleteMessage(GuildMessageDeleteEvent event)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
         thread.submit(() -> check(event.getGuild(), event.getMessageIdLong()));
     }
 
@@ -158,18 +294,29 @@ public class StarboardHandler
 
     private static boolean isConfigured(Guild guild)
     {
-        return !(gsdm.getStarboardChannel(guild) == null) && !(gsdm.getStarboardCount(guild) == null);
+        if(!(Bot.getInstance().dataEnabled))
+            return false;
+
+        return !(GuildUtils.getStarboardChannel(guild) == null) && !(GuildUtils.getStarboardCount(guild) == 0);
     }
 
     private static boolean amountPassed(Message msg)
     {
-        return getStarCount(msg) >= gsdm.getStarboardCount(msg.getGuild());
+        return getStarCount(msg) >= GuildUtils.getStarboardCount(msg.getGuild());
     }
 
     private static int getStarCount(Message msg)
     {
-        List<MessageReaction> reactions = msg.getReactions().stream().filter(r -> r.getReactionEmote().getName().equals("\u2B50")).collect(Collectors.toList());
-        if(reactions.isEmpty()) return 0;
+        if(!(Bot.getInstance().dataEnabled))
+            return 0;
+
+        List<MessageReaction> reactions = msg.getReactions().stream().filter(r -> {
+            String emote = Bot.getInstance().endless.getGuildSettings(r.getGuild()).getStarboardEmote();
+            MessageReaction.ReactionEmote re = r.getReactionEmote();
+            return (re.isEmote()?re.getId().equals(emote):re.getName().equals(emote));
+        }).collect(Collectors.toList());
+        if(reactions.isEmpty())
+            return 0;
 
         List<User> users = reactions.get(0).getUsers().complete();
 
@@ -179,30 +326,97 @@ public class StarboardHandler
 
     private static boolean existsOnStarboard(Long id)
     {
+        if(!(Bot.getInstance().dataEnabled))
+            return false;
+
         return !(sdm.getStarboardMessage(id)==null);
     }
 
-    private static void updateCount(Message msg, Long starboardMsg, Integer amount)
+    private static void updateCount(Message msg, long starboardMsg, int amount)
     {
-        TextChannel tc = gsdm.getStarboardChannel(msg.getGuild());
-        tc.getMessageById(starboardMsg).queue(s -> s.editMessage(getEmote(amount)+" **"+amount+"** "+msg.getTextChannel().getAsMention()+" ID: "+msg.getId()).queue(null, null), null);
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
+        String sbEmote = Bot.getInstance().endless.getGuildSettings(msg.getGuild()).getStarboardEmote();
+        TextChannel tc = GuildUtils.getStarboardChannel(msg.getGuild());
+        tc.getMessageById(starboardMsg).queue(s -> {
+            String emote;
+            if(!(s.getEmotes().isEmpty()))
+            {
+                emote = sbEmote;
+                s.editMessage(s.getContentRaw().replaceAll(Message.MentionType.EMOTE.getPattern().pattern(), getEmote(amount, s, emote))
+                        .replaceAll("\\*\\*(\\d+)\\*\\*", "**"+amount+"**")).queue();
+            }
+            else
+            {
+                List<String> emojis = EmojiParser.extractEmojis(sbEmote);
+                if(!(emojis.isEmpty()))
+                {
+                    emote = emojis.get(0);
+                    s.editMessage(s.getContentRaw().replaceAll("(\\\\u\\w+|\\\\u\\w+\\\\u\\w+)", getEmote(amount, s, emote))
+                            .replaceAll("\\*\\*(\\d+)\\*\\*", "**"+amount+"**")).queue();
+                }
+            }
+        },null);
     }
 
-    private static String getEmote(Integer count)
+    private static void addMessage(Message starredMsg, TextChannel starboard)
     {
-        if(count<5) return ":star:";
-        else if(count>5 || count<=10) return ":star2:";
-        else if(count>15) return ":dizzy:";
-        else return ":star:";
+        EmbedBuilder eb = new EmbedBuilder();
+        MessageBuilder msgB = new MessageBuilder();
+        StringBuilder sb = new StringBuilder();
+        String emote = Bot.getInstance().endless.getGuildSettings(starboard.getGuild()).getStarboardEmote();
+
+        List<Message.Attachment> attachments = starredMsg.getAttachments().stream().filter(a -> !(a.isImage())).collect(Collectors.toList());
+        List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
+
+        sb.append(starredMsg.getContentRaw());
+        eb.setAuthor(starredMsg.getAuthor().getName(), null, starredMsg.getAuthor().getEffectiveAvatarUrl());
+        if(!(attachments.isEmpty())) for(Message.Attachment att : attachments)
+            sb.append("\n").append(att.getUrl());
+        if(!(images.isEmpty())) if(images.size()>1) for(Message.Attachment img : images)
+            sb.append("\n").append(img.getUrl());
+        else eb.setImage(images.get(0).getUrl());
+        eb.setDescription(sb.toString());
+        eb.setColor(Color.ORANGE);
+
+        msgB.setContent(FormatUtil.sanitize(getEmote(getStarCount(starredMsg), starredMsg, emote)+" **"+getStarCount(starredMsg)+"** "+
+                starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId()));
+        msgB.setEmbed(eb.build());
+
+        sdm.addMessage(starredMsg, getStarCount(starredMsg));
+        starboard.sendMessage(msgB.build()).queue(s -> sdm.setStarboardMessageId(starredMsg, s.getIdLong()));
     }
 
-    /*private String getColor(Integer count)
+    private static String getEmote(int count, Message msg, String emote)
     {
-
-    }*/
+        try
+        {
+            return msg.getGuild().getEmoteById(emote).getAsMention();
+        }
+        catch(NumberFormatException e)
+        {
+            if(!(emote.equals("\u2B50")))
+                return emote;
+            else
+            {
+                if(count<5)
+                    return ":star:";
+                else if(count>5)
+                    return ":star2:";
+                else if(count>15)
+                    return ":dizzy:";
+                else
+                    return ":star:";
+            }
+        }
+    }
 
     private static void delete(TextChannel starboard, StarboardMessage starboardMsg)
     {
+        if(starboard==null)
+            return;
+
         starboard.getMessageById(starboardMsg.getStarboardMessageId()).queue(s -> {
             s.delete().queue();
             sdm.deleteMessage(starboardMsg.getMessageIdLong(), starboardMsg.getStarboardMessageIdLong());
@@ -211,7 +425,10 @@ public class StarboardHandler
 
     private static void check(Guild guild, long msg)
     {
-        TextChannel starboard = gsdm.getStarboardChannel(guild);
+        if(!(Bot.getInstance().dataEnabled))
+            return;
+
+        TextChannel starboard = GuildUtils.getStarboardChannel(guild);
         StarboardMessage starboardMsg = sdm.getStarboardMessage(msg);
 
         if(existsOnStarboard(msg))
@@ -226,8 +443,34 @@ public class StarboardHandler
         }
         catch(ErrorResponseException e)
         {
-            delete(gsdm.getStarboardChannel(tc.getGuild()), sdm.getStarboardMessage(id));
+            delete(GuildUtils.getStarboardChannel(tc.getGuild()), sdm.getStarboardMessage(id));
             return null;
         }
+    }
+
+    private static String getUnicode(String emoji)
+    {
+        StringBuilder sb = new StringBuilder();
+        emoji.codePoints().forEachOrdered(code -> {
+            char[] chars = Character.toChars(code);
+            if(chars.length>1)
+            {
+                String hex0 = Integer.toHexString(chars[0]).toUpperCase();
+                String hex1 = Integer.toHexString(chars[1]).toUpperCase();
+                while(hex0.length()<4)
+                    hex0 = "0"+hex0;
+                while(hex1.length()<4)
+                    hex1 = "0"+hex1;
+                sb.append("\\u").append(hex0).append("\\u").append(hex1);
+            }
+            else
+            {
+                String hex = Integer.toHexString(code).toUpperCase();
+                while(hex.length()<4)
+                    hex = "0"+hex;
+                sb.append("\\u").append(hex);
+            }
+        });
+        return sb.toString();
     }
 }

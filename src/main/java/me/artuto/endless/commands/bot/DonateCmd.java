@@ -22,8 +22,8 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -48,7 +48,7 @@ public class DonateCmd extends EndlessCommand
         this.bot = bot;
         this.name = "donate";
         this.aliases = new String[]{"donators"};
-        this.children = new Command[]{new Add(), new Remove()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd()};
         this.help = "Info about donations";
         this.category = Categories.BOT;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
@@ -73,27 +73,37 @@ public class DonateCmd extends EndlessCommand
             sb.append(String.format("**%#s** - %s\n", user, bot.ddm.getDonation(user)));
 
         builder.setColor(color);
-        builder.addField(":moneybag: Donations:", "Actually, I host Endless on a very basic VPS, which can cause some lag sometimes.\n"+"I'll appreciate your donation. All the recauded money will be for get a new and better VPS.\n", false);
-        builder.addField(":money_mouth: How to donate:", "If you want donate please go to **https://paypal.me/artuto**\n"+"You'll get a special role on my server and some perks!", false);
+        builder.addField(":moneybag: Donations:", "Endless is developed in my spare time and its free for everyone to " +
+                "use, however, if you like the bot, its functions or simply want to support me or the development," +
+                "please consider donating. All the money goes into getting a better hosting.", false);
+        builder.addField(":money_mouth: How to donate:", "If you want donate please go to **https://paypal.me/artuto**\n"+
+                "You'll get a special role on my server and some perks!\n" +
+                "After you've donated please join the support server by doing `e!help support` and contact Artuto#0424.", false);
         builder.addField(":heart: Donators:", sb.toString(), false);
 
-        event.reply(new MessageBuilder().append(":information_source: List of donators:").setEmbed(builder.build()).build());
+        event.reply(new MessageBuilder().append(":information_source: Donations:").setEmbed(builder.build()).build());
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a donator to the list";
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.parent = DonateCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
                 event.replyError("This command is not available on a selfhosted instance!");
@@ -137,20 +147,27 @@ public class DonateCmd extends EndlessCommand
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a donator from the list";
             this.category = Categories.BOTADM;
             this.ownerCommand = true;
             this.guildOnly = false;
+            this.parent = DonateCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
                 event.replyError("This command is not available on a selfhosted instance!");

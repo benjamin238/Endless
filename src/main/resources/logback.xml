@@ -28,6 +28,39 @@
         </encoder>
     </appender>
 
+    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
+        <file>logs/latest.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/%d{yyyy-MM-dd}_%d{HH:mm:ss,aux}.log</fileNamePattern>
+            <TimeBasedFileNamingAndTriggeringPolicy class="me.artuto.endless.logging.appenders.FileAppender"/>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>[%d{dd-MM-yyyy HH:mm:ss}] [%thread] [%logger{0}] [%level] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="File-Debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/debug/latest.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/debug/%d{yyyy-MM-dd}_%d{HH:mm:ss,aux}.log</fileNamePattern>
+            <TimeBasedFileNamingAndTriggeringPolicy class="me.artuto.endless.logging.appenders.FileAppender"/>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>[%d{dd-MM-yyyy HH:mm:ss}] [%thread] [%logger{0}] [%level] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="Sentry" class="io.sentry.logback.SentryAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>ERROR</level>
@@ -45,11 +78,13 @@
         <config>webhook.txt</config>
     </appender>
 
-    <logger name="net.dv8tion.jda.core.handle.GuildSetupController" level="trace" />
-    <logger name="net.dv8tion.jda.core.handle.EventCache" level="trace" />
+    <logger name="net.dv8tion.jda.core.handle.GuildSetupController" level="TRACE"/>
+    <logger name="net.dv8tion.jda.core.handle.EventCache" level="TRACE"/>
 
     <root level="DEBUG">
         <appender-ref ref="Console"/>
+        <appender-ref ref="File"/>
+        <appender-ref ref="File-Debug"/>
         <appender-ref ref="Sentry"/>
         <appender-ref ref="Webhook"/>
         <appender-ref ref="Webhook-Debug"/>

@@ -18,18 +18,19 @@
 package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Messages;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.Endless;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
-import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ArgsUtils;
+import me.artuto.endless.utils.ChecksUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
-import java.util.List;
+import java.time.OffsetDateTime;
 
 /**
  * @author Artuto
@@ -53,56 +54,52 @@ public class SoftbanCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        Member member;
+        String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
+        String query = args[0];
+        String reason = args[1];
+
+        Member target = ArgsUtils.findMember(event, query);
         User author = event.getAuthor();
-        String target;
-        String reason;
+        if(target == null) return;
 
-        try
+        if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), target)))
         {
-            String[] args = event.getArgs().split(" for ", 2);
-            target = args[0];
-            reason = args[1];
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            target = event.getArgs();
-            reason = "[no reason specified]";
-        }
-
-        List<Member> list = FinderUtil.findMembers(target, event.getGuild());
-
-        if(list.isEmpty())
-        {
-            event.replyWarning("I was not able to found a user with the provided arguments: '"+target+"'");
+            event.replyError("I can't ban the specified user!");
             return;
         }
-        else if(list.size()>1)
+        if(!(ChecksUtil.canMemberInteract(event.getMember(), target)))
         {
-            event.replyWarning(FormatUtil.listOfMembers(list, target));
-            return;
-        }
-        else member = list.get(0);
-
-        if(!(Checks.canMemberInteract(event.getSelfMember(), member)))
-        {
-            event.replyError("I can't softban the specified user!");
+            event.replyError("You can't ban the specified user!");
             return;
         }
 
-        if(!(Checks.canMemberInteract(event.getMember(), member)))
+        String username = "**"+target.getUser().getName()+"**#"+target.getUser().getDiscriminator();
+        event.async(() ->
         {
-            event.replyError("You can't softban the specified user!");
-            return;
-        }
+            // Ban
+            try
+            {
+                event.getGuild().getController().ban(target, 1).reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).complete();
+            }
+            catch(ErrorResponseException e)
+            {
+                event.replyError(String.format("An error happened when softbanning %s", username));
+                Endless.LOG.error("Could not softban user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
+            }
 
-        String username = "**"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"**";
-        String fReason = reason;
+            // Unban
+            try
+            {
+                event.getGuild().getController().unban(target.getUser()).reason(author.getName()+"#"+author.getDiscriminator()+": Softban Unban").complete();
+            }
+            catch(ErrorResponseException e)
+            {
+                event.replyError(String.format("Error while unbanning %s", username));
+                Endless.LOG.error("Could not unban user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
+            }
 
-        event.getGuild().getController().ban(member, 1).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s ->
-                event.getGuild().getController().unban(member.getUser()).reason("[SOFTBAN - 1 DAY]["+author.getName()+"#"+author.getDiscriminator()+"]: "+fReason).queue(s2 -> {
-            event.replySuccess(Messages.SOFTBAN_SUCCESS+username);
-            bot.modlog.logSoftban(event.getAuthor(), member, fReason, event.getGuild(), event.getTextChannel());
-        }, e -> event.replyError("Error while unbanning "+username)), e -> event.replyError(Messages.SOFTBAN_ERROR+username));
+            event.replySuccess(String.format("Successfully softbanned user %s", username));
+            bot.modlog.logGeneral(Action.SOFTBAN, event, OffsetDateTime.now(), reason, target.getUser());
+        });
     }
 }

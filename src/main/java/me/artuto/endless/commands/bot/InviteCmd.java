@@ -18,9 +18,10 @@
 package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.utils.MiscUtil;
 
 /**
  * @author Artuto
@@ -40,6 +41,25 @@ public class InviteCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        event.reply("So you want invite Endless to your server? Here you have it:\n"+":link: **<"+event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR)+"**");
+        String message = "Hi! I'm **Endless**, if you want to add me to your guild use this link:\n" +
+                ":link: **<%s>**\n" +
+                "You can also join the support server:\n" +
+                ":inbox_tray: **<%s>**";
+
+        if(event.getArgs().isEmpty())
+            event.replyFormatted(message, event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR),
+                    event.getClient().getServerInvite());
+        else
+        {
+            long id = 0L;
+            try
+            {
+                id = MiscUtil.parseSnowflake(event.getArgs());
+            }
+            catch(NumberFormatException ignored) {}
+
+            event.replyFormatted(message, event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR)+(id==0L?"":"&guild_id="+id),
+                    event.getClient().getServerInvite());
+        }
     }
 }

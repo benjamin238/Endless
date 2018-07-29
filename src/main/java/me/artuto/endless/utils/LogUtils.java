@@ -17,19 +17,17 @@
 
 package me.artuto.endless.utils;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.IThrowableProxy;
-import ch.qos.logback.classic.spi.StackTraceElementProxy;
-import ch.qos.logback.classic.spi.ThrowableProxy;
-import net.dv8tion.jda.core.entities.MessageEmbed;
+import me.artuto.endless.Action;
+import me.artuto.endless.Endless;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,39 +37,52 @@ import java.util.Objects;
 
 public class LogUtils
 {
-    public static StringBuilder getStackTrace(ILoggingEvent event)
+    public static File createMessagesTextFile(List<Message> msgs, String name)
     {
-        IThrowableProxy proxy = event.getThrowableProxy();
-        ThrowableProxy throwableImpl = (ThrowableProxy)proxy;
-        StringBuilder stacktrace = new StringBuilder(event.getFormattedMessage());
+        StringBuilder content = new StringBuilder();
+        msgs.forEach(m -> {
+            User a = m.getAuthor();
+            content.append(a.getName()).append("#").append(a.getDiscriminator()).append(": ").append(m.getContentRaw()).append("\n");
+            if(!(m.getAttachments().isEmpty()))
+            {
+                content.append("\nAttachments:");
+                m.getAttachments().forEach(att -> content.append("\n").append(att.getFileName()).append(": ").append(att.getUrl()));
+            }
+            content.append("\n");
+        });
 
-        if(!(proxy==null))
+        Writer output = null;
+        try
         {
-            Throwable throwable = throwableImpl.getThrowable();
-
-            List<StackTraceElementProxy> list = Arrays.asList(proxy.getStackTraceElementProxyArray());
-            String message = proxy.getMessage();
-            if(!(message==null))
-            {
-                stacktrace.append("\n\n```java\n");
-                if(!(throwable==null))
-                    stacktrace.append(throwable.getClass().getName()).append(": ");
-                stacktrace.append(message);
-            }
-            for(StackTraceElementProxy element : list)
-            {
-                String call = element.getSTEAsString();
-                if(call.length()+stacktrace.length()>MessageEmbed.TEXT_MAX_LENGTH)
-                {
-                    stacktrace.append("\n... (").append(list.size()-list.indexOf(element)+1).append(" more calls)");
-                    break;
-                }
-                stacktrace.append("\n").append(call).append("\n");
-            }
-            stacktrace.append("```");
+            output = new BufferedWriter(new FileWriter(name, true));
+            output.append(content).close();
+            return new File(name);
         }
+        catch(IOException e)
+        {
+            Endless.getLog(LogUtils.class).error("Could not create messages file: ", e);
+            return null;
+        }
+    }
 
-        return stacktrace;
+    public static boolean isActionIgnored(Action action, TextChannel modlog)
+    {
+        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-ex:"+action.getInternalAction()+"}");
+    }
+
+    public static boolean isIssuerIgnored(long id, TextChannel channel)
+    {
+        return !(channel.getTopic()==null) && channel.getTopic().toLowerCase().contains("{ignore:"+id+"}");
+    }
+
+    public static boolean isTargetIgnored(long id, TextChannel channel)
+    {
+        return !(channel.getTopic()==null) && channel.getTopic().toLowerCase().contains("{ignore:"+id+"}");
+    }
+
+    public static boolean isTypeIgnored(String type, TextChannel modlog)
+    {
+        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-ex:"+type+"}");
     }
 
     public static File getAvatarUpdateImage(UserUpdateAvatarEvent event)
@@ -98,6 +109,27 @@ public class LogUtils
         {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static class UploadedText
+    {
+        private final String id, channel;
+
+        public UploadedText(String id, String channel)
+        {
+            this.id = id;
+            this.channel = channel;
+        }
+
+        public String getCDNUrl()
+        {
+            return "https://cdn.discordapp.com/attachments/470068055322525708/"+id+"/Messages"+channel+".txt";
+        }
+
+        public String getViewUrl()
+        {
+            return "http://txt.discord.website/?txt=470068055322525708/"+id+"/Messages"+channel;
         }
     }
 }

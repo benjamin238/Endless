@@ -20,18 +20,17 @@ package me.artuto.endless.commands.tools;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.IMentionable;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 
-import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +42,7 @@ public class RoleCmd extends EndlessCommand
         this.name = "role";
         this.help = "Displays info about the specified role";
         this.arguments = "<role>";
-        this.children = new Command[]{new GiveRole(), new TakeRole()};
+        this.children = new Command[]{new GiveRoleCmd(), new PingCmd(), new TakeRoleCmd()};
         this.category = Categories.TOOLS;
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
@@ -51,15 +50,17 @@ public class RoleCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        Role rol;
-        Color color;
-        List<Member> members;
-        List<Permission> perm;
         EmbedBuilder builder = new EmbedBuilder();
-        String permissions;
-        String membersInRole;
+        MessageBuilder mb = new MessageBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        List<net.dv8tion.jda.core.entities.Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
+        List<Member> preMembers;
+        Role role;
+        String color;
+        String members;
+        String perms;
+
+        List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
 
         if(list.isEmpty())
         {
@@ -71,46 +72,34 @@ public class RoleCmd extends EndlessCommand
             event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
             return;
         }
-        else rol = list.get(0);
+        else
+            role = list.get(0);
 
-        color = rol.getColor();
-        members = event.getGuild().getMembersWithRoles(rol);
+        preMembers = role.isPublicRole()?event.getGuild().getMembers():event.getGuild().getMembersWithRoles(role);
+        color = "#"+(role.getColor()==null?"000000":Integer.toHexString(role.getColor().getRGB()).toUpperCase().substring(2));
+        members = preMembers.isEmpty()?"None":preMembers.size()>20?"**"+preMembers.size()+"**":"**"+preMembers.size()+"**\n"
+                +preMembers.stream().map(m -> m.getUser().getAsMention()).collect(Collectors.joining(", "));
+        perms = role.getPermissions().isEmpty()?"None":role.getPermissions().stream().map(p -> "`"+p.getName()+"`")
+                .collect(Collectors.joining(", "));
 
-        if(members.size()>20) membersInRole = String.valueOf(members.size());
-        else if(members.isEmpty()) membersInRole = "Nobody";
-        else membersInRole = members.stream().map(IMentionable::getAsMention).collect(Collectors.joining(", "));
+        sb.append(Const.LINE_START).append(" ID: **").append(role.getId()).append("**\n");
+        sb.append(Const.LINE_START).append(" Creation: **").append(role.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
+        sb.append(Const.LINE_START).append(" Position: **").append(event.getGuild().getRoles().indexOf(role)+1).append("**\n");
+        sb.append(Const.LINE_START).append(" Color: **").append(color).append("**\n");
+        sb.append(Const.LINE_START).append(" Mentionable: **").append(role.isMentionable()?"Yes":"No").append("**\n");
+        sb.append(Const.LINE_START).append(" Hoisted: **").append(role.isHoisted()?"Yes":"No").append("**\n");
+        sb.append(Const.LINE_START).append(" Managed: **").append(role.isManaged()?"Yes":"No").append("**\n");
+        sb.append(Const.LINE_START).append(" Permissions: ").append(perms).append("\n");
+        sb.append(Const.LINE_START).append(" Members: ").append(members);
 
-        perm = rol.getPermissions();
-
-        if(perm.isEmpty()) permissions = "None";
-        else permissions = perm.stream().map(p -> "`"+p.getName()+"`").collect(Collectors.joining(", "));
-
-        String title = ":performing_arts: Information about the role **"+rol.getName()+"**";
-
-        try
-        {
-            builder.addField(":1234: ID: ", "**"+rol.getId()+"**", false);
-            builder.addField(":calendar: Creation Date: ", "**"+rol.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**", false);
-            builder.addField(":paintbrush: Color: ", color == null ? "**#000000**" : "**#"+Integer.toHexString(color.getRGB()).substring(2).toUpperCase()+"**", true);
-            builder.addField(":small_red_triangle: Position: ", String.valueOf("**"+(event.getGuild().getRoles().indexOf(rol)+1)+"**"), true);
-            builder.addField(":bell: Mentionable: ", (rol.isMentionable() ? "**Yes**" : "**No**"), true);
-            builder.addField(":wrench: Managed: ", (rol.isManaged() ? "**Yes**" : "**No**"), true);
-            builder.addField(":link: Hoisted: ", (rol.isHoisted() ? "**Yes**" : "**No**"), true);
-            builder.addField(":passport_control: Public Role: ", (rol.isPublicRole() ? "**Yes**" : "**No**"), true);
-            builder.addField(":key: Permissions: ", permissions, false);
-            builder.addField(":busts_in_silhouette: Members: ", membersInRole, false);
-            builder.setColor(color);
-            event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
-        }
-        catch(Exception e)
-        {
-            event.replyError("Something went wrong when getting the role info: \n```"+e+"```");
-        }
+        builder.setColor(role.getColor()).setDescription(sb);
+        String title = ":performing_arts: Information about **"+role.getName()+"**";
+        event.reply(mb.setContent(title).setEmbed(builder.build()).build());
     }
 
-    private class GiveRole extends EndlessCommand
+    private class GiveRoleCmd extends EndlessCommand
     {
-        GiveRole()
+        GiveRoleCmd()
         {
             this.name = "give";
             this.help = "Gives the specified role to the specified member";
@@ -118,6 +107,7 @@ public class RoleCmd extends EndlessCommand
             this.category = Categories.TOOLS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.parent = RoleCmd.this;
         }
 
         @Override
@@ -170,12 +160,12 @@ public class RoleCmd extends EndlessCommand
             }
             else m = mlist.get(0);
 
-            if(!(Checks.canMemberInteract(author, role)))
+            if(!(ChecksUtil.canMemberInteract(author, role)))
             {
                 event.replyError("I can't interact with that role!");
                 return;
             }
-            if(!(Checks.canMemberInteract(author, role)))
+            if(!(ChecksUtil.canMemberInteract(author, role)))
             {
                 event.replyError("You can't interact with that role!");
                 return;
@@ -187,9 +177,65 @@ public class RoleCmd extends EndlessCommand
         }
     }
 
-    private class TakeRole extends EndlessCommand
+    private class PingCmd extends EndlessCommand
     {
-        TakeRole()
+        PingCmd()
+        {
+            this.name = "ping";
+            this.aliases = new String[]{"notify"};
+            this.help = "Pings the specified role";
+            this.arguments = "<role>";
+            this.category = Categories.TOOLS;
+            this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.parent = RoleCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            Role role;
+            List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
+
+            if(list.isEmpty())
+            {
+                event.replyWarning("I was not able to found a role with the provided arguments: '"+event.getArgs()+"'");
+                return;
+            }
+            else if(list.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
+                return;
+            }
+            else
+                role = list.get(0);
+
+            if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
+            {
+                event.replyError("I can't interact with that role!");
+                return;
+            }
+            if(!(ChecksUtil.canMemberInteract(event.getMember(), role)))
+            {
+                event.replyError("You can't interact with that role!");
+                return;
+            }
+
+            if(role.isMentionable())
+                event.reply(role.getAsMention());
+            else
+            {
+                role.getManager().setMentionable(true).queue(s -> event.reply(role.getAsMention(), s2 -> role.getManager().setMentionable(false).queue(s3 ->
+                                event.reactSuccess(),
+                        e -> event.replyError("Error while setting the role back to no mentionable!")),
+                        e -> event.replyError("Error while setting the role to mentionable!")));
+            }
+        }
+    }
+
+    private class TakeRoleCmd extends EndlessCommand
+    {
+        TakeRoleCmd()
         {
             this.name = "take";
             this.help = "Takes the specified role from the specified member";
@@ -197,6 +243,7 @@ public class RoleCmd extends EndlessCommand
             this.category = Categories.TOOLS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_ROLES};
+            this.parent = RoleCmd.this;
         }
 
         @Override
@@ -255,12 +302,12 @@ public class RoleCmd extends EndlessCommand
             }
             else m = mlist.get(0);
 
-            if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
+            if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
             {
                 event.replyError("I can't interact with that role!");
                 return;
             }
-            if(!(Checks.canMemberInteract(author, role)))
+            if(!(ChecksUtil.canMemberInteract(author, role)))
             {
                 event.replyError("You can't interact with that role!");
                 return;

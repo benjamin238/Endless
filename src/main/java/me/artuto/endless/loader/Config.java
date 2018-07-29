@@ -76,9 +76,14 @@ public class Config
         return format.discordBotListToken;
     }
 
-    public String getDBansToken()
+    public String getBingMapsKey()
     {
-        return format.discordBansToken;
+        return format.bingMapsKey;
+    }
+
+    public String getDarkSkyKey()
+    {
+        return format.darkskyKey;
     }
 
     public String getGihpyKey()
@@ -86,9 +91,24 @@ public class Config
         return format.giphyKey;
     }
 
+    public String getGoogleKey()
+    {
+        return format.googleKey;
+    }
+
+    public String getGoogleSearcherId()
+    {
+        return format.googleSearcherId;
+    }
+
     public String getTranslateKey()
     {
         return format.yandexTranslateKey;
+    }
+
+    public String getYouTubeKey()
+    {
+        return format.youtubeKey;
     }
 
     public String getDoneEmote()
@@ -136,9 +156,9 @@ public class Config
         return format.rootGuildId;
     }
 
-    public Long getBotlogChannelId()
+    public String getCommandlogWebhook()
     {
-        return format.botlogChannelId;
+        return format.commandlogWebhook;
     }
 
     public String getBotlogWebhook()
@@ -189,10 +209,5 @@ public class Config
     public String getSentryDSN()
     {
         return format.sentryDSN;
-    }
-
-    public Long getCommandslogChannelId()
-    {
-        return format.commandslogChannelId;
     }
 }

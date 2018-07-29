@@ -20,16 +20,14 @@ package me.artuto.endless.logging.appenders;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import me.artuto.endless.utils.LogUtils;
-import net.dv8tion.jda.core.EmbedBuilder;
+import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -49,25 +47,9 @@ public class WebhookDebugAppender extends AppenderBase<ILoggingEvent>
     @Override
     protected void append(ILoggingEvent event)
     {
-        Color color = null;
         Level level = event.getLevel();
 
-        if(level==Level.INFO)
-            color = Color.blue;
-        if(level==Level.DEBUG)
-            color = Color.ORANGE;
-        else if(level==Level.ERROR)
-            color = Color.RED;
-        else if(level==Level.WARN)
-            color = Color.ORANGE;
-
-        EmbedBuilder eBuilder = new EmbedBuilder();
-        eBuilder.setColor(color);
-        eBuilder.setDescription(LogUtils.getStackTrace(event));
-        eBuilder.setFooter("Endless Log", "https://cdn.discordapp.com/avatars/328625129309339649/2c1ca7ef1e1b58e5a686b413b6d756c5.png");
-        eBuilder.setTimestamp(Instant.now());
-        eBuilder.setTitle(event.getLoggerName());
-
-        client.send(eBuilder.build());
+        String toSend = "["+level.levelStr.toUpperCase()+"] "+MiscUtils.getStackTrace(event);
+        client.send(FormatUtil.sanitize(toSend));
     }
 }

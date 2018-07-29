@@ -17,12 +17,20 @@
 
 package me.artuto.endless.utils;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.classic.spi.StackTraceElementProxy;
+import ch.qos.logback.classic.spi.ThrowableProxy;
 import me.artuto.endless.Const;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Artuto
@@ -30,6 +38,21 @@ import java.io.InputStream;
 
 public class MiscUtils
 {
+    public static int isCase(Message m, int caseNum)
+    {
+        if(!(m.getAuthor().getIdLong()==m.getJDA().getSelfUser().getIdLong()))
+            return 0;
+        String match = "(?is)`\\[.{8}\\]` `\\["+(caseNum==-1?"(\\d+)":caseNum)+"\\]` .+";
+        if(m.getContentRaw().matches(match))
+            return caseNum==-1?Integer.parseInt(m.getContentRaw().replaceAll(match, "$1")):caseNum;
+        return 0;
+    }
+
+    public static boolean isIgnored(String id, String topic)
+    {
+        return !(topic==null) && topic.contains("{ignore:"+id+"}");
+    }
+
     public static InputStream getInputStream(String url)
     {
         try
@@ -47,5 +70,53 @@ public class MiscUtils
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static StringBuilder getStackTrace(ILoggingEvent event)
+    {
+        IThrowableProxy proxy = event.getThrowableProxy();
+        ThrowableProxy throwableImpl = (ThrowableProxy)proxy;
+        StringBuilder stacktrace = new StringBuilder(event.getFormattedMessage());
+
+        if(!(proxy==null))
+        {
+            Throwable throwable = throwableImpl.getThrowable();
+
+            List<StackTraceElementProxy> list = Arrays.asList(proxy.getStackTraceElementProxyArray());
+            String message = proxy.getMessage();
+            if(!(message==null))
+            {
+                stacktrace.append("\n\n```java\n");
+                if(!(throwable==null))
+                    stacktrace.append(throwable.getClass().getName()).append(": ");
+                stacktrace.append(message);
+            }
+            for(StackTraceElementProxy element : list)
+            {
+                String call = element.getSTEAsString();
+                if(call.length()+stacktrace.length()>MessageEmbed.TEXT_MAX_LENGTH)
+                {
+                    stacktrace.append("\n... (").append(list.size()-list.indexOf(element)+1).append(" more calls)");
+                    break;
+                }
+                stacktrace.append("\n").append(call).append("\n");
+            }
+            stacktrace.append("```");
+        }
+
+        return stacktrace;
+    }
+
+    public static String getImageUrl(String format, String size, String url)
+    {
+        if(url==null)
+            return null;
+
+        if(!(format==null) && !(url.endsWith("gif")))
+            url = url.replace(url.substring(url.length()-3), format);
+        if(!(size==null))
+            url = url+"?size="+size;
+
+        return url;
     }
 }

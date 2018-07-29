@@ -20,10 +20,10 @@ package me.artuto.endless.commands.botadm;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.entities.Blacklist;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.core.entities.Blacklist;
+import me.artuto.endless.core.entities.BlacklistType;
 import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -32,7 +32,7 @@ import net.dv8tion.jda.core.entities.Guild;
 
 import java.awt.*;
 import java.time.OffsetDateTime;
-import java.util.Map;
+import java.util.List;
 
 public class BlacklistGuildCmd extends EndlessCommand
 {
@@ -44,7 +44,7 @@ public class BlacklistGuildCmd extends EndlessCommand
         this.name = "blacklistguild";
         this.help = "Adds, removes or displays the list with blacklisted guilds.";
         this.category = Categories.BOTADM;
-        this.children = new Command[]{new Add(), new Remove(), new Check(), new BlacklistList()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd(), new CheckCmd(), new BlacklistListCmd()};
         this.ownerCommand = true;
         this.guildOnly = false;
     }
@@ -55,9 +55,9 @@ public class BlacklistGuildCmd extends EndlessCommand
         event.replyWarning("Please specify a subcommand!");
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a guild ID to the blacklisted guilds list.";
@@ -66,13 +66,20 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a Guild ID and a reason!";
+            this.parent = BlacklistGuildCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
-            Guild guild = event.getJDA().getGuildCache().getElementById(args[0]);
+            Guild guild = event.getJDA().asBot().getShardManager().getGuildCache().getElementById(args[0]);
 
             if(guild==null)
             {
@@ -80,21 +87,21 @@ public class BlacklistGuildCmd extends EndlessCommand
                 return;
             }
 
-            if(!(bot.bdm.getBlacklist(guild.getIdLong())==null))
+            if(!(bot.endless.getBlacklist(guild.getIdLong())==null))
             {
                 event.replyError("That guild is already on the blacklist!");
                 return;
             }
 
-            bot.bdm.addBlacklist(Const.BlacklistType.GUILD, guild.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
+            bot.bdm.addBlacklist(BlacklistType.GUILD, guild.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
             event.replySuccess("Added **"+guild.getName()+"** to the blacklist.");
             guild.leave().queue();
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a guild ID to the blacklisted guilds list.";
@@ -103,18 +110,24 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a Guild ID!";
+            this.parent = BlacklistGuildCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
             if(event.getArgs().isEmpty())
             {
                 event.replyWarning("Please specify a user ID!");
                 return;
             }
 
-            Guild guild = event.getJDA().getGuildCache().getElementById(event.getArgs());
+            Guild guild = event.getJDA().asBot().getShardManager().getGuildCache().getElementById(event.getArgs());
 
             if(guild==null)
             {
@@ -122,7 +135,7 @@ public class BlacklistGuildCmd extends EndlessCommand
                 return;
             }
 
-            if(bot.bdm.getBlacklist(guild.getIdLong())==null)
+            if(bot.endless.getBlacklist(guild.getIdLong())==null)
             {
                 event.replyError("That ID isn't in the blacklist!");
                 return;
@@ -133,9 +146,9 @@ public class BlacklistGuildCmd extends EndlessCommand
         }
     }
 
-    private class BlacklistList extends EndlessCommand
+    private class BlacklistListCmd extends EndlessCommand
     {
-        BlacklistList()
+        BlacklistListCmd()
         {
             this.name = "list";
             this.help = "Displays blacklisted guilds.";
@@ -144,12 +157,19 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BlacklistGuildCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            Map<Blacklist, Guild> map;
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
+            List<Blacklist> list;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
 
@@ -158,15 +178,19 @@ public class BlacklistGuildCmd extends EndlessCommand
             else
                 color = event.getGuild().getSelfMember().getColor();
 
-            map = bot.bdm.getBlacklistedGuilds(event.getJDA());
+            list = bot.endless.getGuildBlacklists();
 
-            if(map.isEmpty())
+            if(list.isEmpty())
                 event.reply("The list is empty!");
             else
             {
                 StringBuilder sb = new StringBuilder();
-                map.forEach((b, g) -> sb.append(g.getName()).append(" (ID: ").append(g.getId()).append(")"));
-                builder.setDescription(sb);
+                list.forEach(b -> {
+                    Guild guild = event.getJDA().asBot().getShardManager().getGuildById(b.getId());
+                    if(!(guild==null))
+                        sb.append(guild.getName()).append(" (ID: ").append(guild.getId()).append(")\n");
+                });
+                builder.setDescription(sb.toString().isEmpty()?"None":sb);
                 builder.setFooter(event.getSelfUser().getName()+"'s Blacklisted Guilds", event.getSelfUser().getEffectiveAvatarUrl());
                 builder.setColor(color);
                 event.reply(builder.build());
@@ -174,9 +198,9 @@ public class BlacklistGuildCmd extends EndlessCommand
         }
     }
 
-    private class Check extends EndlessCommand
+    private class CheckCmd extends EndlessCommand
     {
-        Check()
+        CheckCmd()
         {
             this.name = "check";
             this.help = "Checks if a guild ID is blacklisted.";
@@ -184,15 +208,22 @@ public class BlacklistGuildCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a guild ID!";
+            this.parent = BlacklistGuildCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            Blacklist blacklist = bot.bdm.getBlacklist(Long.valueOf(event.getArgs()));
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
+            Blacklist blacklist = bot.endless.getBlacklist(Long.valueOf(event.getArgs()));
             if(blacklist==null)
             {
-                Guild guild = event.getJDA().getGuildCache().getElementById(event.getArgs());
+                Guild guild = event.getJDA().asBot().getShardManager().getGuildById(event.getArgs());
 
                 if(guild==null)
                     event.replySuccess("The ID "+event.getArgs()+" isn't blacklisted!");
@@ -201,11 +232,12 @@ public class BlacklistGuildCmd extends EndlessCommand
             }
             else
             {
-                Guild guild = event.getJDA().getGuildCache().getElementById(event.getArgs());
+                Guild guild = event.getJDA().asBot().getShardManager().getGuildById(event.getArgs());
                 String reason = blacklist.getReason()==null?"[no reason provided]":blacklist.getReason();
 
                 if(guild==null)
-                    event.replyWarning("The ID "+event.getArgs()+" is blacklisted!");
+                    event.replyWarning("**"+event.getArgs()+"** is blacklisted!\n" +
+                            "Reason: `"+reason+"`");
                 else
                     event.replyWarning("**"+guild.getName()+"** is blacklisted!\n" +
                             "Reason: `"+reason+"`");

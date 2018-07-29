@@ -20,12 +20,14 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.cmddata.CommandHelper;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.Bot;
+import me.artuto.endless.Endless;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.commands.cmddata.CommandHelper;
+import me.artuto.endless.utils.ChecksUtil;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.*;
 
 /**
  * @author Artuto
@@ -35,6 +37,7 @@ public abstract class EndlessCommand extends Command
 {
     protected boolean needsArguments = true;
     protected boolean ownerCommand = false;
+    protected EndlessCommand parent = null;
     protected Permission[] botPerms = new Permission[0];
     protected Permission[] userPerms = new Permission[0];
     protected String needsArgumentsMessage = null;
@@ -48,24 +51,17 @@ public abstract class EndlessCommand extends Command
     @Override
     public void execute(CommandEvent event)
     {
+        boolean hasPerms = false;
         CommandClient client = event.getClient();
+        Guild guild = event.getGuild();
         Member member = event.getMember();
         Member selfMember = event.getSelfMember();
         TextChannel tc = event.getTextChannel();
+        User author = event.getAuthor();
 
         if(ownerCommand && !(event.isOwner()))
         {
-            event.replyError("This command is only for Bot Owners!");
-            return;
-        }
-
-        if(needsArguments && event.getArgs().isEmpty())
-        {
-            if(needsArgumentsMessage==null)
-                event.replyError("**Too few arguments provided!**\n" +
-                        "Try running `"+client.getPrefix()+this.name+" help` to get help.");
-            else
-                event.replyWarning(needsArgumentsMessage);
+            Endless.LOG.warn(author.getName()+"#"+author.getDiscriminator()+" ("+author.getId()+") tried to run a owner-only command!");
             return;
         }
 
@@ -73,8 +69,9 @@ public abstract class EndlessCommand extends Command
         {
             for(Permission p : botPerms)
             {
-                if(!(Checks.hasPermission(selfMember, tc, p)))
+                if(!(ChecksUtil.hasPermission(selfMember, tc, p)))
                 {
+                    event.getClient().applyCooldown(getCooldownKey(event), 0);
                     event.replyError(String.format("I need the %s permission in this Guild to execute this command!", p.getName()));
                     return;
                 }
@@ -82,20 +79,43 @@ public abstract class EndlessCommand extends Command
             }
 
             if(event.isOwner())
+                hasPerms = true;
+
+            if(Bot.getInstance().dataEnabled)
             {
-                executeCommand(event);
-                return;
+                if(this.category==Categories.MODERATION)
+                {
+                    if(member.getRoles().contains(GuildUtils.getAdminRole(guild)) || member.getRoles().contains(GuildUtils.getModRole(guild)))
+                        hasPerms = true;
+                }
+                else if(member.getRoles().contains(GuildUtils.getAdminRole(guild)))
+                    hasPerms = true;
             }
 
-            for(Permission p : userPerms)
+            if(!(hasPerms))
             {
-                if(!(Checks.hasPermission(member, tc, p)))
+                for(Permission p : userPerms)
                 {
-                    event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
-                    return;
+                    if(!(ChecksUtil.hasPermission(member, tc, p)))
+                    {
+                        event.getClient().applyCooldown(getCooldownKey(event), 0);
+                        event.replyError(String.format("You need the %s permission in this Guild to execute this command!", p.getName()));
+                        return;
+                    }
+                    break;
                 }
-                break;
             }
+        }
+
+        if(needsArguments && event.getArgs().isEmpty())
+        {
+            event.getClient().applyCooldown(getCooldownKey(event), 0);
+            if(needsArgumentsMessage==null)
+                event.replyError("**Too few arguments provided!**\n" +
+                        "Try running `"+client.getPrefix()+(parent==null?"":parent.getName()+" ")+this.name+" help` to get help.");
+            else
+                event.replyWarning(needsArgumentsMessage);
+            return;
         }
 
         executeCommand(event);
@@ -106,6 +126,11 @@ public abstract class EndlessCommand extends Command
     public boolean isOwnerCommand()
     {
         return ownerCommand;
+    }
+
+    public EndlessCommand getParent()
+    {
+        return parent;
     }
 
     public Permission[] getBotPerms()

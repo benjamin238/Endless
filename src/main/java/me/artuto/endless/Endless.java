@@ -17,7 +17,6 @@
 
 package me.artuto.endless;
 
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,18 +26,17 @@ import org.slf4j.LoggerFactory;
 
 public class Endless
 {
-    private static Bot bot;
-    public static Logger LOG = (Logger) LoggerFactory.getLogger("Endless");
+    public static Bot bot;
+    public static Logger LOG = (Logger)LoggerFactory.getLogger("Endless");
 
-    public static Bot getBot()
+    public static Logger getLog(Class c)
     {
-        return bot;
+        return (Logger)LoggerFactory.getLogger(c);
     }
 
     public static void main(String[] args)
     {
-        //LOGGER.setLevel(Level.INFO);
-        Endless.bot = new Bot();
+        bot = new Bot();
 
         if(args.length==0)
             LOG.error("No arguments provided!");
@@ -47,10 +45,22 @@ public class Endless
             switch(args[0])
             {
                 case "normalBoot":
-                    bot.boot(false);
+                    if(args.length>1)
+                        if(args[1].equals("dataDisabled"))
+                        {
+                            bot.boot(false, false);
+                            break;
+                        }
+                    bot.boot(true, false);
                     break;
                 case "maintenance":
-                    bot.boot(true);
+                    if(args.length>1)
+                        if(args[1].equals("dataDisabled"))
+                        {
+                            bot.boot(false, true);
+                            break;
+                        }
+                    bot.boot(true, false);
                     break;
                 case "none":
                     LOG.info("Goodbye! :wave:");

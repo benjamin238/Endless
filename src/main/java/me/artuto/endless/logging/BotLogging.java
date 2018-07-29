@@ -18,10 +18,9 @@
 package me.artuto.endless.logging;
 
 import me.artuto.endless.Bot;
-import me.artuto.endless.utils.GuildUtils;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
@@ -43,26 +42,20 @@ public class BotLogging
     public void logJoin(GuildJoinEvent event)
     {
         Guild guild = event.getGuild();
-        User owner = guild.getOwner().getUser();
-        long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
-        long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
-        long totalCount = guild.getMemberCache().size();
-        GuildUtils.checkBadGuild(guild);
-        TextChannel tc = event.getJDA().getTextChannelCache().getElementById(bot.config.getBotlogChannelId());
+        LoggerFactory.getLogger("Logging").info("[GUILD JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
 
-        if(!(bot.bdm.getBlacklist(guild.getIdLong())==null || bot.bdm.getBlacklist(owner.getIdLong())==null))
+        if(bot.config.isBotlogEnabled())
         {
-            LoggerFactory.getLogger("Logging").info("[BLACKLISTED GUILD/OWNER JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n" +
-                    "Owner: "+owner.getName()+"#"+owner.getDiscriminator()+" (ID: "+owner.getId()+")");
-            guild.leave().queue();
-            return;
-        }
+            long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
+            long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
+            long totalCount = guild.getMemberCache().size();
+            User owner = guild.getOwner().getUser();
 
-        if(!(GuildUtils.isBadGuild(guild)) && bot.config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
-        {
-            tc.sendMessage(":inbox_tray: `[New Guild]:` "+guild.getName()+" (ID: "+guild.getId()+")\n"+"`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+
-                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**\n").queue();
-            LoggerFactory.getLogger("Logging").info("[GUILD JOIN]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
+            String msg = FormatUtil.sanitize(FormatUtil.removeFormatting(":inbox_tray: `[Joined Guild]:` ```diff\n+"+guild.getName()+
+                    " (ID: "+guild.getId()+")```\n"+
+                    "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+
+                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**"));
+            bot.logWebhook.send(msg);
         }
     }
 
@@ -70,19 +63,19 @@ public class BotLogging
     {
         Guild guild = event.getGuild();
         LoggerFactory.getLogger("Logging").info("[GUILD LEFT]: "+guild.getName()+" (ID: "+guild.getId()+")\n");
-        TextChannel tc = event.getJDA().getTextChannelById(bot.config.getBotlogChannelId());
 
-        if(bot.config.isBotlogEnabled() && !(tc == null) && tc.canTalk())
+        if(bot.config.isBotlogEnabled())
         {
             long botCount = guild.getMembers().stream().map(Member::getUser).filter(User::isBot).count();
             long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
-            long totalCount = guild.getMembers().size();
+            long totalCount = guild.getMemberCache().size();
             User owner = guild.getOwner().getUser();
 
-            String msg = (":outbox_tray: `[Left Guild]:` ```"+guild.getName()+"``` (ID: "+guild.getId()+")\n"+
+            String msg = FormatUtil.sanitize(FormatUtil.removeFormatting(":outbox_tray: `[Left Guild]:` ```diff\n-"+guild.getName()+
+                    " (ID: "+guild.getId()+")```\n"+
                     "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+
-                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**");
-            tc.sendMessage(msg).queue();
+                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**"));
+            bot.logWebhook.send(msg);
         }
     }
 }

@@ -25,8 +25,8 @@ import com.kdotj.simplegiphy.data.GiphyListResponse;
 import com.kdotj.simplegiphy.data.RandomGiphy;
 import com.kdotj.simplegiphy.data.RandomGiphyResponse;
 import me.artuto.endless.Bot;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.cmddata.Categories;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -48,7 +48,7 @@ public class GiphyGifCmd extends EndlessCommand
         this.bot = bot;
         this.name = "giphy";
         this.aliases = new String[]{"gif"};
-        this.children = new Command[]{new RandomGif()};
+        this.children = new Command[]{new RandomGifCmd()};
         this.help = "Searches a gif on Giphy using the specified serarch terms.";
         this.arguments = "[keyword]";
         this.category = Categories.FUN;
@@ -126,9 +126,9 @@ public class GiphyGifCmd extends EndlessCommand
         }
     }
 
-    private class RandomGif extends EndlessCommand
+    private class RandomGifCmd extends EndlessCommand
     {
-        RandomGif()
+        RandomGifCmd()
         {
             this.name = "random";
             this.help = "Retrieves a random GIF from Giphy.";
@@ -137,6 +137,7 @@ public class GiphyGifCmd extends EndlessCommand
             this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
             this.guildOnly = false;
             this.needsArgumentsMessage = "No search terms specified!";
+            this.parent = GiphyGifCmd.this;
         }
 
         protected void executeCommand(CommandEvent event)

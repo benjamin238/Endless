@@ -19,9 +19,9 @@ package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import net.dv8tion.jda.core.Permission;
+import me.artuto.endless.commands.cmddata.Categories;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 
 /**
  * @author Artuto
@@ -36,7 +36,8 @@ public class ShutdownCmd extends EndlessCommand
         this.bot = bot;
         this.name = "shutdown";
         this.aliases = new String[]{"quit", "exit", "close", "terminate"};
-        this.help = "Turns Off the bot";
+        this.arguments = "[shard id]";
+        this.help = "Turns Off the bot.";
         this.category = Categories.BOTADM;
         this.ownerCommand = true;
         this.guildOnly = false;
@@ -46,10 +47,12 @@ public class ShutdownCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        ShardManager shardManager = event.getJDA().asBot().getShardManager();
+
         if(event.getArgs().isEmpty())
         {
             event.reactSuccess();
-            event.getJDA().asBot().getShardManager().shutdown();
+            shardManager.shutdown();
             bot.db.shutdown();
         }
         else
@@ -65,7 +68,7 @@ public class ShutdownCmd extends EndlessCommand
                 return;
             }
 
-            if(shard>event.getJDA().asBot().getShardManager().getShardsTotal())
+            if(shard<event.getJDA().getShardInfo().getShardTotal()|| shard>event.getJDA().getShardInfo().getShardTotal())
             {
                 event.replyWarning("A Shard with the ID `"+shard+"` doesn't exists!");
                 return;

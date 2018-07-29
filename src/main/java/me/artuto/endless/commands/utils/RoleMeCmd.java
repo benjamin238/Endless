@@ -22,10 +22,11 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -48,7 +49,7 @@ public class RoleMeCmd extends EndlessCommand
         this.help = "Self-assignable roles.";
         this.arguments = "[roleme role]";
         this.category = Categories.UTILS;
-        this.children = new Command[]{new Add(), new Remove()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd()};
         this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
         this.needsArguments = false;
     }
@@ -56,9 +57,15 @@ public class RoleMeCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
+        if(!(bot.dataEnabled))
+        {
+            event.replyError("Endless is running on No-data mode.");
+            return;
+        }
+
         String args = event.getArgs();
         Guild guild = event.getGuild();
-        List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
+        List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
         Member member = event.getMember();
         Role role;
 
@@ -97,7 +104,7 @@ public class RoleMeCmd extends EndlessCommand
 
             if(rolemeRoles.contains(role))
             {
-                if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
+                if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
                     event.replyError("I can't interact with that role!");
                 else
                 {
@@ -114,22 +121,29 @@ public class RoleMeCmd extends EndlessCommand
         }
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a role to the list of available RoleMe roles.";
-            this.arguments = "[role]";
+            this.arguments = "<role>";
             this.category = Categories.UTILS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.parent = RoleMeCmd.this;
         }
 
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             Guild guild = event.getGuild();
-            List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
+            List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
             String args = event.getArgs();
             Role role;
 
@@ -147,15 +161,13 @@ public class RoleMeCmd extends EndlessCommand
             }
             else role = list.get(0);
 
-            if(rolemeRoles==null)
-                event.replyError("Something has gone wrong while getting the RoleMe roles list, please contact the bot owner.");
-            else if(rolemeRoles.contains(role))
+            if(rolemeRoles.contains(role))
             {
                 event.replyError("That role is already on the RoleMe roles list!");
                 return;
             }
 
-            if(!(Checks.canMemberInteract(event.getSelfMember(), role)))
+            if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
                 event.replyError("I can't interact with that role!");
             else
             {
@@ -165,22 +177,29 @@ public class RoleMeCmd extends EndlessCommand
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a role from the list of available RoleMe roles.";
-            this.arguments = "[role]";
+            this.arguments = "<role>";
             this.category = Categories.UTILS;
             this.botPerms = new Permission[]{Permission.MANAGE_ROLES};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.parent = RoleMeCmd.this;
         }
 
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             Guild guild = event.getGuild();
-            List<Role> rolemeRoles = bot.gsdm.getRolemeRoles(guild);
+            List<Role> rolemeRoles = GuildUtils.getRoleMeRoles(guild);
             String args = event.getArgs();
             Role role;
 
@@ -198,9 +217,8 @@ public class RoleMeCmd extends EndlessCommand
             }
             else role = list.get(0);
 
-            if(rolemeRoles==null)
-                event.replyError("Something has gone wrong while getting the RoleMe roles list, please contact the bot owner.");
-            else if(!(rolemeRoles.contains(role)))
+
+            if(!(rolemeRoles.contains(role)))
             {
                 event.replyError("That role isn't on the RoleMe roles list!");
                 return;

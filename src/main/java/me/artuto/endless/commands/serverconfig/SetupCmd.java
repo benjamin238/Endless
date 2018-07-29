@@ -5,9 +5,9 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.ButtonMenu;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.Checks;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
@@ -23,7 +23,7 @@ public class SetupCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "setup";
-        this.children = new Command[]{new MutedRole()};
+        this.children = new Command[]{new MutedRoleCmd()};
         this.help = "Server setup";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -38,9 +38,9 @@ public class SetupCmd extends EndlessCommand
                 Const.LINE_START+" Starboard (not available yet with this command)");
     }
 
-    private class MutedRole extends EndlessCommand
+    private class MutedRoleCmd extends EndlessCommand
     {
-        MutedRole()
+        MutedRoleCmd()
         {
             this.name = "mutedrole";;
             this.help = "Setup the muted role";
@@ -48,6 +48,7 @@ public class SetupCmd extends EndlessCommand
             this.botPerms = new Permission[]{Permission.ADMINISTRATOR};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArguments = false;
+            this.parent = SetupCmd.this;
         }
 
         @Override
@@ -59,13 +60,13 @@ public class SetupCmd extends EndlessCommand
 
             if(!(mutedRole==null))
             {
-                if(!(Checks.canMemberInteract(event.getSelfMember(), mutedRole)))
+                if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), mutedRole)))
                 {
                     event.replyError("I can't interact with the existing *"+mutedRole.getName()+"* role!");
                     return;
                 }
 
-                if(!(Checks.canMemberInteract(event.getMember(), mutedRole)))
+                if(!(ChecksUtil.canMemberInteract(event.getMember(), mutedRole)))
                 {
                     event.replyError("You can't interact with the existing *"+mutedRole.getName()+"* role!");
                     return;

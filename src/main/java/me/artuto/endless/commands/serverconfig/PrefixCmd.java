@@ -20,9 +20,10 @@ package me.artuto.endless.commands.serverconfig;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.data.managers.ClientGSDMProvider;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -36,7 +37,7 @@ public class PrefixCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "prefix";
-        this.children = new Command[]{new Add(), new Remove()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd()};
         this.help = "Displays or adds a prefix";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -50,9 +51,9 @@ public class PrefixCmd extends EndlessCommand
         Guild guild = event.getGuild();
         String defP = event.getClient().getPrefix();
 
-        Collection<String> prefixes = bot.db.getSettings(guild).getPrefixes();
+        Collection<String> prefixes = GuildUtils.getPrefixes(guild);
 
-        if(prefixes == null)
+        if(prefixes.isEmpty())
             event.reply("The prefix for this guild is `"+defP+"`");
         else
         {
@@ -63,15 +64,16 @@ public class PrefixCmd extends EndlessCommand
         }
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a custom prefix";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "You didn't provided me a prefix!";
+            this.parent = PrefixCmd.this;
         }
 
         @Override
@@ -79,7 +81,7 @@ public class PrefixCmd extends EndlessCommand
         {
             String args = event.getArgs().toLowerCase().trim();
             Guild guild = event.getGuild();
-            ClientGSDMProvider settings = event.getClient().getSettingsFor(guild);
+            GuildSettings settings = event.getClient().getSettingsFor(guild);
 
             if(!(settings.getPrefixes()==null) && settings.getPrefixes().contains(args))
                 event.replyWarning("That prefix is already added!");
@@ -91,15 +93,16 @@ public class PrefixCmd extends EndlessCommand
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a custom prefix";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArgumentsMessage = "You didn't provided me a prefix!";
+            this.parent = PrefixCmd.this;
         }
 
         @Override
@@ -107,7 +110,7 @@ public class PrefixCmd extends EndlessCommand
         {
             String args = event.getArgs().toLowerCase().trim();
             Guild guild = event.getGuild();
-            ClientGSDMProvider settings = event.getClient().getSettingsFor(guild);
+            GuildSettings settings = event.getClient().getSettingsFor(guild);
 
             if(!(settings.getPrefixes()==null) && settings.getPrefixes().contains(args))
             {

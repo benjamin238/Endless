@@ -18,6 +18,13 @@
 package me.artuto.endless.utils;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.exceptions.ErrorResponseException;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Artuto
@@ -25,6 +32,8 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 
 public class ArgsUtils
 {
+    private static final Pattern ID = Pattern.compile("(?:^|\\s)(\\d{17,22})(?:$|\\s)");
+
     public static int parseTime(String timestr)
     {
         timestr = timestr.replaceAll("(?i)(\\s|,|and)","").replaceAll("(?is)(-?\\d+|[a-z]+)", "$1 ").trim();
@@ -42,6 +51,12 @@ public class ArgsUtils
                     num*=60*60;
                 else if(vals[j+1].toLowerCase().startsWith("d"))
                     num*=60*60*24;
+                else if(vals[j+1].toLowerCase().startsWith("w"))
+                    return -1;
+                else if(vals[j+1].toLowerCase().startsWith("m"))
+                    num*=60*60*24*30;
+                else if(vals[j+1].toLowerCase().startsWith("y"))
+                    num*=60*60*24*365;
                 timeinseconds+=num;
             }
         }
@@ -51,6 +66,129 @@ public class ArgsUtils
         }
 
         return timeinseconds;
+    }
+
+    public static Channel findChannel(CommandEvent event, String query)
+    {
+        Guild guild = event.getGuild();
+        List<TextChannel> tcs = FinderUtil.findTextChannels(query, guild);
+        if(tcs.isEmpty())
+        {
+            List<VoiceChannel> vcs = FinderUtil.findVoiceChannels(query, guild);
+            if(vcs.isEmpty())
+            {
+                List<Category> cats = FinderUtil.findCategories(query, guild);
+                if(cats.isEmpty())
+                {
+                    event.replyWarning("I was not able to found a channel with the provided arguments: '"+query+"'");
+                    return null;
+                }
+                else if(cats.size()>1)
+                {
+                    event.replyWarning(FormatUtil.listOfCategories(cats, query));
+                    return null;
+                }
+                else
+                    return cats.get(0);
+            }
+            else if(vcs.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfVcChannels(vcs, query));
+                return null;
+            }
+            else
+                return vcs.get(0);
+        }
+        else if(tcs.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfTcChannels(tcs, query));
+            return null;
+        }
+        else
+            return tcs.get(0);
+    }
+
+    public static Member findMember(CommandEvent event, String query)
+    {
+        List<Member> list = FinderUtil.findMembers(query, event.getGuild());
+
+        if(list.isEmpty())
+        {
+            event.replyWarning("I was not able to found a user with the provided arguments: '"+query+"'");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfMembers(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
+    public static TextChannel findTextChannel(CommandEvent event, String query)
+    {
+        List<TextChannel> list = FinderUtil.findTextChannels(query, event.getGuild());
+        if(list.isEmpty())
+        {
+            event.replyWarning("No Text Channels found matching \""+query+"\"");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfTcChannels(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
+    public static User findBannedUser(CommandEvent event, String query)
+    {
+        List<User> list = FinderUtil.findBannedUsers(query, event.getGuild());
+
+        if(list.isEmpty())
+        {
+            event.replyWarning("I was not able to found a banned user with the provided arguments: '"+query+"'");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfUsers(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
+    public static User findUser(boolean full, CommandEvent event, String query)
+    {
+        List<User> list = FinderUtil.findUsers(query, event.getJDA());
+
+        if(list.isEmpty())
+        {
+            if(full)
+            {
+                Matcher m = ID.matcher(query);
+                if(ID.matcher(query).matches())
+                {
+                    try
+                    {
+                        return event.getJDA().retrieveUserById(m.group(1)).complete();
+                    }
+                    catch(ErrorResponseException ignored) {}
+                }
+            }
+            event.replyWarning("I was not able to found a user with the provided arguments: '"+query+"'");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfUsers(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
     }
 
     public static String[] splitWithReason(int limit, String args, String regex)
@@ -64,5 +202,35 @@ public class ArgsUtils
         {
             return new String[]{args, "[no reason provided]"};
         }
+    }
+
+    public static String[] splitWithReasonAndTime(int limit, String args, String regex)
+    {
+        int time;
+        String reason = "[no reason specified]";
+        String target;
+
+        try
+        {
+            String[] argsArr = args.split(regex, limit);
+            target = argsArr[0].trim();
+            time = ArgsUtils.parseTime(argsArr[1].trim());
+
+            try
+            {
+                if(time==0)
+                    reason = argsArr[1].trim();
+                else
+                    reason = argsArr[1].trim().split(regex, 2)[1].trim();
+            }
+            catch(ArrayIndexOutOfBoundsException ignored) {}
+        }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            target = args.trim();
+            time = 0;
+        }
+
+        return new String[]{target, String.valueOf(time), reason};
     }
 }

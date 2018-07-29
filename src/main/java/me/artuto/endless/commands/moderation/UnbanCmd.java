@@ -18,16 +18,16 @@
 package me.artuto.endless.commands.moderation;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Messages;
-import me.artuto.endless.cmddata.Categories;
+import me.artuto.endless.Endless;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 
-import java.util.List;
+import java.time.OffsetDateTime;
 
 /**
  * @author Artuto
@@ -51,44 +51,22 @@ public class UnbanCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        User author;
-        User user;
-        author = event.getAuthor();
-        String target;
-        String reason;
+        String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
+        String query = args[0];
+        String reason = args[1];
 
-        try
-        {
-            String[] args = event.getArgs().split(" for ", 2);
-            target = args[0];
-            reason = args[1];
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            target = event.getArgs();
-            reason = "[no reason specified]";
-        }
-
-        List<User> list = FinderUtil.findBannedUsers(target, event.getGuild());
-
-        if(list.isEmpty())
-        {
-            event.replyWarning("I was not able to found a user with the provided arguments: '"+target+"'");
+        User target = ArgsUtils.findBannedUser(event, query);
+        User author = event.getAuthor();
+        if(target==null)
             return;
-        }
-        else if(list.size()>1)
-        {
-            event.replyWarning(FormatUtil.listOfUsers(list, target));
-            return;
-        }
-        else user = list.get(0);
 
-        String username = "**"+user.getName()+"#"+user.getDiscriminator()+"**";
-        String fReason = reason;
-
-        event.getGuild().getController().unban(user).reason("["+author.getName()+"#"+author.getDiscriminator()+"]: "+reason).queue(s -> {
-            event.replySuccess(Messages.UNBAN_SUCCESS+username);
-            bot.modlog.logUnban(event.getAuthor(), user, fReason, event.getGuild(), event.getTextChannel());
-        }, e -> event.replyError(Messages.UNBAN_ERROR+username));
+        String username = "**"+target.getName()+"**#"+target.getDiscriminator();
+        event.getGuild().getController().unban(target).reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).queue(s -> {
+            event.replySuccess(String.format("Successfully unbanned user %s", username));
+            bot.modlog.logGeneral(Action.UNBAN, event, OffsetDateTime.now(), reason, target);
+        }, e -> {
+            event.replyError(String.format("An error happened when unbanning %s", username));
+            Endless.LOG.error("Could not unban user {} in guild {}", target.getId(), event.getGuild().getId(), e);
+        });
     }
 }

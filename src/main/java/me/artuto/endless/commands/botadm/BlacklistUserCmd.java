@@ -20,21 +20,18 @@ package me.artuto.endless.commands.botadm;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
-import me.artuto.endless.Const;
-import me.artuto.endless.cmddata.Categories;
 import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.entities.Blacklist;
+import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.core.entities.Blacklist;
+import me.artuto.endless.core.entities.BlacklistType;
 import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class BlacklistUserCmd extends EndlessCommand
 {
@@ -46,7 +43,7 @@ public class BlacklistUserCmd extends EndlessCommand
         this.name = "blacklistuser";
         this.help = "Adds, removes or displays the list with blacklisted users.";
         this.category = Categories.BOTADM;
-        this.children = new Command[]{new Add(), new Remove(), new Check(), new BlacklistList()};
+        this.children = new Command[]{new AddCmd(), new RemoveCmd(), new CheckCmd(), new BlacklistListCmd()};
         this.botPerms = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
         this.ownerCommand = true;
         this.guildOnly = false;
@@ -58,9 +55,9 @@ public class BlacklistUserCmd extends EndlessCommand
         event.replyWarning("Please specify a subcommand!");
     }
 
-    private class Add extends EndlessCommand
+    private class AddCmd extends EndlessCommand
     {
-        Add()
+        AddCmd()
         {
             this.name = "add";
             this.help = "Adds a user ID to the blacklisted users list.";
@@ -69,29 +66,36 @@ public class BlacklistUserCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a user ID and a reason!";
+            this.parent = BlacklistUserCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             String[] args = ArgsUtils.splitWithReason(2, event.getArgs(), " for ");
 
             event.getJDA().retrieveUserById(args[0]).queue(user -> {
-                if(!(bot.bdm.getBlacklist(user.getIdLong())==null))
+                if(!(bot.endless.getBlacklist(user.getIdLong())==null))
                 {
                     event.replyError("That user is already on the blacklist!");
                     return;
                 }
 
-                bot.bdm.addBlacklist(Const.BlacklistType.USER, user.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
+                bot.bdm.addBlacklist(BlacklistType.USER, user.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
                 event.replySuccess("Added **"+user.getName()+"#"+user.getDiscriminator()+"** to the blacklist.");
             }, e -> event.replyError("That ID isn't valid!"));
         }
     }
 
-    private class Remove extends EndlessCommand
+    private class RemoveCmd extends EndlessCommand
     {
-        Remove()
+        RemoveCmd()
         {
             this.name = "remove";
             this.help = "Removes a user ID to the blacklisted users list.";
@@ -100,13 +104,20 @@ public class BlacklistUserCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a user ID!";
+            this.parent = BlacklistUserCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             event.getJDA().retrieveUserById(event.getArgs()).queue(user -> {
-                if(bot.bdm.getBlacklist(user.getIdLong())==null)
+                if(bot.endless.getBlacklist(user.getIdLong())==null)
                 {
                     event.replyError("That ID isn't in the blacklist!");
                     return;
@@ -118,9 +129,9 @@ public class BlacklistUserCmd extends EndlessCommand
         }
     }
 
-    private class BlacklistList extends EndlessCommand
+    private class BlacklistListCmd extends EndlessCommand
     {
-        BlacklistList()
+        BlacklistListCmd()
         {
             this.name = "list";
             this.help = "Displays blacklisted users.";
@@ -128,12 +139,19 @@ public class BlacklistUserCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArguments = false;
+            this.parent = BlacklistUserCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
-            Map<Blacklist, User> map;
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
+            List<Blacklist> list;
             EmbedBuilder builder = new EmbedBuilder();
             Color color;
 
@@ -142,16 +160,17 @@ public class BlacklistUserCmd extends EndlessCommand
             else
                 color = event.getGuild().getSelfMember().getColor();
 
-            map = bot.bdm.getBlacklistedUsers(event.getJDA());
+            list = bot.endless.getUserBlacklists();
 
-            if(map.isEmpty())
+            if(list.isEmpty())
                 event.reply("The list is empty!");
             else
             {
                 StringBuilder sb = new StringBuilder();
-                map.forEach((b, u) -> sb.append(u.getName()).append("#").append(u.getDiscriminator()).append(" (ID: ")
-                        .append(u.getId()).append(")"));
-                builder.setDescription(sb);
+                list.forEach(b -> event.getJDA().retrieveUserById(b.getId()).queue(user ->
+                    sb.append(user.getName()).append("#").append(user.getDiscriminator()).append(" (ID: ").append(user.getId()).append(")\n"),
+                        e -> {}));
+                builder.setDescription(sb.toString().isEmpty()?"None":sb);
                 builder.setFooter(event.getSelfUser().getName()+"'s Blacklisted Users", event.getSelfUser().getEffectiveAvatarUrl());
                 builder.setColor(color);
                 event.reply(builder.build());
@@ -159,9 +178,9 @@ public class BlacklistUserCmd extends EndlessCommand
         }
     }
 
-    private class Check extends EndlessCommand
+    private class CheckCmd extends EndlessCommand
     {
-        Check()
+        CheckCmd()
         {
             this.name = "check";
             this.help = "Checks if a user ID is blacklisted.";
@@ -169,11 +188,18 @@ public class BlacklistUserCmd extends EndlessCommand
             this.ownerCommand = true;
             this.guildOnly = false;
             this.needsArgumentsMessage = "Please specify a user ID!";
+            this.parent = BlacklistUserCmd.this;
         }
 
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(bot.dataEnabled))
+            {
+                event.replyError("Endless is running on No-data mode.");
+                return;
+            }
+
             if(event.getArgs().isEmpty())
             {
                 event.replyWarning("Please specify a user ID!");
@@ -181,7 +207,7 @@ public class BlacklistUserCmd extends EndlessCommand
             }
 
             event.getJDA().retrieveUserById(event.getArgs()).queue(user -> {
-                Blacklist blacklist = bot.bdm.getBlacklist(user.getIdLong());
+                Blacklist blacklist = bot.endless.getBlacklist(user.getIdLong());
                 if(blacklist==null)
                     event.replySuccess("**"+user.getName()+"#"+user.getDiscriminator()+"** isn't blacklisted!");
                 else
