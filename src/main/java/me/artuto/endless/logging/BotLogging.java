@@ -50,11 +50,13 @@ public class BotLogging
             long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
             long totalCount = guild.getMemberCache().size();
             User owner = guild.getOwner().getUser();
+            String guildName = FormatUtil.removeFormatting(guild.getName());
+            String ownerName = FormatUtil.removeFormatting(owner.getName()+"#"+owner.getDiscriminator());
 
-            String msg = FormatUtil.sanitize(FormatUtil.removeFormatting(":inbox_tray: `[Joined Guild]:` ```diff\n+"+guild.getName()+
+            String msg = FormatUtil.sanitize(":inbox_tray: `[Joined Guild]:` ```diff\n+"+guildName+
                     " (ID: "+guild.getId()+")```\n"+
-                    "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+
-                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**"));
+                    "`[Owner]:` **"+ownerName+"** (ID: "+owner.getId()+"\n"+
+                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**");
             bot.logWebhook.send(msg);
         }
     }
@@ -70,11 +72,13 @@ public class BotLogging
             long userCount = guild.getMembers().stream().map(Member::getUser).filter(u -> !(u.isBot())).count();
             long totalCount = guild.getMemberCache().size();
             User owner = guild.getOwner().getUser();
+            String guildName = FormatUtil.removeFormatting(guild.getName());
+            String ownerName = FormatUtil.removeFormatting(owner.getName()+"#"+owner.getDiscriminator());
 
-            String msg = FormatUtil.sanitize(FormatUtil.removeFormatting(":outbox_tray: `[Left Guild]:` ```diff\n-"+guild.getName()+
+            String msg = FormatUtil.sanitize(":outbox_tray: `[Left Guild]:` ```diff\n-"+guildName+
                     " (ID: "+guild.getId()+")```\n"+
-                    "`[Owner]:` **"+owner.getName()+"**#**"+owner.getDiscriminator()+"** (ID: "+owner.getId()+"\n"+
-                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**"));
+                    "`[Owner]:` **"+ownerName+"** (ID: "+owner.getId()+"\n"+
+                    "`[Members]:` Humans: **"+userCount+"** Bots: **"+botCount+"** Total Count: **"+totalCount+"**");
             bot.logWebhook.send(msg);
         }
     }
