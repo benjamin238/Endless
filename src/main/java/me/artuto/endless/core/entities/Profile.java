@@ -27,7 +27,7 @@ public interface Profile
 {
     boolean isEmpty();
 
-    int getDonatedAmount();
+    String getDonatedAmount();
 
     String getTimezone();
 
