@@ -23,7 +23,7 @@
 
     <groupId>me.artuto.endless</groupId>
     <artifactId>Endless</artifactId>
-    <version>5.0.2</version>
+    <version>5.0.3</version>
 
     <repositories>
         <repository>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.DV8FromTheWorld</groupId>
             <artifactId>JDA</artifactId>
-            <version>2a8daf2</version>
+            <version>c18bfd9</version>
         </dependency>
         <dependency>
             <groupId>com.jagrosh</groupId>
