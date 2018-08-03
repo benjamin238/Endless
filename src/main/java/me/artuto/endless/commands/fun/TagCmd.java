@@ -387,7 +387,7 @@ public class TagCmd extends EndlessCommand
         {
             this.name = "exec";
             this.help = "Parses the specified content";
-            this.aliases = new String[]{"execute", "test"};
+            this.aliases = new String[]{"execute"};
             this.arguments = "<content>";
             this.category = Categories.FUN;
             this.guildOnly = false;

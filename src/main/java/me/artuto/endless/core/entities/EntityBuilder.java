@@ -99,12 +99,12 @@ public class EntityBuilder
         array = results.getString("imported_tags");
         if(!(array == null))
         {
-            for(Object preTag : new JSONArray(array))
+            for(Object part : new JSONArray(array))
             {
-                Tag tag = Bot.getInstance().endless.getGlobalTags().stream()
-                        .filter(t -> t.getId()==(Long)preTag).findFirst().orElse(null);
+                long id = Long.valueOf(part.toString());
+                Tag tag = bot.tdm.getGlobalTagById(id);
                 if(tag==null)
-                    tag = Bot.getInstance().endless.getLocalTags().stream().filter(t -> t.getId()==(Long)preTag).findFirst().orElse(null);
+                    tag = bot.tdm.getLocalTagById(guild.getIdLong(), id);
                 if(!(tag==null))
                     importedTags.add(tag);
             }
