@@ -174,7 +174,7 @@ public class EntityBuilder
 
     public Profile createProfile(ResultSet results, User user) throws SQLException
     {
-        return new ProfileImpl(results.getInt("donation"),
+        return new ProfileImpl(results.getString("donation"),
                 results.getString("timezone"),
                 results.getString("twitter"),
                 results.getString("steam"),
