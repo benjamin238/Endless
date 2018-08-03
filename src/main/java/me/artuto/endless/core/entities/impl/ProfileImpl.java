@@ -31,7 +31,7 @@ public class ProfileImpl implements Profile
 {
     public final Map<String, String> fields;
 
-    private final int donatedAmount;
+    private final String donatedAmount;
     private final String timezone;
     private final String twitter;
     private final String steam;
@@ -54,7 +54,7 @@ public class ProfileImpl implements Profile
     private final String reddit;
     private final User user;
 
-    public ProfileImpl(int donatedAmount, String timezone, String twitter, String steam, String wii, String nnid,
+    public ProfileImpl(String donatedAmount, String timezone, String twitter, String steam, String wii, String nnid,
                        String xboxLive, String psn, String threeds, String skype, String youtube, String about, String twitch, String minecraft,
                        String email, String lol, String wow, String battle, String splatoon, String mkwii, String reddit, User user)
     {
@@ -91,7 +91,7 @@ public class ProfileImpl implements Profile
     @Override
     public boolean isEmpty()
     {
-        return donatedAmount==0 && timezone==null && twitter==null && steam==null && wii==null && nnid==null && xboxLive==null && psn==null
+        return donatedAmount==null && timezone==null && twitter==null && steam==null && wii==null && nnid==null && xboxLive==null && psn==null
                 && threeds==null && skype==null && youtube==null && about==null && twitch==null && minecraft==null && email==null
                 && lol==null && wow==null && battle==null && splatoon==null && mkwii==null && reddit==null;
     }
@@ -103,7 +103,7 @@ public class ProfileImpl implements Profile
     }
 
     @Override
-    public int getDonatedAmount()
+    public String getDonatedAmount()
     {
         return donatedAmount;
     }
