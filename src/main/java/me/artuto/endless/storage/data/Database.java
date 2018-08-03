@@ -49,7 +49,7 @@ public class Database
 
     public Profile createDefaultProfile(User user)
     {
-        return new ProfileImpl(0, null, null, null, null, null, null, null,
+        return new ProfileImpl(null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null,
                 null, null, null, user);
     }
