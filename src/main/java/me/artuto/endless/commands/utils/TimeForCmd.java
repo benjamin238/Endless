@@ -84,7 +84,7 @@ public class TimeForCmd extends EndlessCommand
                 {
                     zone = ZoneId.of(p.getTimezone());
                 }
-                catch(DateTimeException | ZoneRulesException e)
+                catch(DateTimeException e)
                 {
                     event.replyError("`"+p.getTimezone()+"` isn't a valid timezone!");
                     return;
@@ -124,7 +124,7 @@ public class TimeForCmd extends EndlessCommand
                 {
                     zone = ZoneId.of(p.getTimezone());
                 }
-                catch(ZoneRulesException | DateTimeException e)
+                catch(DateTimeException e)
                 {
                     event.replyError("`"+p.getTimezone()+"` isn't a valid timezone!");
                     return;
@@ -173,7 +173,7 @@ public class TimeForCmd extends EndlessCommand
             {
                 ZoneId.of(args);
             }
-            catch(ZoneRulesException | DateTimeException e)
+            catch(DateTimeException e)
             {
                 event.replyError("Please specify a valid timezone!");
                 return;
