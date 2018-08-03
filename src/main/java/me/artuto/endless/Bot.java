@@ -309,7 +309,7 @@ public class Bot extends ListenerAdapter
     void sendStats(JDA jda)
     {
         JSONObject body;
-        OkHttpClient client = ((JDAImpl)jda).getHttpClientBuilder().build();
+        OkHttpClient client = ((JDAImpl)jda).getHttpClient();
 
         // Send to DiscordBots.org
         body = new JSONObject().put("server_count", shardManager.getGuildCache().size());
