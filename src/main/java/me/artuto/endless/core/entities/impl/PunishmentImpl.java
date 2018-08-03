@@ -64,4 +64,10 @@ public class PunishmentImpl implements Punishment, TempPunishment
     {
         return expiryTime;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("PS:%s(%d:%d)", type.name(), userId, guildId);
+    }
 }

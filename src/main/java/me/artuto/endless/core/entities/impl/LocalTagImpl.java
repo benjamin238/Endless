@@ -90,7 +90,7 @@ public class LocalTagImpl implements LocalTag
     @Override
     public String toString()
     {
-        return String.format("LocalTag: %s(%s:%s)", name, guildId, tagId);
+        return String.format("LT:%s(%d:%d)", name, guildId, tagId);
     }
 
     public void setContent(String newContent)

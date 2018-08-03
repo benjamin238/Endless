@@ -68,7 +68,7 @@ import net.dv8tion.jda.webhook.WebhookClient;
 
 public class Listener implements CommandListener, EventListener
 {
-    protected Bot bot;
+    private final Bot bot;
     private final ModLogging modlog;
     private final Parser parser;
     private final ServerLogging serverlog;

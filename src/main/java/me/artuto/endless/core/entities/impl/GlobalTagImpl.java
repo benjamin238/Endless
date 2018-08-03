@@ -81,7 +81,7 @@ public class GlobalTagImpl implements Tag
     @Override
     public String toString()
     {
-        return String.format("Tag: %s(%s)", name, tagId);
+        return String.format("T:%s(%d)", name, tagId);
     }
 
     public void setContent(String newContent)

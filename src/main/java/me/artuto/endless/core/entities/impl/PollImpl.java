@@ -64,4 +64,10 @@ public class PollImpl implements Poll
         gmt.setTimeInMillis(endTime);
         return OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId());
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("P:%d(%d)", msgId, tcId);
+    }
 }

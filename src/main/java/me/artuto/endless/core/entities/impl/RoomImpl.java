@@ -98,10 +98,10 @@ public class RoomImpl implements Room
     public String toString()
     {
         if(isCombo())
-            return "ROOM:Combo("+tcId+"-"+vcId+")";
+            return "R:Combo("+tcId+"-"+vcId+")";
         else if(isText())
-            return "ROOM:Text("+tcId+")";
+            return "R:Text("+tcId+")";
         else
-            return "ROOM:Voice("+vcId+")";
+            return "R:Voice("+vcId+")";
     }
 }

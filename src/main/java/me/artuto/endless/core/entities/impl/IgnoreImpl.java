@@ -44,4 +44,10 @@ public class IgnoreImpl implements Ignore
     {
         return guildId;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("I:%d(%d)", entityId, guildId);
+    }
 }

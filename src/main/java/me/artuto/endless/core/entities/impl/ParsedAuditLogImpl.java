@@ -79,4 +79,10 @@ public class ParsedAuditLogImpl implements ParsedAuditLog
     {
         return target;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("PAL:%s(%s)", key.name(), author.getId());
+    }
 }

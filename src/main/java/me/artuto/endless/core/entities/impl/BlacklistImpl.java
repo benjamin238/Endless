@@ -64,4 +64,10 @@ public class BlacklistImpl implements Blacklist
     {
         return reason;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("B:%s(%d)", type.name(), id);
+    }
 }

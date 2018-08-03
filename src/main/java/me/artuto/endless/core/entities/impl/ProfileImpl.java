@@ -227,4 +227,10 @@ public class ProfileImpl implements Profile
     {
         return user;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("PR:%s(%s)", user.getName(), user.getId());
+    }
 }

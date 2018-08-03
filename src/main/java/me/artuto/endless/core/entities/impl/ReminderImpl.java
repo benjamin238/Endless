@@ -69,4 +69,10 @@ public class ReminderImpl implements Reminder
     {
         return message;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("RM:%d(%d)", channelId, userId);
+    }
 }
