@@ -50,12 +50,15 @@ public class StarboardDataManager
 
             try(ResultSet results = statement.executeQuery())
             {
-                results.moveToInsertRow();
-                results.updateLong("msg_id", msg.getIdLong());
-                results.updateLong("tc_id", msg.getTextChannel().getIdLong());
-                results.updateLong("guild_id", msg.getGuild().getIdLong());
-                results.updateInt("star_amount", amount);
-                results.insertRow();
+                if(!(results.next()))
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("msg_id", msg.getIdLong());
+                    results.updateLong("tc_id", msg.getTextChannel().getIdLong());
+                    results.updateLong("guild_id", msg.getGuild().getIdLong());
+                    results.updateInt("star_amount", amount);
+                    results.insertRow();
+                }
             }
         }
         catch(SQLException e)
