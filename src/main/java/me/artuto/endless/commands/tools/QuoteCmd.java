@@ -29,7 +29,9 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author Artuto
@@ -37,6 +39,9 @@ import java.util.List;
 
 public class QuoteCmd extends EndlessCommand
 {
+    // Thanks Dismissed for the RegRx.
+    private final Pattern IMAGE_LINK = Pattern.compile("https?://.*.(png|jpg|jpeg|webm|gif)");
+
     public QuoteCmd()
     {
         this.name = "quote";
@@ -95,18 +100,25 @@ public class QuoteCmd extends EndlessCommand
 
         tc.getMessageById(message).queue(msg -> {
             EmbedBuilder builder = new EmbedBuilder();
+            String content = msg.getContentRaw();
+            String image = Arrays.stream(msg.getContentRaw().split("\\s+")).filter(w -> IMAGE_LINK.matcher(w).matches()).findFirst().orElse(null);
             StringBuilder sb = new StringBuilder();
             User author = msg.getAuthor();
 
-            sb.append(msg.getContentRaw()).append("\n");
-
             if(msg.getAttachments().size()==1 && msg.getAttachments().get(0).isImage())
                 builder.setImage(msg.getAttachments().get(0).getUrl());
+            else if(!(image==null))
+            {
+                content = content.replace(image, "");
+                builder.setImage(image);
+            }
             else
             {
                 for(Message.Attachment att : msg.getAttachments())
                     sb.append(":paperclip: **[").append(att.getFileName()).append("](").append(att.getUrl()).append(")**\n");
             }
+
+            sb.append(content).append("\n");
 
             builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
             builder.setColor(tc.getGuild().getMember(author)==null?null:tc.getGuild().getMember(author).getColor());
