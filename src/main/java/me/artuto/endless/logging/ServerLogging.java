@@ -178,6 +178,8 @@ public class ServerLogging
             return;
         if(!(ChecksUtil.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_EMBED_LINKS)))
             return;
+        if(newMsg.getContentRaw().equals(oldMsg.getContentRaw()))
+            return;
 
         EmbedBuilder builder = new EmbedBuilder();
         MessageBuilder mb = new MessageBuilder();
@@ -192,7 +194,10 @@ public class ServerLogging
                 attachments.append("\n").append(att.getUrl());
         }
 
-        builder.addField("From:", oldC, false).addField("To:", newC, false);
+        if(!(oldC.isEmpty()))
+            builder.addField("From:", oldC, false);
+        if(!(newC.isEmpty()))
+            builder.addField("To:", newC, false);
         if(!(newMsg.getAttachments().isEmpty()))
             builder.addField("Attachments:", attachments.toString(), false);
         builder.setColor(Color.YELLOW).setFooter("Message ID: "+newMsg.getId(), null);
