@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 
 public class QuoteCmd extends EndlessCommand
 {
-    // Thanks Dismissed for the RegRx.
+    // Thanks Dismissed for the RegEx.
     private final Pattern IMAGE_LINK = Pattern.compile("https?://.*.(png|jpg|jpeg|webm|gif)");
 
     public QuoteCmd()
