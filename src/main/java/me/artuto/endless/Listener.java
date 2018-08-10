@@ -409,7 +409,7 @@ public class Listener implements CommandListener, EventListener
         String welcomeDM = gs.getWelcomeDM();
         User user = event.getUser();
 
-        if(welcomeDM==null)
+        if(welcomeDM==null || user.isBot())
             return;
 
         parser.clear().put("user", user).put("guild", guild).put("channel", FinderUtil.getDefaultChannel(guild));
