@@ -26,6 +26,7 @@ import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.LocalTag;
 import me.artuto.endless.core.entities.Tag;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.TagUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -68,7 +69,7 @@ public class TagCmd extends EndlessCommand
             return;
         }
 
-        String[] args = splitArgs(event.getArgs());
+        String[] args = ArgsUtils.split(2, event.getArgs());
         String tagName;
         String tagArgs;
 
@@ -149,23 +150,21 @@ public class TagCmd extends EndlessCommand
                 return;
             }
 
-            String[] args = splitArgs(event.getArgs());
-            String name;
-            String content;
+            Message msg = event.getMessage();
+            String[] args = ArgsUtils.split(2, event.getArgs());
+            String name = args[0].trim().toLowerCase();
+            String content = args[1].trim();
 
-            try
-            {
-                name = args[0].trim().toLowerCase();
-                content = args[1].trim();
-            }
-            catch(ArrayIndexOutOfBoundsException e)
+            if(content.isEmpty() && msg.getAttachments().isEmpty())
             {
                 event.replyWarning("Please specify a tag name and content!");
                 return;
             }
-
-            for(Message.Attachment att : event.getMessage().getAttachments())
-                content += "\n"+att.getUrl();
+            else if(!(msg.getAttachments().isEmpty()))
+            {
+                for(Message.Attachment att : msg.getAttachments())
+                    content += "\n"+att.getUrl();
+            }
 
             Tag tag = bot.endless.getGlobalTag(name);
 
@@ -200,23 +199,21 @@ public class TagCmd extends EndlessCommand
                 return;
             }
 
-            String[] args = splitArgs(event.getArgs());
-            String name;
-            String content;
+            Message msg = event.getMessage();
+            String[] args = ArgsUtils.split(2, event.getArgs());
+            String name = args[0].trim().toLowerCase();
+            String content = args[1].trim();
 
-            try
-            {
-                name = args[0].trim().toLowerCase();
-                content = args[1].trim();
-            }
-            catch(ArrayIndexOutOfBoundsException e)
+            if(content.isEmpty() && msg.getAttachments().isEmpty())
             {
                 event.replyWarning("Please specify a tag name and content!");
                 return;
             }
-
-            for(Message.Attachment att : event.getMessage().getAttachments())
-                content += "\n"+att.getUrl();
+            else if(!(msg.getAttachments().isEmpty()))
+            {
+                for(Message.Attachment att : msg.getAttachments())
+                    content += "\n"+att.getUrl();
+            }
 
             Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), name);
 
@@ -319,19 +316,20 @@ public class TagCmd extends EndlessCommand
                 return;
             }
 
-            String[] args = splitArgs(event.getArgs());
-            String name;
-            String content;
+            Message msg = event.getMessage();
+            String[] args = ArgsUtils.split(2, event.getArgs());
+            String name = args[0].trim().toLowerCase();
+            String content = args[1].trim();
 
-            try
-            {
-                name = args[0].trim().toLowerCase();
-                content = args[1].trim();
-            }
-            catch(ArrayIndexOutOfBoundsException e)
+            if(content.isEmpty() && msg.getAttachments().isEmpty())
             {
                 event.replyWarning("Please specify a tag name and content!");
                 return;
+            }
+            else if(!(msg.getAttachments().isEmpty()))
+            {
+                for(Message.Attachment att : msg.getAttachments())
+                    content += "\n"+att.getUrl();
             }
 
             if(event.isFromType(ChannelType.TEXT))
@@ -612,25 +610,26 @@ public class TagCmd extends EndlessCommand
                 return;
             }
 
-            String[] args = splitArgs(event.getArgs());
-            String tagName;
-            String tagContent;
+            Message msg = event.getMessage();
+            String[] args = ArgsUtils.split(2, event.getArgs());
+            String name = args[0].trim().toLowerCase();
+            String content = args[1].trim();
 
-            try
+            if(content.isEmpty() && msg.getAttachments().isEmpty())
             {
-                tagName = args[0].trim().toLowerCase();
-                tagContent = args[1];
+                event.replyWarning("Please specify a tag name and content!");
+                return;
             }
-            catch(IndexOutOfBoundsException e)
+            else if(!(msg.getAttachments().isEmpty()))
             {
-                tagName = event.getArgs().trim().toLowerCase();
-                tagContent = "";
+                for(Message.Attachment att : msg.getAttachments())
+                    content += "\n"+att.getUrl();
             }
 
-            Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), tagName);
+            Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), name);
             if(tag==null)
             {
-                tag = bot.endless.getGlobalTag(tagName);
+                tag = bot.endless.getGlobalTag(name);
                 if(tag==null)
                 {
                     event.replyError("No tag found with that name!");
@@ -639,31 +638,31 @@ public class TagCmd extends EndlessCommand
             }
 
             for(Message.Attachment att : event.getMessage().getAttachments())
-                tagContent += "\n"+att.getUrl();
+                content += "\n"+att.getUrl();
 
             if(tag.isOverriden())
             {
-                bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), tagName);
+                bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), name);
                 event.replySuccess("Succesfully deleted local tag");
             }
             else
             {
                 if(tag.isGlobal())
                 {
-                    if(tagContent.isEmpty())
-                        bot.tdm.createLocalTag(true, event.getGuild().getIdLong(), event.getGuild().getIdLong(), "", tagName);
+                    if(content.isEmpty())
+                        bot.tdm.createLocalTag(true, event.getGuild().getIdLong(), event.getGuild().getIdLong(), "", name);
                     else
-                        bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getGuild().getIdLong(), tagContent, tagName);
+                        bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getGuild().getIdLong(), content, name);
                     event.replySuccess("Successfully overriden global tag");
                 }
                 else
                 {
-                    if(tagContent.isEmpty())
-                        bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), tagName);
+                    if(content.isEmpty())
+                        bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), name);
                     else
                     {
-                        bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), tagName);
-                        bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getGuild().getIdLong(), tagContent, tagName);
+                        bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), name);
+                        bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getGuild().getIdLong(), content, name);
                     }
                     event.replySuccess("Successfully overriden local tag");
                 }
@@ -881,10 +880,5 @@ public class TagCmd extends EndlessCommand
                 }
             }
         }
-    }
-
-    private String[] splitArgs(String args)
-    {
-        return args.split(" ", 2);
     }
 }

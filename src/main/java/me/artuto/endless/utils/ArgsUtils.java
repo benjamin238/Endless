@@ -191,6 +191,19 @@ public class ArgsUtils
             return list.get(0);
     }
 
+    public static String[] split(int limit, String args)
+    {
+        try
+        {
+            String[] argsArr = args.split("\\s", limit);
+            return new String[]{argsArr[0], argsArr[1]};
+        }
+        catch(IndexOutOfBoundsException e)
+        {
+            return new String[]{args, ""};
+        }
+    }
+
     public static String[] splitWithReason(int limit, String args, String regex)
     {
         try
