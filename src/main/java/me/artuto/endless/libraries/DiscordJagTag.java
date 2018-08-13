@@ -22,6 +22,7 @@ import com.jagrosh.jagtag.ParseException;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Const;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
@@ -236,7 +237,45 @@ public class DiscordJagTag
                     return "";}, (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
                     eb.setTimestamp(OffsetDateTime.parse(in[0]));
-                    return "";}));
+                    return "";}),
+                // Emote
+                new Method("emote", (env) -> "", (env, in) -> {
+                    if(in[0].isEmpty())
+                        return "";
+                    String args = in[0].toLowerCase();
+                    CommandClient client = Bot.getInstance().client;
+                    switch(args)
+                    {
+                        case "dot":
+                            return Const.LINE_START;
+                        case "error":
+                            return client.getError();
+                        case "linestart":
+                            return Const.LINE_START;
+                        case "success":
+                            return client.getSuccess();
+                        case "warning":
+                            return client.getWarning();
+                        case "warn":
+                            return client.getWarning();
+                        default:
+                            User u = env.get("user");
+                            return findEmote(u.getJDA(), args).getAsMention();
+                    }
+                }));
+    }
+
+    private static Emote findEmote(JDA jda, String query) throws ParseException
+    {
+        CommandClient client = Bot.getInstance().client;
+        List<Emote> list = FinderUtil.findEmotes(query, jda);
+
+        if(list.isEmpty())
+            throw new ParseException(String.format("%s I was not able to found an emote with the provided arguments: '%s'", client.getWarning(), query));
+        else if(list.size()>1)
+            throw new ParseException(String.format("%s %s", client.getWarning(), FormatUtil.listOfEmotes(list, query)));
+        else
+            return list.get(0);
     }
 
     private static Member findMember(Guild guild, String query) throws ParseException

@@ -62,6 +62,15 @@ public class FormatUtil
         return out;
     }
 
+    public static String listOfEmotes(List<Emote> list, String query)
+    {
+        String out = " Multiple emotes found matching \""+query+"\":";
+        for(int i = 0; i<6 && i<list.size(); i++)
+            out += "\n - "+list.get(i).getName()+" (ID:"+list.get(i).getId()+")";
+        if(list.size()>6) out += "\n**And "+(list.size()-6)+" more...**";
+        return out;
+    }
+
     public static String listOfMembers(List<Member> list, String query)
     {
         String out = " Multiple members found matching \""+query+"\":";
