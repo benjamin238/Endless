@@ -160,7 +160,7 @@ public class RoleCmd extends EndlessCommand
             }
             else m = mlist.get(0);
 
-            if(!(ChecksUtil.canMemberInteract(author, role)))
+            if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
             {
                 event.replyError("I can't interact with that role!");
                 return;
