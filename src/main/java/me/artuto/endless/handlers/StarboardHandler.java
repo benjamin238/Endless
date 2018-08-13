@@ -362,6 +362,9 @@ public class StarboardHandler
 
     private static void addMessage(Message starredMsg, TextChannel starboard)
     {
+        if(existsOnStarboard(starredMsg.getIdLong()))
+            return;
+
         EmbedBuilder eb = new EmbedBuilder();
         MessageBuilder msgB = new MessageBuilder();
         StringBuilder sb = new StringBuilder();
