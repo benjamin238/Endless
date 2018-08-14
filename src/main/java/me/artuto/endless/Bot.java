@@ -34,6 +34,7 @@ import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.cmddata.CommandHelper;
 import me.artuto.endless.commands.fun.*;
 import me.artuto.endless.commands.moderation.*;
+import me.artuto.endless.commands.music.PlayCmd;
 import me.artuto.endless.commands.serverconfig.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
@@ -125,7 +126,7 @@ public class Bot extends ListenerAdapter
     private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
 
     // Pools
-    private ScheduledThreadPoolExecutor endlessPool;
+    public ScheduledThreadPoolExecutor endlessPool;
 
     // Schedulers;
     private ScheduledExecutorService muteScheduler;
@@ -250,6 +251,9 @@ public class Bot extends ListenerAdapter
                 // Moderation
                 new BanCmd(this), new ClearCmd(this), new KickCmd(this), new HackbanCmd(this),
                 new MuteCmd(this), new ReasonCmd(this), new SoftbanCmd(this), new UnbanCmd(this),
+
+                // Music
+                new PlayCmd(this),
 
                 // Server Settings
                 new IgnoreCmd(this), new LeaveMsgCmd(this), new PrefixCmd(this), new RoomCmd(this),

@@ -29,25 +29,26 @@ import java.util.List;
 
 public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
 {
-    private boolean isDefault;
+    private boolean isDefault, isRepeatModeEnabled;
     private Collection<String> prefixes;
     private Guild guild;
     private int banDeleteDays, starboardCount;
     private List<Ignore> ignoredEntities;
     private List<Role> colorMeRoles, roleMeRoles;
     private List<Tag> importedTags;
-    private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId;
+    private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId, djRoleId, tcMusicId, vcMusicId;
     private Room.Mode roomMode;
     private String leaveMsg, starboardEmote, welcomeDM, welcomeMsg;
     private ZoneId tz;
 
-    public GuildSettingsImpl(boolean isDefault, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
+    public GuildSettingsImpl(boolean isDefault, boolean isRepeatModeEnabled, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
                              List<Ignore> ignoredEntities, List<Role> colorMeRoles, List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId,
-                             long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
-                             long starboardId, long welcomeId, Room.Mode roomMode, String leaveMsg, String starboardEmote,
+                             long djRoleId, long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
+                             long starboardId, long tcMusicId, long vcMusicId, long welcomeId, Room.Mode roomMode, String leaveMsg, String starboardEmote,
                              String welcomeDM, String welcomeMsg, ZoneId tz)
     {
         this.isDefault = isDefault;
+        this.isRepeatModeEnabled = isRepeatModeEnabled;
         this.prefixes = prefixes;
         this.guild = guild;
         this.banDeleteDays = banDeleteDays;
@@ -57,12 +58,15 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.roleMeRoles = roleMeRoles;
         this.importedTags = importedTags;
         this.adminRoleId = adminRoleId;
+        this.djRoleId = djRoleId;
         this.leaveId = leaveId;
         this.modlogId = modlogId;
         this.modRoleId = modRoleId;
         this.mutedRoleId = mutedRoleId;
         this.serverlogId = serverlogId;
         this.starboardId = starboardId;
+        this.tcMusicId = tcMusicId;
+        this.vcMusicId = vcMusicId;
         this.welcomeId = welcomeId;
         this.roomMode = roomMode;
         this.leaveMsg = leaveMsg;
@@ -82,9 +86,15 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public boolean isEmpty()
     {
         return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && ignoredEntities.isEmpty() && colorMeRoles.isEmpty()
-                && roleMeRoles.isEmpty() && importedTags.isEmpty() && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L
-                && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && starboardEmote.equals("\u2B50") && welcomeDM==null
-                && welcomeMsg==null && tz==EntityBuilder.DEFAULT_TZ;
+                && roleMeRoles.isEmpty() && importedTags.isEmpty() && adminRoleId==0L && djRoleId==0L && leaveId==0L && modlogId==0L && modRoleId==0L
+                && serverlogId==0L && starboardId==0L && tcMusicId==0L && vcMusicId==0L && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null
+                && starboardEmote.equals("\u2B50") && welcomeDM==null && welcomeMsg==null && tz==EntityBuilder.DEFAULT_TZ;
+    }
+
+    @Override
+    public boolean isRepeatModeEnabled()
+    {
+        return isRepeatModeEnabled;
     }
 
     @Override
@@ -142,6 +152,12 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     }
 
     @Override
+    public long getDJRole()
+    {
+        return djRoleId;
+    }
+
+    @Override
     public long getLeaveChannel()
     {
         return leaveId;
@@ -175,6 +191,18 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public long getStarboard()
     {
         return starboardId;
+    }
+
+    @Override
+    public long getTextChannelMusic()
+    {
+        return tcMusicId;
+    }
+
+    @Override
+    public long getVoiceChannelMusic()
+    {
+        return vcMusicId;
     }
 
     @Override
@@ -288,6 +316,11 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.banDeleteDays = banDeleteDays;
     }
 
+    public void setDjRoleId(long djRoleId)
+    {
+        this.djRoleId = djRoleId;
+    }
+
     public void setGuild(Guild guild)
     {
         this.guild = guild;
@@ -341,6 +374,16 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public void setStarboardId(long starboardId)
     {
         this.starboardId = starboardId;
+    }
+
+    public void setTextChannelMusicId(long tcMusicId)
+    {
+        this.tcMusicId = tcMusicId;
+    }
+
+    public void setVoiceChannelMusicId(long vcMusicId)
+    {
+        this.vcMusicId = vcMusicId;
     }
 
     public void setWelcomeId(long welcomeId)

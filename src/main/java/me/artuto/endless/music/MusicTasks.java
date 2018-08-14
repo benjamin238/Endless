@@ -23,6 +23,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.artuto.endless.Bot;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -45,24 +46,39 @@ public class MusicTasks
         manager.source(YoutubeAudioSourceManager.class).setPlaylistPageCount(10);
     }
 
-    public AudioPlayerSendHandler setupHandler(CommandEvent event)
+    private AudioPlayerSendHandler setupHandler(CommandEvent event)
     {
         return setupHandler(event.getGuild());
     }
 
-    public AudioPlayerSendHandler setupHandler(Guild guild)
+    private AudioPlayerSendHandler setupHandler(Guild guild)
     {
         AudioPlayerSendHandler handler;
+        AudioPlayer player;
         if(guild.getAudioManager().getSendingHandler()==null)
         {
-            AudioPlayer player = manager.createPlayer();
+            player = manager.createPlayer();
             // add here volume check and set
             handler = new AudioPlayerSendHandler(player, bot, guild);
             guild.getAudioManager().setSendingHandler(handler);
         }
         else
+        {
             handler = (AudioPlayerSendHandler)guild.getAudioManager().getSendingHandler();
+            player = handler.getPlayer();
+        }
 
+        player.addListener(handler);
         return handler;
+    }
+
+    int fairQueueTrack(AudioTrack track, CommandEvent event)
+    {
+        return setupHandler(event).fairQueueTrack(track, event.getAuthor());
+    }
+
+    int queueTrack(AudioTrack track, CommandEvent event)
+    {
+        return setupHandler(event).queueTrack(track, event.getAuthor());
     }
 }

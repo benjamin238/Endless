@@ -35,6 +35,18 @@ public class FormatUtil
 {
     private static final Pattern MENTION = Pattern.compile("<@!?(\\d{17,22})>");
 
+    public static String formatTime(long duration)
+    {
+        if(duration == Long.MAX_VALUE)
+            return "LIVE";
+        long seconds = Math.round(duration/1000.0);
+        long hours = seconds/(60*60);
+        seconds %= 60*60;
+        long minutes = seconds/60;
+        seconds %= 60;
+        return (hours>0 ? hours+":" : "") + (minutes<10 ? "0"+minutes : minutes) + ":" + (seconds<10 ? "0"+seconds : seconds);
+    }
+
     public static String formatLogClean(String message, OffsetDateTime now, ZoneId tz, int caseId, String emote, String aN, String aD, String verb, int number, long tcId, String crit, String reason)
     {
         Matcher m = MENTION.matcher(crit);

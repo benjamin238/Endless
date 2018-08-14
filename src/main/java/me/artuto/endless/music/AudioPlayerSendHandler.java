@@ -19,9 +19,20 @@ package me.artuto.endless.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import me.artuto.endless.Bot;
+import me.artuto.endless.core.entities.GuildSettings;
+import me.artuto.endless.music.queue.FairQueue;
 import net.dv8tion.jda.core.audio.AudioSendHandler;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.User;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Artuto
@@ -29,21 +40,35 @@ import net.dv8tion.jda.core.entities.Guild;
 
 public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSendHandler
 {
+    private AudioFrame lastFrame;
     private final AudioPlayer player;
     private final Bot bot;
     private final Guild guild;
 
-    public AudioPlayerSendHandler(AudioPlayer player, Bot bot, Guild guild)
+    // Queues
+    private final FairQueue<QueuedTrack> queue;
+    private final List<AudioTrack> defQueue;
+    private long requester;
+
+    private final Set<String> votes;
+
+    AudioPlayerSendHandler(AudioPlayer player, Bot bot, Guild guild)
     {
         this.player = player;
         this.bot = bot;
         this.guild = guild;
+
+        this.queue = new FairQueue<>();
+        this.defQueue = new LinkedList<>();
+
+        this.votes = new HashSet<>();
     }
 
     @Override
     public boolean canProvide()
     {
-        return false;
+        lastFrame = player.provide();
+        return !(lastFrame==null);
     }
 
     @Override
@@ -55,6 +80,101 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
     @Override
     public byte[] provide20MsAudio()
     {
-        return new byte[0];
+        return lastFrame.getData();
+    }
+
+    @Override
+    public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason reason)
+    {
+        GuildSettings gs = bot.endless.getGuildSettings(guild);
+        if(reason==AudioTrackEndReason.FINISHED && gs.isRepeatModeEnabled())
+            queue.add(new QueuedTrack(track.makeClone(), requester));
+        requester = 0;
+        if(queue.isEmpty())
+        {
+            if(!(playFromDefault()))
+                bot.endlessPool.submit(() -> guild.getAudioManager().closeAudioConnection());
+        }
+        else
+        {
+            QueuedTrack qt = queue.pull();
+            requester = qt.getIdentifier();
+            player.playTrack(qt.getTrack());
+        }
+    }
+
+    @Override
+    public void onTrackStart(AudioPlayer player, AudioTrack track)
+    {
+        votes.clear();
+    }
+
+    public AudioPlayer getPlayer()
+    {
+        return player;
+    }
+
+    public boolean isMusicPlaying()
+    {
+        return guild.getSelfMember().getVoiceState().inVoiceChannel() && !(player.getPlayingTrack()==null);
+    }
+
+    private boolean playFromDefault()
+    {
+        if(!(defQueue.isEmpty()))
+        {
+            player.playTrack(defQueue.remove(0));
+            return true;
+        }
+        return true;
+    }
+
+    public FairQueue<QueuedTrack> getQueue()
+    {
+        return queue;
+    }
+
+    int fairQueueTrack(AudioTrack track, User author)
+    {
+        if(player.getPlayingTrack()==null)
+        {
+            requester = author.getIdLong();
+            player.playTrack(track);
+            return -1;
+        }
+        else
+            return queue.add(new QueuedTrack(track, author.getIdLong()));
+    }
+
+    int queueTrack(AudioTrack track, User author)
+    {
+        if(player.getPlayingTrack()==null)
+        {
+            requester = author.getIdLong();
+            player.playTrack(track);
+            return -1;
+        }
+        else
+        {
+            defQueue.add(track);
+            return defQueue.indexOf(track)+1;
+        }
+    }
+
+    public long getRequester()
+    {
+        return requester;
+    }
+
+    public Set<String> getVotes()
+    {
+        return votes;
+    }
+
+    public void stopAndClear()
+    {
+        queue.clear();
+        defQueue.clear();
+        player.stopTrack();
     }
 }
