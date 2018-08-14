@@ -21,6 +21,8 @@ import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import me.artuto.endless.bootloader.StartupChecker;
 import me.artuto.endless.bootloader.ThreadLoader;
 import me.artuto.endless.commands.bot.AboutCmd;
@@ -46,6 +48,7 @@ import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.BotLogging;
 import me.artuto.endless.logging.ModLogging;
 import me.artuto.endless.logging.ServerLogging;
+import me.artuto.endless.music.MusicTasks;
 import me.artuto.endless.storage.data.Database;
 import me.artuto.endless.storage.data.managers.*;
 import me.artuto.endless.utils.GuildUtils;
@@ -85,6 +88,10 @@ public class Bot extends ListenerAdapter
     public boolean initialized = false;
     public EndlessCore endless;
     public EndlessCoreBuilder endlessBuilder;
+
+    // Audio
+    public AudioPlayerManager audioManager;
+    public MusicTasks musicTasks = new MusicTasks();
 
     // Config
     public Config config;
@@ -205,6 +212,9 @@ public class Bot extends ListenerAdapter
 
         waiter = new EventWaiter();
         Listener listener = new Listener(this);
+
+        if(config.isAudioEnabled())
+            musicTasks.setupSystem(this);
 
         CommandClientBuilder clientBuilder = new CommandClientBuilder();
         Long[] coOwners = config.getCoOwnerIds();
@@ -375,7 +385,7 @@ public class Bot extends ListenerAdapter
         }
     }
     
-    public void updateGame(JDA shard)
+    void updateGame(JDA shard)
     {
         JDA.ShardInfo shardInfo = shard.getShardInfo();
         Presence presence = shard.getPresence();

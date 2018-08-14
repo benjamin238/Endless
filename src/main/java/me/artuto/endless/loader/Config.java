@@ -210,4 +210,9 @@ public class Config
     {
         return format.sentryDSN;
     }
+
+    public boolean isAudioEnabled()
+    {
+        return format.audioEnabled;
+    }
 }
