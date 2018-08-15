@@ -34,6 +34,7 @@ import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.cmddata.CommandHelper;
 import me.artuto.endless.commands.fun.*;
 import me.artuto.endless.commands.moderation.*;
+import me.artuto.endless.commands.music.NowPlayingCmd;
 import me.artuto.endless.commands.music.PlayCmd;
 import me.artuto.endless.commands.serverconfig.*;
 import me.artuto.endless.commands.tools.*;
@@ -254,7 +255,7 @@ public class Bot extends ListenerAdapter
                 new MuteCmd(this), new ReasonCmd(this), new SoftbanCmd(this), new UnbanCmd(this),
 
                 // Music
-                new PlayCmd(this),
+                new NowPlayingCmd(), new PlayCmd(this),
 
                 // Server Settings
                 new IgnoreCmd(this), new LeaveMsgCmd(this), new PrefixCmd(this), new RoomCmd(this),

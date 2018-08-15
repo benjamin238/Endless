@@ -39,7 +39,6 @@ public abstract class MusicCommand extends EndlessCommand
     public MusicCommand(Bot bot)
     {
         this.bot = bot;
-        this.guildOnly = true;
         this.category = Categories.MUSIC;
     }
 
