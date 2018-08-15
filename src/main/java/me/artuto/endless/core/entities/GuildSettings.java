@@ -40,6 +40,8 @@ public interface GuildSettings
 
     int getStarboardCount();
 
+    int getVolume();
+
     List<Ignore> getIgnoredEntities();
 
     List<Role> getColorMeRoles();

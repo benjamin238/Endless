@@ -22,7 +22,6 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import me.artuto.endless.bootloader.StartupChecker;
 import me.artuto.endless.bootloader.ThreadLoader;
 import me.artuto.endless.commands.bot.AboutCmd;
@@ -37,6 +36,7 @@ import me.artuto.endless.commands.moderation.*;
 import me.artuto.endless.commands.music.NowPlayingCmd;
 import me.artuto.endless.commands.music.PlayCmd;
 import me.artuto.endless.commands.music.SkipCmd;
+import me.artuto.endless.commands.music.VolumeCmd;
 import me.artuto.endless.commands.serverconfig.*;
 import me.artuto.endless.commands.tools.*;
 import me.artuto.endless.commands.utils.*;
@@ -256,7 +256,7 @@ public class Bot extends ListenerAdapter
                 new MuteCmd(this), new ReasonCmd(this), new SoftbanCmd(this), new UnbanCmd(this),
 
                 // Music
-                new NowPlayingCmd(), new PlayCmd(this), new SkipCmd(),
+                new NowPlayingCmd(), new PlayCmd(this), new SkipCmd(), new VolumeCmd(this),
 
                 // Server Settings
                 new IgnoreCmd(this), new LeaveMsgCmd(this), new PrefixCmd(this), new RoomCmd(this),

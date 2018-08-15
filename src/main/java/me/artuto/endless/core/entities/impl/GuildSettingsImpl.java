@@ -32,7 +32,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     private boolean isDefault, isRepeatModeEnabled;
     private Collection<String> prefixes;
     private Guild guild;
-    private int banDeleteDays, starboardCount;
+    private int banDeleteDays, starboardCount, volume;
     private List<Ignore> ignoredEntities;
     private List<Role> colorMeRoles, roleMeRoles;
     private List<Tag> importedTags;
@@ -42,8 +42,8 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     private ZoneId tz;
 
     public GuildSettingsImpl(boolean isDefault, boolean isRepeatModeEnabled, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
-                             List<Ignore> ignoredEntities, List<Role> colorMeRoles, List<Role> roleMeRoles, List<Tag> importedTags, long adminRoleId,
-                             long djRoleId, long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
+                             int volume, List<Ignore> ignoredEntities, List<Role> colorMeRoles, List<Role> roleMeRoles, List<Tag> importedTags,
+                             long adminRoleId, long djRoleId, long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
                              long starboardId, long tcMusicId, long vcMusicId, long welcomeId, Room.Mode roomMode, String leaveMsg, String starboardEmote,
                              String welcomeDM, String welcomeMsg, ZoneId tz)
     {
@@ -53,6 +53,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.guild = guild;
         this.banDeleteDays = banDeleteDays;
         this.starboardCount = starboardCount;
+        this.volume = volume;
         this.ignoredEntities = ignoredEntities;
         this.colorMeRoles = colorMeRoles;
         this.roleMeRoles = roleMeRoles;
@@ -85,7 +86,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     @Override
     public boolean isEmpty()
     {
-        return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && ignoredEntities.isEmpty() && colorMeRoles.isEmpty()
+        return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && volume==0 && ignoredEntities.isEmpty() && colorMeRoles.isEmpty()
                 && roleMeRoles.isEmpty() && importedTags.isEmpty() && adminRoleId==0L && djRoleId==0L && leaveId==0L && modlogId==0L && modRoleId==0L
                 && serverlogId==0L && starboardId==0L && tcMusicId==0L && vcMusicId==0L && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null
                 && starboardEmote.equals("\u2B50") && welcomeDM==null && welcomeMsg==null && tz==EntityBuilder.DEFAULT_TZ;
@@ -119,6 +120,12 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public int getStarboardCount()
     {
         return starboardCount;
+    }
+
+    @Override
+    public int getVolume()
+    {
+        return volume;
     }
 
     @Override
@@ -384,6 +391,11 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public void setVoiceChannelMusicId(long vcMusicId)
     {
         this.vcMusicId = vcMusicId;
+    }
+
+    public void setVolume(int volume)
+    {
+        this.volume = volume;
     }
 
     public void setWelcomeId(long welcomeId)

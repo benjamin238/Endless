@@ -46,12 +46,12 @@ public class MusicTasks
         manager.source(YoutubeAudioSourceManager.class).setPlaylistPageCount(10);
     }
 
-    private AudioPlayerSendHandler setupHandler(CommandEvent event)
+    public AudioPlayerSendHandler setupHandler(CommandEvent event)
     {
         return setupHandler(event.getGuild());
     }
 
-    private AudioPlayerSendHandler setupHandler(Guild guild)
+    public AudioPlayerSendHandler setupHandler(Guild guild)
     {
         AudioPlayerSendHandler handler;
         AudioPlayer player;

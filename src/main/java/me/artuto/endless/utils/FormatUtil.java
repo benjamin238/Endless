@@ -102,7 +102,7 @@ public class FormatUtil
         return str;
     }
 
-    private static String volumeIcon(int volume)
+    public static String volumeIcon(int volume)
     {
         if(volume == 0)
             return "\uD83D\uDD07";

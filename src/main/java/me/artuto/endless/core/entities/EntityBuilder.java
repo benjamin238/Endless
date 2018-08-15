@@ -119,6 +119,7 @@ public class EntityBuilder
                 guild,
                 results.getInt("ban_delete_days"),
                 results.getInt("starboard_count"),
+                results.getInt("volume")==0?100:results.getInt("volume"),
                 bot.db.getIgnoresForGuild(guild),
                 colorMeRoles,
                 roleMeRoles,

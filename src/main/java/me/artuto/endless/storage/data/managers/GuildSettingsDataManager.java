@@ -1059,4 +1059,39 @@ public class GuildSettingsDataManager
             LOG.error("Error while setting the starboard emote for the guild {}", guild.getId(), e);
         }
     }
+
+    public void setVolume(Guild guild, int volume)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, volume FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    results.updateInt("volume", volume);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateInt("volume", volume);
+                    results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setVolume(volume);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.error("Error while setting the volume for the guild {}", guild.getId(), e);
+        }
+    }
 }
