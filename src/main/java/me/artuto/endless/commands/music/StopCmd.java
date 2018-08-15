@@ -25,13 +25,14 @@ import me.artuto.endless.music.AudioPlayerSendHandler;
  * @author Artuto
  */
 
-public class SkipCmd extends EndlessCommand
+public class StopCmd extends EndlessCommand
 {
-    public SkipCmd()
+    public StopCmd()
     {
         this.name = "stop";
         this.help = "Stops the current song and clears the queue.";
         this.category = MusicCommand.DJ;
+        this.needsArguments = false;
     }
 
     @Override
