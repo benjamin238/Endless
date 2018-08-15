@@ -54,4 +54,5 @@ public class ConfigFormat
     public Boolean deepDebug;
     public boolean sentryEnabled;
     public String sentryDSN;
+    public boolean audioEnabled;
 }

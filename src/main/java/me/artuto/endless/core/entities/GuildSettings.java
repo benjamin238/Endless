@@ -30,6 +30,8 @@ public interface GuildSettings
 
     boolean isEmpty();
 
+    boolean isRepeatModeEnabled();
+
     Collection<String> getPrefixes();
 
     Guild getGuild();
@@ -48,6 +50,8 @@ public interface GuildSettings
 
     long getAdminRole();
 
+    long getDJRole();
+
     long getLeaveChannel();
 
     long getModlog();
@@ -59,6 +63,10 @@ public interface GuildSettings
     long getServerlog();
 
     long getStarboard();
+
+    long getTextChannelMusic();
+
+    long getVoiceChannelMusic();
 
     long getWelcomeChannel();
 

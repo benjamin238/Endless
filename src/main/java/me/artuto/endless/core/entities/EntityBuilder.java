@@ -114,6 +114,7 @@ public class EntityBuilder
                 ZoneId.of(results.getString("logs_timezone"));
 
         return new GuildSettingsImpl(false,
+                false,
                 prefixes,
                 guild,
                 results.getInt("ban_delete_days"),
@@ -123,12 +124,15 @@ public class EntityBuilder
                 roleMeRoles,
                 importedTags,
                 results.getLong("admin_role_id"),
+                results.getLong("dj_role_id"),
                 results.getLong("leave_id"),
                 results.getLong("modlog_id"),
                 results.getLong("mod_role_id"),
                 results.getLong("muted_role_id"),
                 results.getLong("serverlog_id"),
                 results.getLong("starboard_id"),
+                results.getLong("tc_music_id"),
+                results.getLong("vc_music_id"),
                 results.getLong("welcome_id"),
                 results.getString("room_mode")==null?Room.Mode.NO_CREATION:Room.Mode.valueOf(results.getString("room_mode")),
                 results.getString("leave_msg"),
