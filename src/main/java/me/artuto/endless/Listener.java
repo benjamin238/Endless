@@ -320,7 +320,7 @@ public class Listener implements CommandListener, EventListener
             if(gs.getColorMeRoles().contains(role))
                 bot.gsdm.removeColormeRole(guild, role);
             if(gs.getRoleMeRoles().contains(role))
-                bot.gsdm.removeColormeRole(guild, role);
+                bot.gsdm.removeRolemeRole(guild, role);
             if(!(bot.endless.getIgnore(guild, role.getIdLong())==null))
                 bot.gsdm.removeIgnore(guild, role.getIdLong());
         }
