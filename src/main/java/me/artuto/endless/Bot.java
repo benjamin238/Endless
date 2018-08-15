@@ -225,6 +225,7 @@ public class Bot extends ListenerAdapter
                 .setLinkedCacheSize(6)
                 .setHelpConsumer(CommandHelper::getHelp)
                 .setCoOwnerIds(owners)
+                .setGuildSettingsManager(new ClientGSDM(this))
                 .addCommands(
                 // Bot
                 new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(),
@@ -254,8 +255,6 @@ public class Bot extends ListenerAdapter
                 new ArchiveCmd(this), new ColorMeCmd(this), new GoogleSearchCmd(this), new ReminderCmd(this),
                 new RoleMeCmd(this), new TimeForCmd(this), new TranslateCmd(this),
                 new WeatherCmd(this), new YouTubeCmd(this));
-        if(dataEnabled)
-            clientBuilder.setGuildSettingsManager(new ClientGSDM(this));
 
         client = clientBuilder.build();
         Endless.LOG.info("Starting JDA...");
