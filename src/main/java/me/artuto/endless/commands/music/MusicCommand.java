@@ -23,6 +23,8 @@ import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.music.AudioPlayerSendHandler;
+import me.artuto.endless.utils.ChecksUtil;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.exceptions.PermissionException;
 
@@ -89,4 +91,17 @@ public abstract class MusicCommand extends EndlessCommand
     }
 
     public abstract void executeMusicCommand(CommandEvent event);
+
+    public static Category DJ = new Category("DJ", event -> {
+       GuildSettings gs = event.getClient().getSettingsFor(event.getGuild());
+       Member member = event.getMember();
+       Role role = event.getGuild().getRoleById(gs.getDJRole());
+
+       if(!(role==null) && member.getRoles().contains(role))
+           return true;
+       else if(ChecksUtil.hasPermission(member, null, Permission.MANAGE_SERVER))
+           return true;
+       else
+           return event.isOwner();
+    });
 }
