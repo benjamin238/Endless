@@ -61,6 +61,7 @@ public class CommandHelper
         }
         else
         {
+            args = args.split("\\s", 2)[0];
             if(args.equalsIgnoreCase("bot"))
                 getHelpCategoryEmbed(Categories.BOT, event, eBuilder);
             else if(args.equalsIgnoreCase("botadm"))
