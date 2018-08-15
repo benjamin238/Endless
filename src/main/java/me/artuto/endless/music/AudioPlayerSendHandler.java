@@ -91,10 +91,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
             queue.add(new QueuedTrack(track.makeClone(), requester));
         requester = 0;
         if(queue.isEmpty())
-        {
-            if(!(playFromDefault()))
-                bot.endlessPool.submit(() -> guild.getAudioManager().closeAudioConnection());
-        }
+            bot.endlessPool.submit(() -> guild.getAudioManager().closeAudioConnection());
         else
         {
             QueuedTrack qt = queue.pull();
@@ -117,16 +114,6 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
     public boolean isMusicPlaying()
     {
         return guild.getSelfMember().getVoiceState().inVoiceChannel() && !(player.getPlayingTrack()==null);
-    }
-
-    private boolean playFromDefault()
-    {
-        if(!(defQueue.isEmpty()))
-        {
-            player.playTrack(defQueue.remove(0));
-            return true;
-        }
-        return true;
     }
 
     public FairQueue<QueuedTrack> getQueue()
