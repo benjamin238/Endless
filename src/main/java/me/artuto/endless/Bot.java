@@ -258,7 +258,7 @@ public class Bot extends ListenerAdapter
 
                 // Server Settings
                 new IgnoreCmd(this), new LeaveMsgCmd(this), new PrefixCmd(this), new RoomCmd(this),
-                new ServerSettingsCmd(this), new SetupCmd(this), new StarboardCmd(this), new WelcomeDmCmd(this),
+                new ServerSettingsCmd(this), new SetDJCmd(this), new SetupCmd(this), new StarboardCmd(this), new WelcomeDmCmd(this),
                 new WelcomeMsgCmd(this),
 
                 // Tools

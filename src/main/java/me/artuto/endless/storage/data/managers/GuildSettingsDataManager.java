@@ -412,7 +412,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.error("Error while setting the muted role for the guild {}", guild.getId(), e);
+            LOG.error("Error while setting the admin role for the guild {}", guild.getId(), e);
         }
     }
 
@@ -458,7 +458,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.error("Error while setting the muted role for the guild {}", guild.getId(), e);
+            LOG.error("Error while setting the mod role for the guild {}", guild.getId(), e);
         }
     }
 
@@ -1092,6 +1092,52 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             LOG.error("Error while setting the volume for the guild {}", guild.getId(), e);
+        }
+    }
+
+    public void setDJRole(Guild guild, Role role)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, dj_role_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(role==null)
+                {
+                    if(results.next())
+                    {
+                        results.updateNull("dj_role_id");
+                        results.updateRow();
+                    }
+                }
+                else
+                {
+                    if(results.next())
+                    {
+                        results.updateLong("dj_role_id", role.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("dj_role_id", role.getIdLong());
+                        results.insertRow();
+                    }
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setDJRoleId(role==null?0L:role.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.error("Error while setting the DJ role for the guild {}", guild.getId(), e);
         }
     }
 }

@@ -331,7 +331,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.banDeleteDays = banDeleteDays;
     }
 
-    public void setDjRoleId(long djRoleId)
+    public void setDJRoleId(long djRoleId)
     {
         this.djRoleId = djRoleId;
     }
