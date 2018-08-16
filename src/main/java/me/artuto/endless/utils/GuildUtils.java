@@ -26,6 +26,7 @@ import net.dv8tion.jda.core.audit.AuditLogKey;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +39,18 @@ public class GuildUtils
     public GuildUtils(Bot bot)
     {
         GuildUtils.bot = bot;
+    }
+
+    public static boolean isPremiumGuild(Guild guild)
+    {
+        Guild rootGuild = bot.shardManager.getGuildById(bot.config.getRootGuildId());
+        if(rootGuild==null)
+            return false;
+        Role donators = rootGuild.getRolesByName("Donators", true).stream().findFirst().orElse(null);
+        if(donators==null)
+            return false;
+        User owner = guild.getOwner().getUser();
+        return rootGuild.getMembersWithRoles(donators).stream().anyMatch(m -> m.getUser().getIdLong()==owner.getIdLong());
     }
 
     public static Collection<String> getPrefixes(Guild guild)

@@ -114,7 +114,8 @@ public class EntityBuilder
                 ZoneId.of(results.getString("logs_timezone"));
 
         return new GuildSettingsImpl(false,
-                false,
+                results.getBoolean("fair_queue_enabled"),
+                results.getBoolean("repeat_mode_enabled"),
                 prefixes,
                 guild,
                 results.getInt("ban_delete_days"),

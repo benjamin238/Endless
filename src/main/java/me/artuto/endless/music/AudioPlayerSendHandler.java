@@ -25,6 +25,7 @@ import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import me.artuto.endless.Bot;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.music.queue.FairQueue;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.audio.AudioSendHandler;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
@@ -50,7 +51,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
     private final List<AudioTrack> defQueue;
     private long requester;
 
-    private final Set<String> votes;
+    private final Set<Long> votes;
 
     AudioPlayerSendHandler(AudioPlayer player, Bot bot, Guild guild)
     {
@@ -88,15 +89,28 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
     {
         GuildSettings gs = bot.endless.getGuildSettings(guild);
         if(reason==AudioTrackEndReason.FINISHED && gs.isRepeatModeEnabled())
-            queue.add(new QueuedTrack(track.makeClone(), requester));
+        {
+            if(isFairQueue())
+                queue.add(new QueuedTrack(track.makeClone(), requester));
+            else
+                defQueue.add(track.makeClone());
+        }
         requester = 0;
-        if(queue.isEmpty())
+        if(queue.isEmpty() || defQueue.isEmpty())
             bot.endlessPool.submit(() -> guild.getAudioManager().closeAudioConnection());
         else
         {
-            QueuedTrack qt = queue.pull();
-            requester = qt.getIdentifier();
-            player.playTrack(qt.getTrack());
+            if(isFairQueue())
+            {
+                QueuedTrack qt = queue.pull();
+                requester = qt.getIdentifier();
+                player.playTrack(qt.getTrack());
+            }
+            else
+            {
+                AudioTrack qt = defQueue.remove(0);
+                player.playTrack(qt);
+            }
         }
     }
 
@@ -116,9 +130,22 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
         return guild.getSelfMember().getVoiceState().inVoiceChannel() && !(player.getPlayingTrack()==null);
     }
 
-    public FairQueue<QueuedTrack> getQueue()
+    boolean isFairQueue()
+    {
+        if(GuildUtils.isPremiumGuild(guild))
+            return bot.endless.getGuildSettings(guild).isFairQueueEnabled();
+        else
+            return true;
+    }
+
+    public FairQueue<QueuedTrack> getFairQueue()
     {
         return queue;
+    }
+
+    public List<AudioTrack> getQueue()
+    {
+        return defQueue;
     }
 
     int fairQueueTrack(AudioTrack track, User author)
@@ -153,7 +180,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
         return requester;
     }
 
-    public Set<String> getVotes()
+    public Set<Long> getVotes()
     {
         return votes;
     }

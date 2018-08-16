@@ -62,7 +62,7 @@ public abstract class MusicCommand extends EndlessCommand
             event.replyInDm(event.getClient().getError()+" You can only use this command in "+musicTc.getAsMention());
             return;
         }
-        if(playing && (guild.getAudioManager().getSendingHandler()==null || ((AudioPlayerSendHandler)guild.getAudioManager().getSendingHandler()).isMusicPlaying()))
+        if(playing && (guild.getAudioManager().getSendingHandler()==null || !(((AudioPlayerSendHandler)guild.getAudioManager().getSendingHandler()).isMusicPlaying())))
         {
             event.replyError("There must be music playing to use that command!");
             return;

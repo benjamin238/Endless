@@ -30,6 +30,8 @@ public interface GuildSettings
 
     boolean isEmpty();
 
+    boolean isFairQueueEnabled();
+
     boolean isRepeatModeEnabled();
 
     Collection<String> getPrefixes();

@@ -25,6 +25,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.artuto.endless.Bot;
+import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.entities.Guild;
 
 /**
@@ -72,12 +73,20 @@ public class MusicTasks
         return handler;
     }
 
-    int fairQueueTrack(AudioTrack track, CommandEvent event)
+    int putInQueue(AudioTrack track, CommandEvent event)
+    {
+        if(setupHandler(event).isFairQueue())
+            return fairQueueTrack(track, event);
+        else
+            return queueTrack(track, event);
+    }
+
+    private int fairQueueTrack(AudioTrack track, CommandEvent event)
     {
         return setupHandler(event).fairQueueTrack(track, event.getAuthor());
     }
 
-    int queueTrack(AudioTrack track, CommandEvent event)
+    private int queueTrack(AudioTrack track, CommandEvent event)
     {
         return setupHandler(event).queueTrack(track, event.getAuthor());
     }

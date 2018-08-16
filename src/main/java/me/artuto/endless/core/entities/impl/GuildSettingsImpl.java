@@ -29,7 +29,7 @@ import java.util.List;
 
 public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
 {
-    private boolean isDefault, isRepeatModeEnabled;
+    private boolean isDefault, isFairQueueEnabled, isRepeatModeEnabled;
     private Collection<String> prefixes;
     private Guild guild;
     private int banDeleteDays, starboardCount, volume;
@@ -41,13 +41,14 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     private String leaveMsg, starboardEmote, welcomeDM, welcomeMsg;
     private ZoneId tz;
 
-    public GuildSettingsImpl(boolean isDefault, boolean isRepeatModeEnabled, Collection<String> prefixes, Guild guild, int banDeleteDays, int starboardCount,
-                             int volume, List<Ignore> ignoredEntities, List<Role> colorMeRoles, List<Role> roleMeRoles, List<Tag> importedTags,
-                             long adminRoleId, long djRoleId, long leaveId, long modlogId, long modRoleId, long mutedRoleId, long serverlogId,
-                             long starboardId, long tcMusicId, long vcMusicId, long welcomeId, Room.Mode roomMode, String leaveMsg, String starboardEmote,
-                             String welcomeDM, String welcomeMsg, ZoneId tz)
+    public GuildSettingsImpl(boolean isDefault, boolean isFairQueueEnabled, boolean isRepeatModeEnabled, Collection<String> prefixes, Guild guild,
+                             int banDeleteDays, int starboardCount, int volume, List<Ignore> ignoredEntities, List<Role> colorMeRoles, List<Role> roleMeRoles,
+                             List<Tag> importedTags, long adminRoleId, long djRoleId, long leaveId, long modlogId, long modRoleId, long mutedRoleId,
+                             long serverlogId, long starboardId, long tcMusicId, long vcMusicId, long welcomeId, Room.Mode roomMode, String leaveMsg,
+                             String starboardEmote, String welcomeDM, String welcomeMsg, ZoneId tz)
     {
         this.isDefault = isDefault;
+        this.isFairQueueEnabled = isFairQueueEnabled;
         this.isRepeatModeEnabled = isRepeatModeEnabled;
         this.prefixes = prefixes;
         this.guild = guild;
@@ -86,10 +87,17 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     @Override
     public boolean isEmpty()
     {
-        return prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && volume==0 && ignoredEntities.isEmpty() && colorMeRoles.isEmpty()
-                && roleMeRoles.isEmpty() && importedTags.isEmpty() && adminRoleId==0L && djRoleId==0L && leaveId==0L && modlogId==0L && modRoleId==0L
-                && serverlogId==0L && starboardId==0L && tcMusicId==0L && vcMusicId==0L && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null
-                && starboardEmote.equals("\u2B50") && welcomeDM==null && welcomeMsg==null && tz==EntityBuilder.DEFAULT_TZ;
+        return !(isFairQueueEnabled) && !(isRepeatModeEnabled) && prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && volume==0 &&
+                ignoredEntities.isEmpty() && colorMeRoles.isEmpty() && roleMeRoles.isEmpty() && importedTags.isEmpty() && adminRoleId==0L && djRoleId==0L
+                && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L && tcMusicId==0L && vcMusicId==0L && welcomeId==0L
+                && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && starboardEmote.equals("\u2B50") && welcomeDM==null && welcomeMsg==null
+                && tz==EntityBuilder.DEFAULT_TZ;
+    }
+
+    @Override
+    public boolean isFairQueueEnabled()
+    {
+        return isFairQueueEnabled;
     }
 
     @Override
@@ -326,6 +334,11 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public void setDjRoleId(long djRoleId)
     {
         this.djRoleId = djRoleId;
+    }
+
+    public void setFairQueueEnabled(boolean fairQueueEnabled)
+    {
+        this.isFairQueueEnabled = fairQueueEnabled;
     }
 
     public void setGuild(Guild guild)
