@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.music.MusicCommand;
 import me.artuto.endless.utils.ChecksUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -54,6 +55,8 @@ public class CommandHelper
             if(event.isFromType(ChannelType.TEXT))
             {
                 eBuilder.addField(Const.BAN+" Moderation Commands:", prefix+"help moderation", false);
+                eBuilder.addField(Const.MUSIC+" Music Commands:", prefix+"help music", false);
+                eBuilder.addField(Const.MUSIC+" Music DJ Commands:", prefix+"help musicdj", false);
                 eBuilder.addField(Const.SERVER_SETTINGS+" Server Settings Commands:", prefix+"help settings", false);
             }
             eBuilder.addField(Const.PEOPLE+" Tool Commands:", prefix+"help tools", false);
@@ -78,6 +81,26 @@ public class CommandHelper
             {
                 if(event.isFromType(ChannelType.TEXT))
                     getHelpCategoryEmbed(Categories.MODERATION, event, eBuilder);
+                else
+                {
+                    event.replyError("This Category is only available in a Guild!");
+                    return;
+                }
+            }
+            else if(args.equalsIgnoreCase("music"))
+            {
+                if(event.isFromType(ChannelType.TEXT))
+                    getHelpCategoryEmbed(Categories.MUSIC, event, eBuilder);
+                else
+                {
+                    event.replyError("This Category is only available in a Guild!");
+                    return;
+                }
+            }
+            else if(args.equalsIgnoreCase("musicdj"))
+            {
+                if(event.isFromType(ChannelType.TEXT))
+                    getHelpCategoryEmbed(MusicCommand.DJ, event, eBuilder);
                 else
                 {
                     event.replyError("This Category is only available in a Guild!");
