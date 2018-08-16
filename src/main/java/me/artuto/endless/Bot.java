@@ -258,8 +258,8 @@ public class Bot extends ListenerAdapter
 
                 // Server Settings
                 new IgnoreCmd(this), new LeaveMsgCmd(this), new PrefixCmd(this), new RoomCmd(this),
-                new ServerSettingsCmd(this), new SetDJCmd(this), new SetupCmd(this), new StarboardCmd(this), new WelcomeDmCmd(this),
-                new WelcomeMsgCmd(this),
+                new ServerSettingsCmd(this), new SetDJCmd(this), new SetMusicTcCmd(this), new SetMusicVcCmd(this), new SetupCmd(this),
+                new StarboardCmd(this), new WelcomeDmCmd(this), new WelcomeMsgCmd(this),
 
                 // Tools
                 new AfkCmd(), new AnnouncementCmd(), new AvatarCmd(), new ChannelInfoCmd(), new EmoteCmd(), new GuildInfoCmd(),
