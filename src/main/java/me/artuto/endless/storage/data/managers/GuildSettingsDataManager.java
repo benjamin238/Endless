@@ -1233,4 +1233,39 @@ public class GuildSettingsDataManager
             LOG.error("Error while setting the music voice channel for the guild {}", guild.getId(), e);
         }
     }
+
+    public void setFairQueueStatus(Guild guild, boolean status)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, fair_queue_enabled FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    results.updateBoolean("fair_queue_enabled", status);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateBoolean("fair_queue_enabled", status);
+                    results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setFairQueueEnabled(status);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.error("Error while setting the status of the fair queue for the guild {}", guild.getId(), e);
+        }
+    }
 }
