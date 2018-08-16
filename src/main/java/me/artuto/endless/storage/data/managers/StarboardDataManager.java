@@ -44,8 +44,9 @@ public class StarboardDataManager
     {
         try
         {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM STARBOARD",
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM STARBOARD WHERE msg_id = ?",
                     ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, msg.getIdLong());
             statement.closeOnCompletion();
 
             try(ResultSet results = statement.executeQuery())
