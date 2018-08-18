@@ -97,7 +97,7 @@ public class ResultHandler implements AudioLoadResultHandler
 
     private void loadSingle(AudioTrack track, AudioPlaylist playlist)
     {
-        int pos = bot.musicTasks.putInQueue(track, event);
+        int pos = bot.musicTasks.putInQueue(track, event)+1;
         String addMsg = FormatUtil.sanitize(event.getClient().getSuccess()+" Added the song **"+track.getInfo().title+"** (`"+
                 FormatUtil.formatTime(track.getDuration())+"`) "+(pos==-1?"to being playing!":"to the queue at position "+pos));
         if(playlist==null || !(ChecksUtil.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MESSAGE_ADD_REACTION)))
