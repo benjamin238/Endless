@@ -61,6 +61,7 @@ public class MusicTasks
             player = manager.createPlayer();
             // add here volume check and set
             handler = new AudioPlayerSendHandler(player, bot, guild);
+            player.addListener(handler);
             guild.getAudioManager().setSendingHandler(handler);
         }
         else
@@ -69,7 +70,6 @@ public class MusicTasks
             player = handler.getPlayer();
         }
 
-        player.addListener(handler);
         return handler;
     }
 
