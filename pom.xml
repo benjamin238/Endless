@@ -23,7 +23,7 @@
 
     <groupId>me.artuto.endless</groupId>
     <artifactId>Endless</artifactId>
-    <version>5.2.0 - MUSIC BETA</version>
+    <version>5.2.0 - Pre-release 1</version>
 
     <repositories>
         <repository>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.DV8FromTheWorld</groupId>
             <artifactId>JDA</artifactId>
-            <version>ae7005c</version>
+            <version>ffee810</version>
         </dependency>
         <dependency>
             <groupId>com.jagrosh</groupId>
