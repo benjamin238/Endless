@@ -87,7 +87,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     @Override
     public boolean isEmpty()
     {
-        return !(isFairQueueEnabled) && !(isRepeatModeEnabled) && prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && volume==0 &&
+        return isFairQueueEnabled && !(isRepeatModeEnabled) && prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && volume==0 &&
                 ignoredEntities.isEmpty() && colorMeRoles.isEmpty() && roleMeRoles.isEmpty() && importedTags.isEmpty() && adminRoleId==0L && djRoleId==0L
                 && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L && tcMusicId==0L && vcMusicId==0L && welcomeId==0L
                 && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && starboardEmote.equals("\u2B50") && welcomeDM==null && welcomeMsg==null
