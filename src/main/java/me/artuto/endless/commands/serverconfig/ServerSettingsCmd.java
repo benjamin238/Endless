@@ -485,6 +485,13 @@ public class ServerSettingsCmd extends EndlessCommand
         @Override
         protected void executeCommand(CommandEvent event)
         {
+            if(!(GuildUtils.isPremiumGuild(event.getGuild())))
+            {
+                event.replyError("This feature is only available to Donators' Guilds! If you want to support Endless'" +
+                        " development please consider donating by doing `"+event.getClient().getPrefix()+"donate`");
+                return;
+            }
+
             String args = event.getArgs();
 
             if(args.equalsIgnoreCase("true"))
