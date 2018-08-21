@@ -48,7 +48,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
 
     // Queues
     private final FairQueue<QueuedTrack> queue;
-    private final List<AudioTrack> defQueue;
+    private final List<QueuedTrack> defQueue;
     private long requester;
 
     private final Set<Long> votes;
@@ -93,7 +93,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
             if(isFairQueue())
                 queue.add(new QueuedTrack(track.makeClone(), requester));
             else
-                defQueue.add(track.makeClone());
+                defQueue.add(new QueuedTrack(track.makeClone(), requester));
         }
         requester = 0;
         if(queue.isEmpty() && defQueue.isEmpty())
@@ -108,8 +108,9 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
             }
             else
             {
-                AudioTrack qt = defQueue.remove(0);
-                player.playTrack(qt);
+                QueuedTrack qt = defQueue.remove(0);
+                requester = qt.getOwner();
+                player.playTrack(qt.getTrack());
             }
         }
     }
@@ -143,9 +144,17 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
         return queue;
     }
 
-    public List<AudioTrack> getDefQueue()
+    public List<QueuedTrack> getDefQueue()
     {
         return defQueue;
+    }
+
+    public List<QueuedTrack> getQueue()
+    {
+        if(isFairQueue())
+            return queue.getList();
+        else
+            return defQueue;
     }
 
     int fairQueueTrack(AudioTrack track, User author)
@@ -170,8 +179,9 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
         }
         else
         {
-            defQueue.add(track);
-            return defQueue.indexOf(track)+1;
+            QueuedTrack qt = new QueuedTrack(track, author.getIdLong());
+            defQueue.add(qt);
+            return defQueue.indexOf(qt)+1;
         }
     }
 

@@ -19,7 +19,6 @@ package me.artuto.endless.commands.music;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.Paginator;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.artuto.endless.Bot;
 import me.artuto.endless.music.AudioPlayerSendHandler;
 import me.artuto.endless.music.QueuedTrack;
@@ -69,31 +68,22 @@ public class QueueCmd extends MusicCommand
         catch(NumberFormatException ignored){}
 
         AudioPlayerSendHandler handler = (AudioPlayerSendHandler)event.getGuild().getAudioManager().getSendingHandler();
-        List<QueuedTrack> fairQueue = handler.getFairQueue().getList();
-        List<AudioTrack> defQueue = handler.getDefQueue();
+        List<QueuedTrack> queue = handler.getQueue();
 
-        if(defQueue.isEmpty() && fairQueue.isEmpty())
+        if(queue.isEmpty())
         {
             event.replyWarning("There is not music in the queue currently!"+(!(handler.isMusicPlaying())?"":" Now playing:\n\n**"+
                     handler.getPlayer().getPlayingTrack().getInfo().title+"**\n"+FormatUtil.embedFormat(handler)));
             return;
         }
 
-        int size = handler.isFairQueue()?fairQueue.size():defQueue.size();
+        int size = queue.size();
         long duration = 0;
         String[] tracks = new String[size];
         for(int i=0; i<size; i++)
         {
-            if(handler.isFairQueue())
-            {
-                duration += fairQueue.get(i).getTrack().getDuration();
-                tracks[i] = fairQueue.get(i).toString();
-            }
-            else
-            {
-                duration += defQueue.get(i).getDuration();
-                tracks[i] = "`["+FormatUtil.formatTime(defQueue.get(i).getDuration())+"]` **"+defQueue.get(i).getInfo().title+"**";
-            }
+            duration += queue.get(i).getTrack().getDuration();
+            tracks[i] = queue.get(i).toString();
         }
         long durationf = duration;
         pB.setText((i1, i2) -> event.getClient().getSuccess()+" "+getQueueTitle(handler, event.getClient().getSuccess(), tracks.length, durationf,

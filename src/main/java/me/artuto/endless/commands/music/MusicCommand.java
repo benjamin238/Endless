@@ -104,4 +104,18 @@ public abstract class MusicCommand extends EndlessCommand
        else
            return event.isOwner();
     });
+
+    protected boolean isDJ(CommandEvent event)
+    {
+        GuildSettings gs = event.getClient().getSettingsFor(event.getGuild());
+        Member member = event.getMember();
+        Role role = event.getGuild().getRoleById(gs.getDJRole());
+
+        if(!(role==null) && member.getRoles().contains(role))
+            return true;
+        else if(ChecksUtil.hasPermission(member, null, Permission.MANAGE_SERVER))
+            return true;
+        else
+            return event.isOwner();
+    }
 }
