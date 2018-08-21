@@ -254,7 +254,7 @@ public class Bot extends ListenerAdapter
 
                 // Music
                 new ForceSkipCmd(this), new NowPlayingCmd(), new PauseCmd(this), new PlayCmd(this), new QueueCmd(this),
-                new ResumeCmd(this), new SkipCmd(this), new StopCmd(), new VolumeCmd(this),
+                new RemoveCmd(this), new ResumeCmd(this), new RepeatCmd(this), new SkipCmd(this), new StopCmd(), new VolumeCmd(this),
 
                 // Server Settings
                 new IgnoreCmd(this), new LeaveMsgCmd(this), new PrefixCmd(this), new RoomCmd(this),

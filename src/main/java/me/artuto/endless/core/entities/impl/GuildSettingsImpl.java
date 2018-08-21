@@ -371,6 +371,11 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.mutedRoleId = mutedRoleId;
     }
 
+    public void setRepeatModeEnabled(boolean status)
+    {
+        this.isRepeatModeEnabled = status;
+    }
+
     public void setRoomMode(Room.Mode mode)
     {
         this.roomMode = mode;
