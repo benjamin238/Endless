@@ -96,7 +96,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
                 defQueue.add(track.makeClone());
         }
         requester = 0;
-        if(queue.isEmpty() || defQueue.isEmpty())
+        if(queue.isEmpty() && defQueue.isEmpty())
             bot.endlessPool.submit(() -> guild.getAudioManager().closeAudioConnection());
         else
         {
