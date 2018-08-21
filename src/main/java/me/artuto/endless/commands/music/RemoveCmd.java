@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.music.AudioPlayerSendHandler;
 import me.artuto.endless.music.QueuedTrack;
+import net.dv8tion.jda.core.entities.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,8 +46,9 @@ public class RemoveCmd extends MusicCommand
     public void executeMusicCommand(CommandEvent event)
     {
         AudioPlayerSendHandler handler = (AudioPlayerSendHandler)event.getGuild().getAudioManager().getSendingHandler();
+        List<QueuedTrack> queue = handler.getQueue();
 
-        if(handler.getQueue().isEmpty())
+        if(queue.isEmpty())
         {
             event.replyWarning("There is nothing on the queue!");
             return;
@@ -54,10 +56,10 @@ public class RemoveCmd extends MusicCommand
         if(event.getArgs().equalsIgnoreCase("all"))
         {
             int count;
-            List<QueuedTrack> queue = handler.getQueue();
             if(isDJ(event))
             {
-                event.replySuccess("Successfully removed **"+queue.size()+"** songs from the queue!", (s) -> queue.clear());
+                event.replySuccess("Successfully removed **"+queue.size()+"** songs from the queue!");
+                queue.clear();
                 return;
             }
 
@@ -73,6 +75,29 @@ public class RemoveCmd extends MusicCommand
             return;
         }
 
-        event.replyWarning("If you have come to this step, congrats! Because i haven't finished this yet:tm: :D");
+        int position;
+        try{position = Integer.parseInt(event.getArgs());}
+        catch(NumberFormatException ignored){position = 0;}
+        if(position<1 || position>queue.size())
+        {
+            event.replyError("The position must be a valid integer between 1 and "+queue.size()+"!");
+            return;
+        }
+
+        QueuedTrack qt = queue.get(position-1);
+        if(qt.getOwner()==event.getAuthor().getIdLong())
+        {
+            queue.remove(qt);
+            event.replySuccess("Successfully removed **"+qt.getTrack().getInfo().title+"** from the queue!");
+        }
+        else if(isDJ(event))
+        {
+            queue.remove(qt);
+            User requester = event.getJDA().asBot().getShardManager().getUserById(qt.getOwner());
+            event.replySuccess("Successfully removed **"+qt.getTrack().getInfo().title+"** from the queue!"+(requester==null?"":" (Requested by **"
+                    +requester.getName()+"**#**"+requester.getDiscriminator()+"**)"));
+        }
+        else
+            event.replyError("You can't remove **"+qt.getTrack().getInfo().title+"** because you didn't added it!");
     }
 }
