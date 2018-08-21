@@ -28,6 +28,7 @@ import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +51,8 @@ public class GuildUtils
         if(donators==null)
             return false;
         User owner = guild.getOwner().getUser();
+        if(bot.client.getOwnerIdLong()==owner.getIdLong() || Arrays.asList(bot.client.getCoOwnerIdsLong()).contains(owner.getIdLong()))
+            return true;
         return rootGuild.getMembersWithRoles(donators).stream().anyMatch(m -> m.getUser().getIdLong()==owner.getIdLong());
     }
 

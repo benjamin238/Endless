@@ -17,6 +17,7 @@
 
 package me.artuto.endless.music;
 
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -131,7 +132,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
         return guild.getSelfMember().getVoiceState().inVoiceChannel() && !(player.getPlayingTrack()==null);
     }
 
-    public boolean isFairQueue()
+    boolean isFairQueue()
     {
         if(GuildUtils.isPremiumGuild(guild))
             return bot.endless.getGuildSettings(guild).isFairQueueEnabled();
