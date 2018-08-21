@@ -35,15 +35,15 @@ public class FairQueue<T extends Queueable>
     {
         int lastIndex;
         for(lastIndex=list.size()-1; lastIndex>-1; lastIndex--)
-            if(list.get(lastIndex).getIdentifier()==item.getIdentifier())
+            if(list.get(lastIndex).getOwner()==item.getOwner())
                 break;
         lastIndex++;
         set.clear();
         for(; lastIndex<list.size(); lastIndex++)
         {
-            if(set.contains(list.get(lastIndex).getIdentifier()))
+            if(set.contains(list.get(lastIndex).getOwner()))
                 break;
-            set.add(list.get(lastIndex).getIdentifier());
+            set.add(list.get(lastIndex).getOwner());
         }
         list.add(lastIndex, item);
         return lastIndex;
@@ -84,7 +84,7 @@ public class FairQueue<T extends Queueable>
         int count = 0;
         for(int i=list.size()-1; i>=0; i--)
         {
-            if(list.get(i).getIdentifier()==identifier)
+            if(list.get(i).getOwner()==identifier)
             {
                 list.remove(i);
                 count++;
@@ -103,7 +103,7 @@ public class FairQueue<T extends Queueable>
         List<Integer> iset = new ArrayList<>();
         for(int i=0; i<list.size(); i++)
         {
-            if(list.get(i).getIdentifier()==identifier)
+            if(list.get(i).getOwner()==identifier)
                 iset.add(i);
         }
         for(int j=0; j<iset.size(); j++)

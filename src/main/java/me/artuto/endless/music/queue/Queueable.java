@@ -23,5 +23,5 @@ package me.artuto.endless.music.queue;
 
 public interface Queueable
 {
-    public long getIdentifier();
+    public long getOwner();
 }

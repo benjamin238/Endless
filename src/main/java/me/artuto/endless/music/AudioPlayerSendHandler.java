@@ -103,7 +103,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
             if(isFairQueue())
             {
                 QueuedTrack qt = queue.pull();
-                requester = qt.getIdentifier();
+                requester = qt.getOwner();
                 player.playTrack(qt.getTrack());
             }
             else
@@ -130,7 +130,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
         return guild.getSelfMember().getVoiceState().inVoiceChannel() && !(player.getPlayingTrack()==null);
     }
 
-    boolean isFairQueue()
+    public boolean isFairQueue()
     {
         if(GuildUtils.isPremiumGuild(guild))
             return bot.endless.getGuildSettings(guild).isFairQueueEnabled();
@@ -143,7 +143,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
         return queue;
     }
 
-    public List<AudioTrack> getQueue()
+    public List<AudioTrack> getDefQueue()
     {
         return defQueue;
     }

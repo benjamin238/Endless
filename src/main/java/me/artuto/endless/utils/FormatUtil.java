@@ -74,7 +74,7 @@ public class FormatUtil
         return mb.setEmbed(eb.build()).build();
     }
 
-    private static String embedFormat(AudioPlayerSendHandler handler)
+    public static String embedFormat(AudioPlayerSendHandler handler)
     {
         if(handler==null)
             return "No music playing\n\u23F9 "+progressBar(-1)+" "+volumeIcon(100);

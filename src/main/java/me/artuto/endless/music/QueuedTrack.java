@@ -36,8 +36,7 @@ public class QueuedTrack implements Queueable
         this.owner = owner;
     }
 
-    @Override
-    public long getIdentifier()
+    public long getOwner()
     {
         return owner;
     }
