@@ -78,7 +78,7 @@ public class WelcomeMsgCmd extends EndlessCommand
             }
             else
             {
-                if(event.getArgs().length()>300)
+                if(event.getArgs().length()>350)
                 {
                     event.replyError("The message can't be longer than 350 characters!");
                     return;
