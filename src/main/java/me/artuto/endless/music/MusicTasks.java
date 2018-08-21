@@ -75,7 +75,7 @@ public class MusicTasks
 
     int putInQueue(AudioTrack track, CommandEvent event)
     {
-        if(setupHandler(event).isFairQueue(event))
+        if(setupHandler(event).isFairQueue())
             return fairQueueTrack(track, event);
         else
             return queueTrack(track, event);
