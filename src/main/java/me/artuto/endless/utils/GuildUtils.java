@@ -119,34 +119,16 @@ public class GuildUtils
         return settings.getWelcomeMsg();
     }
 
-    public static TextChannel getLeaveChannel(Guild guild)
-    {
-        GuildSettings settings = bot.endless.getGuildSettings(guild);
-        return guild.getTextChannelById(settings.getLeaveChannel());
-    }
-
     public static TextChannel getModlogChannel(Guild guild)
     {
         GuildSettings settings = bot.endless.getGuildSettings(guild);
         return guild.getTextChannelById(settings.getModlog());
     }
 
-    public static TextChannel getServerlogChannel(Guild guild)
-    {
-        GuildSettings settings = bot.endless.getGuildSettings(guild);
-        return guild.getTextChannelById(settings.getServerlog());
-    }
-
     public static TextChannel getStarboardChannel(Guild guild)
     {
         GuildSettings settings = bot.endless.getGuildSettings(guild);
         return guild.getTextChannelById(settings.getStarboard());
-    }
-
-    public static TextChannel getWelcomeChannel(Guild guild)
-    {
-        GuildSettings settings = bot.endless.getGuildSettings(guild);
-        return guild.getTextChannelById(settings.getWelcomeChannel());
     }
 
     public static ParsedAuditLog getAuditLog(AuditLogEntry entry, AuditLogKey key)
