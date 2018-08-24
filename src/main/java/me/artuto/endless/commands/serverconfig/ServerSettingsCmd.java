@@ -479,6 +479,7 @@ public class ServerSettingsCmd extends EndlessCommand
             this.arguments = "<status true or false>";
             this.category = Categories.SERVER_CONFIG;
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please provide me `true` or `false`!";
             this.parent = ServerSettingsCmd.this;
         }
 

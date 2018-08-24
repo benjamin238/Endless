@@ -44,15 +44,15 @@ public class GuildUtils
 
     public static boolean isPremiumGuild(Guild guild)
     {
+        User owner = guild.getOwner().getUser();
+        if(bot.client.getOwnerIdLong()==owner.getIdLong() || Arrays.asList(bot.client.getCoOwnerIdsLong()).contains(owner.getIdLong()))
+            return true;
         Guild rootGuild = bot.shardManager.getGuildById(bot.config.getRootGuildId());
         if(rootGuild==null)
             return false;
         Role donators = rootGuild.getRolesByName("Donators", true).stream().findFirst().orElse(null);
         if(donators==null)
             return false;
-        User owner = guild.getOwner().getUser();
-        if(bot.client.getOwnerIdLong()==owner.getIdLong() || Arrays.asList(bot.client.getCoOwnerIdsLong()).contains(owner.getIdLong()))
-            return true;
         return rootGuild.getMembersWithRoles(donators).stream().anyMatch(m -> m.getUser().getIdLong()==owner.getIdLong());
     }
 
