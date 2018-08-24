@@ -47,7 +47,13 @@
         <dependency>
             <groupId>com.github.DV8FromTheWorld</groupId>
             <artifactId>JDA</artifactId>
-            <version>ffee810</version>
+            <version>77679f5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>club.minced</groupId>
+                    <artifactId>opus-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.jagrosh</groupId>
