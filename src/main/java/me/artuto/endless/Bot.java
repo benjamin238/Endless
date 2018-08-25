@@ -23,10 +23,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import me.artuto.endless.bootloader.StartupChecker;
 import me.artuto.endless.bootloader.ThreadLoader;
-import me.artuto.endless.commands.bot.AboutCmd;
-import me.artuto.endless.commands.bot.DonateCmd;
-import me.artuto.endless.commands.bot.InviteCmd;
-import me.artuto.endless.commands.bot.PingCmd;
+import me.artuto.endless.commands.bot.*;
 import me.artuto.endless.commands.botadm.*;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.commands.cmddata.CommandHelper;
@@ -228,7 +225,7 @@ public class Bot extends ListenerAdapter
                 .setGuildSettingsManager(new ClientGSDM(this))
                 .addCommands(
                 // Bot
-                new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(),
+                new AboutCmd(this), new DonateCmd(this), new InviteCmd(), new PingCmd(), new StatsCmd(),
 
                 // Bot Administration
                 new BashCmd(), new BlacklistGuildCmd(this), new BlacklistUserCmd(this),
