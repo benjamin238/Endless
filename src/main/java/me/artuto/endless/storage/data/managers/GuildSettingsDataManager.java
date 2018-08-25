@@ -1157,7 +1157,7 @@ public class GuildSettingsDataManager
                 {
                     if(results.next())
                     {
-                        results.updateNull("modlog_id");
+                        results.updateNull("tc_music_id");
                         results.updateRow();
                     }
                 }
