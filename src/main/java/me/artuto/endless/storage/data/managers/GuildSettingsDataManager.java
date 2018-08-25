@@ -1203,7 +1203,7 @@ public class GuildSettingsDataManager
                 {
                     if(results.next())
                     {
-                        results.updateNull("modlog_id");
+                        results.updateNull("vc_music_id");
                         results.updateRow();
                     }
                 }
