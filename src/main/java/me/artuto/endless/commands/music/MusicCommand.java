@@ -71,7 +71,7 @@ public abstract class MusicCommand extends EndlessCommand
         {
             if(currentVc==null)
                 currentVc = guild.getVoiceChannelById(gs.getVoiceChannelMusic());
-            if(!(state.inVoiceChannel() || state.isDeafened() || (!(currentVc==null)) && !(currentVc.equals(state.getChannel()))))
+            if(!(state.inVoiceChannel()) || state.isDeafened() || (!(currentVc==null) && !(currentVc.equals(state.getChannel())))))
             {
                 event.replyError("You need to be listening in "+(currentVc==null?"a voice channel":"**"+currentVc.getName()+"**")+" to use that!");
                 return;
