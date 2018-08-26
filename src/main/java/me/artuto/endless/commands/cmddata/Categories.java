@@ -45,6 +45,8 @@ public class Categories
 
     public static final Category MODERATION = new Category("Moderation", Categories::doCheck);
 
+    public static final Category MUSIC = new Category("Music", Categories::doCheck);
+
     public static final Category SERVER_CONFIG = new Category("Guild Settings", event -> {
         if(!(Bot.getInstance().dataEnabled))
         {

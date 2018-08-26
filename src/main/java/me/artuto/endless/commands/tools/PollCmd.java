@@ -100,7 +100,7 @@ public class PollCmd extends EndlessCommand
                 builder.setDescription(args[2]);
             builder.setFooter("This poll will expire", event.getAuthor().getEffectiveAvatarUrl());
             builder.setTimestamp(endTime);
-            event.reply(builder.build(), msg -> {
+            event.getTextChannel().sendMessage(builder.build()).queue(msg -> {
                 bot.pldm.createPoll(endTime.toEpochMilli(), event.getGuild().getIdLong(),
                         msg.getIdLong(), event.getTextChannel().getIdLong());
 

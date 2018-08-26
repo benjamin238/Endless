@@ -26,7 +26,9 @@ import net.dv8tion.jda.core.audit.AuditLogKey;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +40,20 @@ public class GuildUtils
     public GuildUtils(Bot bot)
     {
         GuildUtils.bot = bot;
+    }
+
+    public static boolean isPremiumGuild(Guild guild)
+    {
+        User owner = guild.getOwner().getUser();
+        if(bot.client.getOwnerIdLong()==owner.getIdLong() || Arrays.asList(bot.client.getCoOwnerIdsLong()).contains(owner.getIdLong()))
+            return true;
+        Guild rootGuild = bot.shardManager.getGuildById(bot.config.getRootGuildId());
+        if(rootGuild==null)
+            return false;
+        Role donators = rootGuild.getRolesByName("Donators", true).stream().findFirst().orElse(null);
+        if(donators==null)
+            return false;
+        return rootGuild.getMembersWithRoles(donators).stream().anyMatch(m -> m.getUser().getIdLong()==owner.getIdLong());
     }
 
     public static Collection<String> getPrefixes(Guild guild)
@@ -103,34 +119,16 @@ public class GuildUtils
         return settings.getWelcomeMsg();
     }
 
-    public static TextChannel getLeaveChannel(Guild guild)
-    {
-        GuildSettings settings = bot.endless.getGuildSettings(guild);
-        return guild.getTextChannelById(settings.getLeaveChannel());
-    }
-
     public static TextChannel getModlogChannel(Guild guild)
     {
         GuildSettings settings = bot.endless.getGuildSettings(guild);
         return guild.getTextChannelById(settings.getModlog());
     }
 
-    public static TextChannel getServerlogChannel(Guild guild)
-    {
-        GuildSettings settings = bot.endless.getGuildSettings(guild);
-        return guild.getTextChannelById(settings.getServerlog());
-    }
-
     public static TextChannel getStarboardChannel(Guild guild)
     {
         GuildSettings settings = bot.endless.getGuildSettings(guild);
         return guild.getTextChannelById(settings.getStarboard());
-    }
-
-    public static TextChannel getWelcomeChannel(Guild guild)
-    {
-        GuildSettings settings = bot.endless.getGuildSettings(guild);
-        return guild.getTextChannelById(settings.getWelcomeChannel());
     }
 
     public static ParsedAuditLog getAuditLog(AuditLogEntry entry, AuditLogKey key)

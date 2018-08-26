@@ -53,6 +53,7 @@ public class Const
     public static String INVISIBLE = "<:invisible:334859814410649601>";
     public static String LINE_START = ":white_small_square:";
     public static String LOADING = "<a:endlessLoading:444198122965434399>";
+    public static String MUSIC = ":notes:";
     public static String NITRO = "<:nitro:334859814566101004>";
     public static String OFFLINE = "<:offline:334859814423232514>";
     public static String ONLINE = "<:online:334859814410911745>";

@@ -42,9 +42,9 @@ public class Database
 
     public GuildSettings createDefaultSettings(Guild guild)
     {
-        return new GuildSettingsImpl(true, new HashSet<>(), guild, 0, 0, new LinkedList<>(), new LinkedList<>(),
-                new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L, 0L,
-                0L, 0L, 0L, Room.Mode.NO_CREATION, null, "\u2B50", null, null, EntityBuilder.DEFAULT_TZ);
+        return new GuildSettingsImpl(true, true, false, new HashSet<>(), guild, 0, 0, 100, new LinkedList<>(), new LinkedList<>(),
+                new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L, 0L, 0L,
+                0L, 0L, 0L, 0L, 0L, Room.Mode.NO_CREATION, null, "\u2B50", null, null, EntityBuilder.DEFAULT_TZ);
     }
 
     public Profile createDefaultProfile(User user)

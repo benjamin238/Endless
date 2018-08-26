@@ -30,10 +30,7 @@ import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.*;
 
 import java.time.ZoneId;
 import java.time.zone.ZoneRulesException;
@@ -48,7 +45,7 @@ public class ServerSettingsCmd extends EndlessCommand
         this.bot = bot;
         this.name = "settings";
         this.children = new Command[]{new ModlogCmd(), new ServerlogCmd(), new WelcomeCmd(), new LeaveCmd(),
-                new AdminRoleCmd(), new ModRoleCmd(), new MutedRoleCmd(), new BanDeleteDaysCmd(), new TimezoneCmd()};
+                new AdminRoleCmd(), new ModRoleCmd(), new MutedRoleCmd(), new BanDeleteDaysCmd(), new TimezoneCmd(), new SetFairQueueCmd()};
         this.help = "Displays the settings of the server";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -68,9 +65,11 @@ public class ServerSettingsCmd extends EndlessCommand
         int banDeleteDays = settings.getBanDeleteDays();
         int starboardCount = settings.getStarboardCount();
         Role adminRole = GuildUtils.getAdminRole(guild);
+        Role djRole = event.getGuild().getRoleById(settings.getDJRole());
         Role modRole = GuildUtils.getModRole(guild);
         Role mutedRole = GuildUtils.getMutedRole(guild);
         Room.Mode roomMode = settings.getRoomMode();
+        String fairQueue = "**"+(settings.isFairQueueEnabled()?"Yes":"No")+"**";
         String welcomeDm = settings.getWelcomeDM();
         String welcomeMsg = settings.getWelcomeMsg();
         String leaveMsg = settings.getLeaveMsg();
@@ -78,13 +77,16 @@ public class ServerSettingsCmd extends EndlessCommand
         TextChannel serverlog = guild.getTextChannelById(settings.getServerlog());
         TextChannel welcome = guild.getTextChannelById(settings.getWelcomeChannel());
         TextChannel leave = guild.getTextChannelById(settings.getLeaveChannel());
+        TextChannel musicTc = guild.getTextChannelById(settings.getTextChannelMusic());
         TextChannel starboard = guild.getTextChannelById(settings.getStarboard());
+        VoiceChannel musicVc = guild.getVoiceChannelById(settings.getVoiceChannelMusic());
         ZoneId tz = settings.getTimezone();
 
         StringBuilder logsString = new StringBuilder();
         StringBuilder messagesString = new StringBuilder();
         StringBuilder settingsString = new StringBuilder();
         StringBuilder starboardString = new StringBuilder();
+        StringBuilder musicString = new StringBuilder();
 
         logsString.append("Modlog Channel: ").append((modlog==null?"None":"**"+modlog.getAsMention()+"**"))
                 .append("\nServerlog Channel: ").append((serverlog==null?"None":"**"+serverlog.getAsMention()+"**"))
@@ -106,10 +108,16 @@ public class ServerSettingsCmd extends EndlessCommand
                 .append("\nStar Count: ").append((starboardCount==0?"Disabled":String.valueOf("**"+starboardCount+"**")))
                 .append("\nEmote: ").append(starboardEmote==null?settings.getStarboardEmote():starboardEmote.getAsMention());
 
+        musicString.append("DJ Role: ").append((djRole==null?"None":"**"+djRole.getAsMention()+"**"))
+                .append("\nText Channel: ").append((musicTc==null?"None":"**"+musicTc.getAsMention()+"**"))
+                .append("\nVoice Channel: ").append((musicVc==null?"None":"**"+musicVc.getName()+"**"))
+                .append("\nFair Queue: ").append(fairQueue);
+
         builder.addField(":mag: Logs", logsString.toString(), false);
         builder.addField(":speech_balloon: Messages", messagesString.toString(), false);
         builder.addField(":bar_chart: Server Settings", settingsString.toString(), false);
         builder.addField(":star: Starboard", starboardString.toString(), false);
+        builder.addField(":notes: Music", musicString.toString(), false);
 
         builder.setColor(event.getSelfMember().getColor());
         event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
@@ -459,6 +467,46 @@ public class ServerSettingsCmd extends EndlessCommand
 
             bot.gsdm.setTimezone(event.getGuild(), tz);
             event.replySuccess("Successfully updated timezone!");
+        }
+    }
+
+    private class SetFairQueueCmd extends EndlessCommand
+    {
+        SetFairQueueCmd()
+        {
+            this.name = "fairqueue";
+            this.help = "Toggles on and off the fairqueue";
+            this.arguments = "<status true or false>";
+            this.category = Categories.SERVER_CONFIG;
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArgumentsMessage = "Please provide me `true` or `false`!";
+            this.parent = ServerSettingsCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            if(!(GuildUtils.isPremiumGuild(event.getGuild())))
+            {
+                event.replyError("This feature is only available to Donators' Guilds! If you want to support Endless'" +
+                        " development please consider donating by doing `"+event.getClient().getPrefix()+"donate`");
+                return;
+            }
+
+            String args = event.getArgs();
+
+            if(args.equalsIgnoreCase("true"))
+            {
+                bot.gsdm.setFairQueueStatus(event.getGuild(), true);
+                event.replySuccess("Successfully enabled FairQueue");
+            }
+            else if(args.equalsIgnoreCase("false"))
+            {
+                bot.gsdm.setFairQueueStatus(event.getGuild(), false);
+                event.replySuccess("Successfully disabled FairQueue");
+            }
+            else
+                event.replyError("Invalid option! Must be `true` or `false`!");
         }
     }
 

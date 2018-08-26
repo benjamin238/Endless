@@ -31,9 +31,9 @@ import net.dv8tion.jda.core.entities.User;
 public enum PermLevel
 {
     EVERYONE(0),
-    MODERATOR(1),
-    ADMINISTRATOR(2),
-    OWNER(3);
+    MODERATOR(2),
+    ADMINISTRATOR(3),
+    OWNER(4);
 
     private final int level;
 

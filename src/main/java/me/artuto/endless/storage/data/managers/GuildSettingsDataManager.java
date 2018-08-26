@@ -28,6 +28,7 @@ import me.artuto.endless.core.entities.impl.IgnoreImpl;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 import org.json.JSONArray;
 
 import java.sql.Connection;
@@ -412,7 +413,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.error("Error while setting the muted role for the guild {}", guild.getId(), e);
+            LOG.error("Error while setting the admin role for the guild {}", guild.getId(), e);
         }
     }
 
@@ -458,7 +459,7 @@ public class GuildSettingsDataManager
         }
         catch(SQLException e)
         {
-            LOG.error("Error while setting the muted role for the guild {}", guild.getId(), e);
+            LOG.error("Error while setting the mod role for the guild {}", guild.getId(), e);
         }
     }
 
@@ -1057,6 +1058,249 @@ public class GuildSettingsDataManager
         catch(SQLException e)
         {
             LOG.error("Error while setting the starboard emote for the guild {}", guild.getId(), e);
+        }
+    }
+
+    public void setVolume(Guild guild, int volume)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, volume FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    results.updateInt("volume", volume);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateInt("volume", volume);
+                    results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setVolume(volume);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.error("Error while setting the volume for the guild {}", guild.getId(), e);
+        }
+    }
+
+    public void setDJRole(Guild guild, Role role)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, dj_role_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(role==null)
+                {
+                    if(results.next())
+                    {
+                        results.updateNull("dj_role_id");
+                        results.updateRow();
+                    }
+                }
+                else
+                {
+                    if(results.next())
+                    {
+                        results.updateLong("dj_role_id", role.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("dj_role_id", role.getIdLong());
+                        results.insertRow();
+                    }
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setDJRoleId(role==null?0L:role.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.error("Error while setting the DJ role for the guild {}", guild.getId(), e);
+        }
+    }
+
+    public void setMusicTc(Guild guild, TextChannel tc)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, tc_music_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(tc==null)
+                {
+                    if(results.next())
+                    {
+                        results.updateNull("tc_music_id");
+                        results.updateRow();
+                    }
+                }
+                else
+                {
+                    if(results.next())
+                    {
+                        results.updateLong("tc_music_id", tc.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("tc_music_id", tc.getIdLong());
+                        results.insertRow();
+                    }
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setTextChannelMusicId(tc==null?0L:tc.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.error("Error while setting the music text channel for the guild {}", guild.getId(), e);
+        }
+    }
+
+    public void setMusicVc(Guild guild, VoiceChannel vc)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, vc_music_id FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(vc==null)
+                {
+                    if(results.next())
+                    {
+                        results.updateNull("vc_music_id");
+                        results.updateRow();
+                    }
+                }
+                else
+                {
+                    if(results.next())
+                    {
+                        results.updateLong("vc_music_id", vc.getIdLong());
+                        results.updateRow();
+                    }
+                    else
+                    {
+                        results.moveToInsertRow();
+                        results.updateLong("guild_id", guild.getIdLong());
+                        results.updateLong("vc_music_id", vc.getIdLong());
+                        results.insertRow();
+                    }
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setVoiceChannelMusicId(vc==null?0L:vc.getIdLong());
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.error("Error while setting the music voice channel for the guild {}", guild.getId(), e);
+        }
+    }
+
+    public void setFairQueueStatus(Guild guild, boolean status)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, fair_queue_enabled FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    results.updateBoolean("fair_queue_enabled", status);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateBoolean("fair_queue_enabled", status);
+                    results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setFairQueueEnabled(status);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.error("Error while setting the status of the fair queue for the guild {}", guild.getId(), e);
+        }
+    }
+
+    public void setRepeatModeStatus(Guild guild, boolean status)
+    {
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement("SELECT guild_id, repeat_mode_enabled FROM GUILD_SETTINGS WHERE guild_id = ?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, guild.getIdLong());
+            statement.closeOnCompletion();
+
+            try(ResultSet results = statement.executeQuery())
+            {
+                if(results.next())
+                {
+                    results.updateBoolean("repeat_mode_enabled", status);
+                    results.updateRow();
+                }
+                else
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("guild_id", guild.getIdLong());
+                    results.updateBoolean("fair_queue_enabled", status);
+                    results.insertRow();
+                }
+                GuildSettingsImpl settings = (GuildSettingsImpl)bot.endless.getGuildSettings(guild);
+                settings.setRepeatModeEnabled(status);
+                if(bot.endless.getGuildSettingsById(guild.getIdLong()).isDefault())
+                    ((EndlessCoreImpl)bot.endless).addSettings(guild, settings);
+            }
+        }
+        catch(SQLException e)
+        {
+            LOG.error("Error while setting the status of the repeat mode for the guild {}", guild.getId(), e);
         }
     }
 }

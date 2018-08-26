@@ -30,6 +30,10 @@ public interface GuildSettings
 
     boolean isEmpty();
 
+    boolean isFairQueueEnabled();
+
+    boolean isRepeatModeEnabled();
+
     Collection<String> getPrefixes();
 
     Guild getGuild();
@@ -37,6 +41,8 @@ public interface GuildSettings
     int getBanDeleteDays();
 
     int getStarboardCount();
+
+    int getVolume();
 
     List<Ignore> getIgnoredEntities();
 
@@ -47,6 +53,8 @@ public interface GuildSettings
     List<Tag> getImportedTags();
 
     long getAdminRole();
+
+    long getDJRole();
 
     long getLeaveChannel();
 
@@ -59,6 +67,10 @@ public interface GuildSettings
     long getServerlog();
 
     long getStarboard();
+
+    long getTextChannelMusic();
+
+    long getVoiceChannelMusic();
 
     long getWelcomeChannel();
 
