@@ -53,7 +53,7 @@ public abstract class MusicCommand extends EndlessCommand
         Message msg = event.getMessage();
         TextChannel currentTc = event.getTextChannel();
         TextChannel musicTc = guild.getTextChannelById(gs.getTextChannelMusic());
-        VoiceChannel currentVc = state.getChannel();
+        VoiceChannel currentVc = event.getSelfMember().getVoiceState().getChannel();
 
         if(!(musicTc==null) && !(currentTc.equals(musicTc)))
         {
