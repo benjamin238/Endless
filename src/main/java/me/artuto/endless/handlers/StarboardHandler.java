@@ -374,7 +374,7 @@ public class StarboardHandler
         List<Message.Attachment> images = starredMsg.getAttachments().stream().filter(Message.Attachment::isImage).collect(Collectors.toList());
 
         sb.append(starredMsg.getContentRaw());
-        eb.setAuthor(starredMsg.getAuthor().getName(), null, starredMsg.getAuthor().getEffectiveAvatarUrl());
+        eb.setAuthor(starredMsg.getAuthor().getName(), starredMsg.getJumpUrl(), starredMsg.getAuthor().getEffectiveAvatarUrl());
         if(!(attachments.isEmpty())) for(Message.Attachment att : attachments)
             sb.append("\n").append(att.getUrl());
         if(!(images.isEmpty())) if(images.size()>1) for(Message.Attachment img : images)
@@ -382,7 +382,6 @@ public class StarboardHandler
         else eb.setImage(images.get(0).getUrl());
         eb.setDescription(sb.toString());
         eb.setColor(Color.ORANGE);
-        eb.addField("Link", starredMsg.getJumpUrl(), false);
 
         msgB.setContent(FormatUtil.sanitize(getEmote(getStarCount(starredMsg), starredMsg, emote)+" **"+getStarCount(starredMsg)+"** "+
                 starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId()));
