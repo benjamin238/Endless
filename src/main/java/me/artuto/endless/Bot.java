@@ -25,6 +25,7 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import io.sentry.Sentry;
 import me.artuto.endless.bootloader.StartupChecker;
 import me.artuto.endless.bootloader.ThreadLoader;
 import me.artuto.endless.commands.bot.*;
@@ -177,6 +178,9 @@ public class Bot extends ListenerAdapter
         {
             throw new ConfigException(e.getMessage());
         }
+
+        if(config.isSentryEnabled() && !(config.getSentryDSN().isEmpty()))
+            Sentry.init(config.getSentryDSN());
 
         if(dataEnabled)
         {
