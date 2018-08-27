@@ -84,7 +84,7 @@ public class ServerLogging
         TextChannel welcomeChan = guild.getTextChannelById(gs.getWelcomeChannel());
         User user = event.getUser();
 
-        if(!(serverlog==null) && serverlog.canTalk() && !(LogUtils.isTypeIgnored("memberjoin", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog)))
+        if(!(serverlog==null) && serverlog.canTalk() && !(LogUtils.isTypeIgnored("memberjoin", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog)))
         {
             OffsetDateTime now = OffsetDateTime.now();
             long seconds = user.getCreationTime().until(now, ChronoUnit.SECONDS);
@@ -121,7 +121,7 @@ public class ServerLogging
         TextChannel serverlog = guild.getTextChannelById(gs.getServerlog());
         User user = event.getUser();
 
-        if(!(serverlog==null) && serverlog.canTalk() && !(LogUtils.isTypeIgnored("memberleave", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog)))
+        if(!(serverlog==null) && serverlog.canTalk() && !(LogUtils.isTypeIgnored("memberleave", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog)))
         {
             OffsetDateTime now = OffsetDateTime.now();
             long seconds = member.getJoinDate().until(now, ChronoUnit.SECONDS);
@@ -153,7 +153,7 @@ public class ServerLogging
         TextChannel serverlog = event.getGuild().getTextChannelById(bot.endless.getGuildSettings(event.getGuild()).getServerlog());
         if(!(serverlog==null) && !(event.getAuthor().isBot()))
         {
-            if(LogUtils.isIssuerIgnored(event.getAuthor().getIdLong(), serverlog))
+            if(LogUtils.isIgnored(event.getAuthor().getIdLong(), serverlog))
                 return;
 
             MessagesLogging.addMessage(event.getMessage().getIdLong(), event.getMessage());
@@ -174,7 +174,7 @@ public class ServerLogging
 
         if(oldMsg==null || user.isBot())
             return;
-        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("msgedit", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog))
+        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("msgedit", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
             return;
         if(!(ChecksUtil.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_EMBED_LINKS)))
             return;
@@ -222,7 +222,7 @@ public class ServerLogging
         if(msg==null)
             return;
         User user = msg.getAuthor();
-        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("msgdelete", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog))
+        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("msgdelete", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
             return;
         if(!(ChecksUtil.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_EMBED_LINKS)))
             return;
@@ -309,7 +309,7 @@ public class ServerLogging
             GuildSettings gs = bot.endless.getGuildSettings(guild);
             String toSend;
             TextChannel serverlog = guild.getTextChannelById(gs.getServerlog());
-            if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("avatarchange", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog))
+            if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("avatarchange", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
                 return;
             if(!(ChecksUtil.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_EMBED_LINKS)))
                 return;
@@ -341,7 +341,7 @@ public class ServerLogging
 
         if(user.isBot())
             return;
-        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voicejoin", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog))
+        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voicejoin", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
             return;
 
         OffsetDateTime now = OffsetDateTime.now();
@@ -367,7 +367,7 @@ public class ServerLogging
 
         if(user.isBot())
             return;
-        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voicemove", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog))
+        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voicemove", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
             return;
 
         OffsetDateTime now = OffsetDateTime.now();
@@ -392,7 +392,7 @@ public class ServerLogging
 
         if(user.isBot())
             return;
-        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voiceleave", serverlog) || LogUtils.isIssuerIgnored(user.getIdLong(), serverlog))
+        if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voiceleave", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
             return;
 
         OffsetDateTime now = OffsetDateTime.now();

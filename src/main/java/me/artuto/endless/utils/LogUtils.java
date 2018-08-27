@@ -17,7 +17,6 @@
 
 package me.artuto.endless.utils;
 
-import me.artuto.endless.Action;
 import me.artuto.endless.Endless;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -51,7 +50,7 @@ public class LogUtils
             content.append("\n");
         });
 
-        Writer output = null;
+        Writer output;
         try
         {
             output = new BufferedWriter(new FileWriter(name, true));
@@ -65,17 +64,7 @@ public class LogUtils
         }
     }
 
-    public static boolean isActionIgnored(Action action, TextChannel modlog)
-    {
-        return !(modlog.getTopic()==null) && modlog.getTopic().toLowerCase().contains("{-ex:"+action.getInternalAction()+"}");
-    }
-
-    public static boolean isIssuerIgnored(long id, TextChannel channel)
-    {
-        return !(channel.getTopic()==null) && channel.getTopic().toLowerCase().contains("{ignore:"+id+"}");
-    }
-
-    public static boolean isTargetIgnored(long id, TextChannel channel)
+    public static boolean isIgnored(long id, TextChannel channel)
     {
         return !(channel.getTopic()==null) && channel.getTopic().toLowerCase().contains("{ignore:"+id+"}");
     }

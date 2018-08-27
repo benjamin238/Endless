@@ -86,8 +86,8 @@ public class ModLogging
         TextChannel cleanLog = event.getJDA().asBot().getShardManager().getTextChannelById(470068055322525708L);
         TextChannel modlog = guild.getTextChannelById(gs.getModlog());
         User author = event.getAuthor();
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, event.getTextChannel()) || LogUtils.isIssuerIgnored(author.getIdLong(),
-                modlog))
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isTypeIgnored(action.getInternalAction(), event.getTextChannel()) ||
+                LogUtils.isIgnored(author.getIdLong(), modlog))
             return;
 
         getCaseNumberAsync(modlog, id -> {
@@ -117,8 +117,8 @@ public class ModLogging
         GuildSettings gs = event.getClient().getSettingsFor(guild);
         TextChannel modlog = guild.getTextChannelById(gs.getModlog());
         User author = event.getAuthor();
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
-                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isTypeIgnored(action.getInternalAction(), modlog) || LogUtils.isIgnored(author.getIdLong(), modlog) ||
+                LogUtils.isIgnored(target.getIdLong(), modlog))
             return;
 
         getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogGeneral(GENERAL_FORMAT, time, gs.getTimezone(),
@@ -131,7 +131,7 @@ public class ModLogging
                     if(entries.isEmpty())
                         return;
 
-                    if(LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
+                    if(LogUtils.isIgnored(author.getIdLong(), modlog))
                         return;
 
                     banLogs.put(banCacheKey(entries.get(0), target), m);
@@ -152,8 +152,8 @@ public class ModLogging
 
         GuildSettings gs = bot.endless.getGuildSettings(guild);
         TextChannel modlog = guild.getTextChannelById(gs.getModlog());
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
-                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isTypeIgnored(action.getInternalAction(), modlog) || LogUtils.isIgnored(author.getIdLong(), modlog) ||
+                LogUtils.isIgnored(target.getIdLong(), modlog))
             return;
 
         getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogGeneral(GENERAL_FORMAT, time, gs.getTimezone(),
@@ -170,8 +170,8 @@ public class ModLogging
         GuildSettings gs = event.getClient().getSettingsFor(guild);
         TextChannel modlog = guild.getTextChannelById(gs.getModlog());
         User author = event.getAuthor();
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isIssuerIgnored(author.getIdLong(), modlog) ||
-                LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isTypeIgnored(action.getInternalAction(), modlog) || LogUtils.isIgnored(author.getIdLong(), modlog) ||
+                LogUtils.isIgnored(target.getIdLong(), modlog))
             return;
 
         getCaseNumberAsync(modlog, id -> Sender.sendMessage(modlog, FormatUtil.formatLogTemp(TEMP_FORMAT, time, gs.getTimezone(),
@@ -190,7 +190,7 @@ public class ModLogging
 
         GuildSettings gs = bot.endless.getGuildSettings(guild);
         TextChannel modlog = guild.getTextChannelById(gs.getModlog());
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isTypeIgnored(action.getInternalAction(), modlog) || LogUtils.isIgnored(target.getIdLong(), modlog))
             return;
         if(!(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
             return;
@@ -206,7 +206,7 @@ public class ModLogging
 
             String reason = parsedAuditLog.getReason();
             User author = parsedAuditLog.getAuthor();
-            if(author.isBot() ||  LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
+            if(author.isBot() ||  LogUtils.isIgnored(author.getIdLong(), modlog))
                 return;
 
             logManual(action, guild, OffsetDateTime.now(), reason, author, target, m -> banLogs.put(banCacheKey(entries.get(0), target), m));
@@ -224,7 +224,7 @@ public class ModLogging
 
         GuildSettings gs = bot.endless.getGuildSettings(guild);
         TextChannel modlog = guild.getTextChannelById(gs.getModlog());
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isTypeIgnored(action.getInternalAction(), modlog) || LogUtils.isIgnored(target.getIdLong(), modlog))
             return;
         if(!(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
             return;
@@ -241,7 +241,7 @@ public class ModLogging
 
             String reason = parsedAuditLog.getReason();
             User author = parsedAuditLog.getAuthor();
-            if(author.isBot() ||  LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
+            if(author.isBot() ||  LogUtils.isIgnored(author.getIdLong(), modlog))
                 return;
 
             logManual(action, guild, OffsetDateTime.now(), reason, author, target);
@@ -259,7 +259,7 @@ public class ModLogging
 
         GuildSettings gs = bot.endless.getGuildSettings(guild);
         TextChannel modlog = guild.getTextChannelById(gs.getModlog());
-        if(modlog==null || !(modlog.canTalk()) || LogUtils.isActionIgnored(action, modlog) || LogUtils.isTargetIgnored(target.getIdLong(), modlog))
+        if(modlog==null || !(modlog.canTalk()) || LogUtils.isTypeIgnored(action.getInternalAction(), modlog) || LogUtils.isIgnored(target.getIdLong(), modlog))
             return;
         if(!(ChecksUtil.hasPermission(guild.getSelfMember(), null, Permission.VIEW_AUDIT_LOGS)))
             return;
@@ -275,7 +275,7 @@ public class ModLogging
 
             String reason = parsedAuditLog.getReason();
             User author = parsedAuditLog.getAuthor();
-            if(author.isBot() ||  LogUtils.isIssuerIgnored(author.getIdLong(), modlog))
+            if(author.isBot() ||  LogUtils.isIgnored(author.getIdLong(), modlog))
                 return;
 
             guild.getAuditLogs().type(ActionType.BAN).limit(3).queue(preEntries2 -> {
