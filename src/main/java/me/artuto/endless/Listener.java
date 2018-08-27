@@ -30,8 +30,7 @@ import me.artuto.endless.logging.ServerLogging;
 import me.artuto.endless.storage.tempdata.AfkManager;
 import me.artuto.endless.utils.FinderUtil;
 import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.TagUtil;
-import me.artuto.endless.utils.TimeUtils;
+import me.artuto.endless.utils.LogUtils;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
@@ -78,7 +77,7 @@ public class Listener implements CommandListener, EventListener
     {
         this.bot = bot;
         this.modlog = bot.modlog;
-        this.parser = TagUtil.parser;
+        this.parser = Bot.parser;
         this.serverlog = bot.serverlog;
         this.webhook = bot.logWebhook;
     }
@@ -352,14 +351,14 @@ public class Listener implements CommandListener, EventListener
 
         if(guild==null)
         {
-            String toSend = FormatUtil.sanitize("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
+            String toSend = FormatUtil.sanitize("`"+LogUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
                     "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped().trim()+
                     "`) in a **Direct message** (ID: "+event.getChannel().getId()+")");
             bot.cmdWebhook.send(toSend);
         }
         else
         {
-            String toSend = FormatUtil.sanitize("`"+TimeUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
+            String toSend = FormatUtil.sanitize("`"+LogUtils.getTimeAndDate()+"` :keyboard: **"+author.getName()+"#"+author.getDiscriminator()+"** " +
                     "(ID: "+author.getId()+") used the command `"+command.getName()+"` (`"+event.getMessage().getContentStripped().trim()+
                     "`) in **"+guild.getName()+"** (ID: "+guild.getId()+")");
             bot.cmdWebhook.send(toSend);

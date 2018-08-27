@@ -18,6 +18,9 @@
 package me.artuto.endless;
 
 import ch.qos.logback.classic.Logger;
+import com.jagrosh.jagtag.Parser;
+import com.jagrosh.jagtag.ParserBuilder;
+import com.jagrosh.jagtag.libraries.*;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -41,6 +44,7 @@ import me.artuto.endless.core.exceptions.ConfigException;
 import me.artuto.endless.handlers.BlacklistHandler;
 import me.artuto.endless.handlers.IgnoreHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
+import me.artuto.endless.libraries.DiscordJagTag;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.BotLogging;
 import me.artuto.endless.logging.ModLogging;
@@ -120,6 +124,12 @@ public class Bot extends ListenerAdapter
 
     // Loggers
     private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
+
+    // Other
+    public static final Parser parser = new ParserBuilder().addMethods(DiscordJagTag.getMethods())
+            .addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods())
+            .addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(Variables.getMethods())
+            .setMaxOutput(2000).setMaxIterations(1000).build();
 
     // Pools
     public ScheduledThreadPoolExecutor endlessPool;

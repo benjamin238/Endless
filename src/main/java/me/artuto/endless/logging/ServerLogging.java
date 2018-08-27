@@ -26,7 +26,6 @@ import me.artuto.endless.storage.tempdata.MessagesLogging;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.LogUtils;
-import me.artuto.endless.utils.TagUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -67,7 +66,7 @@ public class ServerLogging
     public ServerLogging(Bot bot)
     {
         this.bot = bot;
-        this.parser = TagUtil.parser;
+        this.parser = Bot.parser;
     }
 
     // Member events

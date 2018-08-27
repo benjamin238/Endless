@@ -21,7 +21,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.classic.spi.ThrowableProxy;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
+import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import okhttp3.OkHttpClient;
@@ -46,11 +48,6 @@ public class MiscUtils
         if(m.getContentRaw().matches(match))
             return caseNum==-1?Integer.parseInt(m.getContentRaw().replaceAll(match, "$1")):caseNum;
         return 0;
-    }
-
-    public static boolean isIgnored(String id, String topic)
-    {
-        return !(topic==null) && topic.contains("{ignore:"+id+"}");
     }
 
     public static InputStream getInputStream(String url)
@@ -118,5 +115,12 @@ public class MiscUtils
             url = url+"?size="+size;
 
         return url;
+    }
+
+    public static boolean isNSFWAllowed(CommandEvent event)
+    {
+        if(event.isFromType(ChannelType.TEXT))
+            return event.getTextChannel().isNSFW();
+        return true;
     }
 }

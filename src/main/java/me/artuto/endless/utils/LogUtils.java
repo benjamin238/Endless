@@ -27,8 +27,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Artuto
@@ -99,6 +99,33 @@ public class LogUtils
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static String getTimeAndDate()
+    {
+        return getDate()+" "+getTime();
+    }
+
+    private static String getTime()
+    {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String hour = String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY));
+        String min = String.format("%02d", calendar.get(Calendar.MINUTE));
+        String sec = String.format("%02d", calendar.get(Calendar.SECOND));
+
+        return "["+hour+":"+min+":"+sec+"]";
+    }
+
+    private static String getDate()
+    {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        String day = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
+        String month = String.format("%02d", calendar.get(Calendar.MONTH)+1);
+        String year = String.format("%02d", calendar.get(Calendar.YEAR));
+
+        return "["+day+"/"+month+"/"+year+"]";
     }
 
     public static class UploadedText

@@ -23,7 +23,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Tag;
-import me.artuto.endless.utils.TagUtil;
+import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
@@ -92,7 +92,7 @@ public class ImportedTagHandler
                     return;
 
                 CommandEvent cevent = new CommandEvent(event, commandArgs, client);
-                if(tag.isNSFW() && !(TagUtil.isNSFWAllowed(cevent)))
+                if(tag.isNSFW() && !(MiscUtils.isNSFWAllowed(cevent)))
                 {
                     cevent.replyError("This tag has been marked as NSFW! To use this tag mark this channel as NSFW.");
                     return;

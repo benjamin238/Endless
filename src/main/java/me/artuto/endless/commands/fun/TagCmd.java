@@ -28,7 +28,7 @@ import me.artuto.endless.core.entities.LocalTag;
 import me.artuto.endless.core.entities.Tag;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.TagUtil;
+import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -48,7 +48,7 @@ public class TagCmd extends EndlessCommand
     public TagCmd(Bot bot)
     {
         this.bot = bot;
-        this.parser = TagUtil.parser;
+        this.parser = Bot.parser;
         this.name = "tag";
         this.aliases = new String[]{"t"};
         this.help = "Retrieves a tag with the specified name";
@@ -113,7 +113,7 @@ public class TagCmd extends EndlessCommand
             event.replyError("This tag has been deleted by a Server Moderator!");
             return;
         }
-        if(tag.isNSFW() && !(TagUtil.isNSFWAllowed(event)))
+        if(tag.isNSFW() && !(MiscUtils.isNSFWAllowed(event)))
         {
             event.replyError("This tag has been marked as NSFW! To use this tag mark this channel as NSFW or try in DMs.");
             return;
