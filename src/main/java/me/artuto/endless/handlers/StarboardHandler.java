@@ -382,6 +382,7 @@ public class StarboardHandler
         else eb.setImage(images.get(0).getUrl());
         eb.setDescription(sb.toString());
         eb.setColor(Color.ORANGE);
+        eb.addField("Link", starredMsg.getJumpUrl(), false);
 
         msgB.setContent(FormatUtil.sanitize(getEmote(getStarCount(starredMsg), starredMsg, emote)+" **"+getStarCount(starredMsg)+"** "+
                 starredMsg.getTextChannel().getAsMention()+" ID: "+starredMsg.getId()));
@@ -407,7 +408,7 @@ public class StarboardHandler
                     return ":star:";
                 else if(count>5)
                     return ":star2:";
-                else if(count>15)
+                else if(count>=15)
                     return ":dizzy:";
                 else
                     return ":star:";
