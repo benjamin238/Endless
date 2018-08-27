@@ -67,17 +67,6 @@
         </filter>
     </appender>
 
-    <appender name="Webhook" class="me.artuto.endless.logging.appenders.WebhookAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
-        <config>webhook.txt</config>
-    </appender>
-
-    <appender name="Webhook-Debug" class="me.artuto.endless.logging.appenders.WebhookDebugAppender">
-        <config>webhook.txt</config>
-    </appender>
-
     <logger name="net.dv8tion.jda.core.handle.GuildSetupController" level="TRACE"/>
     <logger name="net.dv8tion.jda.core.handle.EventCache" level="TRACE"/>
 
@@ -86,7 +75,5 @@
         <appender-ref ref="File"/>
         <appender-ref ref="File-Debug"/>
         <appender-ref ref="Sentry"/>
-        <appender-ref ref="Webhook"/>
-        <appender-ref ref="Webhook-Debug"/>
     </root>
 </configuration>
