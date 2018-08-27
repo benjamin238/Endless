@@ -66,7 +66,7 @@ public class ServerLogging
     public ServerLogging(Bot bot)
     {
         this.bot = bot;
-        this.parser = Bot.parser;
+        this.parser = Bot.tagParser;
     }
 
     // Member events
@@ -152,7 +152,7 @@ public class ServerLogging
         TextChannel serverlog = event.getGuild().getTextChannelById(bot.endless.getGuildSettings(event.getGuild()).getServerlog());
         if(!(serverlog==null) && !(event.getAuthor().isBot()))
         {
-            if(LogUtils.isIgnored(event.getAuthor().getIdLong(), serverlog))
+            if(LogUtils.isIgnored(event.getAuthor().getIdLong(), serverlog) || LogUtils.isIgnored(event.getChannel().getIdLong(), serverlog))
                 return;
 
             MessagesLogging.addMessage(event.getMessage().getIdLong(), event.getMessage());
@@ -174,6 +174,8 @@ public class ServerLogging
         if(oldMsg==null || user.isBot())
             return;
         if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("msgedit", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
+            return;
+        if(LogUtils.isIgnored(event.getChannel().getIdLong(), serverlog))
             return;
         if(!(ChecksUtil.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_EMBED_LINKS)))
             return;
@@ -223,6 +225,8 @@ public class ServerLogging
         User user = msg.getAuthor();
         if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("msgdelete", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
             return;
+        if(LogUtils.isIgnored(event.getChannel().getIdLong(), serverlog))
+            return;
         if(!(ChecksUtil.hasPermission(guild.getSelfMember(), serverlog, Permission.MESSAGE_EMBED_LINKS)))
             return;
 
@@ -264,6 +268,8 @@ public class ServerLogging
         event.getMessageIds().stream().filter(id -> !(MessagesLogging.getMsg(Long.valueOf(id))==null)).forEach(id -> messages.add(MessagesLogging.getMsg(Long.valueOf(id))));
 
         if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("bulkdelete", serverlog))
+            return;
+        if(LogUtils.isIgnored(event.getChannel().getIdLong(), serverlog))
             return;
         if(messages.isEmpty())
             return;
@@ -342,6 +348,8 @@ public class ServerLogging
             return;
         if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voicejoin", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
             return;
+        if(LogUtils.isIgnored(joined.getIdLong(), serverlog))
+            return;
 
         OffsetDateTime now = OffsetDateTime.now();
         String toSend;
@@ -368,6 +376,8 @@ public class ServerLogging
             return;
         if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voicemove", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
             return;
+        if(LogUtils.isIgnored(joined.getIdLong(), serverlog) || LogUtils.isIgnored(left.getIdLong(), serverlog))
+            return;
 
         OffsetDateTime now = OffsetDateTime.now();
         String toSend;
@@ -392,6 +402,8 @@ public class ServerLogging
         if(user.isBot())
             return;
         if(serverlog==null || !(serverlog.canTalk()) || LogUtils.isTypeIgnored("voiceleave", serverlog) || LogUtils.isIgnored(user.getIdLong(), serverlog))
+            return;
+        if(LogUtils.isIgnored(left.getIdLong(), serverlog))
             return;
 
         OffsetDateTime now = OffsetDateTime.now();

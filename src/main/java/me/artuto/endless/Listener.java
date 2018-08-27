@@ -77,7 +77,7 @@ public class Listener implements CommandListener, EventListener
     {
         this.bot = bot;
         this.modlog = bot.modlog;
-        this.parser = Bot.parser;
+        this.parser = Bot.tagParser;
         this.serverlog = bot.serverlog;
         this.webhook = bot.logWebhook;
     }

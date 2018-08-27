@@ -48,7 +48,7 @@ public class TagCmd extends EndlessCommand
     public TagCmd(Bot bot)
     {
         this.bot = bot;
-        this.parser = Bot.parser;
+        this.parser = Bot.tagParser;
         this.name = "tag";
         this.aliases = new String[]{"t"};
         this.help = "Retrieves a tag with the specified name";

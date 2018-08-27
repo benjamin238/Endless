@@ -126,7 +126,7 @@ public class Bot extends ListenerAdapter
     private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
 
     // Other
-    public static final Parser parser = new ParserBuilder().addMethods(DiscordJagTag.getMethods())
+    public static final Parser tagParser = new ParserBuilder().addMethods(DiscordJagTag.getMethods())
             .addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods())
             .addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(Variables.getMethods())
             .setMaxOutput(2000).setMaxIterations(1000).build();
