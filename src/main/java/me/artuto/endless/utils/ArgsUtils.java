@@ -170,7 +170,7 @@ public class ArgsUtils
             if(full)
             {
                 Matcher m = ID.matcher(query);
-                if(ID.matcher(query).matches())
+                if(m.matches())
                 {
                     try
                     {
