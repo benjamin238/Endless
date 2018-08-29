@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.DV8FromTheWorld</groupId>
             <artifactId>JDA</artifactId>
-            <version>3bea761</version>
+            <version>a3de205</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minced</groupId>
