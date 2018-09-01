@@ -107,7 +107,7 @@ public class ResultHandler implements AudioLoadResultHandler
             new ButtonMenu.Builder()
                     .setText(addMsg+"\n"+event.getClient().getWarning()+" This playlist has **"+playlist.getTracks().size()+"** tracks. Select "+event.getClient().getSuccess()+
                             " to load the playlist.")
-                    .setChoices(event.getClient().getSuccess(), event.getClient().getError())
+                    .setChoices("444226239683624962", "444226355555729428")
                     .setEventWaiter(bot.waiter)
                     .setTimeout(20, TimeUnit.SECONDS)
                     .setAction(re -> {
