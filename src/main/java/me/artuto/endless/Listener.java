@@ -412,7 +412,6 @@ public class Listener implements CommandListener, EventListener
             return;
 
         parser.clear().put("user", user).put("guild", guild).put("channel", FinderUtil.getDefaultChannel(guild));
-        user.openPrivateChannel().queue(c -> c.sendMessage(FormatUtil.sanitize(parser.parse(welcomeDM))).queue(null, e -> {}));
-        parser.clear();
+        user.openPrivateChannel().queue(c -> c.sendMessage(FormatUtil.sanitize(parser.parse(welcomeDM))).queue((s) -> parser.clear(), (e) -> parser.clear()));
     }
 }
