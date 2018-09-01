@@ -91,9 +91,7 @@ public class AfkManager
             builder.setTimestamp(message.getCreationTime());
             builder.setColor(event.getMember().getColor());
 
-            user.openPrivateChannel().queue(pc -> pc.sendMessage(new MessageBuilder().setEmbed(builder.build())
-                    .build()).queue(null, null));
-            builder.clear();
+            user.openPrivateChannel().queue(pc -> pc.sendMessage(builder.build()).queue((s) -> builder.clear(), (e) -> builder.clear()));
 
             if(!(event.getChannel().canTalk()))
                 return;
