@@ -329,7 +329,7 @@ public class ServerLogging
             toSend = String.format(AVATAR_CHANGED, FormatUtil.timeF(now, gs.getTimezone()), ":frame_photo:", user.getName(), user.getDiscriminator(), user.getIdLong());
             mb.setContent(FormatUtil.sanitize(toSend)).setEmbed(builder.build());
             Sender.sendFile(serverlog, f, mb.build(), s -> {
-                if(guild.equals(guilds.last()))
+                if(guild.equals(guilds.get(guilds.size()-1)))
                     f.delete();
             });
         }
