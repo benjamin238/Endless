@@ -63,7 +63,7 @@ public class StatusCmd extends EndlessCommand
         sb.append("\nCurrent Shard: **").append((event.getJDA().getShardInfo().getShardId()+1)).append("**");
         sb.append("\nShard Statuses: ```diff");
 
-        shardManager.getShards().forEach(shard -> sb.append("\n").append((shard.getStatus==JDA.Status.CONNECTED?"+":"-")+" ").append(shard.getShardInfo().getShardId()+1).append(": ").append(shard.getStatus())
+        shardManager.getShards().forEach(shard -> sb.append("\n").append((shard.getStatus()==JDA.Status.CONNECTED?"+":"-")+" ").append(shard.getShardInfo().getShardId()+1).append(": ").append(shard.getStatus())
                 .append(" - ").append(shard.getGuildCache().size()).append(" guilds"));
         sb.append("```");
 
