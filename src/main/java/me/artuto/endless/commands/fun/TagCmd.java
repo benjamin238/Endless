@@ -724,7 +724,7 @@ public class TagCmd extends EndlessCommand
                 }
                 event.getJDA().retrieveUserById(tag.getOwnerId()).queue(user -> event.reply("The owner of the tag `"+tag.getName()+
                         "` is **"+user.getName()+"#"+user.getDiscriminator()+
-                        "** (ID: **"+user.getId()+"**)"), e -> event.reply("The owner of the tag `"+tag.getName()+"` is **Unknown** (ID: `"+tag.getOwnerId()+"`")."));
+                        "** (ID: **"+user.getId()+"**)"), e -> event.reply("The owner of the tag `"+tag.getName()+"` is **Unknown** (ID: `"+tag.getOwnerId()+"`)."));
             }
         }
     }
