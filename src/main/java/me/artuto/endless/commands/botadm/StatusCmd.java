@@ -23,6 +23,7 @@ import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.bot.sharding.ShardManager;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 
 import java.time.OffsetDateTime;
@@ -60,9 +61,9 @@ public class StatusCmd extends EndlessCommand
         sb.append("\nRAM: **").append(usedRamMb).append("**MB / **").append(totalRamMb).append("**MB");
         sb.append("\nBot Average Ping: **").append(Math.round(shardManager.getAveragePing())).append("**ms");
         sb.append("\nCurrent Shard: **").append((event.getJDA().getShardInfo().getShardId()+1)).append("**");
-        sb.append("\nShard Statuses: ```");
+        sb.append("\nShard Statuses: ```diff");
 
-        shardManager.getShards().forEach(shard -> sb.append("\n").append(shard.getShardInfo().getShardId()+1).append(": ").append(shard.getStatus())
+        shardManager.getShards().forEach(shard -> sb.append("\n").append((shard.getStatus==JDA.Status.CONNECTED?"+":"-")+" ").append(shard.getShardInfo().getShardId()+1).append(": ").append(shard.getStatus())
                 .append(" - ").append(shard.getGuildCache().size()).append(" guilds"));
         sb.append("```");
 
