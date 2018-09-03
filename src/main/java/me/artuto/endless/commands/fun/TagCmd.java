@@ -270,27 +270,27 @@ public class TagCmd extends EndlessCommand
                         bot.tdm.deleteGlobalTag(event.getArgs().trim().toLowerCase());
                     else
                         bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
-                    event.replySuccess("Tag `"+tag.GetName()+"` successfully deleted");
+                    event.replySuccess("Tag `"+tag.getName()+"` successfully deleted");
                 }
                 else
-                    event.replyError("You aren't the owner of the tag `"+tag.GetName()+"`!");
+                    event.replyError("You aren't the owner of the tag `"+tag.getName()+"`!");
             }
             else
             {
                 Tag tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
                 if(tag==null)
                 {
-                    event.replyError("No tag found with the name `"+tag.GetName()+"`!");
+                    event.replyError("No tag found with the name `"+tag.getName()+"`!");
                     return;
                 }
 
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
                     bot.tdm.deleteGlobalTag(event.getArgs().trim().toLowerCase());
-                    event.replySuccess("Tag "+tag.GetName()+"` successfully deleted");
+                    event.replySuccess("Tag "+tag.getName()+"` successfully deleted");
                 }
                 else
-                    event.replyError("You aren't the owner of the tag`"+tag.GetName()+"`!");
+                    event.replyError("You aren't the owner of the tag`"+tag.getName()+"`!");
             }
         }
     }
@@ -340,7 +340,7 @@ public class TagCmd extends EndlessCommand
                     tag = bot.endless.getGlobalTag(name);
                     if(tag==null)
                     {
-                        event.replyError("No tag found with the name `"+tag.GetName()+"`!");
+                        event.replyError("No tag found with the name `"+tag.getName()+"`!");
                         return;
                     }
                 }
@@ -351,10 +351,10 @@ public class TagCmd extends EndlessCommand
                         bot.tdm.updateGlobalTagContent(name, content);
                     else
                         bot.tdm.updateLocalTagContent(event.getGuild().getIdLong(), name, content);
-                    event.replySuccess("Tag `"+tag.GetName()+"` successfully edited!");
+                    event.replySuccess("Tag `"+tag.getName()+"` successfully edited!");
                 }
                 else
-                    event.replyError("You aren't the owner of the tag `"+tag.GetName()+"`!");
+                    event.replyError("You aren't the owner of the tag `"+tag.getName()+"`!");
             }
             else
             {
@@ -371,10 +371,10 @@ public class TagCmd extends EndlessCommand
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
                     bot.tdm.updateGlobalTagContent(name, content);
-                    event.replySuccess("Tag `"+tag.GetName()+"` successfully edited!");
+                    event.replySuccess("Tag `"+tag.getName()+"` successfully edited!");
                 }
                 else
-                    event.replyError("You aren't the owner of the tag `"+tag.GetName()+"`!");
+                    event.replyError("You aren't the owner of the tag `"+tag.getName()+"`!");
             }
         }
     }
@@ -443,11 +443,11 @@ public class TagCmd extends EndlessCommand
                 }
 
                 if(bot.tdm.isImported(event.getGuild().getIdLong(), String.valueOf(tag.getId())))
-                    event.replyError("The tag `"+tag.GetName()+"` is already imported!");
+                    event.replyError("The tag `"+tag.getName()+"` is already imported!");
                 else
                 {
                     bot.tdm.importTag(event.getGuild().getIdLong(), tag);
-                    event.replySuccess("Successfully imported tag `"+tag.GetName()+"`!");
+                    event.replySuccess("Successfully imported tag `"+tag.getName()+"`!");
                 }
             }
         }
@@ -632,7 +632,7 @@ public class TagCmd extends EndlessCommand
                 tag = bot.endless.getGlobalTag(name);
                 if(tag==null)
                 {
-                    event.replyError("No tag found with the name `"+tag.GetName()+"`!");
+                    event.replyError("No tag found with the name `"+tag.getName()+"`!");
                     return;
                 }
             }
@@ -643,7 +643,7 @@ public class TagCmd extends EndlessCommand
             if(tag.isOverriden())
             {
                 bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), name);
-                event.replySuccess("Succesfully deleted local tag `"+tag.GetName()+"`");
+                event.replySuccess("Succesfully deleted local tag `"+tag.getName()+"`");
             }
             else
             {
@@ -653,7 +653,7 @@ public class TagCmd extends EndlessCommand
                         bot.tdm.createLocalTag(true, event.getGuild().getIdLong(), event.getGuild().getIdLong(), "", name);
                     else
                         bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getGuild().getIdLong(), content, name);
-                    event.replySuccess("Successfully overriden global tag `"+tag.GetName()+"`");
+                    event.replySuccess("Successfully overriden global tag `"+tag.getName()+"`");
                 }
                 else
                 {
@@ -664,7 +664,7 @@ public class TagCmd extends EndlessCommand
                         bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), name);
                         bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getGuild().getIdLong(), content, name);
                     }
-                    event.replySuccess("Successfully overriden local tag `"+tag.GetName()+"`");
+                    event.replySuccess("Successfully overriden local tag `"+tag.getName()+"`");
                 }
             }
         }
