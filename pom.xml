@@ -45,9 +45,9 @@
     <dependencies>
         <!-- JDA/Discord -->
         <dependency>
-            <groupId>com.github.DV8FromTheWorld</groupId>
+            <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>405b51a</version>
+            <version>3.7.1_412</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minced</groupId>
