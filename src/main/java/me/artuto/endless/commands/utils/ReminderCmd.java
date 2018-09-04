@@ -122,8 +122,7 @@ public class ReminderCmd extends EndlessCommand
                 return;
             }
             int time = Integer.valueOf(args[0]);
-            int minutes = time/60;
-            Instant expiryTime = Instant.now().plus(minutes, ChronoUnit.MINUTES);
+            Instant expiryTime = Instant.now().plus(time, ChronoUnit.SECONDS);
             if(time<0)
             {
                 event.replyError("The time cannot be negative!");

@@ -318,10 +318,10 @@ public class Bot extends ListenerAdapter
                 if(dataEnabled)
                 {
                     muteScheduler.scheduleWithFixedDelay(() -> pdm.updateTempPunishments(PunishmentType.TEMPMUTE, shardManager),
-                            0, 10, TimeUnit.SECONDS);
-                    pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 0, 10, TimeUnit.SECONDS);
-                    reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 10, TimeUnit.SECONDS);
-                    roomScheduler.scheduleWithFixedDelay(() -> rsdm.updateRooms(shardManager), 0, 10, TimeUnit.SECONDS);
+                            0, 1, TimeUnit.SECONDS);
+                    pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 0, 1, TimeUnit.SECONDS);
+                    reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 1, TimeUnit.SECONDS);
+                    roomScheduler.scheduleWithFixedDelay(() -> rsdm.updateRooms(shardManager), 0, 1, TimeUnit.SECONDS);
                 }
                 endlessPool.schedule(() -> db.toDelete.forEach(g -> db.deleteSettings(g)), 24, TimeUnit.HOURS);
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);

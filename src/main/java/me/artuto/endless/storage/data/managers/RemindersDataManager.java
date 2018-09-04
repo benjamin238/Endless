@@ -126,26 +126,36 @@ public class RemindersDataManager
 
     public void updateReminders(ShardManager shardManager)
     {
-        for(Reminder reminder : getReminders())
-        {
-            if(OffsetDateTime.now().isAfter(reminder.getExpiryTime()))
-            {
-                deleteReminder(reminder.getId(), reminder.getUserId());
-                User user = shardManager.getUserById(reminder.getUserId());
-                if(user==null)
-                    return;
-                MessageChannel channel = shardManager.getTextChannelById(reminder.getChannelId());
-                if(channel==null)
-                    channel = user.openPrivateChannel().complete();
-                String toSend;
-                String formattedTime = FormatUtil.formatTimeFromSeconds(reminder.getExpiryTime().until(OffsetDateTime.now(), ChronoUnit.SECONDS));
-                if(channel instanceof PrivateChannel)
-                    toSend = ":alarm_clock: "+reminder.getMessage()+" ~set "+formattedTime+" ago";
-                else
-                    toSend = user.getAsMention()+" :alarm_clock: "+reminder.getMessage()+" ~set "+formattedTime+" ago";
+        OffsetDateTime now = OffsetDateTime.now();
+        List<Reminder> expired = new LinkedList<>();
+        List<Reminder> reminders = getReminders();
 
-                channel.sendMessage(FormatUtil.sanitize(toSend)).queue(null, e -> {});
-            }
+        // Check for expired
+        for(Reminder reminder : reminders)
+        {
+            if(now.toInstant().toEpochMilli()>reminder.getExpiryTime().toInstant().toEpochMilli())
+                expired.add(reminder);
+        }
+
+        // Tell the user and delete them
+        for(Reminder reminder : expired)
+        {
+            deleteReminder(reminder.getId(), reminder.getUserId());
+            User user = shardManager.getUserById(reminder.getUserId());
+            if(user==null)
+                return;
+            MessageChannel channel = shardManager.getTextChannelById(reminder.getChannelId());
+            if(channel==null)
+                channel = user.openPrivateChannel().complete();
+            String toSend;
+            long until = reminder.getExpiryTime().until(now, ChronoUnit.SECONDS);
+            String formattedTime = FormatUtil.formatTimeFromSeconds(until);
+            if(channel instanceof PrivateChannel)
+                toSend = ":alarm_clock: "+reminder.getMessage()+" ~set "+formattedTime+" ago";
+            else
+                toSend = user.getAsMention()+" :alarm_clock: "+reminder.getMessage()+" ~set "+formattedTime+" ago";
+
+            channel.sendMessage(FormatUtil.sanitize(toSend)).queue(null, e -> {});
         }
     }
 
