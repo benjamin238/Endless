@@ -54,6 +54,10 @@ public class CatCmd extends EndlessCommand
 
     protected void executeCommand(CommandEvent event)
     {
+
+        event.replyError("This command will be removed soon because issues with random.cat API");
+        return;
+
         try
         {
             Color color;
