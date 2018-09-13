@@ -72,13 +72,16 @@ public class StatsCmd extends EndlessCommand
         for(Command command : client.getCommands())
             commandsRan += client.getCommandUses(command);
 
+        long audioConnections = shardManager.getGuilds().stream().filter(g -> g.getSelfMember().getVoiceState().inVoiceChannel()).count();
+
         sb.append(Const.LINE_START).append(" Channels: **").append(channels).append("**\n")
                 .append(Const.LINE_START).append(" Guilds: **").append(guilds).append("**\n")
                 .append(Const.LINE_START).append(" Users: **").append(users).append("**\n")
                 .append(Const.LINE_START).append(" RAM Usage: **").append(usedRamMb).append("**MB / **").append(totalRamMb).append("**MB\n")
                 .append(Const.LINE_START).append(" Commands Ran: **").append(commandsRan).append("**\n")
                 .append(Const.LINE_START).append(" Last startup: ").append(FormatUtil.formatTimeFromSeconds(event.getClient().getStartTime()
-                .until(OffsetDateTime.now(), ChronoUnit.SECONDS))).append(" ago");
+                .until(OffsetDateTime.now(), ChronoUnit.SECONDS))).append(" ago\n")
+                .append(Const.LINE_START).append(" Active Audio Connections **").append(audioConnections).append("**");
 
         builder.setColor(color);
         builder.setDescription(sb);
