@@ -19,9 +19,11 @@ package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.vdurmont.emoji.EmojiParser;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -56,11 +58,10 @@ public class EmoteCmd extends EndlessCommand
     @Override
     protected void executeCommand(CommandEvent event)
     {
-        EmbedBuilder builder = new EmbedBuilder();
-        MessageBuilder mb = new MessageBuilder();
         StringBuilder sb = new StringBuilder();
+        List<String> emojis = EmojiParser.extractEmojis(event.getArgs());
 
-        if(event.getMessage().getEmotes().isEmpty())
+        if(event.getMessage().getEmotes().isEmpty() && !(emojis.isEmpty()))
         {
             String args = event.getArgs();
 
@@ -85,21 +86,36 @@ public class EmoteCmd extends EndlessCommand
             });
             event.replySuccess(sb.toString());
         }
-        else
+        else if(!(event.getMessage().getEmotes().isEmpty()))
         {
             Emote emote = event.getMessage().getEmotes().get(0);
-            Guild guild = emote.getGuild();
-            String url = "[Image]("+emote.getImageUrl()+")";
-
-            sb.append(Const.LINE_START).append(" ID: **").append(emote.getId()).append("**\n");
-            sb.append(Const.LINE_START).append(" Guild: ").append(emote.isFake()?"Unknown":"**"+guild.getName()+"** (ID: "+guild.getId()+")").append("\n");
-            sb.append(Const.LINE_START).append(" URL: **").append(url).append("**\n");
-            if(!(emote.isFake()))
-                sb.append(Const.LINE_START).append(" Global: **").append(emote.isManaged()?"Yes":"No").append("**\n");
-            builder.setImage(emote.getImageUrl()).setColor(event.getSelfMember()==null?null:event.getSelfMember().getColor());
-            builder.setDescription(sb);
-            event.reply(mb.setContent(String.format("%s Emote **%s**", event.getClient().getSuccess(), emote.getName())).setEmbed(builder.build()).build());
+            createEmoteInfoEmbed(event, emote);
         }
+        else
+        {
+            Emote emote = ArgsUtils.findEmote(event, event.getArgs());
+            if(emote==null)
+                return;
+            createEmoteInfoEmbed(event, emote);
+        }
+    }
+
+    private void createEmoteInfoEmbed(CommandEvent event, Emote emote)
+    {
+        EmbedBuilder builder = new EmbedBuilder();
+        MessageBuilder mb = new MessageBuilder();
+        StringBuilder sb = new StringBuilder();
+        Guild guild = emote.getGuild();
+        String url = "[Image]("+emote.getImageUrl()+")";
+
+        sb.append(Const.LINE_START).append(" ID: **").append(emote.getId()).append("**\n");
+        sb.append(Const.LINE_START).append(" Guild: ").append(emote.isFake()?"Unknown":"**"+guild.getName()+"** (ID: "+guild.getId()+")").append("\n");
+        sb.append(Const.LINE_START).append(" URL: **").append(url).append("**\n");
+        if(!(emote.isFake()))
+            sb.append(Const.LINE_START).append(" Global: **").append(emote.isManaged()?"Yes":"No").append("**\n");
+        builder.setImage(emote.getImageUrl()).setColor(event.getSelfMember()==null?null:event.getSelfMember().getColor());
+        builder.setDescription(sb);
+        event.reply(mb.setContent(String.format("%s Emote **%s**", event.getClient().getSuccess(), emote.getName())).setEmbed(builder.build()).build());
     }
 
     private class CreateCmd extends EndlessCommand

@@ -108,6 +108,23 @@ public class ArgsUtils
             return tcs.get(0);
     }
 
+    public static Emote findEmote(CommandEvent event, String query)
+    {
+        List<Emote> list = FinderUtil.findEmotes(query, event.getJDA());
+        if(list.isEmpty())
+        {
+            event.replyWarning("No Emotes found matching \""+query+"\"");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfEmotes(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
     public static Member findMember(CommandEvent event, String query)
     {
         List<Member> list = FinderUtil.findMembers(query, event.getGuild());
