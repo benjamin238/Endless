@@ -54,7 +54,11 @@ public class CatCmd extends EndlessCommand
 
     protected void executeCommand(CommandEvent event)
     {
-        try
+
+        event.replyError("This command will be removed soon because issues with random.cat API");
+        return;
+
+        /*try
         {
             Color color;
 
@@ -84,6 +88,6 @@ public class CatCmd extends EndlessCommand
             LOG.error(e.getMessage());
 
             if(bot.config.isDebugEnabled()) e.printStackTrace();
-        }
+        }*/
     }
 }
