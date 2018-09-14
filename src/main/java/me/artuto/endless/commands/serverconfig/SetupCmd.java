@@ -35,7 +35,7 @@ public class SetupCmd extends EndlessCommand
     {
         event.reply(Const.INFO+" Use this command to setup:\n" +
                 Const.LINE_START+" Muted role (and channel overrides)\n" +
-                Const.LINE_START+" Starboard (not available yet with this command)");
+                Const.LINE_START+" Disable everyone permissions for every role that isn't Admin");
     }
 
     private class MutedRoleCmd extends EndlessCommand
@@ -76,6 +76,36 @@ public class SetupCmd extends EndlessCommand
             else confirm = "This will create a new role called \"Muted\" and assign it overrides on every Channel, Continue?";
 
             waitForConfirm(event, confirm, () -> setupMutedRole(event, mutedRole));
+        }
+    }
+
+    private class DisableAtEveryone extends EndlessCommand
+    {
+        DisableAtEveryone()
+        {
+            this.name = "disableateveryone";;
+            this.help = "Disables the everyone permission for every role that isn't Admin";
+            this.category = Categories.SERVER_CONFIG;
+            this.botPerms = new Permission[]{Permission.ADMINISTRATOR};
+            this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
+            this.needsArguments = false;
+            this.parent = SetupCmd.this;
+        }
+
+        @Override
+        protected void executeCommand(CommandEvent event)
+        {
+            long count = event.getGuild().getRoles().stream().filter(r -> r.getPermissions().contains(Permission.MESSAGE_MENTION_EVERYONE) &&
+                    !(r.getPermissions().contains(Permission.MANAGE_SERVER))).count();
+
+            if(count==0)
+            {
+                event.replySuccess("No changes made because every role had their Permission removed.");
+                return;
+            }
+
+            String confirm = "This will remove the `Mention Everyone` permission form every role that **doesn't** has `Manage Server`. Continute?";
+            waitForConfirm(event, confirm, () -> disableEveryone(event));
         }
     }
 
@@ -133,6 +163,11 @@ public class SetupCmd extends EndlessCommand
                         "Administrator permission and the Muted role is below my higher role.").queue();
             }
         }));
+    }
+
+    private void disableEveryone(CommandEvent event)
+    {
+        
     }
 
     private void waitForConfirm(CommandEvent event, String confirm, Runnable action)
