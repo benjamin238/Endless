@@ -13,7 +13,9 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 
 import java.awt.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class SetupCmd extends EndlessCommand
 {
@@ -23,7 +25,7 @@ public class SetupCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "setup";
-        this.children = new Command[]{new MutedRoleCmd()};
+        this.children = new Command[]{new MutedRoleCmd(), new DisableAtEveryone()};
         this.help = "Server setup";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -83,9 +85,10 @@ public class SetupCmd extends EndlessCommand
     {
         DisableAtEveryone()
         {
-            this.name = "disableateveryone";;
+            this.name = "disableateveryone";
             this.help = "Disables the everyone permission for every role that isn't Admin";
             this.category = Categories.SERVER_CONFIG;
+            this.aliases = new String[]{"disableveryone", "disablevaronbros", "disableale0hio"};
             this.botPerms = new Permission[]{Permission.ADMINISTRATOR};
             this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
             this.needsArguments = false;
@@ -104,7 +107,7 @@ public class SetupCmd extends EndlessCommand
                 return;
             }
 
-            String confirm = "This will remove the `Mention Everyone` permission form every role that **doesn't** has `Manage Server`. Continute?";
+            String confirm = "This will remove the `Mention Everyone` permission form every role that **doesn't** has `Manage Server`. Continue?";
             waitForConfirm(event, confirm, () -> disableEveryone(event));
         }
     }
@@ -167,7 +170,26 @@ public class SetupCmd extends EndlessCommand
 
     private void disableEveryone(CommandEvent event)
     {
-        
+        StringBuilder sb = new StringBuilder(event.getClient().getSuccess()+" Starting setup...\n");
+        event.reply(sb+Const.LOADING+" Filtering roles...", m -> event.async(() -> {
+            try
+            {
+                List<Role> roles = event.getGuild().getRoles().stream().filter(r -> r.getPermissions().contains(Permission.MESSAGE_MENTION_EVERYONE) &&
+                        !(r.getPermissions().contains(Permission.MANAGE_SERVER)) && ChecksUtil.canMemberInteract(event.getSelfMember(), r))
+                        .collect(Collectors.toList());
+
+                for(Role role : roles)
+                    role.getManager().revokePermissions(Permission.MESSAGE_MENTION_EVERYONE).complete();
+
+                sb.append(event.getClient().getSuccess()).append(" Successfully revoked permissions!");
+                m.editMessage(sb).queue();
+            }
+            catch(Exception e)
+            {
+                m.editMessage(sb+event.getClient().getError()+" Something went wrong while editing the roles!" +
+                        " Please check I still have `Administrator` permission.").queue();
+            }
+        }));
     }
 
     private void waitForConfirm(CommandEvent event, String confirm, Runnable action)
