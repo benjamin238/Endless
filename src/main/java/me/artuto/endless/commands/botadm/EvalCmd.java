@@ -103,11 +103,11 @@ public class EvalCmd extends EndlessCommand
 
             if(out == null || String.valueOf(out).isEmpty()) event.reactSuccess();
             else
-                event.replySuccess("Done! Output:\n```"+out.toString().replaceAll(event.getJDA().getToken(), "Nice try.")+"```");
+                event.replySuccess("command.eval.success", out.toString().replaceAll(event.getJDA().getToken(), "Nice try."));
         }
         catch(ScriptException e2)
         {
-            event.replyError("Error! Output:\n```"+e2+" ```");
+            event.replyError("command.eval.error",e2);
         }
     }
 }

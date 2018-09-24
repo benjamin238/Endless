@@ -22,8 +22,12 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Locale;
 import me.artuto.endless.core.entities.GuildSettings;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+
+import java.text.MessageFormat;
+import java.util.Collections;
 
 /**
  * @author Artuto
@@ -50,11 +54,17 @@ public class EndlessCommandEvent extends CommandEvent
     @Override
     public void reply(String s)
     {
+        reply(s, Collections.EMPTY_LIST);
+    }
+
+    public void reply(String s, Object... args)
+    {
         if(event.isFromType(ChannelType.TEXT))
         {
             GuildSettings gs = getClient().getSettingsFor(getGuild());
             Locale locale = gs.getLocale();
-            event.reply(locale.getBundle().getString(s));
+            s = MessageFormat.format(locale.getBundle().getString(s), args);
+            event.reply(s);
         }
         else
         {
@@ -64,13 +74,41 @@ public class EndlessCommandEvent extends CommandEvent
     }
 
     @Override
-    public void replySuccess(String s)
+    public void replyError(String s)
+    {
+        replyError(s, Collections.EMPTY_LIST);
+    }
+
+    public void replyError(String s, Object... args)
     {
         if(event.isFromType(ChannelType.TEXT))
         {
             GuildSettings gs = getClient().getSettingsFor(getGuild());
             Locale locale = gs.getLocale();
-            event.replySuccess(locale.getBundle().getString(s));
+            s = MessageFormat.format(locale.getBundle().getString(s), args);
+            event.replyError(s);
+        }
+        else
+        {
+            Locale locale = Locale.EN_US;
+            event.replyError(locale.getBundle().getString(s));
+        }
+    }
+
+    @Override
+    public void replySuccess(String s)
+    {
+        replySuccess(s, Collections.EMPTY_LIST);
+    }
+
+    public void replySuccess(String s, Object... args)
+    {
+        if(event.isFromType(ChannelType.TEXT))
+        {
+            GuildSettings gs = getClient().getSettingsFor(getGuild());
+            Locale locale = gs.getLocale();
+            s = MessageFormat.format(locale.getBundle().getString(s), args);
+            event.replySuccess(s);
         }
         else
         {
