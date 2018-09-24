@@ -18,6 +18,7 @@
 package me.artuto.endless.core.entities.impl;
 
 import com.jagrosh.jdautilities.command.GuildSettingsProvider;
+import me.artuto.endless.Locale;
 import me.artuto.endless.core.entities.*;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
@@ -36,6 +37,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     private List<Ignore> ignoredEntities;
     private List<Role> colorMeRoles, roleMeRoles;
     private List<Tag> importedTags;
+    private Locale locale;
     private long adminRoleId, modlogId, modRoleId, serverlogId, welcomeId, leaveId, starboardId, mutedRoleId, djRoleId, tcMusicId, vcMusicId;
     private Room.Mode roomMode;
     private String leaveMsg, starboardEmote, welcomeDM, welcomeMsg;
@@ -43,7 +45,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
 
     public GuildSettingsImpl(boolean isDefault, boolean isFairQueueEnabled, boolean isRepeatModeEnabled, Collection<String> prefixes, Guild guild,
                              int banDeleteDays, int starboardCount, int volume, List<Ignore> ignoredEntities, List<Role> colorMeRoles, List<Role> roleMeRoles,
-                             List<Tag> importedTags, long adminRoleId, long djRoleId, long leaveId, long modlogId, long modRoleId, long mutedRoleId,
+                             List<Tag> importedTags, Locale locale, long adminRoleId, long djRoleId, long leaveId, long modlogId, long modRoleId, long mutedRoleId,
                              long serverlogId, long starboardId, long tcMusicId, long vcMusicId, long welcomeId, Room.Mode roomMode, String leaveMsg,
                              String starboardEmote, String welcomeDM, String welcomeMsg, ZoneId tz)
     {
@@ -59,6 +61,7 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
         this.colorMeRoles = colorMeRoles;
         this.roleMeRoles = roleMeRoles;
         this.importedTags = importedTags;
+        this.locale = locale;
         this.adminRoleId = adminRoleId;
         this.djRoleId = djRoleId;
         this.leaveId = leaveId;
@@ -88,10 +91,10 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public boolean isEmpty()
     {
         return isFairQueueEnabled && !(isRepeatModeEnabled) && prefixes.isEmpty() && banDeleteDays==0 && starboardCount==0 && volume==100 &&
-                ignoredEntities.isEmpty() && colorMeRoles.isEmpty() && roleMeRoles.isEmpty() && importedTags.isEmpty() && adminRoleId==0L && djRoleId==0L
-                && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L && tcMusicId==0L && vcMusicId==0L && welcomeId==0L
-                && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && starboardEmote.equals("\u2B50") && welcomeDM==null && welcomeMsg==null
-                && tz==EntityBuilder.DEFAULT_TZ;
+                ignoredEntities.isEmpty() && colorMeRoles.isEmpty() && roleMeRoles.isEmpty() && importedTags.isEmpty() && locale==Locale.EN_US
+                && adminRoleId==0L && djRoleId==0L && leaveId==0L && modlogId==0L && modRoleId==0L && serverlogId==0L && starboardId==0L && tcMusicId==0L
+                && vcMusicId==0L && welcomeId==0L && roomMode==Room.Mode.NO_CREATION && leaveMsg==null && starboardEmote.equals("\u2B50")
+                && welcomeDM==null && welcomeMsg==null && tz==EntityBuilder.DEFAULT_TZ;
     }
 
     @Override
@@ -158,6 +161,12 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public List<Tag> getImportedTags()
     {
         return Collections.unmodifiableList(importedTags);
+    }
+
+    @Override
+    public Locale getLocale()
+    {
+        return locale;
     }
 
     @Override
@@ -319,6 +328,11 @@ public class GuildSettingsImpl implements GuildSettings, GuildSettingsProvider
     public void removeRoleMeRole(Role role)
     {
         roleMeRoles.remove(role);
+    }
+
+    public void setLocale(Locale locale)
+    {
+        this.locale = locale;
     }
 
     public void setAdminRoleId(long adminRoleId)

@@ -17,6 +17,7 @@
 
 package me.artuto.endless.core.entities;
 
+import me.artuto.endless.Locale;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 
@@ -51,6 +52,8 @@ public interface GuildSettings
     List<Role> getRoleMeRoles();
 
     List<Tag> getImportedTags();
+
+    Locale getLocale();
 
     long getAdminRole();
 

@@ -19,6 +19,7 @@ package me.artuto.endless.storage.data;
 
 import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
+import me.artuto.endless.Locale;
 import me.artuto.endless.core.entities.*;
 import me.artuto.endless.core.entities.impl.GuildSettingsImpl;
 import me.artuto.endless.core.entities.impl.ProfileImpl;
@@ -43,7 +44,7 @@ public class Database
     public GuildSettings createDefaultSettings(Guild guild)
     {
         return new GuildSettingsImpl(true, true, false, new HashSet<>(), guild, 0, 0, 100, new LinkedList<>(), new LinkedList<>(),
-                new LinkedList<>(), new LinkedList<>(), 0L, 0L, 0L, 0L, 0L, 0L,
+                new LinkedList<>(), new LinkedList<>(), Locale.EN_US, 0L, 0L, 0L, 0L, 0L, 0L,
                 0L, 0L, 0L, 0L, 0L, Room.Mode.NO_CREATION, null, "\u2B50", null, null, EntityBuilder.DEFAULT_TZ);
     }
 

@@ -18,6 +18,7 @@
 package me.artuto.endless.core.entities;
 
 import me.artuto.endless.Bot;
+import me.artuto.endless.Locale;
 import me.artuto.endless.core.entities.impl.*;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audit.AuditLogChange;
@@ -125,6 +126,7 @@ public class EntityBuilder
                 colorMeRoles,
                 roleMeRoles,
                 importedTags,
+                results.getString("locale")==null?Locale.EN_US:Locale.valueOf(results.getString("locale")),
                 results.getLong("admin_role_id"),
                 results.getLong("dj_role_id"),
                 results.getLong("leave_id"),

@@ -46,9 +46,6 @@ public class InviteCmd extends EndlessCommand
                 "You can also join the support server:\n" +
                 ":inbox_tray: **<%s>**";
 
-        event.reply();
-
-
         if(event.getArgs().isEmpty())
             event.replyFormatted(message, event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR),
                     event.getClient().getServerInvite());
