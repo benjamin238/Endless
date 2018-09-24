@@ -20,6 +20,7 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Locale;
 import me.artuto.endless.core.entities.GuildSettings;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -47,14 +48,34 @@ public class EndlessCommandEvent extends CommandEvent
 
     // Reply methods. To localize strings.
     @Override
-    public void reply(String message)
+    public void reply(String s)
     {
         if(event.isFromType(ChannelType.TEXT))
         {
             GuildSettings gs = getClient().getSettingsFor(getGuild());
-
+            Locale locale = gs.getLocale();
+            event.reply(locale.getBundle().getString(s));
         }
         else
-            event.reply(message);
+        {
+            Locale locale = Locale.EN_US;
+            event.reply(locale.getBundle().getString(s));
+        }
+    }
+
+    @Override
+    public void replySuccess(String s)
+    {
+        if(event.isFromType(ChannelType.TEXT))
+        {
+            GuildSettings gs = getClient().getSettingsFor(getGuild());
+            Locale locale = gs.getLocale();
+            event.replySuccess(locale.getBundle().getString(s));
+        }
+        else
+        {
+            Locale locale = Locale.EN_US;
+            event.replySuccess(locale.getBundle().getString(s));
+        }
     }
 }
