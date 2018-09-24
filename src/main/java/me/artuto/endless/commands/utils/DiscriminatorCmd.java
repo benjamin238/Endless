@@ -17,10 +17,10 @@
 
 package me.artuto.endless.commands.utils;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.Paginator;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
@@ -64,7 +64,7 @@ public class DiscriminatorCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         String discrim;
         int number;

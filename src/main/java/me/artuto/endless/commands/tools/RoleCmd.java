@@ -18,10 +18,10 @@
 package me.artuto.endless.commands.tools;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
@@ -48,7 +48,7 @@ public class RoleCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         MessageBuilder mb = new MessageBuilder();
@@ -111,7 +111,7 @@ public class RoleCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Role role;
             Member m;
@@ -192,7 +192,7 @@ public class RoleCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Role role;
             List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
@@ -247,7 +247,7 @@ public class RoleCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().isEmpty())
             {

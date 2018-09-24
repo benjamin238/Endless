@@ -23,6 +23,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.LocalTag;
 import me.artuto.endless.core.entities.Tag;
@@ -61,7 +62,7 @@ public class TagCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         if(!(bot.dataEnabled))
         {
@@ -142,7 +143,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -191,7 +192,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -242,7 +243,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -308,7 +309,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -393,7 +394,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             EmbedBuilder tagEmbed = new EmbedBuilder();
             parser.clear().put("user", event.getAuthor()).put("guild", event.getGuild()).put("channel", event.getTextChannel())
@@ -420,7 +421,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -467,7 +468,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -602,7 +603,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -684,7 +685,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -743,7 +744,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -796,7 +797,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -849,7 +850,7 @@ public class TagCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {

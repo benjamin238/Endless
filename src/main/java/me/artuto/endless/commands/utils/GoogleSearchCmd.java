@@ -24,6 +24,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.OrderedMenu;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.libraries.GoogleAPIAuth;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -62,7 +63,7 @@ public class GoogleSearchCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         if(bot.config.getGoogleKey().isEmpty())
         {

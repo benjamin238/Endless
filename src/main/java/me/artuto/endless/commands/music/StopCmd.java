@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.music.AudioPlayerSendHandler;
 
 /**
@@ -36,7 +36,7 @@ public class StopCmd extends EndlessCommand
     }
 
     @Override
-    public void executeCommand(CommandEvent event)
+    public void executeCommand(EndlessCommandEvent event)
     {
         AudioPlayerSendHandler handler = (AudioPlayerSendHandler)event.getGuild().getAudioManager().getSendingHandler();
         if(!(handler==null))

@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.bot;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.utils.MiscUtil;
@@ -39,12 +39,15 @@ public class InviteCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         String message = "Hi! I'm **Endless**, if you want to add me to your guild use this link:\n" +
                 ":link: **<%s>**\n" +
                 "You can also join the support server:\n" +
                 ":inbox_tray: **<%s>**";
+
+        event.reply();
+
 
         if(event.getArgs().isEmpty())
             event.replyFormatted(message, event.getJDA().asBot().getInviteUrl(Permission.ADMINISTRATOR),

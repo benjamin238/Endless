@@ -118,10 +118,10 @@ public abstract class EndlessCommand extends Command
             return;
         }
 
-        executeCommand(event);
+        executeCommand(new EndlessCommandEvent(event));
     }
 
-    protected abstract void executeCommand(CommandEvent event);
+    protected abstract void executeCommand(EndlessCommandEvent event);
 
     public boolean isOwnerCommand()
     {

@@ -20,6 +20,7 @@ package me.artuto.endless.commands.music;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.music.AudioPlayerSendHandler;
@@ -45,7 +46,7 @@ public abstract class MusicCommand extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         Guild guild = event.getGuild();
         GuildSettings gs = event.getClient().getSettingsFor(guild);

@@ -18,10 +18,10 @@
 package me.artuto.endless.commands.utils;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.Profile;
 import me.artuto.endless.utils.FormatUtil;
@@ -34,7 +34,6 @@ import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.zone.ZoneRulesException;
 import java.util.List;
 
 public class TimeForCmd extends EndlessCommand
@@ -54,7 +53,7 @@ public class TimeForCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         if(!(bot.dataEnabled))
         {
@@ -153,7 +152,7 @@ public class TimeForCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -197,7 +196,7 @@ public class TimeForCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             event.replySuccess("Here is the list: ");
             try

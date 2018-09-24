@@ -18,7 +18,6 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.kdotj.simplegiphy.SimpleGiphy;
 import com.kdotj.simplegiphy.data.Giphy;
 import com.kdotj.simplegiphy.data.GiphyListResponse;
@@ -26,6 +25,7 @@ import com.kdotj.simplegiphy.data.RandomGiphy;
 import com.kdotj.simplegiphy.data.RandomGiphyResponse;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -59,7 +59,7 @@ public class GiphyGifCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         String args = event.getArgs();
 
@@ -140,7 +140,7 @@ public class GiphyGifCmd extends EndlessCommand
             this.parent = GiphyGifCmd.this;
         }
 
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             String args = event.getArgs();
 

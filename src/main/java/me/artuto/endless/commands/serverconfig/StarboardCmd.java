@@ -23,6 +23,7 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.vdurmont.emoji.EmojiParser;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
@@ -53,7 +54,7 @@ public class StarboardCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         event.replySuccess("Hi! Welcome to the Endless' Starboard Setup. This will automagically install an starboard on your server, I only need some "+
                 "information to continue.", m -> waitForChannel(event));
@@ -228,7 +229,7 @@ public class StarboardCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
@@ -265,7 +266,7 @@ public class StarboardCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Integer args;
 
@@ -308,7 +309,7 @@ public class StarboardCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("default"))
             {

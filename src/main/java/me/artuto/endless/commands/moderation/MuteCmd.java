@@ -17,11 +17,11 @@
 
 package me.artuto.endless.commands.moderation;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Action;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Endless;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.PunishmentType;
 import me.artuto.endless.utils.ArgsUtils;
@@ -56,7 +56,7 @@ public class MuteCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         if(!(bot.dataEnabled))
         {

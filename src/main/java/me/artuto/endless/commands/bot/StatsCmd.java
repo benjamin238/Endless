@@ -19,9 +19,9 @@ package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.MiscUtils;
@@ -52,7 +52,7 @@ public class StatsCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         Color color = event.isFromType(ChannelType.TEXT)?event.getSelfMember().getColor():Color.decode("#33ff00");
         CommandClient client = event.getClient();

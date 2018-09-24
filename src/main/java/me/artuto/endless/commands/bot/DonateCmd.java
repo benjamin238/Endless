@@ -18,11 +18,11 @@
 package me.artuto.endless.commands.bot;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -57,7 +57,7 @@ public class DonateCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         Color color;
         EmbedBuilder builder = new EmbedBuilder();
@@ -97,7 +97,7 @@ public class DonateCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -160,7 +160,7 @@ public class DonateCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {

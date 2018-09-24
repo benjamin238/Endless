@@ -22,6 +22,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.vdurmont.emoji.EmojiParser;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.MiscUtils;
@@ -56,7 +57,7 @@ public class EmoteCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         StringBuilder sb = new StringBuilder();
         List<String> emojis = EmojiParser.extractEmojis(event.getArgs());
@@ -132,7 +133,7 @@ public class EmoteCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             List<Emote> animatedEmotes = guild.getEmotes().stream().filter(Emote::isAnimated).collect(Collectors.toList());
@@ -204,7 +205,7 @@ public class EmoteCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             List<Emote> animatedEmotes = guild.getEmotes().stream().filter(Emote::isAnimated).collect(Collectors.toList());
@@ -275,7 +276,7 @@ public class EmoteCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Emote emote;
 

@@ -18,12 +18,12 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.jagrosh.jdautilities.menu.Paginator;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.Profile;
 import me.artuto.endless.core.entities.impl.ProfileImpl;
@@ -57,7 +57,7 @@ public class ProfileCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         if(!(bot.dataEnabled))
         {
@@ -151,7 +151,7 @@ public class ProfileCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             menu.clearItems();
             Arrays.stream(Const.PROFILE_FIELDS).forEach(menu::addItems);
@@ -175,7 +175,7 @@ public class ProfileCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {

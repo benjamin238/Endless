@@ -15,29 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.artuto.endless.commands.fun;
-
-import me.artuto.endless.commands.EndlessCommand;
-import me.artuto.endless.commands.EndlessCommandEvent;
-import me.artuto.endless.commands.cmddata.Categories;
+package me.artuto.endless.handlers;
 
 /**
  * @author Artuto
  */
 
-public class SayCmd extends EndlessCommand
+public class I18nHandler
 {
-    public SayCmd()
-    {
-        this.name = "say";
-        this.help = "Say something!";
-        this.arguments = "<text>";
-        this.category = Categories.FUN;
-    }
 
-    @Override
-    protected void executeCommand(EndlessCommandEvent event)
+
+    public I18nHandler()
     {
-        event.reply(event.getArgs());
+
     }
 }

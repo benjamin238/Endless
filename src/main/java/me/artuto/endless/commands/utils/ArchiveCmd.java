@@ -1,11 +1,11 @@
 package me.artuto.endless.commands.utils;
 
 import ch.qos.logback.classic.Logger;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.Endless;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.ChecksUtil;
@@ -46,7 +46,7 @@ public class ArchiveCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         String[] inputs = event.getArgs().split("\\s+", 2);
         int num = 100;

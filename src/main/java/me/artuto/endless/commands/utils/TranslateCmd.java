@@ -22,9 +22,9 @@ import com.github.vbauer.yta.model.Translation;
 import com.github.vbauer.yta.service.YTranslateApi;
 import com.github.vbauer.yta.service.YTranslateApiImpl;
 import com.github.vbauer.yta.service.basic.exception.YTranslateException;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -52,7 +52,7 @@ public class TranslateCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         String args = event.getArgs();
         String language;

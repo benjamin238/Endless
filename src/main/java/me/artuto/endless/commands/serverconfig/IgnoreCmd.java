@@ -18,10 +18,10 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.Ignore;
 import me.artuto.endless.utils.FormatUtil;
@@ -55,7 +55,7 @@ public class IgnoreCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         event.replyError("Please choose a valid subcommand!");
     }
@@ -74,7 +74,7 @@ public class IgnoreCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             TextChannel tc;
@@ -117,7 +117,7 @@ public class IgnoreCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             Role role;
@@ -160,7 +160,7 @@ public class IgnoreCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             User user;
@@ -203,7 +203,7 @@ public class IgnoreCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             EmbedBuilder builder = new EmbedBuilder();
             IMentionable entity;
@@ -247,7 +247,7 @@ public class IgnoreCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             TextChannel tc;
@@ -290,7 +290,7 @@ public class IgnoreCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             Role role;
@@ -333,7 +333,7 @@ public class IgnoreCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             User user;

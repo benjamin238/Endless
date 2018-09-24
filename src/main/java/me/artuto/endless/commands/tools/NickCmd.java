@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ChecksUtil;
 import net.dv8tion.jda.core.Permission;
@@ -43,7 +43,7 @@ public class NickCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         Member member = event.getMember();
         String nickname = event.getArgs();

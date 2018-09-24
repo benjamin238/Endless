@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.botadm;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 
 import java.io.BufferedReader;
@@ -42,7 +42,7 @@ public class BashCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         StringBuilder output = new StringBuilder();
         String finalOutput = null;

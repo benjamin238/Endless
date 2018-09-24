@@ -17,9 +17,8 @@
 
 package me.artuto.endless.commands.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
@@ -41,7 +40,7 @@ public class NowPlayingCmd extends EndlessCommand
     }
 
     @Override
-    public void executeCommand(CommandEvent event)
+    public void executeCommand(EndlessCommandEvent event)
     {
         event.reply(FormatUtil.nowPlayingMessage(event.getGuild(), "\uD83C\uDFB6"));
     }

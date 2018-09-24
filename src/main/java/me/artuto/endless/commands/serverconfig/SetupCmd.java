@@ -6,6 +6,7 @@ import com.jagrosh.jdautilities.menu.ButtonMenu;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.GuildUtils;
@@ -33,7 +34,7 @@ public class SetupCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         event.reply(Const.INFO+" Use this command to setup:\n" +
                 Const.LINE_START+" Muted role (and channel overrides)\n" +
@@ -54,7 +55,7 @@ public class SetupCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
             Role mutedRole = GuildUtils.getMutedRole(guild);
@@ -96,7 +97,7 @@ public class SetupCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             long count = event.getGuild().getRoles().stream().filter(r -> r.getPermissions().contains(Permission.MESSAGE_MENTION_EVERYONE) &&
                     !(r.getPermissions().contains(Permission.MANAGE_SERVER))).count();

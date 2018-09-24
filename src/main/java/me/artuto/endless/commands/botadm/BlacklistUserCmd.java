@@ -18,9 +18,9 @@
 package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.Blacklist;
 import me.artuto.endless.core.entities.BlacklistType;
@@ -50,7 +50,7 @@ public class BlacklistUserCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         event.replyWarning("Please specify a subcommand!");
     }
@@ -70,7 +70,7 @@ public class BlacklistUserCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -108,7 +108,7 @@ public class BlacklistUserCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -143,7 +143,7 @@ public class BlacklistUserCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {
@@ -192,7 +192,7 @@ public class BlacklistUserCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(bot.dataEnabled))
             {

@@ -18,10 +18,10 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Room;
@@ -54,7 +54,7 @@ public class ServerSettingsCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
@@ -137,7 +137,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
@@ -174,7 +174,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
@@ -212,7 +212,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
@@ -250,7 +250,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
@@ -287,7 +287,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
@@ -330,7 +330,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
@@ -372,7 +372,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {
@@ -415,7 +415,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("0"))
             {
@@ -450,7 +450,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             String args = event.getArgs();
             ZoneId tz;
@@ -484,7 +484,7 @@ public class ServerSettingsCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(!(GuildUtils.isPremiumGuild(event.getGuild())))
             {

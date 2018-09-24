@@ -17,9 +17,9 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -51,7 +51,7 @@ public class PollCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         if(!(bot.dataEnabled))
         {

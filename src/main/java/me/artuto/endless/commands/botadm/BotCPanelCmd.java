@@ -18,9 +18,9 @@
 package me.artuto.endless.commands.botadm;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
@@ -44,7 +44,7 @@ public class BotCPanelCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         event.reply(Const.ENDLESS+" **Endless Control Panel** "+Const.ENDLESS+"\n" +
                 "Please use a subcommand.");
@@ -64,7 +64,7 @@ public class BotCPanelCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             JDA jda = event.getJDA();
             jda.asBot().getShardManager().getShards().forEach(shard -> {
@@ -99,7 +99,7 @@ public class BotCPanelCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             JDA jda = event.getJDA();
             jda.asBot().getShardManager().getShards().forEach(shard -> {
@@ -149,7 +149,7 @@ public class BotCPanelCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             JDA jda = event.getJDA();
             jda.asBot().getShardManager().getShards().forEach(shard -> {
@@ -187,7 +187,7 @@ public class BotCPanelCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             try
             {

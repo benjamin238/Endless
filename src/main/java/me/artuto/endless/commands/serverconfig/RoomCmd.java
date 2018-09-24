@@ -24,6 +24,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.PermLevel;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Room;
@@ -62,7 +63,7 @@ public class RoomCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         String prefix = event.getClient().getPrefix();
 
@@ -137,7 +138,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             boolean expiry = false;
             Instant expiryTime = null;
@@ -254,7 +255,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             boolean expiry = false;
             Instant expiryTime = null;
@@ -354,7 +355,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             boolean expiry = false;
             Instant expiryTime = null;
@@ -447,7 +448,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             String[] args = splitArgs(event.getArgs(), " to ");
             Member member = findMember(event, args[0]);
@@ -534,7 +535,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Channel channel = findChannel(event, event.getArgs());
             Member member = event.getMember();
@@ -609,7 +610,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             String[] args = splitArgs(event.getArgs(), " from ");
             Member member = findMember(event, args[0]);
@@ -704,7 +705,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Member member = event.getMember();
             Channel channel;
@@ -789,7 +790,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Channel channel;
             if(event.getArgs().isEmpty())
@@ -832,7 +833,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             for(String mode : MODES)
             {
@@ -863,7 +864,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Channel channel;
             if(event.getArgs().isEmpty())
@@ -909,7 +910,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Member member = findMember(event, event.getArgs());
             Channel channel = event.getTextChannel();
@@ -953,7 +954,7 @@ public class RoomCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             Channel channel;
             if(event.getArgs().isEmpty())

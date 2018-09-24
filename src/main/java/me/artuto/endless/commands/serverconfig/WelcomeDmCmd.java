@@ -18,9 +18,9 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.GuildSettings;
 import net.dv8tion.jda.core.Permission;
@@ -46,7 +46,7 @@ public class WelcomeDmCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         Guild guild = event.getGuild();
         GuildSettings gs = event.getClient().getSettingsFor(guild);
@@ -71,7 +71,7 @@ public class WelcomeDmCmd extends EndlessCommand
         }
 
         @Override
-        protected void executeCommand(CommandEvent event)
+        protected void executeCommand(EndlessCommandEvent event)
         {
             if(event.getArgs().equalsIgnoreCase("none"))
             {

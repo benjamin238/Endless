@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.botadm;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.commands.EndlessCommand;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 
@@ -41,7 +41,7 @@ public class RestartShardCmd extends EndlessCommand
     }
 
     @Override
-    protected void executeCommand(CommandEvent event)
+    protected void executeCommand(EndlessCommandEvent event)
     {
         ShardManager shardManager = event.getJDA().asBot().getShardManager();
 
