@@ -20,9 +20,9 @@ package me.artuto.endless.commands;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Const;
 import me.artuto.endless.Locale;
 import me.artuto.endless.core.entities.GuildSettings;
-import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
@@ -50,11 +50,24 @@ public class EndlessCommandEvent extends CommandEvent
         this.bot = Bot.getInstance();
     }
 
+    public String localize(String s, Object... args)
+    {
+        if(event.isFromType(ChannelType.TEXT))
+        {
+            GuildSettings gs = getClient().getSettingsFor(getGuild());
+            s = MessageFormat.format(gs.getLocale().getBundle().getString(s), args);
+        }
+        else
+            s = MessageFormat.format(Locale.EN_US.getBundle().getString(s), args);
+
+        return s;
+    }
+
     // Reply methods. To localize strings.
     @Override
     public void reply(String s)
     {
-        reply(s, Collections.EMPTY_LIST);
+        reply(true, s, Collections.EMPTY_LIST);
     }
 
     public void reply(String s, Object... args)
@@ -62,15 +75,52 @@ public class EndlessCommandEvent extends CommandEvent
         if(event.isFromType(ChannelType.TEXT))
         {
             GuildSettings gs = getClient().getSettingsFor(getGuild());
-            Locale locale = gs.getLocale();
-            s = MessageFormat.format(locale.getBundle().getString(s), args);
-            event.reply(s);
+            s = MessageFormat.format(gs.getLocale().getBundle().getString(s), args);
         }
         else
+            s = MessageFormat.format(Locale.EN_US.getBundle().getString(s), args);
+
+        event.reply(s);
+    }
+
+    public void reply(boolean t, String s, Object... args)
+    {
+        if(t)
         {
-            Locale locale = Locale.EN_US;
-            event.reply(locale.getBundle().getString(s));
+            reply(s, args);
+            return;
         }
+
+        event.reply(s);
+    }
+
+    public void replyInfo(String s)
+    {
+        replyInfo(true, s, Collections.EMPTY_LIST);
+    }
+
+    public void replyInfo(String s, Object... args)
+    {
+        if(event.isFromType(ChannelType.TEXT))
+        {
+            GuildSettings gs = getClient().getSettingsFor(getGuild());
+            s = MessageFormat.format(gs.getLocale().getBundle().getString(s), args);
+        }
+        else
+            s = MessageFormat.format(Locale.EN_US.getBundle().getString(s), args);
+
+        event.reply(Const.INFO+" "+s);
+    }
+
+    public void replyInfo(boolean t, String s, Object... args)
+    {
+        if(t)
+        {
+            replyInfo(s, args);
+            return;
+        }
+
+        event.reply(Const.INFO+" "+s);
     }
 
     @Override
@@ -84,15 +134,23 @@ public class EndlessCommandEvent extends CommandEvent
         if(event.isFromType(ChannelType.TEXT))
         {
             GuildSettings gs = getClient().getSettingsFor(getGuild());
-            Locale locale = gs.getLocale();
-            s = MessageFormat.format(locale.getBundle().getString(s), args);
-            event.replyError(s);
+            s = MessageFormat.format(gs.getLocale().getBundle().getString(s), args);
         }
         else
+            s = MessageFormat.format(Locale.EN_US.getBundle().getString(s), args);
+
+        event.replyError(s);
+    }
+
+    public void replyError(boolean t, String s, Object... args)
+    {
+        if(t)
         {
-            Locale locale = Locale.EN_US;
-            event.replyError(locale.getBundle().getString(s));
+            replyError(s, args);
+            return;
         }
+
+        event.replyError(s);
     }
 
     @Override
@@ -106,14 +164,52 @@ public class EndlessCommandEvent extends CommandEvent
         if(event.isFromType(ChannelType.TEXT))
         {
             GuildSettings gs = getClient().getSettingsFor(getGuild());
-            Locale locale = gs.getLocale();
-            s = MessageFormat.format(locale.getBundle().getString(s), args);
-            event.replySuccess(s);
+            s = MessageFormat.format(gs.getLocale().getBundle().getString(s), args);
         }
         else
+            s = MessageFormat.format(Locale.EN_US.getBundle().getString(s), args);
+
+        event.replySuccess(s);
+    }
+
+    public void replySuccess(boolean t, String s, String... args)
+    {
+        if(t)
         {
-            Locale locale = Locale.EN_US;
-            event.replySuccess(locale.getBundle().getString(s));
+            replySuccess(s, args);
+            return;
         }
+
+        event.replySuccess(s);
+    }
+
+    @Override
+    public void replyWarning(String s)
+    {
+        replyWarning(s, Collections.EMPTY_LIST);
+    }
+
+    public void replyWarning(String s, Object... args)
+    {
+        if(event.isFromType(ChannelType.TEXT))
+        {
+            GuildSettings gs = getClient().getSettingsFor(getGuild());
+            s = MessageFormat.format(gs.getLocale().getBundle().getString(s), args);
+        }
+        else
+            s = MessageFormat.format(Locale.EN_US.getBundle().getString(s), args);
+
+        event.replyWarning(s);
+    }
+
+    public void replyWarning(boolean t, String s, Object... args)
+    {
+        if(t)
+        {
+            replyWarning(s, args);
+            return;
+        }
+
+        event.replyWarning(s);
     }
 }

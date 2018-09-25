@@ -42,6 +42,7 @@ public class PingCmd extends EndlessCommand
     protected void executeCommand(EndlessCommandEvent event)
     {
         long time = System.currentTimeMillis();
-        event.reply("Ping!", (message) -> message.editMessageFormat("Pong! - "+"Discord API Ping: "+event.getJDA().getPing()+"ms - Ping: %dms", System.currentTimeMillis()-time).queue());
+        event.reply("Ping!", (message) -> message.editMessageFormat("Pong! - Discord API Ping: %dms - Ping: %dms",
+                event.getJDA().getPing(), System.currentTimeMillis()-time).queue());
     }
 }

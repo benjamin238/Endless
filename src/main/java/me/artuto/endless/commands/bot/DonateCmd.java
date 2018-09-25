@@ -59,29 +59,27 @@ public class DonateCmd extends EndlessCommand
     @Override
     protected void executeCommand(EndlessCommandEvent event)
     {
-        Color color;
+        Color color = event.isFromType(ChannelType.PRIVATE)?Color.decode("#33ff00"):event.getGuild().getSelfMember().getColor();
         EmbedBuilder builder = new EmbedBuilder();
         StringBuilder sb = new StringBuilder();
         List<User> list = bot.ddm.getUsersThatDonated(event.getJDA());
 
-        if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
-        else color = event.getGuild().getSelfMember().getColor();
-
         if(list.isEmpty())
-            sb.append("None has donated yet ):");
-        else for(User user : list)
-            sb.append(String.format("**%#s** - %s\n", user, bot.ddm.getDonation(user)));
+            sb.append(event.localize("command.donate.noDonations"));
+        else
+        {
+            for(User user : list)
+                sb.append(String.format("**%#s** - %s\n", user, bot.ddm.getDonation(user)));
+        }
 
         builder.setColor(color);
-        builder.addField(":moneybag: Donations:", "Endless is developed in my spare time and its free for everyone to " +
-                "use, however, if you like the bot, its functions or simply want to support me or the development," +
-                "please consider donating. All the money goes into getting a better hosting.", false);
-        builder.addField(":money_mouth: How to donate:", "If you want donate please go to **https://paypal.me/artuto**\n"+
-                "You'll get a special role on my server and some perks!\n" +
-                "After you've donated please join the support server by doing `e!help support` and contact Artuto#0424.", false);
-        builder.addField(":heart: Donators:", sb.toString(), false);
+        builder.addField("\uD83D\uDCB0 "+event.localize("command.donate.donations")+":",
+                event.localize("command.donate.excuseToAskForDonations"), false);
+        builder.addField("\uD83E\uDD11 "+event.localize("command.donate.how2Donate")+":",
+                event.localize("command.donate.instructions"), false);
+        builder.addField("❤ "+event.localize("misc.donators")+":", sb.toString(), false);
 
-        event.reply(new MessageBuilder().append(":information_source: Donations:").setEmbed(builder.build()).build());
+        event.reply(new MessageBuilder().setContent(Const.INFO+" "+event.localize("command.donate.title")+":").setEmbed(builder.build()).build());
     }
 
     private class AddCmd extends EndlessCommand
@@ -101,12 +99,12 @@ public class DonateCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError(false, "Endless is running on No-data mode.");
                 return;
             }
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
-                event.replyError("This command is not available on a selfhosted instance!");
+                event.replyError(false, "This command is not available on a selfhosted instance!");
                 return;
             }
 
@@ -123,7 +121,7 @@ public class DonateCmd extends EndlessCommand
             }
             catch(ArrayIndexOutOfBoundsException e)
             {
-                event.replyWarning("Please specify the user ID and a donated amount!");
+                event.replyWarning(false, "Please specify the user ID and a donated amount!");
                 return;
             }
 
@@ -134,15 +132,16 @@ public class DonateCmd extends EndlessCommand
                 event.getJDA().retrieveUserById(id).queue(s ->
                 {
                     bot.ddm.setDonation(s.getIdLong(), donation);
-                    event.replySuccess(String.format("Successfully added %#s to the donators list!", s));
-                }, e -> event.replyError("Invalid ID!"));
+                    event.replySuccess(false, String.format("Successfully added %#s to the donators list!", s));
+                }, e -> event.replyError(false, "Invalid ID!"));
             }
-            else if(list.size()>1) event.replyWarning(FormatUtil.listOfMembers(list, id));
+            else if(list.size()>1)
+                event.replyWarning(FormatUtil.listOfMembers(list, id));
             else
             {
                 user = list.get(0).getUser();
                 bot.ddm.setDonation(user.getIdLong(), donation);
-                event.replySuccess(String.format("Successfully added %#s to the donators list!", user));
+                event.replySuccess(false, String.format("Successfully added %#s to the donators list!", user));
             }
         }
     }
@@ -164,13 +163,13 @@ public class DonateCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError(false, "Endless is running on No-data mode.");
                 return;
             }
 
             if(!(event.getClient().getOwnerId().equals(String.valueOf(Const.ARTUTO_ID))))
             {
-                event.replyError("This command is not available on a selfhosted instance!");
+                event.replyError(false, "This command is not available on a selfhosted instance!");
                 return;
             }
 
@@ -184,16 +183,17 @@ public class DonateCmd extends EndlessCommand
                     if(!(bot.ddm.hasDonated(s)))
                     {
                         bot.ddm.setDonation(s.getIdLong(), null);
-                        event.replyError("This user hasn't donated!");
+                        event.replyError(false, "This user hasn't donated!");
                     }
                     else
                     {
                         bot.ddm.setDonation(s.getIdLong(), null);
-                        event.replySuccess(String.format("Successfully removed %#s from the donators list!", s));
+                        event.replySuccess(false, String.format("Successfully removed %#s from the donators list!", s));
                     }
-                }, e -> event.replyError("Invalid ID!"));
+                }, e -> event.replyError(false, "Invalid ID!"));
             }
-            else if(list.size()>1) event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
+            else if(list.size()>1)
+                event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
             else
             {
                 user = list.get(0).getUser();
@@ -201,12 +201,12 @@ public class DonateCmd extends EndlessCommand
                 if(!(bot.ddm.hasDonated(user)))
                 {
                     bot.ddm.setDonation(user.getIdLong(), null);
-                    event.replyError("This user hasn't donated!");
+                    event.replyError(false, "This user hasn't donated!");
                 }
                 else
                 {
                     bot.ddm.setDonation(user.getIdLong(), null);
-                    event.replySuccess(String.format("Successfully removed %#s from the donators list!", user));
+                    event.replySuccess(false, String.format("Successfully removed %#s from the donators list!", user));
                 }
             }
         }

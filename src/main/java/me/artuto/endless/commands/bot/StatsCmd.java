@@ -74,18 +74,19 @@ public class StatsCmd extends EndlessCommand
 
         long audioConnections = shardManager.getGuilds().stream().filter(g -> g.getSelfMember().getVoiceState().inVoiceChannel()).count();
 
-        sb.append(Const.LINE_START).append(" Channels: **").append(channels).append("**\n")
-                .append(Const.LINE_START).append(" Guilds: **").append(guilds).append("**\n")
-                .append(Const.LINE_START).append(" Users: **").append(users).append("**\n")
-                .append(Const.LINE_START).append(" RAM Usage: **").append(usedRamMb).append("**MB / **").append(totalRamMb).append("**MB\n")
-                .append(Const.LINE_START).append(" Commands Ran: **").append(commandsRan).append("**\n")
-                .append(Const.LINE_START).append(" Last startup: ").append(FormatUtil.formatTimeFromSeconds(event.getClient().getStartTime()
-                .until(OffsetDateTime.now(), ChronoUnit.SECONDS))).append(" ago\n")
-                .append(Const.LINE_START).append(" Active Audio Connections **").append(audioConnections).append("**");
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.stats.channels")).append(": **").append(channels).append("**\n")
+                .append(Const.LINE_START).append(" ").append(event.localize("command.stats.guilds")).append(": **").append(guilds).append("**\n")
+                .append(Const.LINE_START).append(" ").append(event.localize("command.stats.users")).append(": **").append(users).append("**\n")
+                .append(Const.LINE_START).append(" ").append(event.localize("command.stats.ram")).append(": **").append(usedRamMb).append("**MB / **")
+                .append(totalRamMb).append("**MB\n")
+                .append(Const.LINE_START).append(" ").append(event.localize("command.stats.commands")).append(": **").append(commandsRan).append("**\n")
+                .append(Const.LINE_START).append(" ").append(event.localize("command.stats.startup")).append(": ")
+                .append(FormatUtil.formatTimeFromSeconds(event.getClient().getStartTime().until(OffsetDateTime.now(), ChronoUnit.SECONDS))).append(" ago\n")
+                .append(Const.LINE_START).append(" ").append(event.localize("command.stats.audioConnections")).append(": **").append(audioConnections).append("**");
 
         builder.setColor(color);
         builder.setDescription(sb);
         builder.setThumbnail(MiscUtils.getImageUrl("png", null, event.getSelfUser().getEffectiveAvatarUrl()));
-        event.reply(new MessageBuilder().setContent(Const.ENDLESS+" **Endless** Stats:").setEmbed(builder.build()).build());
+        event.reply(new MessageBuilder().setContent(Const.ENDLESS+" "+event.localize("command.stats.title")+":").setEmbed(builder.build()).build());
     }
 }

@@ -54,23 +54,23 @@ public class AboutCmd extends EndlessCommand
     @Override
     protected void executeCommand(EndlessCommandEvent event)
     {
-        Color color;
+        Color color = event.isFromType(ChannelType.PRIVATE)?Color.decode("#33ff00"):event.getGuild().getSelfMember().getColor();
 
-        if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
-        else color = event.getGuild().getSelfMember().getColor();
-
-        String title = ":information_source: Information about **"+event.getSelfUser().getName()+"**";
+        String title = event.localize("command.about.title", Const.INFO, event.getSelfUser().getName());
         EmbedBuilder builder = new EmbedBuilder();
         User owner = event.getJDA().getUserById(bot.config.getOwnerId());
         String ownername = owner.getName()+"#"+owner.getDiscriminator();
         String ownerid = owner.getId();
 
-        builder.setDescription("Hi, I'm Endless! A multipurpose bot designed to be smart.\n"+"If you found a bug please contact my dad\n"+"("+Const.DEV+")!\n");
-        builder.addField(":bust_in_silhouette: Owner:", "**"+ownername+"** (**"+ownerid+"**)", false);
-        builder.addField("<:jda:325395909347115008>  Library:", "Java Discord API (JDA) "+JDAInfo.VERSION+" and JDA Utilities "+JDAUtilitiesInfo.VERSION, false);
-        builder.addField("<:github:326118305062584321> GitHub:", "Did you found a bug? Want improve something?\n"+"Please open an Issue or create a PR on [**GitHub**](https://github.com/ArtutoGamer/Endless)", false);
-        builder.addField(":link: Support Guild:", "**[Support]("+Const.INVITE+")**\n", false);
-        builder.setFooter("Version: "+Const.VERSION+" | Latest Start", null);
+        builder.setDescription(event.localize("command.about.description"));
+        builder.addField("\uD83D\uDC64 "+event.localize("misc.owner")+":", "**"+ownername+"** (**"+ownerid+"**)", false);
+        builder.addField("<:jda:325395909347115008>  "+event.localize("misc.lib")+":", event.localize("command.about.libInfo",
+                "Java Discord API (JDA) "+JDAInfo.VERSION, "JDA Utilities "+JDAUtilitiesInfo.VERSION), false);
+        builder.addField("<:github:326118305062584321> GitHub:", event.localize("command.about.github",
+                "**[GitHub](https://github.com/EndlessBot/Endless)**"), false);
+        builder.addField("\uD83D\uDD17 "+event.localize("misc.supportGuild")+":",
+                "**["+event.localize("misc.support")+"]("+Const.INVITE+")**\n", false);
+        builder.setFooter(event.localize("command.about.footer", Const.VERSION), null);
         builder.setColor(color);
         builder.setTimestamp(event.getClient().getStartTime());
         builder.setThumbnail(event.getSelfUser().getAvatarUrl());
