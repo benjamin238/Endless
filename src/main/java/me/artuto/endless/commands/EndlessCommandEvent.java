@@ -19,7 +19,6 @@ package me.artuto.endless.commands;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
 import me.artuto.endless.Locale;
 import me.artuto.endless.core.entities.GuildSettings;
@@ -35,7 +34,6 @@ import java.util.Collections;
 
 public class EndlessCommandEvent extends CommandEvent
 {
-    private Bot bot;
     private CommandEvent event;
 
     private EndlessCommandEvent(MessageReceivedEvent event, String args, CommandClient client)
@@ -47,7 +45,6 @@ public class EndlessCommandEvent extends CommandEvent
     {
         this(event.getEvent(), event.getArgs(), event.getClient());
         this.event = event;
-        this.bot = Bot.getInstance();
     }
 
     public String localize(String s, Object... args)
@@ -126,7 +123,7 @@ public class EndlessCommandEvent extends CommandEvent
     @Override
     public void replyError(String s)
     {
-        replyError(s, Collections.EMPTY_LIST);
+        replyError(true, s, Collections.EMPTY_LIST);
     }
 
     public void replyError(String s, Object... args)
@@ -156,7 +153,7 @@ public class EndlessCommandEvent extends CommandEvent
     @Override
     public void replySuccess(String s)
     {
-        replySuccess(s, Collections.EMPTY_LIST);
+        replySuccess(true, s, Collections.EMPTY_LIST);
     }
 
     public void replySuccess(String s, Object... args)
@@ -172,7 +169,7 @@ public class EndlessCommandEvent extends CommandEvent
         event.replySuccess(s);
     }
 
-    public void replySuccess(boolean t, String s, String... args)
+    public void replySuccess(boolean t, String s, Object... args)
     {
         if(t)
         {
@@ -186,7 +183,7 @@ public class EndlessCommandEvent extends CommandEvent
     @Override
     public void replyWarning(String s)
     {
-        replyWarning(s, Collections.EMPTY_LIST);
+        replyWarning(true, s, Collections.EMPTY_LIST);
     }
 
     public void replyWarning(String s, Object... args)
