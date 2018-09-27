@@ -101,13 +101,14 @@ public class EvalCmd extends EndlessCommand
             eval = event.getArgs().replaceAll("getToken", "getSelfUser");
             Object out = engine.eval(importString+eval);
 
-            if(out == null || String.valueOf(out).isEmpty()) event.reactSuccess();
+            if(out == null || String.valueOf(out).isEmpty())
+                event.reactSuccess();
             else
-                event.replySuccess("command.eval.success", out.toString().replaceAll(event.getJDA().getToken(), "Nice try."));
+                event.replySuccess(false, String.format("Done! Output: ```%s```", out.toString().replaceAll(event.getJDA().getToken(), "Nice try.")));
         }
         catch(ScriptException e2)
         {
-            event.replyError("command.eval.error",e2);
+            event.replyError(false, String.format("Error! Output: ```%s```", e2));
         }
     }
 }
