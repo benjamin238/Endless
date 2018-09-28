@@ -256,7 +256,7 @@ public class Bot extends ListenerAdapter
                 new BotCPanelCmd(), new EvalCmd(this), new RestartShardCmd(), new ShutdownCmd(this), new StatusCmd(),
 
                 // Fun
-                new CatCmd(this), new ChooseCmd(), new DogCmd(this),
+                new CatCmd(this), new ChooseCmd(), new DogCmd(),
                 new GiphyGifCmd(this), new ProfileCmd(this), new SayCmd(), new TagCmd(this),
 
                 // Moderation
