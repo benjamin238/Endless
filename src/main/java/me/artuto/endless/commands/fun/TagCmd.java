@@ -66,7 +66,7 @@ public class TagCmd extends EndlessCommand
     {
         if(!(bot.dataEnabled))
         {
-            event.replyError("Endless is running on No-data mode.");
+            event.replyError("core.data.disabled");
             return;
         }
 
@@ -94,7 +94,7 @@ public class TagCmd extends EndlessCommand
                 tag = bot.endless.getGlobalTag(tagName);
                 if(tag==null)
                 {
-                    event.replyError("Tag \""+tagName+"\" not found.");
+                    event.replyError("command.tag.notFound", tagName);
                     return;
                 }
             }
@@ -104,19 +104,19 @@ public class TagCmd extends EndlessCommand
             tag = bot.endless.getGlobalTag(tagName);
             if(tag==null)
             {
-                event.replyError("Tag \""+tagName+"\" not found.");
+                event.replyError("command.tag.notFound", tagName);
                 return;
             }
         }
 
         if(tag.isOverriden() && tag.getContent().isEmpty())
         {
-            event.replyError("This tag has been deleted by a Server Moderator!");
+            event.replyError("command.tag.overriden");
             return;
         }
         if(tag.isNSFW() && !(MiscUtils.isNSFWAllowed(event)))
         {
-            event.replyError("This tag has been marked as NSFW! To use this tag mark this channel as NSFW or try in DMs.");
+            event.replyError("misc.tag.nsfw");
             return;
         }
 
@@ -127,7 +127,7 @@ public class TagCmd extends EndlessCommand
         if(!(tagEmbed.isEmpty()))
             event.reply(new MessageBuilder().setContent(parsed).setEmbed(tagEmbed.build()).build());
         else
-            event.reply(parsed);
+            event.reply(false, parsed);
     }
 
     private class CreateGlobalCmd extends EndlessCommand
@@ -147,7 +147,7 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
@@ -158,7 +158,7 @@ public class TagCmd extends EndlessCommand
 
             if(content.isEmpty() && msg.getAttachments().isEmpty())
             {
-                event.replyWarning("Please specify a tag name and content!");
+                event.replyWarning("command.tag.create.noContent");
                 return;
             }
             else if(!(msg.getAttachments().isEmpty()))
@@ -172,10 +172,10 @@ public class TagCmd extends EndlessCommand
             if(tag==null)
             {
                 bot.tdm.createGlobalTag(event.getAuthor().getIdLong(), content, name);
-                event.replySuccess("Tag \""+name+"\" was created successfully!");
+                event.replySuccess("command.tag.create.createdGlobal", name);
             }
             else
-                event.replyError("A tag already exists with that name!");
+                event.replyError("command.tag.create.alreadyExistant");
         }
     }
 
@@ -196,7 +196,7 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
@@ -207,7 +207,7 @@ public class TagCmd extends EndlessCommand
 
             if(content.isEmpty() && msg.getAttachments().isEmpty())
             {
-                event.replyWarning("Please specify a tag name and content!");
+                event.replyWarning("command.tag.create.noContent");
                 return;
             }
             else if(!(msg.getAttachments().isEmpty()))
@@ -221,10 +221,10 @@ public class TagCmd extends EndlessCommand
             if(tag==null)
             {
                 bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getAuthor().getIdLong(), content, name);
-                event.replySuccess("Tag `"+name+"` was created successfully!");
+                event.replySuccess("command.tag.create.createdLocal", name, event.getGuild().getName());
             }
             else
-                event.replyError("A tag already exists with that name!");
+                event.replyError("command.tag.create.alreadyExistant");
         }
     }
 
@@ -247,20 +247,21 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
+            String name = event.getArgs().trim().toLowerCase();
             if(event.isFromType(ChannelType.TEXT))
             {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
+                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), name);
 
                 if(tag == null)
                 {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
+                    tag = bot.endless.getGlobalTag(name);
                     if(tag==null)
                     {
-                        event.replyError("No tag found with the name `"+tag.getName()+"`!");
+                        event.replyError("command.tag.notFound", name);
                         return;
                     }
                 }
@@ -270,28 +271,28 @@ public class TagCmd extends EndlessCommand
                     if(tag.isGlobal())
                         bot.tdm.deleteGlobalTag(event.getArgs().trim().toLowerCase());
                     else
-                        bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
-                    event.replySuccess("Tag `"+tag.getName()+"` successfully deleted");
+                        bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), name);
+                    event.replySuccess("command.tag.delete.deleted", name);
                 }
                 else
-                    event.replyError("You aren't the owner of the tag `"+tag.getName()+"`!");
+                    event.replyError("command.tag.notOwner", name);
             }
             else
             {
-                Tag tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
+                Tag tag = bot.endless.getGlobalTag(name);
                 if(tag==null)
                 {
-                    event.replyError("No tag found with the name `"+tag.getName()+"`!");
+                    event.replyError("command.tag.notFound", name);
                     return;
                 }
 
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
-                    bot.tdm.deleteGlobalTag(event.getArgs().trim().toLowerCase());
-                    event.replySuccess("Tag "+tag.getName()+"` successfully deleted");
+                    bot.tdm.deleteGlobalTag(name);
+                    event.replySuccess("command.tag.delete.deleted", name);
                 }
                 else
-                    event.replyError("You aren't the owner of the tag`"+tag.getName()+"`!");
+                    event.replyError("command.tag.notOwner", name);
             }
         }
     }
@@ -313,7 +314,7 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
@@ -324,7 +325,7 @@ public class TagCmd extends EndlessCommand
 
             if(content.isEmpty() && msg.getAttachments().isEmpty())
             {
-                event.replyWarning("Please specify a tag name and content!");
+                event.replyWarning("command.tag.create.noContent");
                 return;
             }
             else if(!(msg.getAttachments().isEmpty()))
@@ -341,7 +342,7 @@ public class TagCmd extends EndlessCommand
                     tag = bot.endless.getGlobalTag(name);
                     if(tag==null)
                     {
-                        event.replyError("No tag found with the name `"+tag.getName()+"`!");
+                        event.replyError("command.tag.notFound", name);
                         return;
                     }
                 }
@@ -352,17 +353,17 @@ public class TagCmd extends EndlessCommand
                         bot.tdm.updateGlobalTagContent(name, content);
                     else
                         bot.tdm.updateLocalTagContent(event.getGuild().getIdLong(), name, content);
-                    event.replySuccess("Tag `"+tag.getName()+"` successfully edited!");
+                    event.replySuccess("command.tag.edit.edited", name);
                 }
                 else
-                    event.replyError("You aren't the owner of the tag `"+tag.getName()+"`!");
+                    event.replyError("command.tag.notOwner", name);
             }
             else
             {
                 Tag tag = bot.endless.getGlobalTag(name);
                 if(tag==null)
                 {
-                    event.replyError("No tag found with that name!");
+                    event.replyError("command.tag.notFound", name);
                     return;
                 }
 
@@ -372,10 +373,10 @@ public class TagCmd extends EndlessCommand
                 if(tag.getOwnerId()==event.getAuthor().getIdLong() || event.isOwner())
                 {
                     bot.tdm.updateGlobalTagContent(name, content);
-                    event.replySuccess("Tag `"+tag.getName()+"` successfully edited!");
+                    event.replySuccess("command.tag.edit.edited", name);
                 }
                 else
-                    event.replyError("You aren't the owner of the tag `"+tag.getName()+"`!");
+                    event.replyError("command.tag.notOwner", name);
             }
         }
     }
@@ -403,7 +404,7 @@ public class TagCmd extends EndlessCommand
             if(!(tagEmbed.isEmpty()))
                 event.reply(new MessageBuilder().setContent(parsed).setEmbed(tagEmbed.build()).build());
             else
-                event.reply(parsed);
+                event.reply(false, parsed);
         }
     }
 
@@ -425,30 +426,31 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
+            String name = event.getArgs().trim().toLowerCase();
             if(event.isFromType(ChannelType.TEXT))
             {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
+                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), name);
 
                 if(tag==null)
                 {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
+                    tag = bot.endless.getGlobalTag(name);
                     if(tag==null)
                     {
-                        event.replyError("No tag found with that name!");
+                        event.replyError("command.tag.notFound", name);
                         return;
                     }
                 }
 
                 if(bot.tdm.isImported(event.getGuild().getIdLong(), String.valueOf(tag.getId())))
-                    event.replyError("The tag `"+tag.getName()+"` is already imported!");
+                    event.replyError("command.tag.import.alreadyImported", name);
                 else
                 {
                     bot.tdm.importTag(event.getGuild().getIdLong(), tag);
-                    event.replySuccess("Successfully imported tag `"+tag.getName()+"`!");
+                    event.replySuccess("command.tag.import.imported", name);
                 }
             }
         }
@@ -472,7 +474,7 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
@@ -496,26 +498,26 @@ public class TagCmd extends EndlessCommand
 
                 if(!(globalTags.isEmpty()))
                 {
-                    sb.append("\n").append(event.getClient().getSuccess()).append(" **").append(globalTags.size()).append("** tags owned by **")
-                            .append(user.getName()).append("**:\n");
+                    sb.append("\n").append(event.getClient().getSuccess()).append(" **").append(globalTags.size()).append("** ")
+                            .append(event.localize("command.tag.list.global", user.getName())).append("\n");
                     globalTags.forEach(t -> sb.append(t.getName()).append(" "));
                 }
                 if(!(localTags.isEmpty()))
                 {
-                    sb.append("\n").append(event.getClient().getSuccess()).append(" **").append(localTags.size()).append("** tags in **")
-                            .append(event.getGuild().getName()).append("**:\n");
+                    sb.append("\n").append(event.getClient().getSuccess()).append(" **").append(localTags.size()).append("** ")
+                            .append(event.localize("command.tag.list.local", event.getGuild().getName())).append("\n");
                     localTags.forEach(t -> sb.append(t.getName()).append(" "));
                 }
 
                 if(sb.toString().isEmpty())
                 {
                     if(user==event.getAuthor())
-                        event.replyWarning("You don't own any tag!");
+                        event.replyWarning("command.tag.list.none");
                     else
-                        event.replyWarning("**"+user.getName()+"#"+user.getDiscriminator()+"** doesn't own any tag!");
+                        event.replyWarning("command.tag.list.none.other", user.getName()+"#"+user.getDiscriminator());
                     return;
                 }
-                event.reply(sb.toString());
+                event.reply(false, sb.toString());
             }
             else
             {
@@ -525,17 +527,17 @@ public class TagCmd extends EndlessCommand
 
                 if(!(globalTags.isEmpty()))
                 {
-                    sb.append(event.getClient().getSuccess()).append(" **").append(globalTags.size()).append("** tags owned by **")
-                            .append(user.getName()).append("**:\n");
+                    sb.append(event.getClient().getSuccess()).append(" **").append(globalTags.size()).append("** ")
+                            .append(event.localize("command.tag.list.global", user.getName())).append("\n");
                     globalTags.forEach(t -> sb.append(t.getName()).append(" "));
                 }
 
                 if(sb.toString().isEmpty())
                 {
-                    event.replyWarning("You don't own any tag!");
+                    event.replyWarning("command.tag.list.none");
                     return;
                 }
-                event.reply(sb.toString());
+                event.reply(false, sb.toString());
             }
         }
 
@@ -607,7 +609,7 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
@@ -618,7 +620,7 @@ public class TagCmd extends EndlessCommand
 
             if(content.isEmpty() && msg.getAttachments().isEmpty())
             {
-                event.replyWarning("Please specify a tag name and content!");
+                event.replyWarning("command.tag.create.noContent");
                 return;
             }
             else if(!(msg.getAttachments().isEmpty()))
@@ -633,7 +635,7 @@ public class TagCmd extends EndlessCommand
                 tag = bot.endless.getGlobalTag(name);
                 if(tag==null)
                 {
-                    event.replyError("No tag found with the name `"+tag.getName()+"`!");
+                    event.replyError("command.tag.notFound", name);
                     return;
                 }
             }
@@ -644,7 +646,7 @@ public class TagCmd extends EndlessCommand
             if(tag.isOverriden())
             {
                 bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), name);
-                event.replySuccess("Succesfully deleted local tag `"+tag.getName()+"`");
+                event.replySuccess("command.tag.delete.deleted", name);
             }
             else
             {
@@ -654,7 +656,7 @@ public class TagCmd extends EndlessCommand
                         bot.tdm.createLocalTag(true, event.getGuild().getIdLong(), event.getGuild().getIdLong(), "", name);
                     else
                         bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getGuild().getIdLong(), content, name);
-                    event.replySuccess("Successfully overriden global tag `"+tag.getName()+"`");
+                    event.replySuccess("command.tag.override.overriden", name);
                 }
                 else
                 {
@@ -665,7 +667,7 @@ public class TagCmd extends EndlessCommand
                         bot.tdm.deleteLocalTag(event.getGuild().getIdLong(), name);
                         bot.tdm.createLocalTag(event.getGuild().getIdLong(), event.getGuild().getIdLong(), content, name);
                     }
-                    event.replySuccess("Successfully overriden local tag `"+tag.getName()+"`");
+                    event.replySuccess("command.tag.override.overriden", name);
                 }
             }
         }
@@ -689,43 +691,43 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
+            String name = event.getArgs().trim().toLowerCase();
             if(event.isFromType(ChannelType.TEXT))
             {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
+                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), name);
                 if(tag==null)
                 {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
+                    tag = bot.endless.getGlobalTag(name);
                     if(tag==null)
                     {
-                        event.replyError("No tag found with that name!");
+                        event.replyError("command.tag.notFound", name);
                         return;
                     }
                 }
-                Tag fTag = tag;
                 if(tag.getOwnerId()==event.getGuild().getIdLong())
+                    event.reply("command.tag.owner.server", name, event.getGuild().getName());
+                else
                 {
-                    event.reply("The owner of the tag `"+tag.getName()+"` is the server *("+event.getGuild().getName()+")*");
-                    return;
+                    event.getJDA().asBot().getShardManager().retrieveUserById(tag.getOwnerId()).queue(user -> event.reply("command.tag.owner.user",
+                            name, user.getName()+"#"+user.getDiscriminator(), user.getId()),
+                            e -> event.reply("command.tag.owner.user.unknown", name));
                 }
-                event.getJDA().retrieveUserById(tag.getOwnerId()).queue(user -> event.reply("The owner of the tag `"+fTag.getName()+
-                        "` is **"+user.getName()+"#"+user.getDiscriminator()+
-                        "** (ID: **"+user.getId()+"**)"), e -> event.reply("The owner of the tag `"+fTag.getName()+"` is **Unknown**."));
             }
             else
             {
-                Tag tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
+                Tag tag = bot.endless.getGlobalTag(name);
                 if(tag==null)
                 {
-                    event.replyError("No tag found with that name!");
+                    event.replyError("command.tag.notFound", name);
                     return;
                 }
-                event.getJDA().retrieveUserById(tag.getOwnerId()).queue(user -> event.reply("The owner of the tag `"+tag.getName()+
-                        "` is **"+user.getName()+"#"+user.getDiscriminator()+
-                        "** (ID: **"+user.getId()+"**)"), e -> event.reply("The owner of the tag `"+tag.getName()+"` is **Unknown** (ID: `"+tag.getOwnerId()+"`)."));
+                event.getJDA().asBot().getShardManager().retrieveUserById(tag.getOwnerId()).queue(user -> event.reply("command.tag.owner.user",
+                        name, user.getName()+"#"+user.getDiscriminator(), user.getId()),
+                        e -> event.reply("command.tag.owner.user.unknown", name));
             }
         }
     }
@@ -748,7 +750,7 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
@@ -761,12 +763,12 @@ public class TagCmd extends EndlessCommand
                     tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
                     if(tag==null)
                     {
-                        event.replyError("No tag found with that name!");
+                        event.replyError("command.tag.notFound", name);
                         return;
                     }
                 }
 
-                event.reply("```"+tag.getContent()+"```");
+                event.reply(false, "```"+tag.getContent()+"```");
             }
             else
             {
@@ -774,11 +776,11 @@ public class TagCmd extends EndlessCommand
 
                 if(tag==null)
                 {
-                    event.replyError("No tag found with that name!");
+                    event.replyError("command.tag.notFound", name);
                     return;
                 }
 
-                event.reply("```"+tag.getContent()+"```");
+                event.reply(false, "```"+tag.getContent()+"```");
             }
         }
     }
@@ -801,7 +803,7 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
@@ -814,12 +816,12 @@ public class TagCmd extends EndlessCommand
                     tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
                     if(tag==null)
                     {
-                        event.replyError("No tag found with that name!");
+                        event.replyError("command.tag.notFound", name);
                         return;
                     }
                 }
 
-                event.reply("```"+tag.getContent()+"```");
+                event.reply(false, "```"+tag.getContent()+"```");
             }
             else
             {
@@ -827,11 +829,11 @@ public class TagCmd extends EndlessCommand
 
                 if(tag==null)
                 {
-                    event.replyError("No tag found with that name!");
+                    event.replyError("command.tag.notFound", name);
                     return;
                 }
 
-                event.reply("```"+tag.getContent()+"```");
+                event.reply(false, "```"+tag.getContent()+"```");
             }
         }
     }
@@ -854,30 +856,31 @@ public class TagCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
+            String name = event.getArgs().trim().toLowerCase();
             if(event.isFromType(ChannelType.TEXT))
             {
-                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), event.getArgs().trim().toLowerCase());
+                Tag tag = bot.endless.getLocalTag(event.getGuild().getIdLong(), name);
 
                 if(tag==null)
                 {
-                    tag = bot.endless.getGlobalTag(event.getArgs().trim().toLowerCase());
+                    tag = bot.endless.getGlobalTag(name);
                     if(tag==null)
                     {
-                        event.replyError("No tag found with that name!");
+                        event.replyError("command.tag.notFound", name);
                         return;
                     }
                 }
 
                 if(!(bot.tdm.isImported(event.getGuild().getIdLong(), String.valueOf(tag.getId()))))
-                    event.replyError("The tag `"+tag.getName()+"` isn't imported!");
+                    event.replyError("command.tag.unimport.notImported", name);
                 else
                 {
                     bot.tdm.unImportTag(event.getGuild().getIdLong(), tag);
-                    event.replySuccess("Successfully unimported tag `"+tag.getName()+"`!");
+                    event.replySuccess("command.tag.unimport.unimported", name);
                 }
             }
         }

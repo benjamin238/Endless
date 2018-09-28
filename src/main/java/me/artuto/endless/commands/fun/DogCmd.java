@@ -17,32 +17,21 @@
 
 package me.artuto.endless.commands.fun;
 
-import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.IOUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.io.IOException;
 
 public class DogCmd extends EndlessCommand
 {
-    private final Logger LOG = LoggerFactory.getLogger("Dog Image Command");
-    private Bot bot;
-
-    public DogCmd(Bot bot)
+    public DogCmd()
     {
-        this.bot = bot;
         this.name = "dog";
         this.help = "Displays a cute pupper.";
         this.category = Categories.FUN;
@@ -56,36 +45,28 @@ public class DogCmd extends EndlessCommand
     @Override
     protected void executeCommand(EndlessCommandEvent event)
     {
-        try
+        Color color;
+
+        if(event.isFromType(ChannelType.PRIVATE))
+            color = Color.decode("#33ff00");
+        else
+            color = event.getMember().getColor();
+
+        EmbedBuilder builder = new EmbedBuilder();
+        JSONObject json = IOUtils.makeGETRequest(null, "https://random.dog/woof.json");
+        if(json==null)
         {
-            Color color;
-
-            if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
-            else color = event.getMember().getColor();
-
-            EmbedBuilder builder = new EmbedBuilder();
-            OkHttpClient client = new OkHttpClient();
-            Request req = new Request.Builder().url("https://random.dog/woof.json").get().build();
-            Response res = client.newCall(req).execute();
-            if(!res.isSuccessful()) throw new RuntimeException("Error while fetching remote resource");
-            ResponseBody body = res.body();
-            String data = body.string();
-            JSONObject json = new JSONObject(data);
-            String cat = json.getString("url");
-
-            builder.setAuthor("Requested by "+event.getAuthor().getName(), null, event.getAuthor().getEffectiveAvatarUrl());
-            builder.setImage(cat);
-            builder.setFooter("Image provided by random.dog API", null);
-            builder.setColor(color);
-
-            event.reply(builder.build());
+            event.replyError("core.error.retrievingImage");
+            return;
         }
-        catch(IOException|RuntimeException e)
-        {
-            event.replyError("An error was thrown when getting the image! Ask the Owner to check the Console.");
-            LOG.error(e.getMessage());
 
-            if(bot.config.isDebugEnabled()) e.printStackTrace();
-        }
+        String cat = json.getString("url");
+
+        builder.setAuthor(event.localize("misc.requestedBy", event.getAuthor().getName()), null, event.getAuthor().getEffectiveAvatarUrl());
+        builder.setImage(cat);
+        builder.setFooter(event.localize("misc.imageProvided", "random.dog API"), null);
+        builder.setColor(color);
+
+        event.reply(builder.build());
     }
 }

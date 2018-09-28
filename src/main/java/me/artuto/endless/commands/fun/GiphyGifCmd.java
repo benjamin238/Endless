@@ -65,64 +65,34 @@ public class GiphyGifCmd extends EndlessCommand
 
         if(bot.config.getGihpyKey().isEmpty())
         {
-            event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
-            LOG.warn("Someone triggered the Giphy command, but there isn't a key in the config file. In order to stop this message add a key to the config file.");
+            event.replyError(false, "This command has been disabled due a missing parameter on the config file, ask the Owner to check the Console");
+            LOG.warn("Someone triggered the Giphy command, but there isn't a key in the config file.");
             return;
         }
 
-        try
+        SimpleGiphy.setApiKey(bot.config.getGihpyKey());
+        GiphyListResponse r;
+        String title;
+
+        if(args.isEmpty())
         {
-            SimpleGiphy.setApiKey(bot.config.getGihpyKey());
-            GiphyListResponse r;
-            EmbedBuilder builder = new EmbedBuilder();
-            String title;
-
-            Color color;
-
-            if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
-            else color = event.getMember().getColor();
-
-            if(args.isEmpty())
-            {
-                title = "<:giphy:373675520099090436> Trending GIF:";
-                r = SimpleGiphy.getInstance().trending("50", "pg-13");
-                List<Giphy> list = r.getData();
-                if(list.isEmpty()) event.replyWarning("No results found!");
-                else
-                {
-                    Integer rand = new Random().nextInt(list.size());
-                    Giphy gif = r.getData().get(rand);
-
-                    builder.setImage(gif.getImages().getOriginal().getUrl());
-                    builder.setFooter("GIF provided by Giphy API", "https://cdn.discordapp.com/attachments/304027425509998593/373674151472267265/Poweredby_640px_Badge.gif");
-                    builder.setColor(color);
-
-                    event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
-                }
-            }
+            title = "<:giphy:373675520099090436> "+event.localize("command.giphy.trendingGif");
+            r = SimpleGiphy.getInstance().trending("50", "pg-13");
+            List<Giphy> list = r.getData();
+            if(list.isEmpty())
+                event.replyWarning("misc.noResults");
             else
-            {
-                title = "<:giphy:373675520099090436> Results for `"+args+"`:";
-                r = SimpleGiphy.getInstance().search(args, "50", "0", "pg-13");
-                List<Giphy> list = r.getData();
-                if(list.isEmpty()) event.replyWarning("No results found!");
-                else
-                {
-                    Integer rand = new Random().nextInt(list.size());
-                    Giphy gif = r.getData().get(rand);
-
-                    builder.setImage(gif.getImages().getOriginal().getUrl());
-                    builder.setFooter("GIF provided by Giphy API", "https://cdn.discordapp.com/attachments/304027425509998593/373674151472267265/Poweredby_640px_Badge.gif");
-                    builder.setColor(color);
-
-                    event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
-                }
-            }
+                send(event, r, list, title);
         }
-        catch(Exception e)
+        else
         {
-            event.replyError("An error was thrown when getting a gif! Ask the Owner to check the Console.");
-            LOG.error(e.getMessage());
+            title = "<:giphy:373675520099090436> "+event.localize("command.giphy.results", args);
+            r = SimpleGiphy.getInstance().search(args, "50", "0", "pg-13");
+            List<Giphy> list = r.getData();
+            if(list.isEmpty())
+                event.replyWarning("misc.noResults");
+            else
+                send(event, r, list, title);
         }
     }
 
@@ -146,16 +116,12 @@ public class GiphyGifCmd extends EndlessCommand
 
             if(bot.config.getGihpyKey().isEmpty())
             {
-                event.replyError("This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
-                LOG.warn("Someone triggered the Giphy command, but there isn't a key in the config file. In order to stop this message add a key to the config file.");
+                event.replyError(false, "This command has been disabled due a faulty parameter on the config file, ask the Owner to check the Console");
+                LOG.warn("Someone triggered the Giphy command, but there isn't a key in the config file.");
                 return;
             }
 
-            Color color;
-
-            if(event.isFromType(ChannelType.PRIVATE)) color = Color.decode("#33ff00");
-            else color = event.getMember().getColor();
-
+            Color color = event.isFromType(ChannelType.PRIVATE)?Color.decode("#33ff00"):event.getMember().getColor();
             SimpleGiphy.setApiKey(bot.config.getGihpyKey());
             RandomGiphyResponse r;
             EmbedBuilder builder = new EmbedBuilder();
@@ -164,11 +130,24 @@ public class GiphyGifCmd extends EndlessCommand
             RandomGiphy gif = r.getRandomGiphy();
 
             builder.setImage(gif.getImageOriginalUrl());
-            builder.setFooter("GIF provided by Giphy API", "https://cdn.discordapp.com/attachments/304027425509998593/373674151472267265/Poweredby_640px_Badge.gif");
+            builder.setFooter(event.localize("command.giphy.poweredBy"), "https://cdn.discordapp.com/emojis/494992435756400680.gif");
             builder.setColor(color);
 
             event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
         }
     }
 
+    private void send(EndlessCommandEvent event, GiphyListResponse r, List<Giphy> list, String title)
+    {
+        Color color = event.isFromType(ChannelType.PRIVATE)?Color.decode("#33ff00"):event.getMember().getColor();
+        EmbedBuilder builder = new EmbedBuilder();
+        Integer rand = new Random().nextInt(list.size());
+        Giphy gif = r.getData().get(rand);
+
+        builder.setImage(gif.getImages().getOriginal().getUrl());
+        builder.setFooter(event.localize("command.giphy.poweredBy"), "https://cdn.discordapp.com/emojis/494992435756400680.gif");
+        builder.setColor(color);
+
+        event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
+    }
 }

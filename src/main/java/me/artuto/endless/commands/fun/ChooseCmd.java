@@ -44,8 +44,8 @@ public class ChooseCmd extends EndlessCommand
         String[] options = event.getArgs().split("\\s+");
 
         if(options.length==1)
-            event.replyWarning("You only gave me one option: `"+options[0]+"`");
+            event.replyWarning("command.choose.onlyOneOption", options[0]);
         else
-            event.reply("I choose `"+options[(int) (Math.random()*options.length)]+"`");
+            event.reply("command.choose.chosen", options[(int) (Math.random()*options.length)]);
     }
 }

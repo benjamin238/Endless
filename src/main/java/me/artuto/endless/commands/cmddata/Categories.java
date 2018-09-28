@@ -20,6 +20,7 @@ package me.artuto.endless.commands.cmddata;
 import com.jagrosh.jdautilities.command.Command.Category;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.handlers.BlacklistHandler;
 import me.artuto.endless.handlers.IgnoreHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
@@ -50,7 +51,7 @@ public class Categories
     public static final Category SERVER_CONFIG = new Category("Guild Settings", event -> {
         if(!(Bot.getInstance().dataEnabled))
         {
-            event.replyError("Endless is running on No-data mode.");
+            ((EndlessCommandEvent)event).replyError(true, "core.data.disabled");
             return false;
         }
 

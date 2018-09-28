@@ -18,7 +18,6 @@
 package me.artuto.endless.commands.fun;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.jagrosh.jdautilities.menu.Paginator;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
@@ -27,7 +26,7 @@ import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.Profile;
 import me.artuto.endless.core.entities.impl.ProfileImpl;
-import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -36,7 +35,6 @@ import net.dv8tion.jda.core.exceptions.PermissionException;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ProfileCmd extends EndlessCommand
@@ -61,7 +59,7 @@ public class ProfileCmd extends EndlessCommand
     {
         if(!(bot.dataEnabled))
         {
-            event.replyError("Endless is running on No-data mode.");
+            event.replyError("core.data.disabled");
             return;
         }
 
@@ -69,56 +67,36 @@ public class ProfileCmd extends EndlessCommand
         MessageBuilder messageBuilder = new MessageBuilder();
         Profile p;
         User user;
+
         if(event.getArgs().isEmpty())
-        {
             user = event.getAuthor();
-            if(!(bot.prdm.hasProfile(user)))
-            {
-                event.replyError("You don't have a profile!");
-                return;
-            }
-            p = bot.prdm.getProfile(user);
-            if(p.isEmpty())
-            {
-                event.replyError("You don't have a profile!");
-                return;
-            }
-            builder.setColor(event.getMember().getColor());
-            builder.setDescription(buildProfile(p, user));
-            messageBuilder.setContent(Const.INFO+" **"+user.getName()+"#"+user.getDiscriminator()+"**'s profile:");
-            event.reply(messageBuilder.setEmbed(builder.build()).build());
-        }
         else
+            user = ArgsUtils.findUser(false, event, event.getArgs());
+        if(user==null)
+            return;
+
+        if(!(bot.prdm.hasProfile(user)))
         {
-            List<Member> list = FinderUtil.findMembers(event.getArgs(), event.getGuild());
-            if(list.isEmpty())
-            {
-                event.replyWarning("No Members found matching \""+event.getArgs()+"\"");
-                return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
-                return;
-            }
+            if(user.equals(event.getAuthor()))
+                event.replyError("command.profile.nonExistant");
             else
-                user = list.get(0).getUser();
-            if(!(bot.prdm.hasProfile(user)))
-            {
-                event.replyError("**"+user.getName()+"#"+user.getDiscriminator()+"** doesn't has a profile!");
-                return;
-            }
-            p = bot.prdm.getProfile(user);
-            if(p.isEmpty())
-            {
-                event.replyError("**"+user.getName()+"#"+user.getDiscriminator()+"** doesn't has a profile!");
-                return;
-            }
-            builder.setColor(event.getMember().getColor());
-            builder.setDescription(buildProfile(p, user));
-            messageBuilder.setContent(Const.INFO+" **"+user.getName()+"#"+user.getDiscriminator()+"**'s profile:");
-            event.reply(messageBuilder.setEmbed(builder.build()).build());
+                event.replyError("command.profile.nonExistant.other", user.getName()+"#"+user.getDiscriminator());
+            return;
         }
+        p = bot.prdm.getProfile(user);
+        if(p.isEmpty())
+        {
+            if(user.equals(event.getAuthor()))
+                event.replyError("command.profile.nonExistant");
+            else
+                event.replyError("command.profile.nonExistant.other", user.getName()+"#"+user.getDiscriminator());
+            return;
+        }
+
+        builder.setColor(event.getMember().getColor());
+        builder.setDescription(buildProfile(event, p, user));
+        messageBuilder.setContent(Const.INFO+" "+event.localize("command.profile.of", user.getName()+"#"+user.getDiscriminator()));
+        event.reply(messageBuilder.setEmbed(builder.build()).build());
     }
 
     private class FieldsCmd extends EndlessCommand
@@ -138,13 +116,8 @@ public class ProfileCmd extends EndlessCommand
                     .waitOnSinglePage(false)
                     .useNumberedItems(false)
                     .setFinalAction(m -> {
-                        try
-                        {
-                            m.clearReactions().queue();
-                        } catch(PermissionException ex)
-                        {
-                            m.delete().queue();
-                        }
+                        try {m.clearReactions().queue();}
+                        catch(PermissionException ex) {m.delete().queue();}
                     })
                     .setEventWaiter(bot.waiter)
                     .setTimeout(1, TimeUnit.MINUTES);
@@ -156,7 +129,7 @@ public class ProfileCmd extends EndlessCommand
             menu.clearItems();
             Arrays.stream(Const.PROFILE_FIELDS).forEach(menu::addItems);
             Paginator p = menu.setColor(event.isFromType(ChannelType.TEXT)?event.getSelfMember().getColor():Color.decode("#33ff00"))
-                    .setText(event.getClient().getSuccess()+" Valid profile fields")
+                    .setText(event.getClient().getSuccess()+" "+event.localize("command.profile.fields.validFields"))
                     .setUsers(event.getAuthor())
                     .build();
             p.paginate(event.getChannel(), 1);
@@ -179,42 +152,30 @@ public class ProfileCmd extends EndlessCommand
         {
             if(!(bot.dataEnabled))
             {
-                event.replyError("Endless is running on No-data mode.");
+                event.replyError("core.data.disabled");
                 return;
             }
 
-            String[] args = splitArgs(event.getArgs());
+            String[] args = ArgsUtils.split(2, event.getArgs());
             String field = getField(args[0]);
             String value = args[1];
             if(value.isEmpty())
             {
-                event.replyError("Invalid input for the value!");
+                event.replyError("command.profile.set.invalidInput");
                 return;
             }
             if(field==null)
             {
-                event.replyError("The field `"+args[0]+"` is invalid!");
+                event.replyError("command.profile.set.invalidField");
                 return;
             }
+
             bot.prdm.setValue(event.getAuthor(), field, value);
-            event.replySuccess("Successfully set `"+field+"`.");
+            event.replySuccess("command.profile.set.set", field);
         }
     }
 
-    private String[] splitArgs(String preArgs)
-    {
-        try
-        {
-            String[] args = preArgs.split(" ", 2);
-            return new String[]{args[0].toLowerCase().trim(), args[1].trim()};
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            return new String[]{preArgs.toLowerCase().trim(), ""};
-        }
-    }
-
-    private String buildProfile(Profile p, User user)
+    private String buildProfile(EndlessCommandEvent event, Profile p, User user)
     {
         StringBuilder sb = new StringBuilder();
         ((ProfileImpl)p).fields.forEach((f, v) -> {
@@ -227,10 +188,10 @@ public class ProfileCmd extends EndlessCommand
             Member m = guild.getMember(user);
             Role role = m.getRoles().stream().filter(r -> r.getIdLong()==318524910894841857L).findFirst().orElse(null);
             if(!(role==null))
-                sb.append("\n_ _\n:money_mouth: Donator");
+                sb.append("\n_ _\n:money_mouth: ").append(event.localize("misc.donator"));
         }
         if(user.getIdLong()==Const.ARTUTO_ID || user.getIdLong()==Const.ARTUTO_ALT_ID)
-            sb.append("\n_ _\n").append(Const.BOTADM).append(" Endless Developer");
+            sb.append("\n_ _\n").append(Const.BOTADM).append(" ").append(event.localize("misc.dev"));
         return sb.toString();
     }
 

@@ -38,6 +38,6 @@ public class SayCmd extends EndlessCommand
     @Override
     protected void executeCommand(EndlessCommandEvent event)
     {
-        event.reply(event.getArgs());
+        event.reply(false, event.getArgs());
     }
 }
