@@ -59,17 +59,22 @@ public class PunishmentsDataManager
     {
         try
         {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS",
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS WHERE user_id = ? AND guild_id = ?",
                     ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user);
+            statement.setLong(2, guild);
             statement.closeOnCompletion();
 
             try(ResultSet results = statement.executeQuery())
             {
-                results.moveToInsertRow();
-                results.updateLong("user_id", user);
-                results.updateLong("guild_id", guild);
-                results.updateString("type", type.name());
-                results.insertRow();
+                if(!(results.next()))
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("user_id", user);
+                    results.updateLong("guild_id", guild);
+                    results.updateString("type", type.name());
+                    results.insertRow();
+                }
             }
         }
         catch(SQLException e)
@@ -105,18 +110,24 @@ public class PunishmentsDataManager
     {
         try
         {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS",
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM PUNISHMENTS WHERE user_id = ? AND guild_id = ? AND type = ?",
                     ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            statement.setLong(1, user);
+            statement.setLong(2, guild);
+            statement.setString(3, type.name());
             statement.closeOnCompletion();
 
             try(ResultSet results = statement.executeQuery())
             {
-                results.moveToInsertRow();
-                results.updateLong("user_id", user);
-                results.updateLong("guild_id", guild);
-                results.updateLong("time", time);
-                results.updateString("type", type.name());
-                results.insertRow();
+                if(!(results.next()))
+                {
+                    results.moveToInsertRow();
+                    results.updateLong("user_id", user);
+                    results.updateLong("guild_id", guild);
+                    results.updateLong("time", time);
+                    results.updateString("type", type.name());
+                    results.insertRow();
+                }
             }
         }
         catch(SQLException e)
