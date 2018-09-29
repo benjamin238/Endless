@@ -28,6 +28,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.time.OffsetDateTime;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
  * @author Artuto
  */
 
-public class DiscordJagTag
+public class JagTag
 {
     public static Collection<Method> getMethods()
     {
@@ -262,6 +263,22 @@ public class DiscordJagTag
                             User u = env.get("user");
                             return findEmote(u.getJDA(), args).getAsMention();
                     }
+                }),
+                // Repeat
+                new Method("repeat", (env) -> "", (env, in) -> {
+                    if(in[0].isEmpty())
+                        return "";
+                    String toRepeat = in[0];
+                    int times;
+                    if(in.length==2)
+                    {
+                        try {times = Integer.parseInt(in[1]);}
+                        catch(NumberFormatException ignored) {times=1;}
+                    }
+                    else
+                        times = 1;
+
+                    return StringUtils.repeat(toRepeat, times);
                 }));
     }
 

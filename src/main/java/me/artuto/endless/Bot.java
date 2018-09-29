@@ -45,7 +45,7 @@ import me.artuto.endless.core.exceptions.ConfigException;
 import me.artuto.endless.handlers.BlacklistHandler;
 import me.artuto.endless.handlers.IgnoreHandler;
 import me.artuto.endless.handlers.SpecialCaseHandler;
-import me.artuto.endless.libraries.DiscordJagTag;
+import me.artuto.endless.libraries.JagTag;
 import me.artuto.endless.loader.Config;
 import me.artuto.endless.logging.BotLogging;
 import me.artuto.endless.logging.ModLogging;
@@ -127,7 +127,7 @@ public class Bot extends ListenerAdapter
     private final Logger CONFIGLOG = (Logger)LoggerFactory.getLogger("Config Loader");
 
     // Other
-    public static final Parser tagParser = new ParserBuilder().addMethods(DiscordJagTag.getMethods())
+    public static final Parser tagParser = new ParserBuilder().addMethods(JagTag.getMethods())
             .addMethods(Arguments.getMethods()).addMethods(Functional.getMethods()).addMethods(Miscellaneous.getMethods())
             .addMethods(Strings.getMethods()).addMethods(Time.getMethods()).addMethods(Variables.getMethods())
             .setMaxOutput(2000).setMaxIterations(1000).build();
