@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -163,7 +164,7 @@ public class JagTag
                         return user.getName();
                     return online.get((int)(online.size()*Math.random())).getUser().getName();
                 }),
-                new Method("", (env) -> {
+                new Method("randchannel", (env) -> {
                     Guild guild = env.get("guild");
                     MessageChannel channel = env.get("channel");
                     if(guild==null)
@@ -190,6 +191,9 @@ public class JagTag
                 new Method("field", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
                     String[] parts = in[0].split("\\|",3);
+                    if(parts.length<2)
+                        throw new ParseException("Please specify a field name and content!");
+
                     eb.addField(parts[0], parts[1], parts.length>2 ? parts[2].equalsIgnoreCase("true") : true);
                     return "";}),
                 new Method("image", (env, in) -> {
@@ -220,7 +224,11 @@ public class JagTag
                         case "blurple": eb.setColor(Color.decode("#7289DA")); break;
                         case "greyple": eb.setColor(Color.decode("#99AAB5")); break;
                         case "darktheme": eb.setColor(Color.decode("#2C2F33")); break;
-                        default: eb.setColor(Color.decode(in[0]));
+                        default:
+                            Color color;
+                            try {color = Color.decode(in[0]);}
+                            catch(NumberFormatException ignored) {throw new ParseException("Could not parse the specified color code!");}
+                            eb.setColor(color);
                     }
                     return "";}),
                 new Method("description", (env, in) -> {
@@ -237,7 +245,11 @@ public class JagTag
                     eb.setTimestamp(OffsetDateTime.now());
                     return "";}, (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
-                    eb.setTimestamp(OffsetDateTime.parse(in[0]));
+                    OffsetDateTime time;
+
+                    try {time = OffsetDateTime.parse(in[0]);}
+                    catch(DateTimeParseException ignored) {throw new ParseException("Could not parse the specified timestamp!");}
+                    eb.setTimestamp(time);
                     return "";}),
                 // Emote
                 new Method("emote", (env) -> "", (env, in) -> {
