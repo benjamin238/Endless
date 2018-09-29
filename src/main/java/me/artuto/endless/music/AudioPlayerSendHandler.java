@@ -105,7 +105,7 @@ public class AudioPlayerSendHandler extends AudioEventAdapter implements AudioSe
             {
                 QueuedTrack qt = queue.pull();
                 requester = qt.getOwner();
-                player.playTrack(qt.getTrack());
+                player.playTrack(qt.getTrack().makeClone());
             }
             else
             {
