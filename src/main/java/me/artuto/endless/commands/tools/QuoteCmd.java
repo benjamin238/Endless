@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -58,17 +59,12 @@ public class QuoteCmd extends EndlessCommand
         String message;
         String textChannel;
 
-        try
-        {
-            String[] args = event.getArgs().split(" ", 2);
-            message = args[0].trim();
-            textChannel = args[1];
-        }
-        catch(IndexOutOfBoundsException e)
-        {
-            message = event.getArgs().trim();
+        String[] args = ArgsUtils.split(2, event.getArgs());
+        message = args[0].trim();
+        if(args[1].isEmpty())
             textChannel = event.getTextChannel().getId();
-        }
+        else
+            textChannel = args[1];
 
         List<TextChannel> tList = FinderUtil.findTextChannels(textChannel, event.getJDA());
 
@@ -82,7 +78,8 @@ public class QuoteCmd extends EndlessCommand
             event.replyWarning(FormatUtil.listOfTcChannels(tList, event.getArgs()));
             return;
         }
-        else tc = tList.get(0);
+        else
+            tc = tList.get(0);
 
         if(!(ChecksUtil.hasPermission(tc.getGuild().getMember(event.getSelfUser()), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
         {
@@ -90,18 +87,26 @@ public class QuoteCmd extends EndlessCommand
             return;
         }
 
-        if(!(tc.getGuild().getMember(event.getAuthor())==null) && !(ChecksUtil.hasPermission(tc.getGuild().getMember(event.getAuthor()), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
+        if(!(tc.getGuild().getMember(event.getAuthor())==null) && !(ChecksUtil.hasPermission(tc.getGuild().getMember(event.getAuthor()), tc,
+                Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
         {
             event.replyError("You can't see that channel or you don't have Read Message History permission on it!");
             return;
         }
 
-        final String id = message;
+        long id;
+        try {id = Long.parseLong(message);}
+        catch(NumberFormatException ignored)
+        {
+            event.replyError("The message ID you provided is not a valid ID!");
+            return;
+        }
 
-        tc.getMessageById(message).queue(msg -> {
+        tc.getMessageById(id).queue(msg -> {
             EmbedBuilder builder = new EmbedBuilder();
             String content = msg.getContentRaw();
-            String image = Arrays.stream(msg.getContentRaw().split("\\s+")).filter(w -> IMAGE_LINK.matcher(w).matches()).findFirst().orElse(null);
+            String image = Arrays.stream(msg.getContentRaw().split("\\s+")).filter(w ->
+                    IMAGE_LINK.matcher(w).matches()).findFirst().orElse(null);
             StringBuilder sb = new StringBuilder();
             User author = msg.getAuthor();
 

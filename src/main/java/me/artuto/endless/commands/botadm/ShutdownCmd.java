@@ -52,8 +52,9 @@ public class ShutdownCmd extends EndlessCommand
         if(event.getArgs().isEmpty())
         {
             event.reactSuccess();
-            shardManager.shutdown();
+            event.getClient().shutdown();
             bot.db.shutdown();
+            shardManager.shutdown();
         }
         else
         {
