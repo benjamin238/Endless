@@ -95,7 +95,7 @@ public class BlacklistGuildCmd extends EndlessCommand
 
             bot.bdm.addBlacklist(BlacklistType.GUILD, guild.getIdLong(), OffsetDateTime.now().toInstant().toEpochMilli(), args[1]);
             event.replySuccess("Added **"+guild.getName()+"** to the blacklist.");
-            guild.leave().queue();
+            // guild.leave().queue();
         }
     }
 

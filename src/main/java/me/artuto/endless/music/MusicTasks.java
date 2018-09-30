@@ -59,7 +59,7 @@ public class MusicTasks
         if(guild.getAudioManager().getSendingHandler()==null)
         {
             player = manager.createPlayer();
-            // add here volume check and set
+            player.setVolume(bot.endless.getGuildSettings(guild).getVolume());
             handler = new AudioPlayerSendHandler(player, bot, guild);
             player.addListener(handler);
             guild.getAudioManager().setSendingHandler(handler);
