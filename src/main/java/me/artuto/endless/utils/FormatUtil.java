@@ -19,6 +19,7 @@ package me.artuto.endless.utils;
 
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.music.AudioPlayerSendHandler;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -40,16 +41,16 @@ public class FormatUtil
 {
     private static final Pattern MENTION = Pattern.compile("<@!?(\\d{17,22})>");
 
-    public static Message nowPlayingMessage(Guild guild, String successEmoji)
+    public static Message nowPlayingMessage(EndlessCommandEvent event, Guild guild, String successEmoji)
     {
         MessageBuilder mb = new MessageBuilder();
-        mb.append(successEmoji).append(" **Now Playing...**");
+        mb.append(successEmoji).append(" **").append(event.localize("core.music.np")).append("**");
         EmbedBuilder eb = new EmbedBuilder();
         AudioPlayerSendHandler ah = (AudioPlayerSendHandler)guild.getAudioManager().getSendingHandler();
         eb.setColor(guild.getSelfMember().getColor());
         if(ah==null || !(ah.isMusicPlaying()))
         {
-            eb.setTitle("No music playing");
+            eb.setTitle(event.localize("core.music.notPlaying"));
             eb.setDescription("\u23F9 "+progressBar(-1)+" "+volumeIcon(ah==null?100:ah.getPlayer().getVolume()));
         }
         else
@@ -58,7 +59,7 @@ public class FormatUtil
             {
                 User u = guild.getJDA().getUserById(ah.getRequester());
                 if(u==null)
-                    eb.setAuthor("Unknown (ID:"+ah.getRequester()+")", null, null);
+                    eb.setAuthor(event.localize("misc.unknown")+" (ID:"+ah.getRequester()+")", null, null);
                 else
                     eb.setAuthor(u.getName()+"#"+u.getDiscriminator(), null, u.getEffectiveAvatarUrl());
             }
@@ -69,17 +70,17 @@ public class FormatUtil
             if(ah.getPlayer().getPlayingTrack() instanceof YoutubeAudioTrack)
                 eb.setThumbnail("https://img.youtube.com/vi/"+ah.getPlayer().getPlayingTrack().getIdentifier()+"/mqdefault.jpg");
 
-            eb.setDescription(FormatUtil.embedFormat(ah));
+            eb.setDescription(FormatUtil.embedFormat(event, ah));
         }
         return mb.setEmbed(eb.build()).build();
     }
 
-    public static String embedFormat(AudioPlayerSendHandler handler)
+    public static String embedFormat(EndlessCommandEvent event, AudioPlayerSendHandler handler)
     {
         if(handler==null)
-            return "No music playing\n\u23F9 "+progressBar(-1)+" "+volumeIcon(100);
+            return event.localize("core.music.notPlaying")+"\n\u23F9 "+progressBar(-1)+" "+volumeIcon(100);
         else if (!(handler.isMusicPlaying()))
-            return "No music playing\n\u23F9 "+progressBar(-1)+" "+volumeIcon(handler.getPlayer().getVolume());
+            return event.localize("core.music.notPlaying")+"\n\u23F9 "+progressBar(-1)+" "+volumeIcon(handler.getPlayer().getVolume());
         else
         {
             AudioTrack track = handler.getPlayer().getPlayingTrack();

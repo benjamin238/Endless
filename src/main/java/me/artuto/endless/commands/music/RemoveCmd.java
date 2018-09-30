@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.music.AudioPlayerSendHandler;
 import me.artuto.endless.music.QueuedTrack;
 import net.dv8tion.jda.core.entities.User;
@@ -43,14 +43,14 @@ public class RemoveCmd extends MusicCommand
     }
 
     @Override
-    public void executeMusicCommand(CommandEvent event)
+    public void executeMusicCommand(EndlessCommandEvent event)
     {
         AudioPlayerSendHandler handler = (AudioPlayerSendHandler)event.getGuild().getAudioManager().getSendingHandler();
         List<QueuedTrack> queue = handler.getQueue();
 
         if(queue.isEmpty())
         {
-            event.replyWarning("There is nothing on the queue!");
+            event.replyWarning("command.queue.noQueue");
             return;
         }
         if(event.getArgs().equalsIgnoreCase("all"))
@@ -58,19 +58,19 @@ public class RemoveCmd extends MusicCommand
             int count;
             if(isDJ(event))
             {
-                event.replySuccess("Successfully removed **"+queue.size()+"** songs from the queue!");
                 queue.clear();
+                event.replySuccess("command.remove.removedAll", queue.size());
                 return;
             }
 
             List<QueuedTrack> toRemove = queue.stream().filter(qt -> qt.getOwner()==event.getAuthor().getIdLong()).collect(Collectors.toList());
             count = toRemove.size();
             if(count==0)
-                event.replyError("You don't have any songs in queue to remove!");
+                event.replyError("command.remove.noOwnSongs");
             else
             {
                 queue.removeAll(toRemove);
-                event.replySuccess("Successfully removed **"+count+"** songs from the queue!");
+                event.replySuccess("command.remove.removedAll", count);
             }
             return;
         }
@@ -78,9 +78,10 @@ public class RemoveCmd extends MusicCommand
         int position;
         try{position = Integer.parseInt(event.getArgs());}
         catch(NumberFormatException ignored){position = 0;}
+
         if(position<1 || position>queue.size())
         {
-            event.replyError("The position must be a valid integer between 1 and "+queue.size()+"!");
+            event.replyError("command.remove.invalidPos", queue.size());
             return;
         }
 
@@ -88,16 +89,16 @@ public class RemoveCmd extends MusicCommand
         if(qt.getOwner()==event.getAuthor().getIdLong())
         {
             queue.remove(qt);
-            event.replySuccess("Successfully removed **"+qt.getTrack().getInfo().title+"** from the queue!");
+            event.replySuccess("command.remove.removed", qt.getTrack().getInfo().title);
         }
         else if(isDJ(event))
         {
             queue.remove(qt);
             User requester = event.getJDA().asBot().getShardManager().getUserById(qt.getOwner());
-            event.replySuccess("Successfully removed **"+qt.getTrack().getInfo().title+"** from the queue!"+(requester==null?"":" (Requested by **"
-                    +requester.getName()+"**#**"+requester.getDiscriminator()+"**)"));
+            event.replySuccess("command.remove.removedDj", qt.getTrack().getInfo().title, (requester==null?"":
+                    " (Requested by **"+requester.getName()+"**#**"+requester.getDiscriminator()+"**"));
         }
         else
-            event.replyError("You can't remove **"+qt.getTrack().getInfo().title+"** because you didn't added it!");
+            event.replyError("command.remove.cannot", qt.getTrack().getInfo().title);
     }
 }

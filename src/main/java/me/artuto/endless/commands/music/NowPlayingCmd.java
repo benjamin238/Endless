@@ -42,6 +42,6 @@ public class NowPlayingCmd extends EndlessCommand
     @Override
     public void executeCommand(EndlessCommandEvent event)
     {
-        event.reply(FormatUtil.nowPlayingMessage(event.getGuild(), "\uD83C\uDFB6"));
+        event.reply(FormatUtil.nowPlayingMessage(event, event.getGuild(), "\uD83C\uDFB6"));
     }
 }

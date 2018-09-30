@@ -17,9 +17,9 @@
 
 package me.artuto.endless.commands.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.music.ResultHandler;
 
 /**
@@ -40,18 +40,18 @@ public class PlayCmd extends MusicCommand
     }
 
     @Override
-    public void executeMusicCommand(CommandEvent event)
+    public void executeMusicCommand(EndlessCommandEvent event)
     {
         if(event.getArgs().isEmpty() && event.getMessage().getAttachments().isEmpty())
         {
-            event.replyError("Please specify an URL, a title or upload an attachment!");
+            event.replyError("command.play.noArgs");
             return;
         }
 
         String args = (event.getArgs().startsWith("<") && event.getArgs().endsWith(">"))?
                 event.getArgs().substring(1, event.getArgs().length()-1):(event.getArgs().isEmpty()?
                 event.getMessage().getAttachments().get(0).getUrl():event.getArgs());
-        event.reply(Const.LOADING+" Loading... `["+args+"]`", msg -> bot.audioManager.loadItemOrdered(event.getGuild(), args,
+        event.reply(Const.LOADING+" "+event.localize("misc.loading")+" `["+args+"]`", msg -> bot.audioManager.loadItemOrdered(event.getGuild(), args,
                 new ResultHandler(bot, false, event, msg)));
     }
 }

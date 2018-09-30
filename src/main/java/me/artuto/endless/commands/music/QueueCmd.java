@@ -17,9 +17,9 @@
 
 package me.artuto.endless.commands.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.Paginator;
 import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.music.AudioPlayerSendHandler;
 import me.artuto.endless.music.QueuedTrack;
 import me.artuto.endless.utils.FormatUtil;
@@ -61,7 +61,7 @@ public class QueueCmd extends MusicCommand
     }
 
     @Override
-    public void executeMusicCommand(CommandEvent event)
+    public void executeMusicCommand(EndlessCommandEvent event)
     {
         int page = 1;
         try{page = Integer.parseInt(event.getArgs());}
@@ -72,8 +72,9 @@ public class QueueCmd extends MusicCommand
 
         if(queue.isEmpty())
         {
-            event.replyWarning("There is not music in the queue currently!"+(!(handler.isMusicPlaying())?"":" Now playing:\n\n**"+
-                    handler.getPlayer().getPlayingTrack().getInfo().title+"**\n"+FormatUtil.embedFormat(handler)));
+            String message = event.localize("command.queue.noQueue")+(!(handler.isMusicPlaying())?"":" "+event.localize("core.music.np")+"\n\n**"+
+                handler.getPlayer().getPlayingTrack().getInfo().title+"**\n"+FormatUtil.embedFormat(event, handler));
+            event.replyWarning(false, message);
             return;
         }
 
@@ -86,21 +87,20 @@ public class QueueCmd extends MusicCommand
             tracks[i] = queue.get(i).toString();
         }
         long durationf = duration;
-        pB.setText((i1, i2) -> event.getClient().getSuccess()+" "+getQueueTitle(handler, event.getClient().getSuccess(), tracks.length, durationf,
+        pB.setText((i1, i2) -> event.getClient().getSuccess()+" "+getQueueTitle(handler, event, tracks.length, durationf,
                 bot.endless.getGuildSettings(event.getGuild()).isRepeatModeEnabled()))
                 .setItems(tracks).setUsers(event.getAuthor()).setColor(event.getSelfMember().getColor());
         pB.build().paginate(event.getTextChannel(), page);
     }
 
     // I'm just lazy tbh
-    private String getQueueTitle(AudioPlayerSendHandler handler, String success, int songslength, long total, boolean repeatmode)
+    private String getQueueTitle(AudioPlayerSendHandler handler, EndlessCommandEvent event, int songslength, long total, boolean repeatmode)
     {
         StringBuilder sb = new StringBuilder();
         if(!(handler.getPlayer().getPlayingTrack()==null))
             sb.append("**").append(handler.getPlayer().getPlayingTrack().getInfo().title).append("**\n")
-                    .append(FormatUtil.embedFormat(handler)).append("\n\n");
-        return FormatUtil.sanitize(sb.append(success).append(" Current Queue | ").append(songslength)
-                .append(" entries | `").append(FormatUtil.formatTime(total)).append("` ")
-                .append(repeatmode ? "| \uD83D\uDD01" : "").toString());
+                    .append(FormatUtil.embedFormat(event, handler)).append("\n\n");
+        return FormatUtil.sanitize(sb.append(event.getClient().getSuccess()).append(" ").append(event.localize("command.queue.current", songslength,
+                FormatUtil.formatTime(total))).append(" ").append(repeatmode ? "| \uD83D\uDD01" : "").toString());
     }
 }

@@ -91,7 +91,7 @@ public abstract class MusicCommand extends EndlessCommand
         executeMusicCommand(event);
     }
 
-    public abstract void executeMusicCommand(CommandEvent event);
+    public abstract void executeMusicCommand(EndlessCommandEvent event);
 
     public static Category DJ = new Category("DJ", event -> {
        GuildSettings gs = event.getClient().getSettingsFor(event.getGuild());
@@ -106,7 +106,7 @@ public abstract class MusicCommand extends EndlessCommand
            return event.isOwner();
     });
 
-    protected boolean isDJ(CommandEvent event)
+    boolean isDJ(CommandEvent event)
     {
         GuildSettings gs = event.getClient().getSettingsFor(event.getGuild());
         Member member = event.getMember();

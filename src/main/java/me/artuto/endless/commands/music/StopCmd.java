@@ -42,6 +42,6 @@ public class StopCmd extends EndlessCommand
         if(!(handler==null))
             handler.stopAndClear();
         event.getGuild().getAudioManager().closeAudioConnection();
-        event.replySuccess("Successfully stopped player and cleared queue.");
+        event.replySuccess("command.stop");
     }
 }

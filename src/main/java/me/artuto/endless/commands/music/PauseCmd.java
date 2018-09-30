@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.music.AudioPlayerSendHandler;
 
 /**
@@ -38,15 +38,15 @@ public class PauseCmd extends MusicCommand
     }
 
     @Override
-    public void executeMusicCommand(CommandEvent event)
+    public void executeMusicCommand(EndlessCommandEvent event)
     {
         AudioPlayerSendHandler handler = (AudioPlayerSendHandler)event.getGuild().getAudioManager().getSendingHandler();
         if(handler.getPlayer().isPaused())
-            event.replyWarning("This song is already paused! Use `"+event.getClient().getPrefix()+"resume` to resume it!");
+            event.replyWarning("command.pause.paused", event.getClient().getPrefix());
         else
         {
             handler.getPlayer().setPaused(true);
-            event.replySuccess("Paused the current playing song.");
+            event.replySuccess("command.pause.success");
         }
     }
 }

@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.music.AudioPlayerSendHandler;
 import net.dv8tion.jda.core.entities.User;
 
@@ -40,12 +40,15 @@ public class ForceSkipCmd extends MusicCommand
     }
 
     @Override
-    public void executeMusicCommand(CommandEvent event)
+    public void executeMusicCommand(EndlessCommandEvent event)
     {
         AudioPlayerSendHandler handler = (AudioPlayerSendHandler)event.getGuild().getAudioManager().getSendingHandler();
         User requester = bot.shardManager.getUserById(handler.getRequester());
-        event.replySuccess("Successfully skipped **"+handler.getPlayer().getPlayingTrack().getInfo().title+"**"+
-                (requester==null?"":" (Requested by **"+requester.getName()+"**#**"+requester.getDiscriminator()+"**)"));
+
+        String message = event.localize("command.skip.success", handler.getPlayer().getPlayingTrack().getInfo().title)+" "+
+                (requester==null?"":event.localize("core.music.requestedBy", requester.getName()+"#"+requester.getDiscriminator()));
+
+        event.replySuccess(false, message);
         handler.getPlayer().stopTrack();
     }
 }

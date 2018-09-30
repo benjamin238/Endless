@@ -17,13 +17,13 @@
 
 package me.artuto.endless.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.ButtonMenu;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
@@ -40,10 +40,10 @@ public class ResultHandler implements AudioLoadResultHandler
 {
     private final Bot bot;
     private final boolean ytSearch;
-    private final CommandEvent event;
+    private final EndlessCommandEvent event;
     private final Message msg;
 
-    public ResultHandler(Bot bot, boolean ytSearch, CommandEvent event, Message msg)
+    public ResultHandler(Bot bot, boolean ytSearch, EndlessCommandEvent event, Message msg)
     {
         this.bot = bot;
         this.ytSearch = ytSearch;
@@ -72,8 +72,9 @@ public class ResultHandler implements AudioLoadResultHandler
         }
         else
         {
-            msg.editMessage(FormatUtil.sanitize(event.getClient().getSuccess()+" Found "+(playlist.getName()==null?"a playlist":"playlist **"+
-                    playlist.getName()+"**")+"with **"+playlist.getTracks().size()+"** tracks. They have been added to the queue!")).queue();
+            String message = event.localize("core.music.results.playlist", (playlist.getName()==null?"Unknown title":playlist.getName()),
+                    playlist.getTracks().size());
+            msg.editMessage(FormatUtil.sanitize(event.getClient().getSuccess()+" "+message)).queue();
         }
     }
 
@@ -81,7 +82,10 @@ public class ResultHandler implements AudioLoadResultHandler
     public void noMatches()
     {
         if(ytSearch)
-            msg.editMessage(FormatUtil.sanitize(event.getClient().getWarning()+" No result found for `"+event.getArgs()+"`!")).queue();
+        {
+            msg.editMessage(FormatUtil.sanitize(event.getClient().getWarning()+" "+event.localize("core.music.results.notFound",
+                    event.getArgs()))).queue();
+        }
         else
             bot.audioManager.loadItemOrdered(event.getGuild(), "ytsearch:"+event.getArgs(), new ResultHandler(bot, true, event, msg));
     }
@@ -90,29 +94,34 @@ public class ResultHandler implements AudioLoadResultHandler
     public void loadFailed(FriendlyException exception)
     {
         if(exception.severity==FriendlyException.Severity.COMMON)
-            msg.editMessage(event.getClient().getError()+" Could not load track: `"+exception.getMessage()+"`").queue();
+            msg.editMessage(event.getClient().getError()+" "+event.localize("core.music.error.message", exception.getMessage())).queue();
         else
-            msg.editMessage(event.getClient().getError()+" Could not load track.").queue();
+            msg.editMessage(event.getClient().getError()+" "+event.localize("core.music.error")).queue();
     }
 
     private void loadSingle(AudioTrack track, AudioPlaylist playlist)
     {
         int pos = bot.musicTasks.putInQueue(track, event)+2;
-        String addMsg = FormatUtil.sanitize(event.getClient().getSuccess()+" Added the song **"+track.getInfo().title+"** (`"+
-                FormatUtil.formatTime(track.getDuration())+"`) "+(pos==1?"to begin playing!":"to the queue at position "+pos));
+        String added = event.localize("core.music.added");
+        String position = pos==1?event.localize("core.music.added.playing"):event.localize("core.music.added.queued", pos);
+        String addMsg = FormatUtil.sanitize(event.getClient().getSuccess()+" "+added+" "+position);
+
         if(playlist==null || !(ChecksUtil.hasPermission(event.getSelfMember(), event.getTextChannel(), Permission.MESSAGE_ADD_REACTION)))
             msg.editMessage(addMsg).queue();
         else
         {
             new ButtonMenu.Builder()
-                    .setText(addMsg+"\n"+event.getClient().getWarning()+" This playlist has **"+playlist.getTracks().size()+"** tracks. Select "+event.getClient().getSuccess()+
-                            " to load the playlist.")
+                    .setText(addMsg+"\n"+event.getClient().getWarning()+" "+event.localize("core.music.added.playlistAsk",
+                            playlist.getTracks().size(), event.getClient().getSuccess()))
                     .setChoices("444226239683624962", "444226355555729428")
                     .setEventWaiter(bot.waiter)
                     .setTimeout(20, TimeUnit.SECONDS)
                     .setAction(re -> {
                         if(re.isEmote() && re.getEmote().getAsMention().equals(event.getClient().getSuccess()))
-                            msg.editMessage(addMsg+"\n"+event.getClient().getSuccess()+" Successfully loaded **"+loadPl(playlist)+"**").queue();
+                        {
+                            msg.editMessage(addMsg+"\n"+event.getClient().getSuccess()+" "+event.localize("core.music.added.playlist",
+                                    loadPl(playlist))).queue();
+                        }
                     }).setFinalAction(m -> {
                         try{m.clearReactions().queue();}
                         catch(PermissionException ignored){}

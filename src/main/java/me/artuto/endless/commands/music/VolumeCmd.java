@@ -51,7 +51,7 @@ public class VolumeCmd extends EndlessCommand
         int volume = (handler==null && gs.getVolume()==0)?100:(handler==null?gs.getVolume():handler.getPlayer().getVolume());
 
         if(event.getArgs().isEmpty())
-            event.reply(FormatUtil.volumeIcon(volume)+" The current volume is **"+volume+"**");
+            event.reply("command.volume.volume", FormatUtil.volumeIcon(volume), volume);
         else
         {
             int newVolume;
@@ -60,13 +60,13 @@ public class VolumeCmd extends EndlessCommand
 
             if(newVolume<0 || newVolume>150)
             {
-                event.replyError("The volume must be a valid number between 0 and 150!");
+                event.replyError("command.volume.invalid");
                 return;
             }
 
             bot.musicTasks.setupHandler(event).getPlayer().setVolume(newVolume);
             bot.gsdm.setVolume(event.getGuild(), newVolume);
-            event.replySuccess("Successfully changed volume from `"+volume+"` to `"+newVolume+"`.");
+            event.replySuccess("command.volume.change", volume, newVolume);
         }
     }
 }

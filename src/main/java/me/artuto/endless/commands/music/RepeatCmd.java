@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommandEvent;
 
 /**
  * @author Artuto
@@ -37,10 +37,10 @@ public class RepeatCmd extends MusicCommand
     }
 
     @Override
-    public void executeMusicCommand(CommandEvent event)
+    public void executeMusicCommand(EndlessCommandEvent event)
     {
         boolean status = !(bot.endless.getGuildSettings(event.getGuild()).isRepeatModeEnabled());
         bot.gsdm.setRepeatModeStatus(event.getGuild(), status);
-        event.replySuccess("Successfully toggled "+(status?"ON":"OFF")+" the repeat mode!");
+        event.replySuccess("command.repeat.toggled", status?"ON":"OFF");
     }
 }

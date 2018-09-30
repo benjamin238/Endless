@@ -17,8 +17,8 @@
 
 package me.artuto.endless.commands.music;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.music.AudioPlayerSendHandler;
 import net.dv8tion.jda.core.entities.User;
 
@@ -40,13 +40,13 @@ public class SkipCmd extends MusicCommand
     }
 
     @Override
-    public void executeMusicCommand(CommandEvent event)
+    public void executeMusicCommand(EndlessCommandEvent event)
     {
         AudioPlayerSendHandler handler = (AudioPlayerSendHandler)event.getGuild().getAudioManager().getSendingHandler();
         User author = event.getAuthor();
         if(handler.getRequester()==author.getIdLong())
         {
-            event.replySuccess("Successfully skipped **"+handler.getPlayer().getPlayingTrack().getInfo().title+"**");
+            event.replySuccess("command.skip.success", handler.getPlayer().getPlayingTrack().getInfo().title, "");
             handler.getPlayer().stopTrack();
         }
         else
@@ -55,24 +55,25 @@ public class SkipCmd extends MusicCommand
                     !(m.getUser().isBot()) && !(m.getVoiceState().isDeafened())).count();
             String msg;
             if(handler.getVotes().contains(author.getIdLong()))
-                msg = "You already voted to skip this song, "+author.getAsMention()+" `[";
+                msg = event.localize("command.skip.aVoted");
             else
             {
-                msg = "You voted to skip the current song. `[";
+                msg = event.localize("command.skip.voted");
                 handler.getVotes().add(author.getIdLong());
             }
             long skippers = event.getSelfMember().getVoiceState().getChannel().getMembers().stream().filter(m ->
                     handler.getVotes().contains(m.getUser().getIdLong())).count();
             long requiredSkippers = (long)Math.ceil(people*.55);
-            msg += skippers+" votes of "+requiredSkippers+"/"+people+" needed]`";
+            msg += event.localize("command.skip.votes", skippers, requiredSkippers, people);
             if(skippers>=requiredSkippers)
             {
                 User requester = bot.shardManager.getUserById(handler.getRequester());
-                msg += "\n"+event.getClient().getSuccess()+" Successfully skipped **"+handler.getPlayer().getPlayingTrack().getInfo().title+"**"+
-                        (requester==null?"":" (Requested by **"+requester.getName()+"**#**"+requester.getDiscriminator()+"**)");
+                msg += "\n"+event.getClient().getSuccess()+" "+event.localize("command.skip.success",
+                        handler.getPlayer().getPlayingTrack().getInfo().title,
+                        (requester==null?"":" (Requested by **"+requester.getName()+"**#**"+requester.getDiscriminator()+"**)"));
                 handler.getPlayer().stopTrack();
             }
-            event.reply(msg);
+            event.reply(false, msg);
         }
     }
 }
