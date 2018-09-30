@@ -246,6 +246,7 @@ public class Bot extends ListenerAdapter
                 .setLinkedCacheSize(6)
                 .setHelpConsumer(CommandHelper::getHelp)
                 .setCoOwnerIds(owners)
+                .setShutdownAutomatically(false)
                 .setGuildSettingsManager(new ClientGSDM(this))
                 .addCommands(
                 // Bot
@@ -289,7 +290,6 @@ public class Bot extends ListenerAdapter
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setGame(Game.playing("[ENDLESS] Loading..."))
                 .setBulkDeleteSplittingEnabled(false)
-                .setAutoReconnect(true)
                 .setEnableShutdownHook(true);
         if(maintenance)
             builder.addEventListeners(this, client);
