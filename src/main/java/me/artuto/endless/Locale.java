@@ -9,7 +9,9 @@ import java.util.ResourceBundle;
 public enum Locale
 {
     EN_US("en_US", "English (US)", "English (US)"),
-    ES_MX("es_MX", "Spanish (Mexico)", "Español (México)");
+    ES_MX("es_MX", "Spanish (Mexico)", "Español (México)"),
+    DE_DE("de_DE", "German (Germany)", "Deutsch, (Deutschland)"),
+    FR_FR("fr_FR", "French (France)", "Francais (France)");
 
     private java.util.Locale locale;
     private ResourceBundle bundle;
