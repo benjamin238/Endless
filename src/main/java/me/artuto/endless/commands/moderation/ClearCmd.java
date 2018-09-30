@@ -43,15 +43,8 @@ public class ClearCmd extends EndlessCommand
     private final Pattern MENTION = Pattern.compile("<@!?(\\d{17,22})>");
     private final Pattern ID = Pattern.compile("(?:^|\\s)(\\d{17,22})(?:$|\\s)");
     private final Pattern NUM = Pattern.compile("(?:^|\\s)(\\d{1,4})(?:$|\\s)");
-    private final String LIMIT = "This command, due a Discord API limitation, can't clear messages older than a week.";
-    private final String NO_PARAMS = "**No valid parameters detected:**\n"+"Pinned messages are ignored.\n"+
-        "**You can following parameters, the order doesn't matters:**\n"+
-        "-`<numberOfPosts>`: Number of post to clean, min. 2 and max. 1000.\n"+
-        "-`bots`: Clears messages by bots.\n"+"-`embeds`: Clears messages with embeds.\n"+
-        "-`links`: Clears messages which contains links.\n"+"-`images`: Clears messages with images.\n"+
-        "-`<@user|ID|nickname|username>`: Clears messages sent by the specified user.\n"+
-        "-`\"text\"`: Clears messages with the text specified in quotes.\n"+
-        "-` \\`regex\\` `: Clears messages that match the specified regex.";
+    private final String LIMIT = "command.clear.limit";
+    private final String NO_PARAMS = "command.clear.noParams";
 
     public ClearCmd(Bot bot)
     {
@@ -117,8 +110,7 @@ public class ClearCmd extends EndlessCommand
         else num = 100;
         if(num>1000 || num<2)
         {
-            String numberOfPosts = "The number of messages must be between `2` and `1000`";
-            event.replyError(numberOfPosts);
+            event.replyError("command.clear.msgLimit");
             return;
         }
 
@@ -187,7 +179,7 @@ public class ClearCmd extends EndlessCommand
 
             if(deletion.isEmpty())
             {
-                event.replyWarning("There were no messages to clear!"+(weeks2 ? LIMIT : ""));
+                event.replyWarning("command.clear.noMessages", (weeks2?LIMIT:""));
                 return;
             }
 
@@ -208,12 +200,12 @@ public class ClearCmd extends EndlessCommand
             }
             catch(Exception e)
             {
-                event.replyError(String.format("An error happened when clearing **%d** messages!", deletion.size()));
-                Endless.LOG.error("Error while cleaning messages in TC: {}", event.getTextChannel().getId(), e);
+                event.replyError("command.clear.error", deletion.size());
+                Endless.LOG.error("Error while deleting messages in TC {}", event.getTextChannel().getId(), e);
                 return;
             }
 
-            event.replySuccess(String.format("Successfully cleared **%d** messages!", deletion.size()), s -> event.getMessage().delete().queue());
+            event.replySuccess("command.clear.success", deletion.size());
             bot.modlog.logClear(Action.CLEAN, event, deletion, OffsetDateTime.now(), logParams, reason);
         });
     }

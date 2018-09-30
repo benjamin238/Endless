@@ -65,22 +65,22 @@ public class BanCmd extends EndlessCommand
 
         if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), target)))
         {
-            event.replyError("I can't ban the specified user!");
+            event.replyError("core.error.cantInteract.user.bot");
             return;
         }
         if(!(ChecksUtil.canMemberInteract(event.getMember(), target)))
         {
-            event.replyError("You can't ban the specified user!");
+            event.replyError("core.error.cantInteract.user.executor");
             return;
         }
 
         String username = "**"+target.getUser().getName()+"**#"+target.getUser().getDiscriminator();
         event.getGuild().getController().ban(target, GuildUtils.getBanDeleteDays(event.getGuild()))
                 .reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).queue(s -> {
-                    event.replySuccess(String.format("Successfully banned user %s", username));
+                    event.replySuccess("command.ban.success", username);
                     bot.modlog.logGeneral(Action.BAN, event, OffsetDateTime.now(), reason, target.getUser());
         }, e -> {
-                    event.replyError(String.format("An error happened when banning %s", username));
+                    event.replyError("command.ban.error", username);
                     Endless.LOG.error("Could not ban user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
         });
     }

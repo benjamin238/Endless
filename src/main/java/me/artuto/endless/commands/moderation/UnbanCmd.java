@@ -62,10 +62,10 @@ public class UnbanCmd extends EndlessCommand
 
         String username = "**"+target.getName()+"**#"+target.getDiscriminator();
         event.getGuild().getController().unban(target).reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).queue(s -> {
-            event.replySuccess(String.format("Successfully unbanned user %s", username));
+            event.replySuccess("command.unban.success", username);
             bot.modlog.logGeneral(Action.UNBAN, event, OffsetDateTime.now(), reason, target);
         }, e -> {
-            event.replyError(String.format("An error happened when unbanning %s", username));
+            event.replyError("command.unban.error", username);
             Endless.LOG.error("Could not unban user {} in guild {}", target.getId(), event.getGuild().getId(), e);
         });
     }

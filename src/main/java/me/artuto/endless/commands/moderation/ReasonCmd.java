@@ -61,12 +61,12 @@ public class ReasonCmd extends EndlessCommand
 
         if(caseNum<-1 || caseNum==0)
         {
-            event.replyError("Case number must be a positive integer! The case number can be omitted to use the latest un-reasoned case.");
+            event.replyError("command.reason.invalid");
             return;
         }
         if(str==null || str.isEmpty())
         {
-            event.replyError("Please provide a reason!");
+            event.replyError("command.reason.noReason");
             return;
         }
 
@@ -78,19 +78,19 @@ public class ReasonCmd extends EndlessCommand
             switch(result)
             {
                 case -1:
-                    event.replyError("No modlog is set on this server!");
+                    event.replyError("command.reason.noModlog");
                     break;
                 case -2:
-                    event.replyError("I am unable to Read, Write or retrieve History in the modlog!");
+                    event.replyError("command.reason.modlog.noPerms");
                     break;
                 case -3:
-                    event.replyError("Case `"+fcaseNum+"` could not be found among the recent cases in the modlog!");
+                    event.replyError("command.reason.modlog.notFound", fcaseNum);
                     break;
                 case -4:
-                    event.replyError("A recent case with no reason could not be found in the modlog!");
+                    event.replyError("command.reason.modlog.notFoundLatest");
                     break;
                 default:
-                    event.replySuccess("Updated case **"+result+"** in <#"+((GuildSettings)event.getClient().getSettingsFor(event.getGuild())).getModlog()+">");
+                    event.replySuccess("command.reason.updated", result, ((GuildSettings)event.getClient().getSettingsFor(event.getGuild())).getModlog());
                     break;
             }
         });

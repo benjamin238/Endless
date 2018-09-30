@@ -64,12 +64,12 @@ public class SoftbanCmd extends EndlessCommand
 
         if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), target)))
         {
-            event.replyError("I can't ban the specified user!");
+            event.replyError("core.error.cantInteract.user.bot");
             return;
         }
         if(!(ChecksUtil.canMemberInteract(event.getMember(), target)))
         {
-            event.replyError("You can't ban the specified user!");
+            event.replyError("core.error.cantInteract.user.executor");
             return;
         }
 
@@ -83,8 +83,8 @@ public class SoftbanCmd extends EndlessCommand
             }
             catch(ErrorResponseException e)
             {
-                event.replyError(String.format("An error happened when softbanning %s", username));
-                Endless.LOG.error("Could not softban user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
+                event.replyError("command.softban.error.ban", username);
+                Endless.LOG.error("Could not ban (softban) user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
             }
 
             // Unban
@@ -94,11 +94,11 @@ public class SoftbanCmd extends EndlessCommand
             }
             catch(ErrorResponseException e)
             {
-                event.replyError(String.format("Error while unbanning %s", username));
-                Endless.LOG.error("Could not unban user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
+                event.replyError("command.softban.error.unban", username);
+                Endless.LOG.error("Could not unban (softban) user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
             }
 
-            event.replySuccess(String.format("Successfully softbanned user %s", username));
+            event.replySuccess("command.softban.success", username);
             bot.modlog.logGeneral(Action.SOFTBAN, event, OffsetDateTime.now(), reason, target.getUser());
         });
     }

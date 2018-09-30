@@ -59,17 +59,17 @@ public class HackbanCmd extends EndlessCommand
 
         if(!(event.getGuild().getMember(target)==null))
         {
-            event.replyWarning("This user is on this Guild! Please use `"+event.getClient().getPrefix()+"ban` instead.");
+            event.replyWarning("command.hackban.onGuild", event.getClient().getPrefix());
             return;
         }
 
         String username = "**"+target.getName()+"**#"+target.getDiscriminator();
         event.getGuild().getController().ban(target, GuildUtils.getBanDeleteDays(event.getGuild()))
                 .reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).queue(s -> {
-                    event.replySuccess(String.format("Successfully hackbanned user %s", username));
+                    event.replySuccess("command.ban.success", username);
                     bot.modlog.logGeneral(Action.BAN, event, OffsetDateTime.now(), reason, target);
             }, e -> {
-                    event.replyError(String.format("An error happened when hackbanning %s", username));
+                    event.replyError("command.ban.error", username);
                     Endless.LOG.error("Could not hackban user {} in guild {}", target.getId(), event.getGuild().getId(), e);
         });
     }

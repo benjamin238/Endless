@@ -64,21 +64,21 @@ public class KickCmd extends EndlessCommand
 
         if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), target)))
         {
-            event.replyError("I can't kick the specified user!");
+            event.replyError("core.error.cantInteract.user.bot");
             return;
         }
         if(!(ChecksUtil.canMemberInteract(event.getMember(), target)))
         {
-            event.replyError("You can't kick the specified user!");
+            event.replyError("core.error.cantInteract.user.executor");
             return;
         }
 
         String username = "**"+target.getUser().getName()+"**#"+target.getUser().getDiscriminator();
         event.getGuild().getController().kick(target).reason(author.getName()+"#"+author.getDiscriminator()+": "+reason).queue(s -> {
-            event.replySuccess(String.format("Successfully kicked user %s", username));
+            event.replySuccess("command.kick.success", username);
             bot.modlog.logGeneral(Action.KICK, event, OffsetDateTime.now(), reason, target.getUser());
         }, e -> {
-            event.replyError(String.format("An error happened when kicking %s", username));
+            event.replyError("command.kick.error", username);
             Endless.LOG.error("Could not kick user {} in guild {}", target.getUser().getId(), event.getGuild().getId(), e);
         });
     }
