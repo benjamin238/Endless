@@ -103,13 +103,19 @@ public class QuoteCmd extends EndlessCommand
         }
 
         tc.getMessageById(id).queue(msg -> {
+            if(msg.getContentRaw().isEmpty())
+            {
+                event.replyWarning("The given message has no content.");
+                return;
+            }
+            
             EmbedBuilder builder = new EmbedBuilder();
             String content = msg.getContentRaw();
             String image = Arrays.stream(msg.getContentRaw().split("\\s+")).filter(w ->
                     IMAGE_LINK.matcher(w).matches()).findFirst().orElse(null);
             StringBuilder sb = new StringBuilder();
             User author = msg.getAuthor();
-
+            
             if(msg.getAttachments().size()==1 && msg.getAttachments().get(0).isImage())
                 builder.setImage(msg.getAttachments().get(0).getUrl());
             else if(!(image==null))
@@ -125,10 +131,9 @@ public class QuoteCmd extends EndlessCommand
 
             sb.append(content).append("\n");
 
-            builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
+            builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), msg.getJumpUrl(), author.getEffectiveAvatarUrl());
             builder.setColor(tc.getGuild().getMember(author)==null?null:tc.getGuild().getMember(author).getColor());
             builder.setDescription(sb.toString());
-            builder.addField("Link", msg.getJumpUrl(), false);
             builder.setFooter((msg.isEdited()?"Edited":"Sent")+" in #"+tc.getName(), null);
             builder.setTimestamp(msg.isEdited()?msg.getEditedTime():msg.getCreationTime());
             event.reply(builder.build());
