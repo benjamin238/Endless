@@ -95,7 +95,7 @@ public class ModLogging
             MessageBuilder mb = new MessageBuilder();
             mb.setContent(FormatUtil.formatLogClean(CLEAN_FORMAT, time, gs.getTimezone(), id, action.getEmote(), author.getName(),
                     author.getDiscriminator(), action.getVerb(), messages.size(), event.getTextChannel().getIdLong(), crit, reason));
-            Sender.sendMessage(modlog, mb.build(), m -> {
+            Sender.sendMessage(modlog, mb.build(), m -> bot.endlessPool.submit(() -> {
                 File file = LogUtils.createMessagesTextFile(messages, "Messages"+event.getTextChannel().getId()+".txt");
                 if(!(file==null) && ChecksUtil.hasPermission(guild.getSelfMember(), modlog, Permission.MESSAGE_EMBED_LINKS))
                 {
@@ -104,7 +104,7 @@ public class ModLogging
                     fileEmbed.setDescription("[`\uD83D\uDCC4 View`]("+text.getViewUrl()+") | [`\uD83D\uDCE9 Download`]("+text.getCDNUrl()+")");
                     m.editMessage(mb.setEmbed(fileEmbed.build()).build()).queue(s -> file.delete(), e -> file.delete());
                 }
-            });
+            }));
         });
     }
 
