@@ -105,7 +105,7 @@ public class QuoteCmd extends EndlessCommand
         tc.getMessageById(id).queue(msg -> {
             if(msg.getContentRaw().isEmpty())
             {
-                event.replyWarning("The message i got is empty.");
+                event.replyWarning("The given message has no content.");
                 return;
             }
             
