@@ -103,13 +103,19 @@ public class QuoteCmd extends EndlessCommand
         }
 
         tc.getMessageById(id).queue(msg -> {
+            if(msg.getContentRaw().isEmpty())
+            {
+                event.replyWarning("The message i got is empty.");
+                return;
+            }
+            
             EmbedBuilder builder = new EmbedBuilder();
             String content = msg.getContentRaw();
             String image = Arrays.stream(msg.getContentRaw().split("\\s+")).filter(w ->
                     IMAGE_LINK.matcher(w).matches()).findFirst().orElse(null);
             StringBuilder sb = new StringBuilder();
             User author = msg.getAuthor();
-
+            
             if(msg.getAttachments().size()==1 && msg.getAttachments().get(0).isImage())
                 builder.setImage(msg.getAttachments().get(0).getUrl());
             else if(!(image==null))
