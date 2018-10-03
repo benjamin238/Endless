@@ -30,12 +30,14 @@ import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 /**
@@ -177,29 +179,50 @@ public class JagTag
                 new Method("title", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
                     String[] parts = in[0].split("\\|",2);
-                    eb.setTitle(parts[0], parts.length>1 ? parts[1] : null);
-                    return "";}),
+                    String title = parts[0];
+                    String url = parts.length>1?parts[1]:null;
+                    checkTitle(title);
+                    checkUrl(url, false);
+                    eb.setTitle(title, url);
+                    return "";
+                }),
                 new Method("author", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
                     String[] parts = in[0].split("\\|",3);
-                    eb.setAuthor(parts[0], parts.length>2 ? parts[2] : null, parts.length>1 ? parts[1] : null);
-                    return "";}),
+                    String author = parts[0];
+                    String url = parts.length>2?parts[2]:null;
+                    String image = parts.length>1?parts[1]:null;
+                    checkText(author);
+                    checkUrl(url, false);
+                    checkUrl(image, true);
+                    eb.setAuthor(author, url, image);
+                    return "";
+                }),
                 new Method("thumbnail", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
+                    checkUrl(in[0], true);
                     eb.setThumbnail(in[0]);
-                    return "";}),
+                    return "";
+                }),
                 new Method("field", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
                     String[] parts = in[0].split("\\|",3);
                     if(parts.length<2)
                         throw new ParseException("Please specify a field name and content!");
-
-                    eb.addField(parts[0], parts[1], parts.length>2 ? parts[2].equalsIgnoreCase("true") : true);
-                    return "";}),
+                    String title = parts[0];
+                    String value = parts[1];
+                    boolean inline = parts.length>2?parts[2].equalsIgnoreCase("true"):true;
+                    checkTitle(title);
+                    checkField(value);
+                    eb.addField(title, value, inline);
+                    return "";
+                }),
                 new Method("image", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
+                    checkUrl(in[0], true);
                     eb.setImage(in[0]);
-                    return "";}),
+                    return "";
+                }),
                 new Method("color", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
                     switch(in[0].toLowerCase()) {
@@ -230,27 +253,36 @@ public class JagTag
                             catch(NumberFormatException ignored) {throw new ParseException("Could not parse the specified color code!");}
                             eb.setColor(color);
                     }
-                    return "";}),
+                    return "";
+                }),
                 new Method("description", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
+                    checkText(in[0]);
                     eb.setDescription(in[0]);
-                    return "";}),
+                    return "";
+                }),
                 new Method("footer", (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
                     String[] parts = in[0].split("\\|",2);
-                    eb.setFooter(parts[0], parts.length>1 ? parts[1] : null);
-                    return "";}),
+                    String title = parts[0];
+                    String icon = parts.length>1?parts[1]:null;
+                    checkTitle(title);
+                    checkUrl(icon, true);
+                    eb.setFooter(title, icon);
+                    return "";
+                }),
                 new Method("timestamp", (env) -> {
                     EmbedBuilder eb = env.get("builder");
                     eb.setTimestamp(OffsetDateTime.now());
-                    return "";}, (env, in) -> {
+                    return "";
+                    }, (env, in) -> {
                     EmbedBuilder eb = env.get("builder");
                     OffsetDateTime time;
-
                     try {time = OffsetDateTime.parse(in[0]);}
                     catch(DateTimeParseException ignored) {throw new ParseException("Could not parse the specified timestamp!");}
                     eb.setTimestamp(time);
-                    return "";}),
+                    return "";
+                }),
                 // Emote
                 new Method("emote", (env) -> "", (env, in) -> {
                     if(in[0].isEmpty())
@@ -331,5 +363,34 @@ public class JagTag
             throw new ParseException(String.format("%s %s", client.getWarning(), FormatUtil.listOfUsers(list, query)));
         else
             return list.get(0);
+    }
+
+    private static void checkUrl(@Nullable String url, boolean image) throws ParseException
+    {
+        if(url==null)
+            return;
+        if(url.length()>MessageEmbed.URL_MAX_LENGTH)
+            throw new ParseException("The specified "+(image?"image url":"url")+" is too long!");
+        Matcher m = EmbedBuilder.URL_PATTERN.matcher(url);
+        if(!(m.matches()))
+            throw new ParseException("The specified "+(image?"image url":"url")+" is not valid!");
+    }
+
+    private static void checkText(String text) throws ParseException
+    {
+        if(text.length()>MessageEmbed.TEXT_MAX_LENGTH)
+            throw new ParseException("The specified description is too long!");
+    }
+
+    private static void checkField(String text) throws ParseException
+    {
+        if(text.length()>MessageEmbed.VALUE_MAX_LENGTH)
+            throw new ParseException("One of the specified field value is too long!");
+    }
+
+    private static void checkTitle(String text) throws ParseException
+    {
+        if(text.length()>MessageEmbed.TITLE_MAX_LENGTH)
+            throw new ParseException("The specified title is too long!");
     }
 }
