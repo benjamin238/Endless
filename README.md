@@ -12,7 +12,7 @@ Also, any changes made to any piece of code published here may be stated.
 
 ## Editing the source code
 
-I won't provide support when editing the source code to create a custom build of Endless, unless its going to be a [pull request](https://github.com/EndlessBot/Endless/pulls).
+I won't provide support when editing the source code to create a custom build of Endless (unless its going to be a [pull request](https://github.com/EndlessBot/Endless/pulls)).
 
 ## Support
 
