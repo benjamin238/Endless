@@ -140,7 +140,7 @@ public class UserInfoCmd extends EndlessCommand
         {
             sb.append(Const.LINE_START).append(" Status: ").append(statusEmote).append(" **").append(status).append("**");
             if(!(game==null))
-                sb.append(" (").append(getGame(game.getType().getKey())).append(" *").append(game.getName()).append("*)");
+                sb.append(" (").append(getGame(game.getType().getKey())).append(" *[").append(game.getName()).append("](").append(game.getUrl()).append(")*)");
             sb.append("\n");
             sb.append(Const.LINE_START).append(" Account Creation Date: **").append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
                     .append("**\n");
