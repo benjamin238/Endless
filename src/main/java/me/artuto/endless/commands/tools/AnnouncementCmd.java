@@ -17,17 +17,15 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.ChecksUtil;
 import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
-
-import java.util.List;
 
 /**
  * @author Artuto
@@ -51,62 +49,36 @@ public class AnnouncementCmd extends EndlessCommand
      {
          String args = event.getArgs();
 
-         boolean ping = true;
+         boolean ping;
          Role role;
          String[] splittedArgs = args.split(" \\| ", 2);
          String[] splittedArgs2;
          String message;
-         String preChannel;
-         String preRole;
+         String channelQuery;
+         String roleQuery;
          TextChannel tc;
 
          try
          {
              message = splittedArgs[0].trim();
-             splittedArgs2 = splittedArgs[1].trim().trim().split(" \\| ", 2);
+             splittedArgs2 = splittedArgs[1].trim().split(" \\| ", 2);
              try
              {
-                 preChannel = splittedArgs2[0].trim();
-
-                 List<TextChannel> tcList = FinderUtil.findTextChannels(preChannel, event.getGuild());
-                 if(tcList.isEmpty())
-                 {
-                     event.replyWarning("I was not able to found a text channel with the provided arguments: '"+preChannel+"'");
+                 channelQuery = splittedArgs2[0].trim();
+                 tc = ArgsUtils.findTextChannel(event, channelQuery);
+                 if(tc==null)
                      return;
-                 }
-                 else if(tcList.size()>1)
-                 {
-                     event.replyWarning(FormatUtil.listOfTcChannels(tcList, event.getArgs()));
-                     return;
-                 }
-                 else tc = tcList.get(0);
              }
-             catch(ArrayIndexOutOfBoundsException e)
-             {
-                 tc = null;
-             }
+             catch(ArrayIndexOutOfBoundsException e) {tc = null;}
 
              try
              {
-                 preRole = splittedArgs2[1].trim();
-
-                 List<Role> rList = FinderUtil.findRoles(preRole, event.getGuild());
-                 if(rList.isEmpty())
-                 {
-                     event.replyWarning("I was not able to found a role with the provided arguments: '"+preRole+"'");
+                 roleQuery = splittedArgs2[1].trim();
+                 role = ArgsUtils.findRole(event, roleQuery);
+                 if(role==null)
                      return;
-                 }
-                 else if(rList.size()>1)
-                 {
-                     event.replyWarning(FormatUtil.listOfRoles(rList, event.getArgs()));
-                     return;
-                 }
-                 else role = rList.get(0);
              }
-             catch(ArrayIndexOutOfBoundsException e)
-             {
-                 role = null;
-             }
+             catch(ArrayIndexOutOfBoundsException e) {role = null;}
          }
          catch(ArrayIndexOutOfBoundsException e)
          {
@@ -115,20 +87,17 @@ public class AnnouncementCmd extends EndlessCommand
              tc = null;
          }
 
-         if(tc==null)
-             tc = event.getTextChannel();
-         if(role==null)
-             ping = false;
+         tc = tc==null?event.getTextChannel():tc;
+         ping = !(role==null);
 
          if(!(tc.canTalk()))
          {
-             event.replyError("I can't talk in the specified channel!");
+             event.replyError("command.announcement.cantTalk.bot");
              return;
          }
-
          if(!(tc.canTalk(event.getMember())))
          {
-             event.replyError("You can't talk in the specified channel!");
+             event.replyError("command.announcement.cantTalk.executor");
              return;
          }
 
@@ -136,25 +105,23 @@ public class AnnouncementCmd extends EndlessCommand
          {
              if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), role)))
              {
-                 event.replyError("I can't interact with the specified role!");
+                 event.replyError("core.error.cantInteract.role.bot");
                  return;
              }
-
              if(!(ChecksUtil.canMemberInteract(event.getMember(), role)))
              {
-                 event.replyError("You can't interact with the specified role!");
+                 event.replyError("core.error.cantInteract.role.executor");
                  return;
              }
 
              if(role.isPublicRole() && !(ChecksUtil.hasPermission(event.getSelfMember(), tc, Permission.MESSAGE_MENTION_EVERYONE)))
              {
-                 event.replyError("I can't mention everyone!");
+                 event.replyError("command.announcement.cantPing.bot");
                  return;
              }
-
              if(role.isPublicRole() && !(ChecksUtil.hasPermission(event.getMember(), tc, Permission.MESSAGE_MENTION_EVERYONE)))
              {
-                 event.replyError("You can't mention everyone!");
+                 event.replyError("command.announcement.cantPing.executor");
                  return;
              }
 
@@ -164,21 +131,25 @@ public class AnnouncementCmd extends EndlessCommand
                  String fMessage = message;
                  TextChannel fTc = tc;
 
-                 role.getManager().setMentionable(true).queue(s -> fTc.sendMessage(fRole.getAsMention()+" "+fMessage).queue(s2 -> fRole.getManager().setMentionable(false).queue(s3 ->
-                         event.replySuccess("Successfully sent the announcement!"),
-                         e -> event.replyError("Error while setting the role back to no mentionable!")),
-                         e -> event.replyError("Error while sending the announcement!")), e -> event.replyError("Error while setting the role to mentionable!"));
+                 role.getManager().setMentionable(true).queue(s -> fTc.sendMessage(fRole.getAsMention()+" "+fMessage)
+                         .queue(s2 -> fRole.getManager().setMentionable(false).queue(s3 ->
+                                         event.replySuccess("command.announcement.success"),
+                                 e -> event.replyError("command.announcement.error.noMentionable")),
+                                 e -> event.replyError("command.announcement.error.sending")),
+                         e -> event.replyError("command.announcement.error.mentionable"));
              }
              else
              {
-                 tc.sendMessage(role.getAsMention()+" "+FormatUtil.sanitize(message)).queue(s -> event.replySuccess("Successfully sent the announcement!"), e ->
-                 event.replyError("Error while sending the announcement!"));
+                 tc.sendMessage(role.getAsMention()+" "+FormatUtil.sanitize(message))
+                         .queue(s -> event.replySuccess("command.announcement.success"), e ->
+                                 event.replyError("command.announcement.error.sending"));
              }
          }
 		 else
 		 {
-			tc.sendMessage(FormatUtil.sanitize(message)).queue(s -> event.replySuccess("Successfully sent the announcement!"), e ->
-                 event.replyError("Error while sending the announcement!"));
+			tc.sendMessage(FormatUtil.sanitize(message))
+                    .queue(s -> event.replySuccess("command.announcement.success"), e ->
+                            event.replyError("command.announcement.error.sending"));
 		 }
      }
 }

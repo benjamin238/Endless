@@ -22,6 +22,7 @@ import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -51,11 +52,7 @@ public class ChannelInfoCmd extends EndlessCommand
     @Override
     protected void executeCommand(EndlessCommandEvent event)
     {
-        Channel channel;
-        if(event.getArgs().isEmpty())
-            channel = event.getTextChannel();
-        else
-            channel = ArgsUtils.findChannel(true, event, event.getArgs());
+        Channel channel = event.getArgs().isEmpty()?event.getTextChannel():ArgsUtils.findChannel(true, event, event.getArgs());
         Guild guild = event.getGuild();
         if(channel==null)
             return;
@@ -73,14 +70,16 @@ public class ChannelInfoCmd extends EndlessCommand
             position = guild.getCategories().indexOf(channel);
 
         sb.append(Const.LINE_START).append(" ID: **").append(channel.getId()).append("**\n");
-        sb.append(Const.LINE_START).append(" Position: **").append(position).append("**\n");
-        sb.append(Const.LINE_START).append(" Creation: **").append(channel.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
-        sb.append(Const.LINE_START).append(" Users: **").append(channel.getMembers().size());
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.channel.position")).append(" **").append(position).append("**\n");
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.channel.creation")).append(" **").append(channel.getCreationTime()
+                .format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.channel.users")).append(" **").append(channel.getMembers().size());
+
         if(channel instanceof VoiceChannel)
         {
             VoiceChannel vc = (VoiceChannel)channel;
-            sb.append("/").append(vc.getUserLimit()==0?"Unlimited":vc.getUserLimit()).append("**\n");
-            sb.append(Const.LINE_START).append(" Bitrate: **").append(vc.getBitrate()).append("**kbps\n");
+            sb.append("/").append(vc.getUserLimit()==0?event.localize("command.channel.users.unlimited"):vc.getUserLimit()).append("**\n");
+            sb.append(Const.LINE_START).append(" ").append(event.localize("command.channel.bitrate")).append(" **").append(vc.getBitrate()).append("**kbps\n");
         }
         else
             sb.append("**\n");
@@ -89,21 +88,21 @@ public class ChannelInfoCmd extends EndlessCommand
         {
             TextChannel tc = (TextChannel)channel;
             if(!(tc.getTopic()==null || tc.getTopic().isEmpty()))
-                eb.addField("Topic:", tc.getTopic(), false);
+                eb.addField(event.localize("command.channel.topic"), tc.getTopic(), false);
         }
         else if(channel instanceof net.dv8tion.jda.core.entities.Category)
         {
             net.dv8tion.jda.core.entities.Category category = (net.dv8tion.jda.core.entities.Category)channel;
             if(!(category.getTextChannels().isEmpty()))
-                eb.addField("Text Channels:", category.getTextChannels().stream().map(IMentionable::getAsMention)
+                eb.addField(event.localize("command.channel.tcs"), category.getTextChannels().stream().map(IMentionable::getAsMention)
                         .collect(Collectors.joining(", ")), false);
             if(!(category.getVoiceChannels().isEmpty()))
-                eb.addField("Voice Channels:", category.getVoiceChannels().stream().map(Channel::getName)
+                eb.addField(event.localize("command.channel.vcs"), category.getVoiceChannels().stream().map(Channel::getName)
                         .collect(Collectors.joining(", ")), false);
         }
 
         String name = channel instanceof TextChannel?((TextChannel)channel).getAsMention():channel.getName();
-        String title = ":tv: Information about **"+name+"**";
+        String title = FormatUtil.sanitize(":tv: "+event.localize("command.channel.title", name));
         eb.setColor(event.getSelfMember().getColor()).setDescription(sb.toString());
         event.reply(mb.setContent(title).setEmbed(eb.build()).build());
     }

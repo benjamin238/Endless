@@ -40,6 +40,6 @@ public class AfkCmd extends EndlessCommand
         User user = event.getAuthor();
 
         AfkManager.setAfk(user.getIdLong(), event.getArgs().isEmpty()?null:event.getArgs());
-        event.replySuccess("**"+user.getName()+"** is now AFK!");
+        event.replySuccess("command.afk", user.getAsMention());
     }
 }

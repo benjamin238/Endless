@@ -17,21 +17,19 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
-import java.util.List;
 
 /**
  * @author Artuto
@@ -61,23 +59,12 @@ public class AvatarCmd extends EndlessCommand
             target = event.getAuthor();
         else
         {
-            List<Member> list = FinderUtil.findMembers(event.getArgs(), event.getGuild());
-
-            if(list.isEmpty())
-            {
-                event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
+            target = ArgsUtils.findUser(false, event, event.getArgs());
+            if(target==null)
                 return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
-                return;
-            }
-            else
-                target = list.get(0).getUser();
         }
 
-        String title = ":frame_photo: Avatar of **"+target.getName()+"**#**"+target.getDiscriminator()+"**";
+        String title = FormatUtil.sanitize(":frame_photo: "+event.localize("command.avatar", target.getName()+"#"+target.getDiscriminator()));
 
         builder.setImage(MiscUtils.getImageUrl("png", "512", target.getEffectiveAvatarUrl()));
         builder.setColor(event.isFromType(ChannelType.TEXT)?event.getGuild().getMember(target).getColor():Color.decode("#33ff00"));
