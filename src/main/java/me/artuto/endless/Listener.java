@@ -427,7 +427,10 @@ public class Listener implements CommandListener, EventListener
         VoiceChannel vc = event.getChannelLeft();
 
         if(user.getIdLong()==event.getJDA().getSelfUser().getIdLong())
+        {
+            bot.musicTasks.cancelLeave(vc);
             return;
+        }
 
         vc.getMembers().stream().filter(m -> !(m.getVoiceState().isDeafened()) && !(m.getUser().isBot())).forEach(actualListeners::add);
         if(actualListeners.isEmpty())
