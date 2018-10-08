@@ -96,7 +96,7 @@ public class UserInfoCmd extends EndlessCommand
                 else
                     gameName = "*("+game.getUrl()+")["+game.getUrl()+"]*";
                 
-                sb.append(" (").append(getGame(game.getType().getKey())).append(gameName).append().append(")");
+                sb.append(" (").append(getGame(game.getType().getKey())).append(" ").append(gameName).append(")");
             }
             sb.append("\n");
 
@@ -154,7 +154,7 @@ public class UserInfoCmd extends EndlessCommand
                 else
                     gameName = "*("+game.getUrl()+")["+game.getUrl()+"]*";
                 
-                sb.append(" (").append(getGame(game.getType().getKey())).append(gameName).append().append(")");
+                sb.append(" (").append(getGame(game.getType().getKey())).append(" ").append(gameName).append(")");
             }
             sb.append("\n");
             sb.append(Const.LINE_START).append(" Account Creation Date: **").append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
