@@ -51,10 +51,10 @@ public class WelcomeDmCmd extends EndlessCommand
         Guild guild = event.getGuild();
         GuildSettings gs = event.getClient().getSettingsFor(guild);
 
-        if(!(gs.getWelcomeDM() == null))
-            event.replySuccess("Welcome DM at **"+guild.getName()+"**:\n ```"+gs.getWelcomeDM()+"```");
+        if(!(gs.getWelcomeDM()==null))
+            event.replySuccess("command.welcome.dm.set", guild.getName(), gs.getWelcomeDM());
         else
-            event.replyError("No message configured! Use `"+event.getClient().getPrefix()+"welcomedm change` to set one.");
+            event.replyError("command.welcome.dm.unset", event.getClient().getPrefix());
     }
 
     private class ChangeCmd extends EndlessCommand
@@ -76,18 +76,18 @@ public class WelcomeDmCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setWelcomeDm(event.getGuild(), null);
-                event.replySuccess("Successfully removed welcome DM");
+                event.replySuccess("command.welcome.dm.set.removed");
             }
             else
             {
-                if(event.getArgs().length()>350)
+                if(event.getArgs().length()>400)
                 {
-                    event.replyError("The message can't be longer than 350 characters!");
+                    event.replyError("command.welcome.dm.set.length");
                     return;
                 }
 
                 bot.gsdm.setWelcomeDm(event.getGuild(), event.getArgs());
-                event.replySuccess("Welcome DM configured.");
+                event.replySuccess("command.welcome.dm.set.set");
             }
         }
     }

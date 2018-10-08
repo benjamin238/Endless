@@ -56,15 +56,6 @@ public class GuildUtils
         return rootGuild.getMembersWithRoles(donators).stream().anyMatch(m -> m.getUser().getIdLong()==owner.getIdLong());
     }
 
-    public static Collection<String> getPrefixes(Guild guild)
-    {
-        if(bot.endless==null)
-            return Collections.emptySet();
-
-        GuildSettings settings = bot.endless.getGuildSettings(guild);
-        return settings.getPrefixes();
-    }
-
     public static int getBanDeleteDays(Guild guild)
     {
         GuildSettings settings = bot.endless.getGuildSettings(guild);
@@ -105,18 +96,6 @@ public class GuildUtils
     {
         return guild.getRolesByName("Muted", true)
                 .stream().findFirst().orElse(guild.getRoleById(bot.endless.getGuildSettings(guild).getMutedRole()));
-    }
-
-    public static String getLeaveMessage(Guild guild)
-    {
-        GuildSettings settings = bot.endless.getGuildSettings(guild);
-        return settings.getLeaveMsg();
-    }
-
-    public static String getWelcomeMessage(Guild guild)
-    {
-        GuildSettings settings = bot.endless.getGuildSettings(guild);
-        return settings.getWelcomeMsg();
     }
 
     public static TextChannel getModlogChannel(Guild guild)

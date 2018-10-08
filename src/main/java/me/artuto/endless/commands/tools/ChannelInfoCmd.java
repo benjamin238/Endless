@@ -55,7 +55,7 @@ public class ChannelInfoCmd extends EndlessCommand
         if(event.getArgs().isEmpty())
             channel = event.getTextChannel();
         else
-            channel = ArgsUtils.findChannel(event, event.getArgs());
+            channel = ArgsUtils.findChannel(true, event, event.getArgs());
         Guild guild = event.getGuild();
         if(channel==null)
             return;

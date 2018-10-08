@@ -17,16 +17,13 @@
 
 package me.artuto.endless.commands.serverconfig;
 
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
-import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.VoiceChannel;
-
-import java.util.List;
 
 /**
  * @author Artuto
@@ -54,20 +51,16 @@ public class SetMusicVcCmd extends EndlessCommand
         if(event.getArgs().equalsIgnoreCase("none"))
         {
             bot.gsdm.setMusicVc(event.getGuild(), null);
-            event.replySuccess("Music can now be played on every channel now.");
+            event.replySuccess("command.setmusicvc.unset");
         }
         else
         {
-            List<VoiceChannel> list = FinderUtil.findVoiceChannels(event.getArgs(), event.getGuild());
-            if(list.isEmpty())
-                event.replyWarning("No Voice Channels found matching \""+event.getArgs()+"\"");
-            else if(list.size()>1)
-                event.replyWarning(FormatUtil.listOfVcChannels(list, event.getArgs()));
-            else
-            {
-                bot.gsdm.setMusicVc(event.getGuild(), list.get(0));
-                event.replySuccess("Music can now be played only on **"+list.get(0).getName()+"** now");
-            }
+            VoiceChannel vc = ArgsUtils.findVoiceChannel(event, event.getArgs());
+            if(vc==null)
+                return;
+
+            bot.gsdm.setMusicVc(event.getGuild(), vc);
+            event.replySuccess("command.setmusicvc.set", vc.getName());
         }
     }
 }

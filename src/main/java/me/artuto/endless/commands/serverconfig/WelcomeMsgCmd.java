@@ -22,7 +22,6 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
-import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -46,13 +45,12 @@ public class WelcomeMsgCmd extends EndlessCommand
     protected void executeCommand(EndlessCommandEvent event)
     {
         Guild guild = event.getGuild();
-        String msg = GuildUtils.getWelcomeMessage(guild);
+        String msg = bot.endless.getGuildSettings(guild).getWelcomeMsg();
 
         if(!(msg==null))
-            event.replySuccess("Welcome message at **"+guild.getName()+"**:\n ```"+msg+"```");
+            event.replySuccess("command.welcome.msg.set", guild.getName(), msg);
         else
-            event.replyError("No message configured! Use `"+event.getClient().getPrefix()+"welcomemsg change` to set one.\n" +
-                    "Remember to set the channel too!");
+            event.replyError("command.welcome.msg.unset", event.getClient().getPrefix());
     }
 
     private class ChangeCmd extends EndlessCommand
@@ -74,18 +72,18 @@ public class WelcomeMsgCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setWelcomeMessage(event.getGuild(), null);
-                event.replySuccess("Successfully removed welcome message");
+                event.replySuccess("command.welcome.msg.set.removed");
             }
             else
             {
-                if(event.getArgs().length()>350)
+                if(event.getArgs().length()>400)
                 {
-                    event.replyError("The message can't be longer than 350 characters!");
+                    event.replyError("command.welcome.msg.set.length");
                     return;
                 }
 
                 bot.gsdm.setWelcomeMessage(event.getGuild(), event.getArgs());
-                event.replySuccess("Welcome message configured.");
+                event.replySuccess("command.welcome.msg.set.set");
             }
         }
     }

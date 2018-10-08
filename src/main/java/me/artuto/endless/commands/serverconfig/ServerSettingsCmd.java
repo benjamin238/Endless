@@ -18,14 +18,14 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.GuildSettings;
 import me.artuto.endless.core.entities.Room;
-import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -34,7 +34,6 @@ import net.dv8tion.jda.core.entities.*;
 
 import java.time.ZoneId;
 import java.time.zone.ZoneRulesException;
-import java.util.List;
 
 public class ServerSettingsCmd extends EndlessCommand
 {
@@ -58,8 +57,22 @@ public class ServerSettingsCmd extends EndlessCommand
     {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = event.getGuild();
-        String title = ":information_source: Settings of **"+event.getGuild().getName()+"**:";
+        String title = Const.INFO+" "+event.localize("command.settings", guild.getName());
         GuildSettings settings = bot.endless.getGuildSettings(guild);
+
+        // pre-localized strings
+        String yes = event.localize("misc.yes");
+        String no = event.localize("misc.no");
+        String none = event.localize("misc.none");
+        String disabled = event.localize("misc.disabled");
+        String dontdel = event.localize("command.settings.value.bdd.dontDel");
+
+        // titles
+        String logs = event.localize("command.settings.title.logs");
+        String msgs = event.localize("command.settings.title.msgs");
+        String gs = event.localize("command.settings.title.gs");
+        String sb = event.localize("command.settings.title.sb");
+        String m = event.localize("command.settings.title.m");
 
         Emote starboardEmote = getEmote(guild, settings.getStarboardEmote());
         int banDeleteDays = settings.getBanDeleteDays();
@@ -69,7 +82,7 @@ public class ServerSettingsCmd extends EndlessCommand
         Role modRole = GuildUtils.getModRole(guild);
         Role mutedRole = GuildUtils.getMutedRole(guild);
         Room.Mode roomMode = settings.getRoomMode();
-        String fairQueue = "**"+(settings.isFairQueueEnabled()?"Yes":"No")+"**";
+        String fairQueue = "**"+(settings.isFairQueueEnabled()?yes:no)+"**";
         String welcomeDm = settings.getWelcomeDM();
         String welcomeMsg = settings.getWelcomeMsg();
         String leaveMsg = settings.getLeaveMsg();
@@ -88,36 +101,37 @@ public class ServerSettingsCmd extends EndlessCommand
         StringBuilder starboardString = new StringBuilder();
         StringBuilder musicString = new StringBuilder();
 
-        logsString.append("Modlog Channel: ").append((modlog==null?"None":"**"+modlog.getAsMention()+"**"))
-                .append("\nServerlog Channel: ").append((serverlog==null?"None":"**"+serverlog.getAsMention()+"**"))
-                .append("\nWelcome Channel: ").append((welcome==null?"None":"**"+welcome.getAsMention()+"**"))
-                .append("\nLeave Channel: ").append((leave==null?"None":"**"+leave.getAsMention()+"**"));
+        logsString.append(event.localize("command.settings.value.modlog")).append((modlog==null?none:"**"+modlog.getAsMention()+"**"))
+                .append(event.localize("command.settings.value.serverlog")).append((serverlog==null?none:"**"+serverlog.getAsMention()+"**"))
+                .append(event.localize("command.settings.value.welcome")).append((welcome==null?none:"**"+welcome.getAsMention()+"**"))
+                .append(event.localize("command.settings.value.leave")).append((leave==null?none:"**"+leave.getAsMention()+"**"));
 
-        messagesString.append("Welcome DM: ").append((welcomeDm==null?"None":"`"+welcomeDm+"`"))
-                .append("\nWelcome Message: ").append((welcomeMsg==null?"None":"`"+welcomeMsg+"`"))
-                .append("\nLeave Message: ").append((leaveMsg==null?"None":"`"+leaveMsg+"`"));
+        messagesString.append(event.localize("command.settings.value.welcome.dm")).append((welcomeDm==null?none:"`"+welcomeDm+"`"))
+                .append(event.localize("command.settings.value.welcome.msg")).append((welcomeMsg==null?none:"`"+welcomeMsg+"`"))
+                .append(event.localize("command.settings.value.leave.msg")).append((leaveMsg==null?none:"`"+leaveMsg+"`"));
 
-        settingsString.append("Admin Role: ").append((adminRole==null?"None":"**"+adminRole.getAsMention()+"**"))
-                .append("\nMod Role: ").append((modRole==null?"None":"**"+modRole.getAsMention()+"**"))
-                .append("\nMuted Role: ").append((mutedRole==null?"None":"**"+mutedRole.getAsMention()+"**"))
-                .append("\nBan delete days: ").append((banDeleteDays==0?"Don't delete":String.valueOf("**"+banDeleteDays+"**")))
-                .append("\nRoom Mode: **").append(roomMode.getName()).append("**")
-                .append("\nTimezone: **").append(tz.toString()).append("**");
+        settingsString.append(event.localize("command.settings.value.adminR")).append((adminRole==null?none:"**"+adminRole.getAsMention()+"**"))
+                .append(event.localize("command.settings.value.modR")).append((modRole==null?none:"**"+modRole.getAsMention()+"**"))
+                .append(event.localize("command.settings.value.mutedR")).append((mutedRole==null?none:"**"+mutedRole.getAsMention()+"**"))
+                .append(event.localize("command.settings.value.bdd")).append((banDeleteDays==0?dontdel:"**"+banDeleteDays+"**"))
+                .append(event.localize("command.settings.value.room")).append(" **").append(roomMode.getName()).append("**")
+                .append(event.localize("command.settings.value.tz")).append(" **").append(tz.toString()).append("**");
 
-        starboardString.append("Starboard Channel: ").append((starboard==null?"None":"**"+starboard.getAsMention()+"**"))
-                .append("\nStar Count: ").append((starboardCount==0?"Disabled":String.valueOf("**"+starboardCount+"**")))
-                .append("\nEmote: ").append(starboardEmote==null?settings.getStarboardEmote():starboardEmote.getAsMention());
+        starboardString.append(event.localize("command.settings.value.starboard")).append((starboard==null?none:"**"+starboard.getAsMention()+"**"))
+                .append(event.localize("command.settings.value.starboard.count")).append((starboardCount==0?disabled:"**"+starboardCount+"**"))
+                .append(event.localize("command.settings.value.starboard.emote")).append(starboardEmote==null?
+                settings.getStarboardEmote():starboardEmote.getAsMention());
 
-        musicString.append("DJ Role: ").append((djRole==null?"None":"**"+djRole.getAsMention()+"**"))
-                .append("\nText Channel: ").append((musicTc==null?"None":"**"+musicTc.getAsMention()+"**"))
-                .append("\nVoice Channel: ").append((musicVc==null?"None":"**"+musicVc.getName()+"**"))
-                .append("\nFair Queue: ").append(fairQueue);
+        musicString.append(event.localize("command.settings.value.music.djR")).append((djRole==null?none:"**"+djRole.getAsMention()+"**"))
+                .append(event.localize("command.settings.value.music.tc")).append((musicTc==null?none:"**"+musicTc.getAsMention()+"**"))
+                .append(event.localize("command.settings.value.music.vc")).append((musicVc==null?none:"**"+musicVc.getName()+"**"))
+                .append(event.localize("command.settings.value.music.fq")).append(fairQueue);
 
-        builder.addField(":mag: Logs", logsString.toString(), false);
-        builder.addField(":speech_balloon: Messages", messagesString.toString(), false);
-        builder.addField(":bar_chart: Server Settings", settingsString.toString(), false);
-        builder.addField(":star: Starboard", starboardString.toString(), false);
-        builder.addField(":notes: Music", musicString.toString(), false);
+        builder.addField(":mag: "+logs, logsString.toString(), false);
+        builder.addField(":speech_balloon: "+msgs, messagesString.toString(), false);
+        builder.addField(":bar_chart: "+gs, settingsString.toString(), false);
+        builder.addField(":star: "+sb, starboardString.toString(), false);
+        builder.addField(":notes: "+m, musicString.toString(), false);
 
         builder.setColor(event.getSelfMember().getColor());
         event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
@@ -142,20 +156,16 @@ public class ServerSettingsCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setModlogChannel(event.getGuild(), null);
-                event.replySuccess("Modlogging disabled");
+                event.replySuccess("command.settings.disabled", "Modlogging");
             }
             else
             {
-                List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-                if(list.isEmpty())
-                    event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1)
-                    event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
-                else
-                {
-                    bot.gsdm.setModlogChannel(event.getGuild(), list.get(0));
-                    event.replySuccess("Modlogging actions will be logged in "+list.get(0).getAsMention());
-                }
+                TextChannel tc = ArgsUtils.findTextChannel(event, event.getArgs());
+                if(tc==null)
+                    return;
+
+                bot.gsdm.setModlogChannel(event.getGuild(), tc);
+                event.replySuccess("command.settings.modlog", tc.getAsMention());
             }
         }
     }
@@ -179,20 +189,16 @@ public class ServerSettingsCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setServerlogChannel(event.getGuild(), null);
-                event.replySuccess("Serverlogging disabled");
+                event.replySuccess("command.settings.disabled", "Serverlogging");
             }
             else
             {
-                List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-                if(list.isEmpty())
-                    event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1)
-                    event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
-                else
-                {
-                    bot.gsdm.setServerlogChannel(event.getGuild(), list.get(0));
-                    event.replySuccess("Serverlogging actions will be logged in "+list.get(0).getAsMention());
-                }
+                TextChannel tc = ArgsUtils.findTextChannel(event, event.getArgs());
+                if(tc==null)
+                    return;
+
+                bot.gsdm.setServerlogChannel(event.getGuild(), tc);
+                event.replySuccess("command.settings.serverlog", tc.getAsMention());
             }
         }
     }
@@ -217,20 +223,16 @@ public class ServerSettingsCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setWelcomeChannel(event.getGuild(), null);
-                event.replySuccess("Welcome channel disabled");
+                event.replySuccess("command.settings.disabled", "Welcome channel");
             }
             else
             {
-                List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-                if(list.isEmpty())
-                    event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1)
-                    event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
-                else
-                {
-                    bot.gsdm.setWelcomeChannel(event.getGuild(), list.get(0));
-                    event.replySuccess("The message configured will be sent in "+list.get(0).getAsMention());
-                }
+                TextChannel tc = ArgsUtils.findTextChannel(event, event.getArgs());
+                if(tc==null)
+                    return;
+
+                bot.gsdm.setWelcomeChannel(event.getGuild(), tc);
+                event.replySuccess("command.settings.welcome", tc.getAsMention());
             }
         }
     }
@@ -255,20 +257,16 @@ public class ServerSettingsCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setLeaveChannel(event.getGuild(), null);
-                event.replySuccess("Leave channel disabled");
+                event.replySuccess("command.settings.disabled", "Leave channel");
             }
             else
             {
-                List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-                if(list.isEmpty())
-                    event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1)
-                    event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
-                else
-                {
-                    bot.gsdm.setLeaveChannel(event.getGuild(), list.get(0));
-                    event.replySuccess("The message configured will be sent in "+list.get(0).getAsMention());
-                }
+                TextChannel tc = ArgsUtils.findTextChannel(event, event.getArgs());
+                if(tc==null)
+                    return;
+
+                bot.gsdm.setLeaveChannel(event.getGuild(), tc);
+                event.replySuccess("command.settings.leave", tc.getAsMention());
             }
         }
     }
@@ -292,26 +290,22 @@ public class ServerSettingsCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setAdminRole(event.getGuild(), null);
-                event.replySuccess("Admin role disabled");
+                event.replySuccess("command.settings.disabled", "Admin role");
             }
             else
             {
-                List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
-                if(list.isEmpty())
-                    event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1)
-                    event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
-                else
-                {
-                    if(!(GuildUtils.getAdminRole(event.getGuild())==null))
-                    {
-                        event.replyError("You already have an Admin role!");
-                        return;
-                    }
+                Role role = ArgsUtils.findRole(event, event.getArgs());
+                if(role==null)
+                    return;
 
-                    bot.gsdm.setAdminRole(event.getGuild(), list.get(0));
-                    event.replySuccess("The admin role is now "+list.get(0).getAsMention());
+                if(!(GuildUtils.getAdminRole(event.getGuild())==null))
+                {
+                    event.replyError("command.settings.adminR.already");
+                    return;
                 }
+
+                bot.gsdm.setAdminRole(event.getGuild(), role);
+                event.replySuccess("command.settings.adminR", role.getName());
             }
         }
     }
@@ -335,26 +329,22 @@ public class ServerSettingsCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setModRole(event.getGuild(), null);
-                event.replySuccess("Mod role disabled");
+                event.replySuccess("command.settings.disabled", "Mod role");
             }
             else
             {
-                List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
-                if(list.isEmpty())
-                    event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1)
-                    event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
-                else
-                {
-                    if(!(GuildUtils.getModRole(event.getGuild())==null))
-                    {
-                        event.replyError("You already have a Mod role!");
-                        return;
-                    }
+                Role role = ArgsUtils.findRole(event, event.getArgs());
+                if(role==null)
+                    return;
 
-                    bot.gsdm.setModRole(event.getGuild(), list.get(0));
-                    event.replySuccess("The mod role is now "+list.get(0).getAsMention());
+                if(!(GuildUtils.getModRole(event.getGuild())==null))
+                {
+                    event.replyError("command.settings.modR.already");
+                    return;
                 }
+
+                bot.gsdm.setModRole(event.getGuild(), role);
+                event.replySuccess("command.settings.modR", role.getName());
             }
         }
     }
@@ -377,26 +367,22 @@ public class ServerSettingsCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setMutedRole(event.getGuild(), null);
-                event.replySuccess("Muted role disabled");
+                event.replySuccess("command.settings.disabled", "Muted role");
             }
             else
             {
-                List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
-                if(list.isEmpty())
-                    event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
-                else if(list.size()>1)
-                    event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
-                else
-                {
-                    if(!(GuildUtils.getMutedRole(event.getGuild())==null))
-                    {
-                        event.replyError("You already have a Muted role!");
-                        return;
-                    }
+                Role role = ArgsUtils.findRole(event, event.getArgs());
+                if(role==null)
+                    return;
 
-                    bot.gsdm.setMutedRole(event.getGuild(), list.get(0));
-                    event.replySuccess("The muted role is now "+list.get(0).getAsMention());
+                if(!(GuildUtils.getMutedRole(event.getGuild())==null))
+                {
+                    event.replyError("command.settings.mutedR.already");
+                    return;
                 }
+
+                bot.gsdm.setMutedRole(event.getGuild(), role);
+                event.replySuccess("command.settings.mutedR", role.getName());
             }
         }
     }
@@ -417,23 +403,20 @@ public class ServerSettingsCmd extends EndlessCommand
         @Override
         protected void executeCommand(EndlessCommandEvent event)
         {
-            if(event.getArgs().equalsIgnoreCase("0"))
+            switch(event.getArgs())
             {
-                bot.gsdm.setBanDeleteDays(event.getGuild(), 0);
-                event.replySuccess("Ban delete days set to 0 (No delete)");
+                case "0":
+                    bot.gsdm.setBanDeleteDays(event.getGuild(), 0);
+                    event.replySuccess("command.settings.bdd.set", "0 (No deletion)");
+                case "1":
+                    bot.gsdm.setBanDeleteDays(event.getGuild(), 1);
+                    event.replySuccess("command.settings.bdd.set", "1");
+                case "7":
+                    bot.gsdm.setBanDeleteDays(event.getGuild(), 7);
+                    event.replySuccess("command.settings.bdd.set", "7");
+                default:
+                    event.replyError("command.settings.bdd.invalid");
             }
-            else if(event.getArgs().equalsIgnoreCase("1"))
-            {
-                bot.gsdm.setBanDeleteDays(event.getGuild(), 1);
-                event.replySuccess("Ban delete days set to 1");
-            }
-            else if(event.getArgs().equalsIgnoreCase("7"))
-            {
-                bot.gsdm.setBanDeleteDays(event.getGuild(), 7);
-                event.replySuccess("Ban delete days set to 7");
-            }
-            else
-                event.replyError("That isn't a valid option! Valid options are `0` (Don't delete), `1` and `7`");
         }
     }
 
@@ -455,18 +438,15 @@ public class ServerSettingsCmd extends EndlessCommand
             String args = event.getArgs();
             ZoneId tz;
 
-            try
-            {
-                tz = ZoneId.of(args);
-            }
+            try {tz = ZoneId.of(args);}
             catch(ZoneRulesException e)
             {
-                event.replyError("Please specify a valid timezone!");
+                event.replyError("command.settings.tz.invalid");
                 return;
             }
 
             bot.gsdm.setTimezone(event.getGuild(), tz);
-            event.replySuccess("Successfully updated timezone!");
+            event.replySuccess("command.settings.tz.set");
         }
     }
 
@@ -488,8 +468,7 @@ public class ServerSettingsCmd extends EndlessCommand
         {
             if(!(GuildUtils.isPremiumGuild(event.getGuild())))
             {
-                event.replyError("This feature is only available to Donators' Guilds! If you want to support Endless'" +
-                        " development please consider donating by doing `"+event.getClient().getPrefix()+"donate`");
+                event.replyError("command.settings.fp.notDonator");
                 return;
             }
 
@@ -498,29 +477,23 @@ public class ServerSettingsCmd extends EndlessCommand
             if(args.equalsIgnoreCase("true"))
             {
                 bot.gsdm.setFairQueueStatus(event.getGuild(), true);
-                event.replySuccess("Successfully enabled FairQueue");
+                event.replySuccess("command.settings.fp.set", "enabled");
             }
             else if(args.equalsIgnoreCase("false"))
             {
                 bot.gsdm.setFairQueueStatus(event.getGuild(), false);
-                event.replySuccess("Successfully disabled FairQueue");
+                event.replySuccess("command.settings.fp.set", "disabled");
             }
             else
-                event.replyError("Invalid option! Must be `true` or `false`!");
+                event.replyError("command.settings.fp.invalid");
         }
     }
 
     private Emote getEmote(Guild guild, String emote)
     {
         long id;
-        try
-        {
-             id = Long.parseLong(emote);
-        }
-        catch(NumberFormatException e)
-        {
-            return null;
-        }
+        try {id = Long.parseLong(emote);}
+        catch(NumberFormatException e) {return null;}
 
         return guild.getEmoteById(id);
     }

@@ -1,30 +1,26 @@
 package me.artuto.endless.core.entities.impl;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Bot;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.core.entities.Room;
 import me.artuto.endless.utils.GuildUtils;
-
-import java.time.OffsetDateTime;
 
 public class RoomImpl implements Room
 {
     private boolean restricted;
     private long guildId, tcId, ownerId, vcId;
-    private OffsetDateTime expiryTime;
 
-    public RoomImpl(boolean restricted, long guildId, long tcId, long ownerId, long vcId, OffsetDateTime expiryTime)
+    public RoomImpl(boolean restricted, long guildId, long tcId, long ownerId, long vcId)
     {
         this.restricted = restricted;
         this.guildId = guildId;
         this.tcId = tcId;
         this.ownerId = ownerId;
         this.vcId = vcId;
-        this.expiryTime = expiryTime;
     }
 
     @Override
-    public boolean canAccess(CommandEvent event)
+    public boolean canAccess(EndlessCommandEvent event)
     {
         if(event.getAuthor().getIdLong()==ownerId || event.isOwner())
             return true;
@@ -44,12 +40,6 @@ public class RoomImpl implements Room
     public boolean isRestricted()
     {
         return restricted;
-    }
-
-    @Override
-    public boolean isTemporal()
-    {
-        return !(expiryTime==null);
     }
 
     @Override
@@ -86,12 +76,6 @@ public class RoomImpl implements Room
     public long getVoiceChannelId()
     {
         return vcId;
-    }
-
-    @Override
-    public OffsetDateTime getExpiryTime()
-    {
-        return expiryTime;
     }
 
     @Override

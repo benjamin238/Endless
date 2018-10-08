@@ -19,6 +19,7 @@ package me.artuto.endless.utils;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
@@ -70,6 +71,11 @@ public class ArgsUtils
 
     public static Channel findChannel(CommandEvent event, String query)
     {
+        return findChannel(false, event, query);
+    }
+
+    public static Channel findChannel(boolean categories, CommandEvent event, String query)
+    {
         Guild guild = event.getGuild();
         List<TextChannel> tcs = FinderUtil.findTextChannels(query, guild);
         if(tcs.isEmpty())
@@ -77,19 +83,27 @@ public class ArgsUtils
             List<VoiceChannel> vcs = FinderUtil.findVoiceChannels(query, guild);
             if(vcs.isEmpty())
             {
-                List<Category> cats = FinderUtil.findCategories(query, guild);
-                if(cats.isEmpty())
+                if(categories)
+                {
+                    List<Category> cats = FinderUtil.findCategories(query, guild);
+                    if(cats.isEmpty())
+                    {
+                        event.replyWarning("I was not able to found a channel with the provided arguments: '"+query+"'");
+                        return null;
+                    }
+                    else if(cats.size()>1)
+                    {
+                        event.replyWarning(FormatUtil.listOfCategories(cats, query));
+                        return null;
+                    }
+                    else
+                        return cats.get(0);
+                }
+                else
                 {
                     event.replyWarning("I was not able to found a channel with the provided arguments: '"+query+"'");
                     return null;
                 }
-                else if(cats.size()>1)
-                {
-                    event.replyWarning(FormatUtil.listOfCategories(cats, query));
-                    return null;
-                }
-                else
-                    return cats.get(0);
             }
             else if(vcs.size()>1)
             {
@@ -160,6 +174,23 @@ public class ArgsUtils
             return list.get(0);
     }
 
+    public static Role findRole(EndlessCommandEvent event, String query)
+    {
+        List<Role> list = FinderUtil.findRoles(query, event.getGuild());
+        if(list.isEmpty())
+        {
+            event.replyWarning("No Roles found matching \""+query+"\"");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfRoles(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
     public static User findBannedUser(CommandEvent event, String query)
     {
         List<User> list = FinderUtil.findBannedUsers(query, event.getGuild());
@@ -202,6 +233,23 @@ public class ArgsUtils
         else if(list.size()>1)
         {
             event.replyWarning(FormatUtil.listOfUsers(list, query));
+            return null;
+        }
+        else
+            return list.get(0);
+    }
+
+    public static VoiceChannel findVoiceChannel(EndlessCommandEvent event, String query)
+    {
+        List<VoiceChannel> list = FinderUtil.findVoiceChannels(query, event.getGuild());
+        if(list.isEmpty())
+        {
+            event.replyWarning("No Voice Channels found matching \""+query+"\"");
+            return null;
+        }
+        else if(list.size()>1)
+        {
+            event.replyWarning(FormatUtil.listOfVcChannels(list, query));
             return null;
         }
         else
@@ -262,5 +310,31 @@ public class ArgsUtils
         }
 
         return new String[]{target, String.valueOf(time), reason};
+    }
+
+    public static String[] splitWithSeparator(int limit, String args, String regex)
+    {
+        try
+        {
+            String[] argsArr = args.split(regex, limit);
+            return new String[]{argsArr[0], argsArr[1]};
+        }
+        catch(IndexOutOfBoundsException e)
+        {
+            return new String[]{args, ""};
+        }
+    }
+
+    public static String[] splitWithTime(String preArgs)
+    {
+        try
+        {
+            String[] args = preArgs.split(" \\|", 2);
+            return new String[]{args[0], String.valueOf(ArgsUtils.parseTime(args[1]))};
+        }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            return new String[]{preArgs, ""};
+        }
     }
 }

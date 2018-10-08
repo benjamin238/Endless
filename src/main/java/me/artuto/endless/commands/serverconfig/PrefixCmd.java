@@ -23,7 +23,6 @@ import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.GuildSettings;
-import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -50,17 +49,17 @@ public class PrefixCmd extends EndlessCommand
         StringBuilder sb = new StringBuilder();
         Guild guild = event.getGuild();
         String defP = event.getClient().getPrefix();
-
-        Collection<String> prefixes = GuildUtils.getPrefixes(guild);
+        GuildSettings gs = event.getClient().getSettingsFor(guild);
+        Collection<String> prefixes = gs.getPrefixes();
 
         if(prefixes.isEmpty())
-            event.reply("The prefix for this guild is `"+defP+"`");
+            event.reply("command.prefix.default");
         else
         {
             sb.append("`").append(defP).append("`");
             prefixes.forEach(p -> sb.append(", `").append(p).append("`"));
 
-            event.reply("The prefixes on this guild are: "+sb.toString());
+            event.reply("command.prefix.list", sb.toString());
         }
     }
 
@@ -83,12 +82,12 @@ public class PrefixCmd extends EndlessCommand
             Guild guild = event.getGuild();
             GuildSettings settings = event.getClient().getSettingsFor(guild);
 
-            if(!(settings.getPrefixes()==null) && settings.getPrefixes().contains(args))
-                event.replyWarning("That prefix is already added!");
+            if(settings.getPrefixes().contains(args))
+                event.replyError("command.prefix.add.alreadyAdded");
             else
             {
                 bot.gsdm.addPrefix(guild, args);
-                event.replySuccess("Successfully added prefix!");
+                event.replySuccess("command.prefix.add.added");
             }
         }
     }
@@ -112,13 +111,13 @@ public class PrefixCmd extends EndlessCommand
             Guild guild = event.getGuild();
             GuildSettings settings = event.getClient().getSettingsFor(guild);
 
-            if(!(settings.getPrefixes()==null) && settings.getPrefixes().contains(args))
+            if(settings.getPrefixes().contains(args))
             {
                 bot.gsdm.removePrefix(guild, args);
-                event.replySuccess("Successfully removed a prefix!");
+                event.replySuccess("command.prefix.remove.removed");
             }
             else
-                event.replyWarning("That prefix doesn't exists!");
+                event.replyError("command.prefix.remove.notAdded");
         }
     }
 }

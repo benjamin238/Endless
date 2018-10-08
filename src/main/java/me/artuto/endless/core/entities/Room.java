@@ -1,18 +1,14 @@
 package me.artuto.endless.core.entities;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-
-import java.time.OffsetDateTime;
+import me.artuto.endless.commands.EndlessCommandEvent;
 
 public interface Room
 {
-    boolean canAccess(CommandEvent event);
+    boolean canAccess(EndlessCommandEvent event);
 
     boolean isCombo();
 
     boolean isRestricted();
-
-    boolean isTemporal();
 
     boolean isText();
 
@@ -25,8 +21,6 @@ public interface Room
     long getOwnerId();
 
     long getVoiceChannelId();
-
-    OffsetDateTime getExpiryTime();
 
     enum Mode
     {

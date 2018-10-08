@@ -245,27 +245,11 @@ public class EntityBuilder
 
     public Room createRoom(ResultSet results) throws SQLException
     {
-        if(!(results.getLong("expiry_time")==0L))
-        {
-            Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-            gmt.setTimeInMillis(results.getLong("expiry_time"));
-            return new RoomImpl(results.getBoolean("restricted"),
-                    results.getLong("guild_id"),
-                    results.getLong("tc_id"),
-                    results.getLong("owner_id"),
-                    results.getLong("vc_id"),
-                    OffsetDateTime.ofInstant(gmt.toInstant(), gmt.getTimeZone().toZoneId()));
-
-        }
-        else
-        {
-            return new RoomImpl(results.getBoolean("restricted"),
-                    results.getLong("guild_id"),
-                    results.getLong("tc_id"),
-                    results.getLong("owner_id"),
-                    results.getLong("vc_id"),
-                    null);
-        }
+        return new RoomImpl(results.getBoolean("restricted"),
+                results.getLong("guild_id"),
+                results.getLong("tc_id"),
+                results.getLong("owner_id"),
+                results.getLong("vc_id"));
     }
 
     public StarboardMessage createStarboardMessage(ResultSet results) throws SQLException

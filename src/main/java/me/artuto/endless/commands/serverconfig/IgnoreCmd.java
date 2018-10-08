@@ -18,13 +18,12 @@
 package me.artuto.endless.commands.serverconfig;
 
 import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.core.entities.Ignore;
-import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -57,7 +56,7 @@ public class IgnoreCmd extends EndlessCommand
     @Override
     protected void executeCommand(EndlessCommandEvent event)
     {
-        event.replyError("Please choose a valid subcommand!");
+        event.replyError("command.ignore.noArgs");
     }
 
     private class AddChannelCmd extends EndlessCommand
@@ -77,29 +76,17 @@ public class IgnoreCmd extends EndlessCommand
         protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
-            TextChannel tc;
-
-            List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), guild);
-            if(list.isEmpty())
-            {
-                event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
+            TextChannel tc = ArgsUtils.findTextChannel(event, event.getArgs());
+            if(tc==null)
                 return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
-                return;
-            }
-            else
-                tc = list.get(0);
 
             if(bot.endless.getIgnore(guild, tc.getIdLong())==null)
             {
                 bot.gsdm.addIgnore(guild, tc.getIdLong());
-                event.replySuccess("Successfully added **"+tc.getAsMention()+"** to the ignores list!");
+                event.replySuccess("command.ignore.added", tc.getAsMention());
             }
             else
-                event.replyWarning("That channel is already ignored!");
+                event.replyError("command.ignore.alreadyIgnored", "channel");
         }
     }
 
@@ -120,29 +107,17 @@ public class IgnoreCmd extends EndlessCommand
         protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
-            Role role;
-
-            List<Role> list = FinderUtil.findRoles(event.getArgs(), guild);
-            if(list.isEmpty())
-            {
-                event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
+            Role role = ArgsUtils.findRole(event, event.getArgs());
+            if(role==null)
                 return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
-                return;
-            }
-            else
-                role = list.get(0);
 
             if(bot.endless.getIgnore(guild, role.getIdLong())==null)
             {
                 bot.gsdm.addIgnore(guild, role.getIdLong());
-                event.replySuccess("Successfully added **"+role.getName()+"** to the ignores list!");
+                event.replySuccess("command.ignore.added", role.getName());
             }
             else
-                event.replyWarning("That role is ignored already!");
+                event.replyError("command.ignore.alreadyIgnored", "role");
         }
     }
 
@@ -163,29 +138,18 @@ public class IgnoreCmd extends EndlessCommand
         protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
-            User user;
-
-            List<Member> list = FinderUtil.findMembers(event.getArgs(), guild);
-            if(list.isEmpty())
-            {
-                event.replyWarning("No Users found matching \""+event.getArgs()+"\"");
+            Member member = ArgsUtils.findMember(event, event.getArgs());
+            if(member==null)
                 return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
-                return;
-            }
-            else
-                user = list.get(0).getUser();
+            User user = member.getUser();
 
             if(bot.endless.getIgnore(guild, user.getIdLong())==null)
             {
                 bot.gsdm.addIgnore(guild, user.getIdLong());
-                event.replySuccess("Successfully added **"+user.getName()+"#"+user.getDiscriminator()+"** to the ignores list!");
+                event.replySuccess("command.ignore.added", user.getName()+"#"+user.getDiscriminator());
             }
             else
-                event.replyWarning("That role is ignored already!");
+                event.replyError("command.ignore.alreadyAdded", "user");
         }
     }
 
@@ -211,7 +175,7 @@ public class IgnoreCmd extends EndlessCommand
             StringBuilder sb = new StringBuilder();
 
             if(ignores.isEmpty())
-                event.replyWarning("This guild doesn't has ignored entities!");
+                event.replyWarning("command.ignore.empty");
             else
             {
                 for(Ignore ignore : ignores)
@@ -227,7 +191,7 @@ public class IgnoreCmd extends EndlessCommand
 
                 builder.setDescription(sb);
                 builder.setColor(event.getSelfMember().getColor());
-                builder.setFooter("Ignores in "+event.getGuild().getName(), event.getGuild().getIconUrl());
+                builder.setFooter(event.localize("command.ignore.list")+" "+event.getGuild().getName(), event.getGuild().getIconUrl());
                 event.reply(builder.build());
             }
         }
@@ -250,29 +214,17 @@ public class IgnoreCmd extends EndlessCommand
         protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
-            TextChannel tc;
-
-            List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), guild);
-            if(list.isEmpty())
-            {
-                event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
+            TextChannel tc = ArgsUtils.findTextChannel(event, event.getArgs());
+            if(tc==null)
                 return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
-                return;
-            }
-            else
-                tc = list.get(0);
 
             if(!(bot.endless.getIgnore(guild, tc.getIdLong())==null))
             {
                 bot.gsdm.removeIgnore(guild, tc.getIdLong());
-                event.replySuccess("Successfully removed **"+tc.getAsMention()+"** from the ignores list!");
+                event.replySuccess("command.ignore.removed", tc.getAsMention());
             }
             else
-                event.replyWarning("That channel isn't ignored!");
+                event.replyError("command.ignore.notIgnored", "channel");
         }
     }
 
@@ -293,29 +245,17 @@ public class IgnoreCmd extends EndlessCommand
         protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
-            Role role;
-
-            List<Role> list = FinderUtil.findRoles(event.getArgs(), guild);
-            if(list.isEmpty())
-            {
-                event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
+            Role role = ArgsUtils.findRole(event, event.getArgs());
+            if(role==null)
                 return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
-                return;
-            }
-            else
-                role = list.get(0);
 
             if(!(bot.endless.getIgnore(guild, role.getIdLong())==null))
             {
                 bot.gsdm.removeIgnore(guild, role.getIdLong());
-                event.replySuccess("Successfully removed **"+role.getName()+"** from the ignores list!");
+                event.replySuccess("command.ignore.removed", role.getName());
             }
             else
-                event.replyWarning("That role isn't ignored!");
+                event.replyWarning("command.ignore.notIgnored", "role");
         }
     }
 
@@ -336,29 +276,18 @@ public class IgnoreCmd extends EndlessCommand
         protected void executeCommand(EndlessCommandEvent event)
         {
             Guild guild = event.getGuild();
-            User user;
-
-            List<Member> list = FinderUtil.findMembers(event.getArgs(), guild);
-            if(list.isEmpty())
-            {
-                event.replyWarning("No Users found matching \""+event.getArgs()+"\"");
+            Member member = ArgsUtils.findMember(event, event.getArgs());
+            if(member==null)
                 return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfMembers(list, event.getArgs()));
-                return;
-            }
-            else
-                user = list.get(0).getUser();
+            User user = member.getUser();
 
             if(!(bot.endless.getIgnore(guild, user.getIdLong())==null))
             {
                 bot.gsdm.removeIgnore(guild, user.getIdLong());
-                event.replySuccess("Successfully removed **"+user.getName()+"#"+user.getDiscriminator()+"** from the ignores list!");
+                event.replySuccess("command.ignore.removed", user.getName()+"#"+user.getDiscriminator());
             }
             else
-                event.replyWarning("That user isn't ignored!");
+                event.replyWarning("command.ignore.notIgnored", "user");
         }
     }
 }

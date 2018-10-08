@@ -140,7 +140,6 @@ public class Bot extends ListenerAdapter
     private ScheduledExecutorService optimizerScheduler;
     private ScheduledExecutorService pollScheduler;
     private ScheduledExecutorService reminderScheduler;
-    private ScheduledExecutorService roomScheduler;
 
     // Threads
     public ScheduledExecutorService archiveThread;
@@ -213,7 +212,6 @@ public class Bot extends ListenerAdapter
             muteScheduler = ThreadLoader.createThread("Mutes");
             pollScheduler = ThreadLoader.createThread("Polls");
             reminderScheduler = ThreadLoader.createThread("Reminders");
-            roomScheduler = ThreadLoader.createThread("Rooms");
             starboardThread = ThreadLoader.createThread("Starboard");
         }
         archiveThread = ThreadLoader.createThread("Archive Command");
@@ -321,7 +319,6 @@ public class Bot extends ListenerAdapter
                             0, 1, TimeUnit.SECONDS);
                     pollScheduler.scheduleWithFixedDelay(() -> pldm.updatePolls(shardManager), 0, 1, TimeUnit.SECONDS);
                     reminderScheduler.scheduleWithFixedDelay(() -> rdm.updateReminders(shardManager), 0, 1, TimeUnit.SECONDS);
-                    roomScheduler.scheduleWithFixedDelay(() -> rsdm.updateRooms(shardManager), 0, 1, TimeUnit.SECONDS);
                 }
                 endlessPool.schedule(() -> db.toDelete.forEach(g -> db.deleteSettings(g)), 24, TimeUnit.HOURS);
                 optimizerScheduler.scheduleWithFixedDelay(System::gc, 5, 30, TimeUnit.MINUTES);

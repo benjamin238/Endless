@@ -22,7 +22,7 @@ import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
-import me.artuto.endless.utils.GuildUtils;
+import me.artuto.endless.core.entities.GuildSettings;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -46,12 +46,13 @@ public class LeaveMsgCmd extends EndlessCommand
     protected void executeCommand(EndlessCommandEvent event)
     {
         Guild guild = event.getGuild();
-        String msg = GuildUtils.getLeaveMessage(guild);
+        GuildSettings gs = event.getClient().getSettingsFor(guild);
+        String msg = gs.getLeaveMsg();
 
         if(!(msg==null))
-            event.replySuccess("Leave message at **"+guild.getName()+"**:\n ```"+msg+"```");
+            event.replySuccess("command.leave.message", guild.getName(), msg);
         else
-            event.replyError("No message configured! Use `"+event.getClient().getPrefix()+"leavemsg change` to set one.");
+            event.replyError("command.leave.unset", event.getClient().getPrefix());
     }
 
     private class ChangeCmd extends EndlessCommand
@@ -73,18 +74,18 @@ public class LeaveMsgCmd extends EndlessCommand
             if(event.getArgs().equalsIgnoreCase("none"))
             {
                 bot.gsdm.setLeaveMessage(event.getGuild(), null);
-                event.replySuccess("Successfully removed leave message");
+                event.replySuccess("command.leave.change.removed");
             }
             else
             {
-                if(event.getArgs().length()>350)
+                if(event.getArgs().length()>400)
                 {
-                    event.replyError("The message can't be longer than 350 characters!");
+                    event.replyError("command.leave.change.tooLong");
                     return;
                 }
 
                 bot.gsdm.setLeaveMessage(event.getGuild(), event.getArgs());
-                event.replySuccess("Leave message configured.");
+                event.replySuccess("command.leave.change.set");
             }
         }
     }

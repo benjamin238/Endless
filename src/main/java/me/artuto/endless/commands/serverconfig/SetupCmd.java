@@ -1,7 +1,5 @@
 package me.artuto.endless.commands.serverconfig;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.ButtonMenu;
 import me.artuto.endless.Bot;
 import me.artuto.endless.Const;
@@ -26,7 +24,7 @@ public class SetupCmd extends EndlessCommand
     {
         this.bot = bot;
         this.name = "setup";
-        this.children = new Command[]{new MutedRoleCmd(), new DisableAtEveryone()};
+        this.children = new EndlessCommand[]{new MutedRoleCmd(), new DisableAtEveryone()};
         this.help = "Server setup";
         this.category = Categories.SERVER_CONFIG;
         this.userPerms = new Permission[]{Permission.MANAGE_SERVER};
@@ -36,16 +34,14 @@ public class SetupCmd extends EndlessCommand
     @Override
     protected void executeCommand(EndlessCommandEvent event)
     {
-        event.reply(Const.INFO+" Use this command to setup:\n" +
-                Const.LINE_START+" Muted role (and channel overrides)\n" +
-                Const.LINE_START+" Disable everyone permissions for every role that isn't Admin");
+        event.reply("command.setup", Const.INFO, Const.LINE_START);
     }
 
     private class MutedRoleCmd extends EndlessCommand
     {
         MutedRoleCmd()
         {
-            this.name = "mutedrole";;
+            this.name = "mutedrole";
             this.help = "Setup the muted role";
             this.category = Categories.SERVER_CONFIG;
             this.botPerms = new Permission[]{Permission.ADMINISTRATOR};
@@ -65,18 +61,19 @@ public class SetupCmd extends EndlessCommand
             {
                 if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), mutedRole)))
                 {
-                    event.replyError("I can't interact with the existing *"+mutedRole.getName()+"* role!");
+                    event.replyError("command.setup.muted.cantInteract.bot", mutedRole.getName());
+                    return;
+                }
+                if(!(ChecksUtil.canMemberInteract(event.getMember(), mutedRole)))
+                {
+                    event.replyError("command.setup.muted.cantInteract.user", mutedRole.getName());
                     return;
                 }
 
-                if(!(ChecksUtil.canMemberInteract(event.getMember(), mutedRole)))
-                {
-                    event.replyError("You can't interact with the existing *"+mutedRole.getName()+"* role!");
-                    return;
-                }
-                confirm = "This will modify the role \""+mutedRole.getName()+"\" role and assign it overrides on every Channel, Continue?";
+                confirm = event.localize("command.setup.muted.confirm.nonExistant", mutedRole.getName());
             }
-            else confirm = "This will create a new role called \"Muted\" and assign it overrides on every Channel, Continue?";
+            else
+                confirm = event.localize("command.setup.muted.confirm.create");
 
             waitForConfirm(event, confirm, () -> setupMutedRole(event, mutedRole));
         }
@@ -104,19 +101,19 @@ public class SetupCmd extends EndlessCommand
 
             if(count==0)
             {
-                event.replySuccess("No changes made because every role had their Permission removed.");
+                event.replySuccess("command.setup.everyone.noChanges");
                 return;
             }
 
-            String confirm = "This will remove the `Mention Everyone` permission form every role that **doesn't** has `Manage Server`. Continue?";
+            String confirm = event.localize("command.setup.everyone.confirm");
             waitForConfirm(event, confirm, () -> disableEveryone(event));
         }
     }
 
-    private void setupMutedRole(CommandEvent event, Role role)
+    private void setupMutedRole(EndlessCommandEvent event, Role role)
     {
-        StringBuilder sb = new StringBuilder(event.getClient().getSuccess()+" Starting setup...\n");
-        event.reply(sb+Const.LOADING+" Creating role...", m -> event.async(() -> {
+        StringBuilder sb = new StringBuilder(event.getClient().getSuccess()+" "+event.localize("core.setup.starting")+"\n");
+        event.reply(sb+Const.LOADING+" "+event.localize("core.setup.muted.creating"), m -> event.async(() -> {
             try
             {
                 Role mutedRole;
@@ -124,8 +121,8 @@ public class SetupCmd extends EndlessCommand
                     mutedRole = event.getGuild().getController().createRole().setName("Muted").setColor(Color.RED).complete();
                 else
                     mutedRole = role;
-                sb.append(event.getClient().getSuccess()).append(" Role created!\n");
-                m.editMessage(sb+Const.LOADING+" Creating Category overrides...").complete();
+                sb.append(event.getClient().getSuccess()).append(" ").append(event.localize("core.setup.muted.created")).append("\n");
+                m.editMessage(sb+Const.LOADING+" "+event.localize("core.setup.muted.creating.categories")).complete();
 
                 PermissionOverride po;
                 for(net.dv8tion.jda.core.entities.Category cat : event.getGuild().getCategories())
@@ -138,8 +135,8 @@ public class SetupCmd extends EndlessCommand
                         po.getManager().deny(Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_WRITE,
                                 Permission.VOICE_CONNECT, Permission.VOICE_SPEAK).complete();
                 }
-                sb.append(event.getClient().getSuccess()).append(" Successfully created Category overrides!\n");
-                m.editMessage(sb+Const.LOADING+" Creating Text Channel overrides...").complete();
+                sb.append(event.getClient().getSuccess()).append(" ").append(event.localize("core.setup.muted.created.categories")).append("\n");
+                m.editMessage(sb+Const.LOADING+" "+event.localize("core.setup.muted.creating.text")).complete();
                 for(TextChannel tc : event.getGuild().getTextChannels())
                 {
                     po = tc.getPermissionOverride(mutedRole);
@@ -148,8 +145,8 @@ public class SetupCmd extends EndlessCommand
                     else
                         po.getManager().deny(Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_WRITE).complete();
                 }
-                sb.append(event.getClient().getSuccess()).append(" Successfully created Text Channel overrides!\n");
-                m.editMessage(sb+Const.LOADING+" Creating Voice Channel overrides...").complete();
+                sb.append(event.getClient().getSuccess()).append(" ").append(event.localize("core.setup.muted.created.text")).append("\n");
+                m.editMessage(sb+Const.LOADING+" "+event.localize("core.setup.muted.creating.voice")).complete();
                 for(VoiceChannel vc : event.getGuild().getVoiceChannels())
                 {
                     po = vc.getPermissionOverride(mutedRole);
@@ -158,21 +155,20 @@ public class SetupCmd extends EndlessCommand
                     else
                         po.getManager().deny(Permission.VOICE_CONNECT, Permission.VOICE_SPEAK).complete();
                 }
-                m.editMessage(sb+event.getClient().getSuccess()+" Successfully created Voice Channel overrides!\n\n" +
-                        event.getClient().getSuccess()+" Muted role setup has been completed!").queue();
+                m.editMessage(sb+event.getClient().getSuccess()+" "+event.localize("core.setup.muted.created.voice")+"\n\n" +
+                        event.getClient().getSuccess()+" "+event.localize("core.setup.finished")).queue();
             }
             catch(Exception e)
             {
-                m.editMessage(sb+event.getClient().getError()+" Something went wrong while setting up the Muted role. Check that I have " +
-                        "Administrator permission and the Muted role is below my higher role.").queue();
+                m.editMessage(sb+event.getClient().getError()+" "+event.localize("core.setup.muted.error")).queue();
             }
         }));
     }
 
-    private void disableEveryone(CommandEvent event)
+    private void disableEveryone(EndlessCommandEvent event)
     {
-        StringBuilder sb = new StringBuilder(event.getClient().getSuccess()+" Starting setup...\n");
-        event.reply(sb+Const.LOADING+" Filtering roles...", m -> event.async(() -> {
+        StringBuilder sb = new StringBuilder(event.getClient().getSuccess()+" "+event.localize("core.setup.starting")+"\n");
+        event.reply(sb+Const.LOADING+" "+event.localize("core.setup.everyone.filtering"), m -> event.async(() -> {
             try
             {
                 List<Role> roles = event.getGuild().getRoles().stream().filter(r -> r.getPermissions().contains(Permission.MESSAGE_MENTION_EVERYONE) &&
@@ -182,25 +178,24 @@ public class SetupCmd extends EndlessCommand
                 for(Role role : roles)
                     role.getManager().revokePermissions(Permission.MESSAGE_MENTION_EVERYONE).complete();
 
-                sb.append(event.getClient().getSuccess()).append(" Successfully revoked permissions!");
+                sb.append(event.getClient().getSuccess()).append(" ").append(event.localize("core.setup.everyone.revoked"));
                 m.editMessage(sb).queue();
             }
             catch(Exception e)
             {
-                m.editMessage(sb+event.getClient().getError()+" Something went wrong while editing the roles!" +
-                        " Please check I still have `Administrator` permission.").queue();
+                m.editMessage(sb+event.getClient().getError()+" "+event.localize("core.setup.everyone.error")).queue();
             }
         }));
     }
 
-    private void waitForConfirm(CommandEvent event, String confirm, Runnable action)
+    private void waitForConfirm(EndlessCommandEvent event, String confirm, Runnable action)
     {
         new ButtonMenu.Builder()
                 .setChoices("444226239683624962", "444226355555729428")
                 .setEventWaiter(bot.waiter)
                 .setTimeout(1, TimeUnit.MINUTES)
-                .setText(event.getClient().getWarning()+" "+confirm+"\n\n"+event.getClient().getSuccess()+" Continue\n" +
-                        event.getClient().getError()+" Cancel")
+                .setText(event.getClient().getWarning()+" "+confirm+"\n\n"+event.getClient().getSuccess()+" "+event.localize("misc.continue")+"\n" +
+                        event.getClient().getError()+" "+event.localize("misc.cancel"))
                 .setFinalAction(m -> m.delete().queue(s -> {}, e -> {}))
                 .setUsers(event.getAuthor())
                 .setAction(re -> {

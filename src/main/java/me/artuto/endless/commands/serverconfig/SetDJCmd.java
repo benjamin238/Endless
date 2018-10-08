@@ -17,16 +17,13 @@
 
 package me.artuto.endless.commands.serverconfig;
 
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
-import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Role;
-
-import java.util.List;
 
 /**
  * @author Artuto
@@ -53,27 +50,16 @@ public class SetDJCmd extends EndlessCommand
         if(event.getArgs().equalsIgnoreCase("none"))
         {
             bot.gsdm.setDJRole(event.getGuild(), null);
-            event.replySuccess("Successfully disabled DJ Role.");
+            event.replySuccess("command.setdj.disabled");
         }
         else
         {
-            Role role;
-            List<Role> list = FinderUtil.findRoles(event.getArgs(), event.getGuild());
-            if(list.isEmpty())
-            {
-                event.replyWarning("No Roles found matching \""+event.getArgs()+"\"");
+            Role role = ArgsUtils.findRole(event, event.getArgs());
+            if(role==null)
                 return;
-            }
-            else if(list.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfRoles(list, event.getArgs()));
-                return;
-            }
-            else
-                role = list.get(0);
 
             bot.gsdm.setDJRole(event.getGuild(), role);
-            event.replySuccess("Successfully set the DJ role to **"+role.getName()+"**.");
+            event.replySuccess("command.setdj.set", role.getName());
         }
     }
 }

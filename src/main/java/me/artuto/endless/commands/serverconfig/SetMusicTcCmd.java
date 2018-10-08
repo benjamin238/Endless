@@ -17,16 +17,13 @@
 
 package me.artuto.endless.commands.serverconfig;
 
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
-import me.artuto.endless.utils.FormatUtil;
+import me.artuto.endless.utils.ArgsUtils;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
-
-import java.util.List;
 
 /**
  * @author Artuto
@@ -54,20 +51,16 @@ public class SetMusicTcCmd extends EndlessCommand
         if(event.getArgs().equalsIgnoreCase("none"))
         {
             bot.gsdm.setMusicTc(event.getGuild(), null);
-            event.replySuccess("Music commands can be executed on every channel now.");
+            event.replySuccess("command.setmusictc.unset");
         }
         else
         {
-            List<TextChannel> list = FinderUtil.findTextChannels(event.getArgs(), event.getGuild());
-            if(list.isEmpty())
-                event.replyWarning("No Text Channels found matching \""+event.getArgs()+"\"");
-            else if(list.size()>1)
-                event.replyWarning(FormatUtil.listOfTcChannels(list, event.getArgs()));
-            else
-            {
-                bot.gsdm.setMusicTc(event.getGuild(), list.get(0));
-                event.replySuccess("Music commands must be executed on "+list.get(0).getAsMention()+" now");
-            }
+            TextChannel tc = ArgsUtils.findTextChannel(event, event.getArgs());
+            if(tc==null)
+                return;
+
+            bot.gsdm.setMusicTc(event.getGuild(), tc);
+            event.replySuccess("command.setmusictc.set", tc.getAsMention());
         }
     }
 }
