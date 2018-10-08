@@ -197,7 +197,7 @@
                             <minimizeJar>true</minimizeJar>  
                             <archive>
                                 <manifest>
-                                    <mainClass>YourMainClass</mainClass> <!-- You have to replace this with a path to your main class like my.path.Main -->
+                                    <mainClass>me.artuto.endless.Endless</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
