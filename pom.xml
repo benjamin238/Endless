@@ -194,7 +194,12 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <minimizeJar>true</minimizeJar>
+                            <minimizeJar>true</minimizeJar>  
+                            <archive>
+                                <manifest>
+                                    <mainClass>YourMainClass</mainClass> <!-- You have to replace this with a path to your main class like my.path.Main -->
+                                </manifest>
+                            </archive>
                         </configuration>
                     </execution>
                 </executions>
