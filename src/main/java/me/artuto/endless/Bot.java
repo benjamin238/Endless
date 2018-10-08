@@ -136,6 +136,7 @@ public class Bot extends ListenerAdapter
     public ScheduledThreadPoolExecutor endlessPool;
 
     // Schedulers;
+    public ScheduledExecutorService voiceLeaverScheduler;
     private ScheduledExecutorService muteScheduler;
     private ScheduledExecutorService optimizerScheduler;
     private ScheduledExecutorService pollScheduler;
@@ -218,6 +219,7 @@ public class Bot extends ListenerAdapter
         clearThread = ThreadLoader.createThread("Clear Command");
         endlessPool = ThreadLoader.createThread("Endless");
         optimizerScheduler = ThreadLoader.createThread("Optimizer");
+        voiceLeaverScheduler = ThreadLoader.createThread("Voice Leaver");
 
         waiter = new EventWaiter();
         Listener listener = new Listener(this);

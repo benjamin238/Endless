@@ -61,6 +61,9 @@ import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.webhook.WebhookClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Artuto
  */
@@ -242,6 +245,7 @@ public class Listener implements CommandListener, EventListener
                 return;
             GuildVoiceJoinEvent event = (GuildVoiceJoinEvent)preEvent;
             serverlog.onGuildVoiceJoin(event);
+            checkVoiceJoin(event);
         }
         else if(preEvent instanceof GuildVoiceMoveEvent)
         {
@@ -256,6 +260,7 @@ public class Listener implements CommandListener, EventListener
                 return;
             GuildVoiceLeaveEvent event = (GuildVoiceLeaveEvent)preEvent;
             serverlog.onGuildVoiceLeave(event);
+            checkVoiceLeave(event);
         }
         else if(preEvent instanceof GuildBanEvent)
         {
@@ -413,5 +418,35 @@ public class Listener implements CommandListener, EventListener
 
         parser.clear().put("user", user).put("guild", guild).put("channel", FinderUtil.getDefaultChannel(guild));
         user.openPrivateChannel().queue(c -> c.sendMessage(FormatUtil.sanitize(parser.parse(welcomeDM))).queue((s) -> parser.clear(), (e) -> parser.clear()));
+    }
+
+    private void checkVoiceLeave(GuildVoiceLeaveEvent event)
+    {
+        List<Member> actualListeners = new ArrayList<>();
+        User user = event.getMember().getUser();
+        VoiceChannel vc = event.getChannelLeft();
+
+        if(user.getIdLong()==event.getJDA().getSelfUser().getIdLong())
+        {
+            bot.musicTasks.cancelLeave(vc);
+            return;
+        }
+
+        vc.getMembers().stream().filter(m -> !(m.getVoiceState().isDeafened()) && !(m.getUser().isBot())).forEach(actualListeners::add);
+        if(actualListeners.isEmpty())
+            bot.musicTasks.scheduleLeave(vc, event.getGuild());
+    }
+
+    private void checkVoiceJoin(GuildVoiceJoinEvent event)
+    {
+        Member member = event.getMember();
+        User user = member.getUser();
+        VoiceChannel vc = event.getChannelJoined();
+
+        if(user.getIdLong()==event.getJDA().getSelfUser().getIdLong())
+            return;
+
+        if(!(member.getVoiceState().isDeafened()) && !(user.isBot()))
+            bot.musicTasks.cancelLeave(vc);
     }
 }

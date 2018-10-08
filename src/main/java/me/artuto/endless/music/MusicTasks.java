@@ -27,6 +27,12 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.artuto.endless.Bot;
 import me.artuto.endless.utils.GuildUtils;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.VoiceChannel;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Artuto
@@ -36,6 +42,8 @@ public class MusicTasks
 {
     private AudioPlayerManager manager;
     private Bot bot;
+
+    private final Map<Long, ScheduledFuture> futures = new HashMap<>();
 
     public void setupSystem(Bot bot)
     {
@@ -65,12 +73,25 @@ public class MusicTasks
             guild.getAudioManager().setSendingHandler(handler);
         }
         else
-        {
             handler = (AudioPlayerSendHandler)guild.getAudioManager().getSendingHandler();
-            player = handler.getPlayer();
-        }
 
         return handler;
+    }
+
+    public void scheduleLeave(VoiceChannel vc, Guild guild)
+    {
+        AudioPlayerSendHandler handler = setupHandler(guild);
+        ScheduledFuture future = bot.voiceLeaverScheduler.schedule(handler::stopAndClear, 5, TimeUnit.MINUTES);
+        futures.put(vc.getIdLong(), future);
+    }
+
+    public void cancelLeave(VoiceChannel vc)
+    {
+        ScheduledFuture future = futures.remove(vc.getIdLong());
+        if(future==null)
+            return;
+
+        future.cancel(true);
     }
 
     int putInQueue(AudioTrack track, CommandEvent event)

@@ -77,6 +77,7 @@ public class UserInfoCmd extends EndlessCommand
         Game game = user.getMutualGuilds().get(0).getMember(user).getGame();
         String status = getStatus(user.getMutualGuilds().get(0).getMember(user).getOnlineStatus());
         String statusEmote = getStatusEmote(user.getMutualGuilds().get(0).getMember(user));
+        String gameName;
 
         sb.append(Const.LINE_START).append(" ID: **").append(user.getId()).append("**\n");
 
@@ -90,7 +91,14 @@ public class UserInfoCmd extends EndlessCommand
             statusEmote = getStatusEmote(member);
             sb.append(Const.LINE_START).append(" Status: ").append(statusEmote).append(" **").append(status).append("**");
             if(!(game==null))
-                sb.append(" (").append(getGame(game.getType().getKey())).append(" *").append(game.getName()).append("*)");
+            {
+                if(game.getUrl()==null)
+                    gameName = "*"+game.getName()+"*";
+                else
+                    gameName = "*("+game.getUrl()+")["+game.getUrl()+"]*";
+                
+                sb.append(" (").append(getGame(game.getType().getKey())).append(" ").append(gameName).append(")");
+            }
             sb.append("\n");
 
             if(!(event.getGuild().getMember(user)==null))
@@ -141,7 +149,14 @@ public class UserInfoCmd extends EndlessCommand
         {
             sb.append(Const.LINE_START).append(" Status: ").append(statusEmote).append(" **").append(status).append("**");
             if(!(game==null))
-                sb.append(" (").append(getGame(game.getType().getKey())).append(" *").append(game.getName()).append("*)");
+            {
+                if(game.getUrl()==null)
+                    gameName = "*"+game.getName()+"*";
+                else
+                    gameName = "*("+game.getUrl()+")["+game.getUrl()+"]*";
+                
+                sb.append(" (").append(getGame(game.getType().getKey())).append(" ").append(gameName).append(")");
+            }
             sb.append("\n");
             sb.append(Const.LINE_START).append(" Account Creation Date: **").append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
                     .append("**\n");
