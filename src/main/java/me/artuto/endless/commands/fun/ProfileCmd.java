@@ -95,6 +95,7 @@ public class ProfileCmd extends EndlessCommand
 
         builder.setColor(event.getMember().getColor());
         builder.setDescription(buildProfile(event, p, user));
+        builder.addField("Badges", buildBadges(user), false);
         messageBuilder.setContent(Const.INFO+" "+event.localize("command.profile.of", user.getName()+"#"+user.getDiscriminator()));
         event.reply(messageBuilder.setEmbed(builder.build()).build());
     }
@@ -182,18 +183,23 @@ public class ProfileCmd extends EndlessCommand
             if(!(v==null))
                 sb.append(Const.LINE_START).append(" **").append(f).append("**: ").append(v.trim()).append("\n");
         });
-        Guild guild = bot.shardManager.getGuildById(Const.MAIN_GUILD);
+        return sb.toString();
+    }
+
+   private String buildBadges(User user)
+   {
+       StringBuilder badges = new StringBuilder();
+       Guild guild = bot.shardManager.getGuildById(Const.MAIN_GUILD);
         if(!(guild.getMember(user)==null))
         {
             Member m = guild.getMember(user);
             Role role = m.getRoles().stream().filter(r -> r.getIdLong()==318524910894841857L).findFirst().orElse(null);
             if(!(role==null))
-                sb.append("\n_ _\n:money_mouth: ").append(event.localize("misc.donator"));
+                badges.append(":money_mouth: ").append(event.localize("misc.donator"));
         }
         if(user.getIdLong()==Const.ARTUTO_ID || user.getIdLong()==Const.ARTUTO_ALT_ID)
-            sb.append("\n_ _\n").append(Const.BOTADM).append(" ").append(event.localize("misc.dev"));
-        return sb.toString();
-    }
+            badges.append("\n_ _\n").append(Const.BOTADM).append(" ").append(event.localize("misc.dev"));
+   }
 
     private String getField(String field)
     {
