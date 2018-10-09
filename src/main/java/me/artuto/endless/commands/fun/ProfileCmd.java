@@ -95,7 +95,7 @@ public class ProfileCmd extends EndlessCommand
 
         builder.setColor(event.getMember().getColor());
         builder.setDescription(buildProfile(event, p, user));
-        builder.addField("Badges", buildBadges(user), false);
+        builder.addField("Badges", buildBadges(event, user), false);
         messageBuilder.setContent(Const.INFO+" "+event.localize("command.profile.of", user.getName()+"#"+user.getDiscriminator()));
         event.reply(messageBuilder.setEmbed(builder.build()).build());
     }
@@ -186,7 +186,7 @@ public class ProfileCmd extends EndlessCommand
         return sb.toString();
     }
 
-   private String buildBadges(User user)
+   private String buildBadges(EndlessCommandEvent event, User user)
    {
        StringBuilder badges = new StringBuilder();
        Guild guild = bot.shardManager.getGuildById(Const.MAIN_GUILD);
