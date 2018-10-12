@@ -22,6 +22,7 @@ import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.MiscUtils;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -81,8 +82,8 @@ public class LookupCmd extends EndlessCommand
                             .format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
                     builder.setDescription(sb).setThumbnail(MiscUtils.getImageUrl("png", null, user.getEffectiveAvatarUrl()))
                             .setColor(event.getMember().getColor());
-                    event.reply(mb.setContent((user.isBot()?Const.BOT:Const.PEOPLE)+" Info about **"+user.getName()+"#"+user.getDiscriminator()+"**"
-                            +(nitro?Const.NITRO:"")).setEmbed(builder.build()).build());
+                    event.reply(mb.setContent(FormatUtil.sanitize((user.isBot()?Const.BOT:Const.PEOPLE)+" Info about **"+user.getName()+"#"+user.getDiscriminator()+"**"
+                            +(nitro?Const.NITRO:""))).setEmbed(builder.build()).build());
                     return;
                 }
 
@@ -135,7 +136,7 @@ public class LookupCmd extends EndlessCommand
                 }
                 builder.setDescription(sb).setThumbnail(invite==null?null:MiscUtils.getImageUrl("png", null, invite.getGuild().getIconUrl()))
                         .setColor(event.getMember().getColor());
-                event.reply(mb.setContent(":computer: Info about **"+widget.getName()+"** "+(verified?Const.VERIFIED:"")).setEmbed(builder.build()).build());
+                event.reply(mb.setContent(FormatUtil.sanitize(":computer: Info about **"+widget.getName()+"** "+(verified?Const.VERIFIED:""))).setEmbed(builder.build()).build());
                 return;
             }
             catch(NumberFormatException ignored) {}
@@ -176,7 +177,7 @@ public class LookupCmd extends EndlessCommand
             if(inviter==null)
                 sb.append("N/A\n");
             else
-                sb.append("**").append(inviter.getName()).append("#").append(inviter.getDiscriminator()).append("** (ID: ")
+                sb.append("**").append(FormatUtil.sanitize(inviter.getName())).append("#").append(inviter.getDiscriminator()).append("** (ID: ")
                         .append(inviter.getId()).append(")\n");
 
             StringBuilder gInfo = new StringBuilder();
@@ -192,7 +193,7 @@ public class LookupCmd extends EndlessCommand
             builder.setThumbnail(MiscUtils.getImageUrl("png", null, guild.getIconUrl()))
                     .setDescription(sb).setColor(event.getMember().getColor());
             builder.addField("Guild Info", gInfo.toString(), false);
-            event.reply(mb.setContent(":link: Info about invite code **"+code+"**").setEmbed(builder.build()).build());
+            event.reply(mb.setContent(FormatUtil.sanitize(":link: Info about invite code **"+code+"**")).setEmbed(builder.build()).build());
         });
     }
 }
