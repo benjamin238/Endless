@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -86,7 +87,7 @@ public class GuildInfoCmd extends EndlessCommand
         builder.setColor(guild.getMember(owner).getColor()).setDescription(sb)
                 .setThumbnail(MiscUtils.getImageUrl("png", null, guild.getIconUrl()));
         boolean verified = guild.getFeatures().contains("VERIFIED");
-        String title = ":computer: Info about **"+guild.getName()+"** "+(verified?Const.VERIFIED:"");
+        String title = FormatUtil.sanitize(":computer: Info about **"+guild.getName()+"** "+(verified?Const.VERIFIED:""));
         event.reply(mb.setContent(title).setEmbed(builder.build()).build());
     }
 

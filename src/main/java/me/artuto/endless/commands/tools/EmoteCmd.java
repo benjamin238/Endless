@@ -24,6 +24,7 @@ import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
+import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -115,7 +116,7 @@ public class EmoteCmd extends EndlessCommand
             sb.append(Const.LINE_START).append(" Global: **").append(emote.isManaged()?"Yes":"No").append("**\n");
         builder.setImage(emote.getImageUrl()).setColor(event.getSelfMember()==null?null:event.getSelfMember().getColor());
         builder.setDescription(sb);
-        event.reply(mb.setContent(String.format("%s Emote **%s**", event.getClient().getSuccess(), emote.getName())).setEmbed(builder.build()).build());
+        event.reply(mb.setContent(FormatUtil.sanitize(String.format("%s Emote **%s**", event.getClient().getSuccess(), emote.getName()))).setEmbed(builder.build()).build());
     }
 
     private class CreateCmd extends EndlessCommand
@@ -185,8 +186,8 @@ public class EmoteCmd extends EndlessCommand
             }
 
             guild.getController().createEmote(name, icon).reason("["+event.getAuthor().getName()+"#"+
-                    event.getAuthor().getDiscriminator()+"]").queue(em -> event.replySuccess("Successfully added emote *"+
-                    em.getName()+"* ("+em.getAsMention()+")"), e -> event.replyError("Something went wrong while creating a new emote!"));
+                    event.getAuthor().getDiscriminator()+"]").queue(em -> event.replySuccess(FormatUtil.sanitize("Successfully added emote *"+
+                    em.getName()+"* ("+em.getAsMention()+")")), e -> event.replyError("Something went wrong while creating a new emote!"));
         }
     }
 
@@ -256,8 +257,8 @@ public class EmoteCmd extends EndlessCommand
             }
 
             guild.getController().createEmote(name, icon).reason("["+event.getAuthor().getName()+"#"+
-                    event.getAuthor().getDiscriminator()+"]").queue(em -> event.replySuccess("Successfully added emote *"+
-                    em.getName()+"* ("+em.getAsMention()+")"), e -> event.replyError("Something went wrong while creating a new emote!"));
+                    event.getAuthor().getDiscriminator()+"]").queue(em -> event.replySuccess(FormatUtil.sanitize("Successfully added emote *"+
+                    em.getName()+"* ("+em.getAsMention()+")")), e -> event.replyError("Something went wrong while creating a new emote!"));
         }
     }
 
@@ -287,7 +288,7 @@ public class EmoteCmd extends EndlessCommand
             emote = event.getMessage().getEmotes().get(0);
 
             emote.delete().reason("["+event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"]")
-                    .queue(em -> event.replySuccess("Successfully deleted emote *"+emote.getName()+"*"),
+                    .queue(em -> event.replySuccess(FormatUtil.sanitize("Successfully deleted emote *"+emote.getName()+"*")),
                             e -> event.replyError("Something went wrong while deleting the emote!"));
         }
     }
