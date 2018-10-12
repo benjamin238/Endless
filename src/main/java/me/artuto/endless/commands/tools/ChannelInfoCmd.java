@@ -22,6 +22,7 @@ import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -102,7 +103,7 @@ public class ChannelInfoCmd extends EndlessCommand
                         .collect(Collectors.joining(", ")), false);
         }
 
-        String name = FormatUtil.sanitize(channel instanceof TextChannel?((TextChannel)channel).getAsMention():channel.getName());
+        String name = channel instanceof TextChannel?((TextChannel)channel).getAsMention():channel.getName();
         String title = ":tv: Information about **"+name+"**";
         eb.setColor(event.getSelfMember().getColor()).setDescription(sb.toString());
         event.reply(mb.setContent(title).setEmbed(eb.build()).build());
