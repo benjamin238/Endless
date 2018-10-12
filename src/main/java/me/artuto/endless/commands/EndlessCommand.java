@@ -59,6 +59,9 @@ public abstract class EndlessCommand extends Command
         TextChannel tc = event.getTextChannel();
         User author = event.getAuthor();
 
+        if(!(Categories.doCheck(event)))
+            return;
+
         if(ownerCommand && !(event.isOwner()))
         {
             Endless.LOG.warn(author.getName()+"#"+author.getDiscriminator()+" ("+author.getId()+") tried to run a owner-only command!");

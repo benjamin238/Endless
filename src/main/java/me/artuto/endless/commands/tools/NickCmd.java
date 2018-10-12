@@ -21,6 +21,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ChecksUtil;
+import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
@@ -46,7 +47,7 @@ public class NickCmd extends EndlessCommand
     protected void executeCommand(CommandEvent event)
     {
         Member member = event.getMember();
-        String nickname = event.getArgs();
+        String nickname = FormatUtil.sanitize(event.getArgs());
         User author = event.getAuthor();
 
         if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), member)))

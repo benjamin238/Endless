@@ -29,7 +29,7 @@ public class Categories
     private static boolean maintenance;
     private static BlacklistHandler bHandler;
     private static IgnoreHandler iHandler;
-    private static SpecialCaseHandler sHandler;
+    public static SpecialCaseHandler sHandler;
 
     public Categories(boolean maintenance, BlacklistHandler bHandler, IgnoreHandler iHandler, SpecialCaseHandler shHndler)
     {
@@ -65,7 +65,7 @@ public class Categories
 
     // public static final Category OTHERS = new Category("Others", Categories::doCheck);
 
-    private static boolean doCheck(CommandEvent event)
+    public static boolean doCheck(CommandEvent event)
     {
         if(event.isOwner())
             return true;

@@ -91,6 +91,7 @@ public class ReminderCmd extends EndlessCommand
             this.help = "Creates a reminder.";
             this.arguments = "<time> <message>";
             this.guildOnly = false;
+            this.category = Categories.UTILS;
             this.parent = ReminderCmd.this;
         }
 

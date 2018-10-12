@@ -77,7 +77,7 @@ public class AvatarCmd extends EndlessCommand
                 target = list.get(0).getUser();
         }
 
-        String title = ":frame_photo: Avatar of **"+target.getName()+"**#**"+target.getDiscriminator()+"**";
+        String title = FormatUtil.sanitize(":frame_photo: Avatar of **"+target.getName()+"**#**"+target.getDiscriminator()+"**");
 
         builder.setImage(MiscUtils.getImageUrl("png", "512", target.getEffectiveAvatarUrl()));
         builder.setColor(event.isFromType(ChannelType.TEXT)?event.getGuild().getMember(target).getColor():Color.decode("#33ff00"));
