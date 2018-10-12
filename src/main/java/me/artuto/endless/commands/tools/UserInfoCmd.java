@@ -163,8 +163,8 @@ public class UserInfoCmd extends EndlessCommand
 
         builder.setDescription(sb).setThumbnail(MiscUtils.getImageUrl("png", null, user.getEffectiveAvatarUrl()));
         boolean nitro = !(user.getAvatarId()==null) && user.getAvatarId().startsWith("a_");
-        String title = (user.isBot()?Const.BOT:Const.PEOPLE)+" Information about **"+user.getName()+"**#**"+user.getDiscriminator()+"** "
-                +(nitro?Const.NITRO:"");
+        String title = FormatUtil.sanitize((user.isBot()?Const.BOT:Const.PEOPLE)+" Information about **"+user.getName()+"**#**"+user.getDiscriminator()+"** "
+                +(nitro?Const.NITRO:""));
         event.reply(mb.setContent(title).setEmbed(builder.build()).build());
     }
 
