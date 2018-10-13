@@ -169,6 +169,7 @@ public class RoomsDataManager
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE tc_id = ? OR vc_id = ?",
                     ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.setLong(1, roomId);
+            statement.setLong(2, roomId);
             statement.closeOnCompletion();
 
             try(ResultSet results = statement.executeQuery())
@@ -193,6 +194,7 @@ public class RoomsDataManager
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM ROOMS WHERE tc_id = ? OR vc_id = ?",
                     ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             statement.setLong(1, roomId);
+            statement.setLong(2, roomId);
             statement.closeOnCompletion();
 
             try(ResultSet results = statement.executeQuery())

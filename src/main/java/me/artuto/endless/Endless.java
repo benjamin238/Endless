@@ -60,7 +60,7 @@ public class Endless
                             bot.boot(false, true);
                             break;
                         }
-                    bot.boot(true, false);
+                    bot.boot(true, true);
                     break;
                 case "none":
                     LOG.info("Goodbye! :wave:");

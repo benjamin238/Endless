@@ -94,7 +94,7 @@ public class RoleCmd extends EndlessCommand
 
         builder.setColor(role.getColor()).setDescription(sb);
         String title = ":performing_arts: Information about **"+role.getName()+"**";
-        event.reply(mb.setContent(title).setEmbed(builder.build()).build());
+        event.reply(mb.setContent(FormatUtil.sanitize(title)).setEmbed(builder.build()).build());
     }
 
     private class GiveRoleCmd extends EndlessCommand

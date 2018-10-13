@@ -65,7 +65,6 @@ public class AvatarCmd extends EndlessCommand
         }
 
         String title = FormatUtil.sanitize(":frame_photo: "+event.localize("command.avatar", target.getName()+"#"+target.getDiscriminator()));
-
         builder.setImage(MiscUtils.getImageUrl("png", "512", target.getEffectiveAvatarUrl()));
         builder.setColor(event.isFromType(ChannelType.TEXT)?event.getGuild().getMember(target).getColor():Color.decode("#33ff00"));
         event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());

@@ -78,8 +78,8 @@ public class LookupCmd extends EndlessCommand
                             .format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
                     builder.setDescription(sb).setThumbnail(MiscUtils.getImageUrl("png", null, user.getEffectiveAvatarUrl()))
                             .setColor(event.getMember().getColor());
-                    event.reply(mb.setContent(event.localize("command.lookup.user.title", user.isBot()?Const.BOT:Const.PEOPLE,
-                            user.getName()+"#"+user.getDiscriminator(), nitro?Const.NITRO:"")).setEmbed(builder.build()).build());
+                    event.reply(mb.setContent(FormatUtil.sanitize(event.localize("command.lookup.user.title", user.isBot()?Const.BOT:Const.PEOPLE,
+                            user.getName()+"#"+user.getDiscriminator(), nitro?Const.NITRO:""))).setEmbed(builder.build()).build());
                     return;
                 }
 

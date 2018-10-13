@@ -23,6 +23,7 @@ import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
+import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -116,7 +117,7 @@ public class EmoteCmd extends EndlessCommand
                     event.localize("misc.yes"):event.localize("misc.no")).append("**\n");
         builder.setImage(emote.getImageUrl()).setColor(event.getSelfMember()==null?null:event.getSelfMember().getColor());
         builder.setDescription(sb);
-        event.reply(mb.setContent(event.getClient().getSuccess()+" "+event.localize("command.emote.emote", emote.getName())).setEmbed(builder.build()).build());
+        event.reply(mb.setContent(FormatUtil.sanitize(event.getClient().getSuccess()+" "+event.localize("command.emote.emote", emote.getName()))).setEmbed(builder.build()).build());
     }
 
     private class CreateCmd extends EndlessCommand

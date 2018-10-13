@@ -62,7 +62,7 @@ public class GuildInfoCmd extends EndlessCommand
             try {id = Long.parseLong(event.getArgs());}
             catch(NumberFormatException ignored) {id = 0L;}
 
-            guild = event.getJDA().getGuildById(id);
+            guild = event.getJDA().asBot().getShardManager().getGuildById(id);
             if(guild==null)
             {
                 event.replyWarning(false, "Could not find that guild! :(");
