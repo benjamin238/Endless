@@ -23,7 +23,7 @@
 
     <groupId>me.artuto.endless</groupId>
     <artifactId>Endless</artifactId>
-    <version>5.3.7</version>
+    <version>5.3.8</version>
 
     <repositories>
         <repository>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.8.0_436</version>
+            <version>3.8.2_437</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minced</groupId>
