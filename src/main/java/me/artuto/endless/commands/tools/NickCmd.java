@@ -51,17 +51,17 @@ public class NickCmd extends EndlessCommand
 
         if(!(ChecksUtil.canMemberInteract(event.getSelfMember(), member)))
         {
-            event.replyError("I can't interact with you!");
+            event.replyError("core.error.cantInteract.user.bot.executor");
             return;
         }
         if(nickname.length()>32)
         {
-            event.replyError("Your nickname can't be longer than 32 characters!");
+            event.replyError("command.nick.length");
             return;
         }
 
         event.getGuild().getController().setNickname(member, nickname).reason(author.getName()+"#"+author.getDiscriminator()+": Nickname change")
-                .queue(s -> event.replySuccess("Successfully changed your nickname to **"+nickname+"**"),
-                        e -> event.replyError("Could not change your nickname to **"+nickname+"**"));
+                .queue(s -> event.replySuccess("command.nick.success", nickname),
+                        e -> event.replyError("command.nick.error", nickname));
     }
 }

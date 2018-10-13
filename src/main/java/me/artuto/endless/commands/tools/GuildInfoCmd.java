@@ -21,6 +21,7 @@ import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.FormatUtil;
 import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -53,8 +54,24 @@ public class GuildInfoCmd extends EndlessCommand
         EmbedBuilder builder = new EmbedBuilder();
         MessageBuilder mb = new MessageBuilder();
         StringBuilder sb = new StringBuilder();
+        Guild guild;
 
-        Guild guild = event.getGuild();
+        if(!(event.getArgs().isEmpty()) && event.isOwner())
+        {
+            long id;
+            try {id = Long.parseLong(event.getArgs());}
+            catch(NumberFormatException ignored) {id = 0L;}
+
+            guild = event.getJDA().getGuildById(id);
+            if(guild==null)
+            {
+                event.replyWarning(false, "Could not find that guild! :(");
+                return;
+            }
+        }
+        else
+            guild = event.getGuild();
+
         int memberCount = (int)guild.getMemberCache().size();
         int botCount = (int)guild.getMemberCache().stream().filter(m -> m.getUser().isBot()).count();
         int onlineCount = (int)guild.getMemberCache().stream().filter(m -> m.getOnlineStatus()==OnlineStatus.ONLINE).count();
@@ -64,48 +81,53 @@ public class GuildInfoCmd extends EndlessCommand
         User owner = guild.getOwner().getUser();
 
         sb.append(Const.LINE_START).append(" ID: **").append(guild.getId()).append("**\n");
-        sb.append(Const.LINE_START).append(" Owner: **").append(owner.getName()).append("#").append(owner.getDiscriminator()).append("**\n");
-        sb.append(Const.LINE_START).append(" Voice Region: **").append(guild.getRegion().getName()).append(" ")
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.guild.owner")).append(" **").append(owner.getName())
+                .append("#").append(owner.getDiscriminator()).append("**\n");
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.guild.region")).append(" **").append(guild.getRegion().getName()).append(" ")
                 .append(guild.getRegion().getEmoji()).append("**\n");
-        sb.append(Const.LINE_START).append(" Creation: **").append(guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
-        sb.append(Const.LINE_START).append(" Members: ").append(Const.ONLINE).append(" **").append(onlineCount).append("** - ")
-                .append(Const.IDLE).append(" **").append(idleCount).append("** - ").append(Const.DND).append(" **").append(dndCount)
-                .append("** - ").append(Const.OFFLINE).append(" **").append(offlineCount).append("** (**").append(memberCount).append("**, ")
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.guild.creation")).append(" **")
+                .append(guild.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.guild.members")).append(" **").append(Const.ONLINE).append(" **")
+                .append(onlineCount).append("** - ").append(Const.IDLE).append(" **").append(idleCount).append("** - ").append(Const.DND).append(" **")
+                .append(dndCount).append("** - ").append(Const.OFFLINE).append(" **").append(offlineCount).append("** (**").append(memberCount).append("**, ")
                 .append(Const.BOT).append(" **").append(botCount).append("**)\n");
-        sb.append(Const.LINE_START).append(" Channels: Text: **").append(guild.getTextChannelCache().size()).append("** - Voice: **")
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.guild.channels")).append(" ").append(event.localize("command.guild.tcs"))
+                .append(" **").append(guild.getTextChannelCache().size()).append("** - ").append(event.localize("command.guild.vcs")).append(" **")
                 .append(guild.getVoiceChannelCache().size()).append("**\n");
-        sb.append(Const.LINE_START).append(" Verification Level: **").append(getVerificationLevel(guild.getVerificationLevel().getKey())).append("**\n");
-        sb.append(Const.LINE_START).append(" Explicit Content Level: **").append(guild.getExplicitContentLevel().getDescription()).append("**");
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.guild.verify")).append(" **")
+                .append(getVerificationLevel(event, guild.getVerificationLevel().getKey())).append("**\n");
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.guild.explicitLevel")).append(" **")
+                .append(guild.getExplicitContentLevel().getDescription()).append("**");
 
         if(!(guild.getSplashId()==null))
         {
-            sb.append("\n_ _\n").append(Const.PARTNER).append(" **Discord Partner** ").append(Const.PARTNER);
+            sb.append("\n_ _\n").append(Const.PARTNER).append(" **").append("command.guild.partner").append("** ").append(Const.PARTNER);
             builder.setImage(MiscUtils.getImageUrl("png", "2048", guild.getSplashUrl()));
         }
 
         builder.setColor(guild.getMember(owner).getColor()).setDescription(sb)
                 .setThumbnail(MiscUtils.getImageUrl("png", null, guild.getIconUrl()));
         boolean verified = guild.getFeatures().contains("VERIFIED");
-        String title = ":computer: Info about **"+guild.getName()+"** "+(verified?Const.VERIFIED:"");
+        String title = FormatUtil.sanitize(":computer: "+event.localize("command.guild.title", guild.getName(), verified?Const.VERIFIED:""));
         event.reply(mb.setContent(title).setEmbed(builder.build()).build());
     }
 
-    private String getVerificationLevel(int level)
+    private String getVerificationLevel(EndlessCommandEvent event, int level)
     {
         switch(level)
         {
             case 0:
-                return "None";
+                return event.localize("misc.none");
             case 1:
-                return "Low";
+                return event.localize("command.guild.verify.low");
             case 2:
-                return "Medium";
+                return event.localize("command.guild.verify.medium");
             case 3:
                 return "(╯°□°）╯︵ ┻━┻";
             case 4:
                 return "┻━┻ ﾐヽ(ಠ益ಠ)ノ彡┻━┻";
             default:
-                return "Unknown";
+                return event.localize("misc.unknown");
         }
     }
 }

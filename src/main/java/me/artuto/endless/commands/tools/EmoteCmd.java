@@ -17,8 +17,6 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.vdurmont.emoji.EmojiParser;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
@@ -48,7 +46,7 @@ public class EmoteCmd extends EndlessCommand
     {
         this.name = "emote";
         this.aliases = new String[]{"emoji", "charinfo"};
-        this.children = new Command[]{new CreateCmd(), new StealCmd(), new RemoveCmd()};
+        this.children = new EndlessCommand[]{new CreateCmd(), new StealCmd(), new RemoveCmd()};
         this.help = "Get the info of a specified emote, emoji or character.";
         this.arguments = "<emote>";
         this.category = Categories.TOOLS;
@@ -66,7 +64,7 @@ public class EmoteCmd extends EndlessCommand
         {
             String args = event.getArgs();
 
-            sb.append("Emoji/Character info:\n");
+            sb.append(event.localize("command.emote.emoji")).append("\n");
             args.codePoints().forEachOrdered(code -> {
                 char[] chars = Character.toChars(code);
                 String hex = Integer.toHexString(code).toUpperCase();
@@ -101,7 +99,7 @@ public class EmoteCmd extends EndlessCommand
         }
     }
 
-    private void createEmoteInfoEmbed(CommandEvent event, Emote emote)
+    private void createEmoteInfoEmbed(EndlessCommandEvent event, Emote emote)
     {
         EmbedBuilder builder = new EmbedBuilder();
         MessageBuilder mb = new MessageBuilder();
@@ -110,13 +108,15 @@ public class EmoteCmd extends EndlessCommand
         String url = "[Image]("+emote.getImageUrl()+")";
 
         sb.append(Const.LINE_START).append(" ID: **").append(emote.getId()).append("**\n");
-        sb.append(Const.LINE_START).append(" Guild: ").append(emote.isFake()?"Unknown":"**"+guild.getName()+"** (ID: "+guild.getId()+")").append("\n");
+        sb.append(Const.LINE_START).append(" ").append(event.localize("command.emote.guild")).append(emote.isFake()?event.localize("misc.unknown"):"**"
+                +guild.getName()+"** (ID: "+guild.getId()+")").append("\n");
         sb.append(Const.LINE_START).append(" URL: **").append(url).append("**\n");
         if(!(emote.isFake()))
-            sb.append(Const.LINE_START).append(" Global: **").append(emote.isManaged()?"Yes":"No").append("**\n");
+            sb.append(Const.LINE_START).append(" ").append(event.localize("command.emote.global")).append(" **").append(emote.isManaged()?
+                    event.localize("misc.yes"):event.localize("misc.no")).append("**\n");
         builder.setImage(emote.getImageUrl()).setColor(event.getSelfMember()==null?null:event.getSelfMember().getColor());
         builder.setDescription(sb);
-        event.reply(mb.setContent(String.format("%s Emote **%s**", event.getClient().getSuccess(), emote.getName())).setEmbed(builder.build()).build());
+        event.reply(mb.setContent(event.getClient().getSuccess()+" "+event.localize("command.emote.emote", emote.getName())).setEmbed(builder.build()).build());
     }
 
     private class CreateCmd extends EndlessCommand
@@ -138,12 +138,12 @@ public class EmoteCmd extends EndlessCommand
             Guild guild = event.getGuild();
             List<Emote> animatedEmotes = guild.getEmotes().stream().filter(Emote::isAnimated).collect(Collectors.toList());
             List<Emote> emotes = guild.getEmotes().stream().filter(e -> !(e.isAnimated())).collect(Collectors.toList());
-            String[] args = splitArgs(event.getArgs());
+            String[] args = ArgsUtils.split(2, event.getArgs());
             String name;
 
             if(!(args[0].endsWith(".png") || args[0].endsWith(".jpg") || args[0].endsWith(".jpeg") || args[0].endsWith(".gif")))
             {
-                event.replyError("You didn't specified a emote!");
+                event.replyError("command.emote.create.noArgs");
                 return;
             }
 
@@ -151,19 +151,19 @@ public class EmoteCmd extends EndlessCommand
             {
                 if(args[0].endsWith(".gif") && animatedEmotes.size()>=50)
                 {
-                    event.replyError("This guild has reached the limit for animated emotes (50)!");
+                    event.replyError("command.emote.create.limit.animated");
                     return;
                 }
                 else if(!(args[0].endsWith("gif")) && emotes.size()>=50)
                 {
-                    event.replyError("This guild has reached the limit for non-animated emotes (50)!");
+                    event.replyError("command.emote.create.limit.normal");
                     return;
                 }
             }
 
             if(args[1].isEmpty())
             {
-                event.replyError("You didn't specified a name!");
+                event.replyError("command.emote.create.noName");
                 return;
             }
             name = args[1];
@@ -174,7 +174,7 @@ public class EmoteCmd extends EndlessCommand
                 InputStream iSteam = MiscUtils.getInputStream(args[0]);
                 if(iSteam==null)
                 {
-                    event.replyError("An error occurred while retrieving the emote image!");
+                    event.replyError("command.emote.create.error.download");
                     return;
                 }
                 icon = Icon.from(iSteam);
@@ -186,8 +186,8 @@ public class EmoteCmd extends EndlessCommand
             }
 
             guild.getController().createEmote(name, icon).reason("["+event.getAuthor().getName()+"#"+
-                    event.getAuthor().getDiscriminator()+"]").queue(em -> event.replySuccess("Successfully added emote *"+
-                    em.getName()+"* ("+em.getAsMention()+")"), e -> event.replyError("Something went wrong while creating a new emote!"));
+                    event.getAuthor().getDiscriminator()+"]").queue(em -> event.replySuccess("command.emote.create.success",
+                    em.getName(), em.getAsMention()), e -> event.replyError("command.emote.create.error"));
         }
     }
 
@@ -210,12 +210,12 @@ public class EmoteCmd extends EndlessCommand
             Guild guild = event.getGuild();
             List<Emote> animatedEmotes = guild.getEmotes().stream().filter(Emote::isAnimated).collect(Collectors.toList());
             List<Emote> emotes = guild.getEmotes().stream().filter(e -> !(e.isAnimated())).collect(Collectors.toList());
-            String[] args = splitArgs(event.getArgs());
+            String[] args = ArgsUtils.split(2, event.getArgs());
             String name;
 
             if(event.getMessage().getEmotes().isEmpty())
             {
-                event.replyError("You didn't specified a emote!");
+                event.replyError("command.emote.create.noArgs");
                 return;
             }
 
@@ -224,28 +224,24 @@ public class EmoteCmd extends EndlessCommand
             {
                 if(emote.isAnimated() && animatedEmotes.size()>=50)
                 {
-                    event.replyError("This guild has reached the limit for animated emotes (50)!");
+                    event.replyError("command.emote.create.limit.animated");
                     return;
                 }
                 else if(!(emote.isAnimated()) && emotes.size()>=50)
                 {
-                    event.replyError("This guild has reached the limit for non-animated emotes (50)!");
+                    event.replyError("command.emote.create.limit.normal");
                     return;
                 }
             }
 
-            if(args[1].isEmpty())
-                name = emote.getName();
-            else
-                name = args[1];
-
+            name = args[1].isEmpty()?emote.getName():args[1];
             Icon icon;
             try
             {
                 InputStream iSteam = MiscUtils.getInputStream(emote.getImageUrl());
                 if(iSteam==null)
                 {
-                    event.replyError("An error occurred while retrieving the emote image!");
+                    event.replyError("command.emote.create.error.download");
                     return;
                 }
                 icon = Icon.from(iSteam);
@@ -257,8 +253,8 @@ public class EmoteCmd extends EndlessCommand
             }
 
             guild.getController().createEmote(name, icon).reason("["+event.getAuthor().getName()+"#"+
-                    event.getAuthor().getDiscriminator()+"]").queue(em -> event.replySuccess("Successfully added emote *"+
-                    em.getName()+"* ("+em.getAsMention()+")"), e -> event.replyError("Something went wrong while creating a new emote!"));
+                    event.getAuthor().getDiscriminator()+"]").queue(em -> event.replySuccess("command.emote.create.success",
+                    em.getName(), em.getAsMention()), e -> event.replyError("Scommand.emote.create.error"));
         }
     }
 
@@ -282,27 +278,14 @@ public class EmoteCmd extends EndlessCommand
 
             if(event.getMessage().getEmotes().isEmpty())
             {
-                event.replyError("You didn't specified a emote to delete!");
+                event.replyError("command.emote.delete.noArgs");
                 return;
             }
             emote = event.getMessage().getEmotes().get(0);
 
             emote.delete().reason("["+event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+"]")
-                    .queue(em -> event.replySuccess("Successfully deleted emote *"+emote.getName()+"*"),
-                            e -> event.replyError("Something went wrong while deleting the emote!"));
-        }
-    }
-
-    private String[] splitArgs(String preArgs)
-    {
-        try
-        {
-            String[] args = preArgs.split(" ", 2);
-            return new String[]{args[0], args[1]};
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            return new String[]{preArgs, ""};
+                    .queue(s -> event.replySuccess("command.emote.delete.success", emote.getName()),
+                            e -> event.replyError("command.emote.delete.error"));
         }
     }
 }

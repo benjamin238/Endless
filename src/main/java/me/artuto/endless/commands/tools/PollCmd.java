@@ -17,19 +17,30 @@
 
 package me.artuto.endless.commands.tools;
 
+import com.vdurmont.emoji.EmojiParser;
 import me.artuto.endless.Bot;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
+import net.dv8tion.jda.core.entities.Message;
+import picocli.CommandLine;
 
 import java.awt.*;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +50,7 @@ import java.util.stream.Collectors;
 public class PollCmd extends EndlessCommand
 {
     private final Bot bot;
+    private final Pattern ARGS_PATTERN = Pattern.compile("(?:--\\S+ |-\\S ?)(.*?)(?=$| -)");
 
     public PollCmd(Bot bot)
     {
@@ -55,7 +67,21 @@ public class PollCmd extends EndlessCommand
     {
         if(!(bot.dataEnabled))
         {
-            event.replyError("Endless is running on No-data mode.");
+            event.replyError("core.data.disabled");
+            return;
+        }
+
+
+        if(true)
+        {
+            ParsedArgs pa = new ParsedArgs(event);
+            CommandLine cli = new CommandLine(pa);
+            cli.parse(event.getArgs().split("\\s+"));
+
+            event.reply(false, "title: `"+String.join(" ", pa.title)+"`\n" +
+                    "descrp: `"+pa.description+"`\n" +
+                    "color: `"+pa.rawColor+"`\n" +
+                    "emotes: `"+pa.rawEmotes+"`");
             return;
         }
 
@@ -123,10 +149,7 @@ public class PollCmd extends EndlessCommand
                 color = "#"+color;
             return Color.decode(color);
         }
-        catch(NumberFormatException e)
-        {
-            return null;
-        }
+        catch(NumberFormatException ignored) {return null;}
     }
 
     private String[] splitArgs(String preArgs)
@@ -153,5 +176,66 @@ public class PollCmd extends EndlessCommand
         }
 
         return new String[]{question.trim(), color.trim(), description.trim(), time.trim(), emotes.trim()};
+    }
+
+    private class ParsedArgs
+    {
+        @CommandLine.Parameters()
+        public String[] title;
+        @CommandLine.Option(names = {"-d", "--description"})
+        public String description = null;
+        @CommandLine.Option(names = {"-c", "--color"})
+        public String rawColor = null;
+        @CommandLine.Option(names = {"-t", "--time"})
+        public String rawTime;
+        @CommandLine.Option(names = {"-e", "--emotes", "--emojis"})
+        public String rawEmotes = null;
+
+        private Color color = null;
+        private OffsetDateTime time;
+        private List<String> emotes = new ArrayList<>();
+
+        ParsedArgs(EndlessCommandEvent event)
+        {
+            /*Matcher m = ARGS_PATTERN.matcher(args);
+            while(m.find())
+            {
+                String g = m.group();
+                if(g.startsWith("-d") || g.startsWith("--description"))
+                    this.description = g.replace("-d", "").replace("--description", "");
+                else if(g.startsWith("-t") || g.startsWith("--time"))
+                {
+                    g = g.replace("-t", "").replace("--time", "");
+                    int parsedT = ArgsUtils.parseTime(g);
+                    if(parsedT==0)
+                        parsedT = ArgsUtils.parseTime("10m");
+
+                    this.time = OffsetDateTime.ofInstant(Instant.now().plusSeconds(parsedT), ZoneId.systemDefault());
+                }
+                else if(g.startsWith("-c") || g.startsWith("--color"))
+                {
+                    g = g.replace("-c", "").replace("--color", "");
+                    try {this.color = Color.decode(g.startsWith("#")?g:"#"+g);}
+                    catch(NumberFormatException ignored) {this.color = null;}
+                }
+                else if(g.startsWith("-e") || g.startsWith("--emotes"))
+                {
+                    g = g.replace("-e", "").replace("--emotes", "");
+                    List<String> emotesFound = new ArrayList<>();
+                    List<String> emojisFound = EmojiParser.extractEmojis(g);
+
+                    Matcher emoteM = Message.MentionType.EMOTE.getPattern().matcher(g);
+                    while(emoteM.find())
+                    {
+                        Emote emote = shards.getEmoteById(emoteM.group(2));
+                        if(!(emote==null))
+                            emotesFound.add(emote.getId());
+                    }
+
+                    emotes.addAll(emotesFound);
+                    emotes.addAll(emojisFound);
+                }
+            }*/
+        }
     }
 }

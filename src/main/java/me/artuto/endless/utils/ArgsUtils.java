@@ -54,7 +54,7 @@ public class ArgsUtils
                     num*=60*60*24;
                 else if(vals[j+1].toLowerCase().startsWith("w"))
                     return -1;
-                else if(vals[j+1].toLowerCase().startsWith("m"))
+                else if(vals[j+1].toLowerCase().startsWith("mo"))
                     num*=60*60*24*30;
                 else if(vals[j+1].toLowerCase().startsWith("y"))
                     num*=60*60*24*365;
@@ -322,19 +322,6 @@ public class ArgsUtils
         catch(IndexOutOfBoundsException e)
         {
             return new String[]{args, ""};
-        }
-    }
-
-    public static String[] splitWithTime(String preArgs)
-    {
-        try
-        {
-            String[] args = preArgs.split(" \\|", 2);
-            return new String[]{args[0], String.valueOf(ArgsUtils.parseTime(args[1]))};
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            return new String[]{preArgs, ""};
         }
     }
 }
