@@ -1,0 +1,36 @@
+token: 'need i say'
+prefix: 'dev!'
+game: 'memes'
+doneEmote: 'lol'
+warnEmote: 'yo:'
+errorEmote: 'whoopsies:'
+# yeah this is just stupid but it's java so please just change `meme` as the name
+dbUrl: 'jdbc:mysql://localhost/meme?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC'
+dbUsername: 'root'
+dbPassword: ''
+# your discord id
+ownerId: 239809536012058625
+discordBotsToken: ''
+discordBotListToken: ''
+bingMapsKey: ''
+darkskyKey: ''
+giphyKey: ''
+googleKey: ''
+googleSearcherId: ''
+yandexTranslateKey: ''
+youtubeKey: ''
+botlogWebhook: 'webhook_goes_here'
+commandlogWebhook: 'likewise_lol'
+api: false
+# change as you'd like
+rootGuildId: 324354675453424564
+# empty list
+coOwnerIds:
+  -
+status: ONLINE
+botlog: true
+debug: true
+deepDebug: true
+sentryEnabled: false
+sentryDSN: ''
+audioEnabled: false
