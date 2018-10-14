@@ -12,7 +12,7 @@ EDIT: GPL 3.0 allows you to redistribute, modify and publish the source code as 
 
 Also, any changes made to any piece of code published here may be stated.
 
-EDIT: **If you are told that you are not allowed to rehost or modify the bot, do not believe that. GPL 3.0 gives you every right to do that as long as you are in compliance with it. GPL 3.0 is designed to protect the people that keep OSS in the community and use it for there own things.**
+EDIT: **If you are told that you are not allowed to rehost or modify the bot, do not believe that. GPL 3.0 gives you every right to do that as long as you are in compliance with it. GPL 3.0 is designed to protect the people that keep OSS in the community and use it for their own things.**
 
 ### Significant Changes (caution3)
 - Removed some redundant and bullshit code in StartupChecker.java which stopped users other than Artuto from being able to run and be an operator of a custom build of the bot. 10/10 Open Source. [Commit](https://github.com/caution3/Endless/commit/0897b6ddf3d7da8d21c4ad2500daad40b1aa1806)
