@@ -1,15 +1,15 @@
-token: 'need i say'
+token: 'need i say' # REQUIRED.
 prefix: 'dev!'
 game: 'memes'
 doneEmote: 'lol'
 warnEmote: 'yo:'
 errorEmote: 'whoopsies:'
 # yeah this is just stupid but it's java so please just change `meme` as the name
-dbUrl: 'jdbc:mysql://localhost/meme?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC'
-dbUsername: 'root'
-dbPassword: ''
-# your discord id
-ownerId: 239809536012058625
+dbUrl: 'jdbc:mysql://localhost/endless?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC'
+dbUsername: 'endless' # REQUIRED.
+dbPassword: '' # REQUIRED.
+# your discord id, REQUIRED.
+ownerId: 
 discordBotsToken: ''
 discordBotListToken: ''
 bingMapsKey: ''
@@ -19,10 +19,10 @@ googleKey: ''
 googleSearcherId: ''
 yandexTranslateKey: ''
 youtubeKey: ''
-botlogWebhook: 'webhook_goes_here'
-commandlogWebhook: 'likewise_lol'
+botlogWebhook: 'webhook_goes_here' # REQUIRED.
+commandlogWebhook: 'likewise_lol' # REQUIRED.
 api: false
-# change as you'd like
+# change rootGuildId as you'd like, usually REQUIRED.
 rootGuildId: 324354675453424564
 # empty list
 coOwnerIds:
