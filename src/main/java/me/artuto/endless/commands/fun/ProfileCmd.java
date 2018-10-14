@@ -94,7 +94,7 @@ public class ProfileCmd extends EndlessCommand
         }
 
         builder.setColor(event.getMember().getColor());
-        builder.setDescription(buildProfile(event, p, user));
+        builder.setDescription(buildProfile(p));
         builder.addField("Badges", buildBadges(event, user), false);
         messageBuilder.setContent(Const.INFO+" "+event.localize("command.profile.of", user.getName()+"#"+user.getDiscriminator()));
         event.reply(messageBuilder.setEmbed(builder.build()).build());
@@ -176,7 +176,7 @@ public class ProfileCmd extends EndlessCommand
         }
     }
 
-    private String buildProfile(EndlessCommandEvent event, Profile p, User user)
+    private String buildProfile(Profile p)
     {
         StringBuilder sb = new StringBuilder();
         ((ProfileImpl)p).fields.forEach((f, v) -> {
@@ -199,6 +199,7 @@ public class ProfileCmd extends EndlessCommand
         }
         if(user.getIdLong()==Const.ARTUTO_ID || user.getIdLong()==Const.ARTUTO_ALT_ID)
             badges.append("\n_ _\n").append(Const.BOTADM).append(" ").append(event.localize("misc.dev"));
+        return badges.toString();
    }
 
     private String getField(String field)

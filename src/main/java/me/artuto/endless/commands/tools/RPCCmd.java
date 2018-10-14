@@ -28,6 +28,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.RichPresence;
+import net.dv8tion.jda.core.entities.User;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -53,19 +54,14 @@ public class RPCCmd extends EndlessCommand
     @Override
     protected void executeCommand(EndlessCommandEvent event)
     {
-        Member member;
-        if(event.getArgs().isEmpty())
-            member = event.getMember();
-        else
-            member = ArgsUtils.findMember(event, event.getArgs());
-
+        Member member = event.getArgs().isEmpty()?event.getMember():ArgsUtils.findMember(event, event.getArgs());
         if(member==null)
             return;
 
         Game game = member.getGame();
         if(game==null)
         {
-            event.replyWarning("This member is not playing anything!");
+            event.replyWarning("command.rpc.notPlaying");
             return;
         }
 
@@ -73,26 +69,32 @@ public class RPCCmd extends EndlessCommand
         MessageBuilder mb = new MessageBuilder();
         StringBuilder sb = new StringBuilder();
 
-        sb.append(Const.LINE_START).append(" Name: **").append(game.getName()).append("**");
+        sb.append(Const.LINE_START).append(" **").append(event.localize("command.rpc.name")).append(": **").append(game.getName()).append("**");
         if(!(game.getUrl()==null))
-            sb.append("\n").append(Const.LINE_START).append("Link: **").append("[").append(game.getUrl()).append("](Link)**");
+        {
+            sb.append("\n").append(Const.LINE_START).append(" **").append(event.localize("command.rpc.link")).append(": **[").append(game.getName())
+                    .append("](").append(game.getUrl()).append(")**");
+        }
 
         if(game.isRich())
         {
             RichPresence rpc = game.asRichPresence();
-            sb.append("\n").append(Const.LINE_START).append(" Details: **").append(rpc.getDetails()).append("**\n")
-                    .append(Const.LINE_START).append(" State: **").append(rpc.getState()).append("**");
+            sb.append("\n").append(Const.LINE_START).append(" **").append(event.localize("command.rpc.details")).append(": **")
+                    .append(rpc.getDetails()).append("**\n")
+                    .append(Const.LINE_START).append(" **").append(event.localize("command.rpc.state")).append(": **").append(rpc.getState()).append("**");
             if(!(rpc.getTimestamps()==null))
             {
                 RichPresence.Timestamps timestamps = rpc.getTimestamps();
                 if(!(timestamps.getStartTime()==null))
                 {
-                    sb.append("\n").append(Const.LINE_START).append(" Start Time: **").append(OffsetDateTime.ofInstant(timestamps.getStartTime(),
+                    sb.append("\n").append(Const.LINE_START).append(" **").append(event.localize("command.rpc.startTime"))
+                            .append(": **").append(OffsetDateTime.ofInstant(timestamps.getStartTime(),
                             ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**");
                 }
                 if(!(timestamps.getEndTime()==null))
                 {
-                    sb.append("\n").append(Const.LINE_START).append(" End Time: **").append(OffsetDateTime.ofInstant(timestamps.getEndTime(),
+                    sb.append("\n").append(Const.LINE_START).append(" **").append(event.localize("command.rpc.endTime"))
+                            .append(": **").append(OffsetDateTime.ofInstant(timestamps.getEndTime(),
                             ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**");
                 }
             }
@@ -101,7 +103,8 @@ public class RPCCmd extends EndlessCommand
         }
 
         builder.setDescription(sb).setColor(member.getColor());
-        event.reply(mb.setContent(event.getClient().getSuccess()+" Info about the game of **"+member.getUser().getName()+"**#**"
-                +member.getUser().getDiscriminator()+"**").setEmbed(builder.build()).build());
+        User user = member.getUser();
+        event.reply(mb.setContent(event.getClient().getSuccess()+" "+event.localize("command.rpc.title",
+                user.getName()+"#"+user.getDiscriminator())).setEmbed(builder.build()).build());
     }
 }

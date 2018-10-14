@@ -17,21 +17,19 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.ChecksUtil;
-import me.artuto.endless.utils.FormatUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -57,40 +55,23 @@ public class QuoteCmd extends EndlessCommand
     {
         TextChannel tc;
         String message;
-        String textChannel;
 
         String[] args = ArgsUtils.split(2, event.getArgs());
         message = args[0].trim();
-        if(args[1].isEmpty())
-            textChannel = event.getTextChannel().getId();
-        else
-            textChannel = args[1];
+        tc = args[1].isEmpty()?event.getTextChannel():ArgsUtils.findTextChannel(true, event, args[1]);
+        if(tc==null)
+            return;
 
-        List<TextChannel> tList = FinderUtil.findTextChannels(textChannel, event.getJDA());
-
-        if(tList.isEmpty())
+        Member selfm = tc.getGuild().getSelfMember();
+        if(!(ChecksUtil.hasPermission(selfm, tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
         {
-            event.replyWarning("I was not able to found a text channel with the provided arguments: '"+event.getArgs()+"'");
+            event.replyError("core.error.cantSee.bot");
             return;
         }
-        else if(tList.size()>1)
+        Member m = tc.getGuild().getMember(event.getAuthor());
+        if(!(m==null) && !(ChecksUtil.hasPermission(m, tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
         {
-            event.replyWarning(FormatUtil.listOfTcChannels(tList, event.getArgs()));
-            return;
-        }
-        else
-            tc = tList.get(0);
-
-        if(!(ChecksUtil.hasPermission(tc.getGuild().getMember(event.getSelfUser()), tc, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
-        {
-            event.replyError("I can't see that channel or I don't have Read Message History permission on it!");
-            return;
-        }
-
-        if(!(tc.getGuild().getMember(event.getAuthor())==null) && !(ChecksUtil.hasPermission(tc.getGuild().getMember(event.getAuthor()), tc,
-                Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY)))
-        {
-            event.replyError("You can't see that channel or you don't have Read Message History permission on it!");
+            event.replyError("core.error.cantSee.executor");
             return;
         }
 
@@ -98,14 +79,14 @@ public class QuoteCmd extends EndlessCommand
         try {id = Long.parseLong(message);}
         catch(NumberFormatException ignored)
         {
-            event.replyError("The message ID you provided is not a valid ID!");
+            event.replyError("command.quote.invalidId");
             return;
         }
 
         tc.getMessageById(id).queue(msg -> {
             if(msg.getContentRaw().isEmpty() && msg.getAttachments().isEmpty())
             {
-                event.replyWarning("The given message has no content.");
+                event.replyWarning("command.quote.empty");
                 return;
             }
             
@@ -134,10 +115,11 @@ public class QuoteCmd extends EndlessCommand
             builder.setAuthor(author.getName()+"#"+author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
             builder.setColor(tc.getGuild().getMember(author)==null?null:tc.getGuild().getMember(author).getColor());
             builder.setDescription(sb.toString());
-            builder.addField("Jump URL:", "[Message]("+msg.getJumpUrl()+")", false);
-            builder.setFooter((msg.isEdited()?"Edited":"Sent")+" in #"+tc.getName(), null);
+            builder.addField(event.localize("command.quote.jump"), "["+event.localize("misc.msg")+"]("+msg.getJumpUrl()+")", false);
+            builder.setFooter((msg.isEdited()?event.localize("command.quote.edited"):event.localize("command.quote.sent"))+
+                    " #"+tc.getName(), null);
             builder.setTimestamp(msg.isEdited()?msg.getEditedTime():msg.getCreationTime());
             event.reply(builder.build());
-        }, e -> event.replyWarning("I couldn't find the message `"+id+"` in "+tc.getAsMention()+"!"));
+        }, e -> event.replyWarning("command.quote.error", id, tc.getAsMention()));
     }
 }

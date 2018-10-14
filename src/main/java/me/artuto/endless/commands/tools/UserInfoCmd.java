@@ -17,14 +17,12 @@
 
 package me.artuto.endless.commands.tools;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import me.artuto.endless.Const;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
+import me.artuto.endless.utils.ArgsUtils;
 import me.artuto.endless.utils.FormatUtil;
-import me.artuto.endless.utils.MiscUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
@@ -63,19 +61,12 @@ public class UserInfoCmd extends EndlessCommand
         StringBuilder sb = new StringBuilder();
 
         Member member;
-        User user;
-
-        if(event.getArgs().isEmpty())
-            user = event.getAuthor();
-        else
-        {
-            user = searchUser(event);
-            if(user==null)
-                return;
-        }
+        User user = event.getArgs().isEmpty()?event.getAuthor():ArgsUtils.findUser(false, event, event.getArgs());
+        if(user==null)
+            return;
 
         Game game = user.getMutualGuilds().get(0).getMember(user).getGame();
-        String status = getStatus(user.getMutualGuilds().get(0).getMember(user).getOnlineStatus());
+        String status = getStatus(event, user.getMutualGuilds().get(0).getMember(user).getOnlineStatus());
         String statusEmote = getStatusEmote(user.getMutualGuilds().get(0).getMember(user));
         String gameName;
 
@@ -87,9 +78,10 @@ public class UserInfoCmd extends EndlessCommand
             if(member==null)
                 member = user.getMutualGuilds().get(0).getMember(user);
             game = member.getGame();
-            status = getStatus(member.getOnlineStatus());
+            status = getStatus(event, member.getOnlineStatus());
             statusEmote = getStatusEmote(member);
-            sb.append(Const.LINE_START).append(" Status: ").append(statusEmote).append(" **").append(status).append("**");
+            sb.append(Const.LINE_START).append(" ").append(event.localize("command.user.status")).append(": ").append(statusEmote)
+                    .append(" **").append(status).append("**");
             if(!(game==null))
             {
                 if(game.getUrl()==null)
@@ -97,22 +89,25 @@ public class UserInfoCmd extends EndlessCommand
                 else
                     gameName = "*("+game.getUrl()+")["+game.getUrl()+"]*";
                 
-                sb.append(" (").append(getGame(game.getType().getKey())).append(" ").append(gameName).append(")");
+                sb.append(" (").append(getGame(event, game.getType().getKey())).append(" ").append(gameName).append(")");
             }
             sb.append("\n");
 
             if(!(event.getGuild().getMember(user)==null))
             {
                 if(!(member.getNickname()==null))
-                    sb.append(Const.LINE_START).append(" Nickname: **").append(member.getNickname()).append("**\n");
+                {
+                    sb.append(Const.LINE_START).append(" ").append(event.localize("command.user.nick")).append(": **")
+                            .append(member.getNickname()).append("**\n");
+                }
                 String roles = member.getRoles().isEmpty()?"":member.getRoles().stream().map(IMentionable::getAsMention)
                         .collect(Collectors.joining(", "));
                 if(!(roles.isEmpty()))
-                    sb.append(Const.LINE_START).append(" Roles: ").append(roles).append("\n");
-                sb.append(Const.LINE_START).append(" Guild Join Date: **").append(member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME))
-                        .append("**\n");
-                sb.append(Const.LINE_START).append(" Account Creation Date: **").append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
-                        .append("**\n");
+                    sb.append(Const.LINE_START).append(" ").append(event.localize("command.user.roles")).append(": **").append(roles).append("\n");
+                sb.append(Const.LINE_START).append(" ").append(event.localize("command.user.joinDate")).append(": **")
+                        .append(member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
+                sb.append(Const.LINE_START).append(" ").append(event.localize("command.user.creationDate")).append(": **")
+                        .append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
 
                 StringBuilder strjoins;
                 List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
@@ -138,16 +133,18 @@ public class UserInfoCmd extends EndlessCommand
 
                     strjoins.append(" > ").append(name);
                 }
-                sb.append(Const.LINE_START).append(" Join Order: ").append("`(#").append(joinnumber+1).append(")` ").append(strjoins).append("\n");
+                sb.append(Const.LINE_START).append(" ").append(event.localize("command.user.joinOrder")).append(": ").append("`(#")
+                    .append(joinnumber+1).append(")` ").append(strjoins).append("\n");
                 builder.setColor(member.getColor());
             }
             else
-                sb.append(Const.LINE_START).append(" Account Creation Date: **").append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
-                        .append("**\n");
+                sb.append(Const.LINE_START).append(" ").append(event.localize("command.user.creationDate")).append(": **")
+                        .append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
         }
         else
         {
-            sb.append(Const.LINE_START).append(" Status: ").append(statusEmote).append(" **").append(status).append("**");
+            sb.append(Const.LINE_START).append(" ").append(event.localize("command.user.status")).append(": ")
+                    .append(statusEmote).append(" **").append(status).append("**");
             if(!(game==null))
             {
                 if(game.getUrl()==null)
@@ -155,34 +152,34 @@ public class UserInfoCmd extends EndlessCommand
                 else
                     gameName = "*("+game.getUrl()+")["+game.getUrl()+"]*";
                 
-                sb.append(" (").append(getGame(game.getType().getKey())).append(" ").append(gameName).append(")");
+                sb.append(" (").append(getGame(event, game.getType().getKey())).append(" ").append(gameName).append(")");
             }
             sb.append("\n");
-            sb.append(Const.LINE_START).append(" Account Creation Date: **").append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
-                    .append("**\n");
+            sb.append(Const.LINE_START).append(" ").append(event.localize("command.user.creationDate")).append(": **")
+                    .append(user.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("**\n");
         }
 
-        builder.setDescription(sb).setThumbnail(MiscUtils.getImageUrl("png", null, user.getEffectiveAvatarUrl()));
+        builder.setDescription(sb).setThumbnail(user.getEffectiveAvatarUrl());
         boolean nitro = !(user.getAvatarId()==null) && user.getAvatarId().startsWith("a_");
-        String title = FormatUtil.sanitize((user.isBot()?Const.BOT:Const.PEOPLE)+" Information about **"+user.getName()+"**#**"+user.getDiscriminator()+"** "
-                +(nitro?Const.NITRO:""));
+        String title = FormatUtil.sanitize(event.localize("command.user.title", user.isBot()?Const.BOT:Const.PEOPLE,
+                user.getName()+"**#**"+user.getDiscriminator(), (nitro?Const.NITRO+":":":")));
         event.reply(mb.setContent(title).setEmbed(builder.build()).build());
     }
 
-    private String getGame(int type)
+    private String getGame(EndlessCommandEvent event, int type)
     {
         switch(type)
         {
             case 0:
-                return "Playing";
+                return event.localize("misc.playing");
             case 1:
-                return "Streaming";
+                return event.localize("misc.streaming");
             case 2:
-                return "Listening";
+                return event.localize("misc.listening");
             case 3:
-                return "Watching";
+                return event.localize("misc.watching");
             default:
-                return "Playing";
+                return event.localize("misc.playing");
         }
     }
 
@@ -206,70 +203,20 @@ public class UserInfoCmd extends EndlessCommand
         }
     }
 
-    private String getStatus(OnlineStatus status)
+    private String getStatus(EndlessCommandEvent event, OnlineStatus status)
     {
         switch(status)
         {
             case ONLINE:
-                return "Online";
+                return event.localize("misc.online");
             case IDLE:
-                return "Idle";
+                return event.localize("misc.idle");
             case DO_NOT_DISTURB:
-                return "Do Not Disturb";
+                return event.localize("misc.dnd");
             case OFFLINE:
-                return "Offline";
+                return event.localize("misc.offline");
             default:
-                return "Invisible";
-        }
-    }
-
-    private User searchUser(CommandEvent event)
-    {
-        if(event.isFromType(ChannelType.TEXT))
-        {
-            List<Member> members = FinderUtil.findMembers(event.getArgs(), event.getGuild());
-
-            if(members.isEmpty())
-            {
-                List<User> users = FinderUtil.findUsers(event.getArgs(), event.getJDA());
-
-                if(users.isEmpty())
-                {
-                    event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
-                    return null;
-                }
-                else if(users.size()>1)
-                {
-                    event.replyWarning(FormatUtil.listOfUsers(users, event.getArgs()));
-                    return null;
-                }
-                else
-                    return users.get(0);
-            }
-            else if(members.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfMembers(members, event.getArgs()));
-                return null;
-            }
-            else
-                return members.get(0).getUser();
-        }
-        else
-        {
-            List<User> users = FinderUtil.findUsers(event.getArgs(), event.getJDA());
-
-            if(users.isEmpty())
-            {
-                event.replyWarning("I was not able to found a user with the provided arguments: '"+event.getArgs()+"'");
-                return null;
-            }
-            else if(users.size()>1)
-            {
-                event.replyWarning(FormatUtil.listOfUsers(users, event.getArgs()));
-                return null;
-            }
-            else
-                return users.get(0);
+                return event.localize("misc.invisible");
         }
     }
 }

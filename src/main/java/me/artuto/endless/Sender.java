@@ -18,8 +18,10 @@
 package me.artuto.endless;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import me.artuto.endless.commands.EndlessCommandEvent;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,6 +41,11 @@ public class Sender
     public static void sendFile(MessageChannel chan, File file, Message message, Consumer<Message> success)
     {
         chan.sendFile(file, message).queue(success);
+    }
+
+    public static void sendHelp(EndlessCommandEvent event, MessageEmbed embed)
+    {
+        event.replyInDm(embed, s -> event.reactSuccess(), e -> event.replyWarning("core.error.dm.help"));
     }
 
     public static void sendMessage(MessageChannel chan, Message message, Consumer<Message> success)

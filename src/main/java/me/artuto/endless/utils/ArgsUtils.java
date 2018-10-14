@@ -23,7 +23,7 @@ import me.artuto.endless.commands.EndlessCommandEvent;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -157,13 +157,26 @@ public class ArgsUtils
             return list.get(0);
     }
 
-    public static TextChannel findTextChannel(CommandEvent event, String query)
+    public static TextChannel findTextChannel(boolean jda, EndlessCommandEvent event, String query)
     {
         List<TextChannel> list = FinderUtil.findTextChannels(query, event.getGuild());
         if(list.isEmpty())
         {
-            event.replyWarning("No Text Channels found matching \""+query+"\"");
-            return null;
+            if(jda)
+                list = FinderUtil.findTextChannels(query, event.getJDA());
+
+            if(list.isEmpty())
+            {
+                event.replyWarning("No Text Channels found matching \""+query+"\"");
+                return null;
+            }
+            else if(list.size()>1)
+            {
+                event.replyWarning(FormatUtil.listOfTcChannels(list, query));
+                return null;
+            }
+            else
+                return list.get(0);
         }
         else if(list.size()>1)
         {
@@ -172,6 +185,11 @@ public class ArgsUtils
         }
         else
             return list.get(0);
+    }
+
+    public static TextChannel findTextChannel(EndlessCommandEvent event, String query)
+    {
+        return findTextChannel(false, event, query);
     }
 
     public static Role findRole(EndlessCommandEvent event, String query)
@@ -323,5 +341,42 @@ public class ArgsUtils
         {
             return new String[]{args, ""};
         }
+    }
+
+    public static Map<String, String> parseArgs(String[] flags, String[] args)
+    {
+        String currentFlag = null;
+        Map<String, String> output = new HashMap<>();
+
+        for(String w : args)
+        {
+            if(w.startsWith("-"))
+            {
+                if(w.length()>1)
+                {
+                    String flag = Arrays.stream(flags).filter(f -> f.equalsIgnoreCase(w.substring(1, 2))).findFirst().orElse(null);
+                    if(!(flag==null))
+                    {
+                        currentFlag = flag;
+                        output.put(flag, w.replace(w, "").trim());
+                    }
+                }
+            }
+            else
+            {
+                if(currentFlag==null)
+                {
+                    String title = output.getOrDefault("title", "");
+                    output.put("title", (title+" "+w).trim());
+                }
+                else
+                {
+                    String value = output.get(currentFlag);
+                    output.put(currentFlag, (value+" "+w).trim());
+                }
+            }
+        }
+
+        return output;
     }
 }

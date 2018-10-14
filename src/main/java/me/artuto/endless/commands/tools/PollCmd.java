@@ -19,29 +19,23 @@ package me.artuto.endless.commands.tools;
 
 import com.vdurmont.emoji.EmojiParser;
 import me.artuto.endless.Bot;
+import me.artuto.endless.Sender;
 import me.artuto.endless.commands.EndlessCommand;
 import me.artuto.endless.commands.EndlessCommandEvent;
 import me.artuto.endless.commands.cmddata.Categories;
 import me.artuto.endless.utils.ArgsUtils;
-import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.Message;
-import picocli.CommandLine;
 
 import java.awt.*;
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * @author Artuto
@@ -50,7 +44,7 @@ import java.util.stream.Collectors;
 public class PollCmd extends EndlessCommand
 {
     private final Bot bot;
-    private final Pattern ARGS_PATTERN = Pattern.compile("(?:--\\S+ |-\\S ?)(.*?)(?=$| -)");
+    private final String[] FLAGS = {"c", "d", "e", "t"};
 
     public PollCmd(Bot bot)
     {
@@ -71,20 +65,7 @@ public class PollCmd extends EndlessCommand
             return;
         }
 
-
-        if(true)
-        {
-            ParsedArgs pa = new ParsedArgs(event);
-            CommandLine cli = new CommandLine(pa);
-            cli.parse(event.getArgs().split("\\s+"));
-
-            event.reply(false, "title: `"+String.join(" ", pa.title)+"`\n" +
-                    "descrp: `"+pa.description+"`\n" +
-                    "color: `"+pa.rawColor+"`\n" +
-                    "emotes: `"+pa.rawEmotes+"`");
-            return;
-        }
-
+        ParsedArgs pa = new ParsedArgs(event);
         EmbedBuilder builder = new EmbedBuilder();
 
         if(event.getArgs().equalsIgnoreCase("flags"))
@@ -93,103 +74,51 @@ public class PollCmd extends EndlessCommand
             builder.setDescription("`-t` - Sets how long the poll will be.\n" +
                     "`-e` - Emotes to apply to the poll.\n" +
                     "`-d` - Sets the description of the poll.\n" +
-                    "`-c` - The color of the poll.\n");
+                    "`-c` - The color of the poll.\n\n" +
+                    ":warning: REMEMBER TO PUT A SPACE AFTER AN OPTION!!! :warning:\n" +
+                    "For example `-t 24h`");
             builder.setColor(Color.YELLOW);
-            event.replyInDm(builder.build(), s -> event.reactSuccess(),
-                    e -> event.replyWarning("Help cannot be sent because you are blocking Drect Messages."));
+            Sender.sendHelp(event, builder.build());
+            return;
         }
-        else
+
+        String title = pa.title;
+        String description = pa.description;
+        Color color = pa.color;
+        OffsetDateTime endTime = pa.time;
+        if(title==null)
         {
-            Color color;
-            int time;
-            List<Emote> emotes = event.getMessage().getEmotes().stream().filter(e -> !(e.isFake()))
-                    .collect(Collectors.toList());
-            String[] args = splitArgs(event.getArgs());
-            if(args[0].isEmpty())
-            {
-                event.replyWarning("I could not determine a question for the poll!");
-                return;
-            }
-            color = getColor(args[1]);
-            time = ArgsUtils.parseTime(args[3]);
-            int minutes = time/60;
-            Instant endTime = Instant.now().plus(minutes, ChronoUnit.MINUTES);
-            if(time<0)
-            {
-                event.replyError("The time cannot be negative!");
-                return;
-            }
+            event.replyError("command.poll.noQuestion");
+            return;
+        }
 
-            builder.setTitle(args[0]);
-            builder.setColor(color==null?event.getMember().getColor():color);
-            if(!(args[2].isEmpty()))
-                builder.setDescription(args[2]);
-            builder.setFooter("This poll will expire", event.getAuthor().getEffectiveAvatarUrl());
-            builder.setTimestamp(endTime);
-            event.getTextChannel().sendMessage(builder.build()).queue(msg -> {
-                bot.pldm.createPoll(endTime.toEpochMilli(), event.getGuild().getIdLong(),
-                        msg.getIdLong(), event.getTextChannel().getIdLong());
-
-                if(emotes.isEmpty())
-                {
-                    msg.addReaction("\uD83D\uDC4D").queue();
-                    msg.addReaction("\uD83D\uDC4E").queue();
-                }
+        builder.setTitle(title);
+        builder.setColor(color==null?event.getMember().getColor():color);
+        builder.setDescription(description==null?"\n":description);
+        builder.setFooter(event.localize("command.poll.expireIn"), event.getAuthor().getEffectiveAvatarUrl());
+        builder.setTimestamp(endTime);
+        event.getTextChannel().sendMessage(builder.build()).queue(msg -> {
+            bot.pldm.createPoll(endTime.toInstant().toEpochMilli(), event.getGuild().getIdLong(), msg.getIdLong(), event.getTextChannel().getIdLong());
+            pa.emotes.forEach(str -> {
+                long id = 0L;
+                try {id = Long.parseLong(str);}
+                catch(NumberFormatException ignored) {}
+                Emote e = event.getJDA().asBot().getShardManager().getEmoteById(id);
+                if(e==null)
+                    msg.addReaction(str).queue();
                 else
-                    emotes.forEach(e -> msg.addReaction(e).queue());
+                    msg.addReaction(e).queue();
             });
-        }
-    }
-
-    private Color getColor(String color)
-    {
-        try
-        {
-            if(!(color.startsWith("#")))
-                color = "#"+color;
-            return Color.decode(color);
-        }
-        catch(NumberFormatException ignored) {return null;}
-    }
-
-    private String[] splitArgs(String preArgs)
-    {
-        String[] args = preArgs.split(" \\| ");
-        String color = "";
-        String description = "";
-        String emotes = "";
-        String time = "10s";
-        String question = "";
-
-        for(String part : args)
-        {
-            if(!(part.startsWith("-")))
-                question = part;
-            else if(part.startsWith("-c"))
-                color = part.replace("-c ", "");
-            else if(part.startsWith("-d"))
-                description = part.replace("-d ", "");
-            else if(part.startsWith("-e"))
-                emotes = part.replace("-e ", "");
-            else if(part.startsWith("-t"))
-                time = part.replaceAll("-t ", "");
-        }
-
-        return new String[]{question.trim(), color.trim(), description.trim(), time.trim(), emotes.trim()};
+        });
     }
 
     private class ParsedArgs
     {
-        @CommandLine.Parameters()
-        public String[] title;
-        @CommandLine.Option(names = {"-d", "--description"})
-        public String description = null;
-        @CommandLine.Option(names = {"-c", "--color"})
-        public String rawColor = null;
-        @CommandLine.Option(names = {"-t", "--time"})
-        public String rawTime;
-        @CommandLine.Option(names = {"-e", "--emotes", "--emojis"})
-        public String rawEmotes = null;
+        private String title;
+        private String description;
+        private String rawColor;
+        private String rawTime;
+        private String rawEmotes;
 
         private Color color = null;
         private OffsetDateTime time;
@@ -197,45 +126,39 @@ public class PollCmd extends EndlessCommand
 
         ParsedArgs(EndlessCommandEvent event)
         {
-            /*Matcher m = ARGS_PATTERN.matcher(args);
-            while(m.find())
+            Map<String, String> map = ArgsUtils.parseArgs(FLAGS, event.getArgs().split("\\s+"));
+            this.title = map.get("title");
+            this.description = map.get("d");
+            this.rawColor = map.getOrDefault("c", "#"+event.hashCode()); // i need a random color so...
+            this.rawTime = map.get("t");
+            this.rawEmotes = map.getOrDefault("e", "");
+
+            // parse color
+            try {this.color = Color.decode(rawColor.startsWith("#")?rawColor:"#"+rawColor);}
+            catch(NumberFormatException ignored) {}
+
+            // parse emotes/emojis
+            emotes.addAll(EmojiParser.extractEmojis(rawEmotes));
+            Pattern EMOTE = Message.MentionType.EMOTE.getPattern();
+            for(String e : rawEmotes.split("\\s+"))
             {
-                String g = m.group();
-                if(g.startsWith("-d") || g.startsWith("--description"))
-                    this.description = g.replace("-d", "").replace("--description", "");
-                else if(g.startsWith("-t") || g.startsWith("--time"))
+                Matcher m = EMOTE.matcher(e);
+                while(m.find())
                 {
-                    g = g.replace("-t", "").replace("--time", "");
-                    int parsedT = ArgsUtils.parseTime(g);
-                    if(parsedT==0)
-                        parsedT = ArgsUtils.parseTime("10m");
-
-                    this.time = OffsetDateTime.ofInstant(Instant.now().plusSeconds(parsedT), ZoneId.systemDefault());
+                    Emote em = event.getJDA().asBot().getShardManager().getEmoteById(m.group(2));
+                    if(!(em==null))
+                        emotes.add(em.getId());
                 }
-                else if(g.startsWith("-c") || g.startsWith("--color"))
-                {
-                    g = g.replace("-c", "").replace("--color", "");
-                    try {this.color = Color.decode(g.startsWith("#")?g:"#"+g);}
-                    catch(NumberFormatException ignored) {this.color = null;}
-                }
-                else if(g.startsWith("-e") || g.startsWith("--emotes"))
-                {
-                    g = g.replace("-e", "").replace("--emotes", "");
-                    List<String> emotesFound = new ArrayList<>();
-                    List<String> emojisFound = EmojiParser.extractEmojis(g);
+            }
+            if(emotes.isEmpty())
+            {
+                emotes.add("\uD83D\uDC4D");
+                emotes.add("\uD83D\uDC4E");
+            }
 
-                    Matcher emoteM = Message.MentionType.EMOTE.getPattern().matcher(g);
-                    while(emoteM.find())
-                    {
-                        Emote emote = shards.getEmoteById(emoteM.group(2));
-                        if(!(emote==null))
-                            emotesFound.add(emote.getId());
-                    }
-
-                    emotes.addAll(emotesFound);
-                    emotes.addAll(emojisFound);
-                }
-            }*/
+            // parse time
+            int t = ArgsUtils.parseTime(rawTime==null?"60s":rawTime);
+            this.time = OffsetDateTime.now().plusSeconds(t==0?60:t);
         }
     }
 }
