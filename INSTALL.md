@@ -15,6 +15,8 @@ Please make sure you have the following installed:
 1. Create a new user on the server under the name `endless`. Make sure they have the same permissions as root does.
 2. You'll need to run the SQL File in this repo called `endless.sql`, this is a set of instructions that will do the preparation work.
 3. Exit the shell, and edit the `config.yml` to the endless user, this includes placing the password in the config, this shouldn't be a problem as long as your VPS is configured properly.
+
+### Part Two: Setting up Endless
 #### Compiling Endless
 To compile Endless, go to the root directory of your cloned repo and run `mvn package`, this may take a while as Java isn't the most efficent and top speed language. If you get a message saying `BUILD SUCCESS`... **congrats!** Endless has now been compiled into a nice little folder called `target/`.
 #### Preparing the config.yml
