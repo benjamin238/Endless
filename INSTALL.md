@@ -7,7 +7,7 @@ Please make sure you have the following installed:
 - MySQL Server (mysql-server)
 - Git (git)
 - OpenJDK 11 Headless (openjdk-11-jdk-headless)
-- Modified Endless Bot Source (https://github.com/caution3/Endless/)
+- Endless Bot Source.
 *You'll want to clone from my repo, and not the official one, as the official one does not contain the files needed to setup the bot.*
 - Before starting, clone this repo into your home directory on the VPS via Git.
 #### MySQL Server Setup
@@ -65,6 +65,4 @@ A lot of the required fields should be self-explanatory. Webhooks can be created
 Use this command in the root directory of your cloned repo: `java -jar target/Endless-5.3.8-jar-with-dependencies.jar normalBoot`.
 The normalBoot argument is required, otherwise Endless **will not work.**
 
-##### Using the original Endless source?
-If so, you'll need to take extra steps and care in editing the ConfigChecker in StartupChecker.java to make it return true automatically. Otherwise, Endless will not run.
-You'll also need to check for any other scripts designed to prevent Endless from being self-hosted. Don't worry, GPL-3.0 *should* protect you in this case.
+**NOTE: SUPPORT IS NOT PROVIDED FOR INSTALLING, BUILDING OR REHOSTING ENDLESS. DO NOT ASK. DO NOT TRY. DO NOT BOTHER.**
