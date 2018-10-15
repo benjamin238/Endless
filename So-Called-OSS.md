@@ -1,4 +1,4 @@
-# The so called Open Source Software
+# So called 'Open Source' Software
 ## Prohibiting beyond GPL 3.0 and why it's unethical.
 Open Source is great. It's so great in fact, that it's underrated. We have a community developing OSS on a mass scale and it is innovating the future of software, even in proprietory environments. 
 This software model has even proved itself in business models, and companies like Red Hat have proved that OSS can be profitable and beneficial for both the seller and consumer. 
@@ -13,3 +13,5 @@ The foundations and ideas of GPL [from the GNU Site by Brett Smith](https://www.
 - the freedom to change the software to suit your needs,
 - the freedom to share the software with your friends and neighbors, and
 - the freedom to share the changes you make.
+
+#### In conclusion, if you don't want it open source or you don't plan on following the OSS license associated, don't make it open source.
