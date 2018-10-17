@@ -1,4 +1,5 @@
 # Endless (caution3 edit)
+**NOTE: The original Endless Repo as of 18th October 2018, was taken down, however, thanks to the magic of GPL, we've used our magic to keep this repo in hopes of it becoming useful... somehow.**
 
 Endless was a Discord bot originally written by Artuto in Java using [Java Discord API (JDA)](https://github.com/DV8FromTheWorld/JDA) and [JDA-Utilities](https://github.com/JDA-Applications/JDA-Utilities) "with love".
 
