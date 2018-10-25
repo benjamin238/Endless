@@ -90,7 +90,7 @@ public class DiscriminatorCmd extends EndlessCommand
 
         if(number<1 || number>9999)
         {
-            event.replyError("The discriminator must be between `0001` and `9999`!");
+            event.replyError("The discriminator must be a whole number between `0001` and `9999`!");
             return;
         }
 
